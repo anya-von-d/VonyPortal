@@ -58,10 +58,9 @@ const syncPublicProfile = async (userData) => {
 };
 
 export default function Home() {
-  const { user: authUser, isLoadingAuth, navigateToLogin } = useAuth();
+  const { user: authUser, userProfile, isLoadingAuth, navigateToLogin } = useAuth();
   const [loans, setLoans] = useState([]);
   const [payments, setPayments] = useState([]);
-  const [user, setUser] = useState(null);
   const [publicProfiles, setPublicProfiles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -69,6 +68,9 @@ export default function Home() {
   const [pendingAcceptLoan, setPendingAcceptLoan] = useState(null);
   const [isSigning, setIsSigning] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
+
+  // Use profile from context
+  const user = userProfile ? { ...userProfile, id: authUser?.id, email: authUser?.email } : null;
 
   const safeEntityCall = async (entityCall, fallback = []) => {
     try {
@@ -82,32 +84,30 @@ export default function Home() {
 
   const loadData = async () => {
     if (!authUser) {
-      setUser(null);
       setIsLoading(false);
       return;
     }
 
     setIsLoading(true);
     try {
-      // Get full user profile and data in parallel
-      const [currentUser, allLoans, recentPayments, allProfiles] = await Promise.all([
-        User.me(),
+      // Only fetch loan data - user profile comes from context
+      const [allLoans, recentPayments, allProfiles] = await Promise.all([
         safeEntityCall(() => Loan.list('-created_date')),
         safeEntityCall(() => Payment.list('-created_date', 10)),
         safeEntityCall(() => PublicProfile.list()),
       ]);
 
-      setUser(currentUser);
       setLoans(allLoans);
       setPayments(recentPayments);
       setPublicProfiles(allProfiles);
       setDataLoaded(true);
 
-      // Sync profile in background (don't await)
-      syncPublicProfile(currentUser);
+      // Sync profile in background if we have user data
+      if (userProfile) {
+        syncPublicProfile({ ...userProfile, id: authUser.id });
+      }
     } catch (error) {
       console.error("Data load error:", error);
-      setUser(null);
       setLoans([]);
       setPayments([]);
       setPublicProfiles([]);

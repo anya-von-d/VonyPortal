@@ -5,9 +5,29 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [authError, setAuthError] = useState(null);
+
+  // Fetch full profile from profiles table
+  const fetchUserProfile = async (userId) => {
+    try {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (!error && profile) {
+        setUserProfile(profile);
+        return profile;
+      }
+    } catch (e) {
+      console.log('Profile fetch error:', e);
+    }
+    return null;
+  };
 
   useEffect(() => {
     const handleAuth = async () => {
@@ -34,6 +54,7 @@ export const AuthProvider = ({ children }) => {
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!session?.user) {
         setUser(null);
+        setUserProfile(null);
         setIsAuthenticated(false);
         return;
       }
@@ -46,27 +67,36 @@ export const AuthProvider = ({ children }) => {
 
   const checkUserAuth = async () => {
     try {
-      // Now check if the user is authenticated
       setIsLoadingAuth(true);
 
-      // First try to get session (this handles the OAuth callback)
       const { data: sessionData } = await supabase.auth.getSession();
-
       const { data: authData, error } = await supabase.auth.getUser();
 
       if (error || !authData?.user) {
         setUser(null);
+        setUserProfile(null);
         setIsAuthenticated(false);
         setIsLoadingAuth(false);
         return;
       }
+
       setUser(authData.user);
       setIsAuthenticated(true);
+
+      // Fetch profile in parallel - don't block auth
+      fetchUserProfile(authData.user.id);
+
       setIsLoadingAuth(false);
     } catch (error) {
       console.error('User auth check failed:', error);
       setIsLoadingAuth(false);
       setIsAuthenticated(false);
+    }
+  };
+
+  const refreshProfile = async () => {
+    if (user?.id) {
+      await fetchUserProfile(user.id);
     }
   };
 
@@ -90,14 +120,16 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      isAuthenticated, 
+    <AuthContext.Provider value={{
+      user,
+      userProfile,
+      isAuthenticated,
       isLoadingAuth,
       authError,
       logout,
       navigateToLogin,
-      checkUserAuth
+      checkUserAuth,
+      refreshProfile
     }}>
       {children}
     </AuthContext.Provider>
