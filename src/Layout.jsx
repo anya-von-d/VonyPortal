@@ -72,17 +72,22 @@ export default function Layout({ children }) {
   const { user: authUser, isLoadingAuth } = useAuth();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [profileFetched, setProfileFetched] = useState(false);
 
   // Fetch full profile only when needed (for theme preference)
-  const fetchUserProfile = async () => {
+  const fetchUserProfile = async (force = false) => {
     if (!authUser) {
       setUser(null);
       setIsLoading(false);
       return;
     }
+    if (profileFetched && !force) {
+      return;
+    }
     try {
       const currentUser = await AppUser.me();
       setUser(currentUser);
+      setProfileFetched(true);
     } catch (e) {
       console.log("User not authenticated or network error");
       setUser(null);
@@ -92,20 +97,22 @@ export default function Layout({ children }) {
   };
 
   useEffect(() => {
-    if (!isLoadingAuth) {
+    if (!isLoadingAuth && authUser && !profileFetched) {
       fetchUserProfile();
+    } else if (!isLoadingAuth && !authUser) {
+      setIsLoading(false);
     }
 
     // Listen for theme changes from Profile page
     const handleThemeChange = () => {
-      fetchUserProfile();
+      fetchUserProfile(true); // Force refresh on theme change
     };
     window.addEventListener('themeChanged', handleThemeChange);
 
     return () => {
       window.removeEventListener('themeChanged', handleThemeChange);
     };
-  }, [isLoadingAuth, authUser]);
+  }, [isLoadingAuth]);
 
   // Use user preference or default to morning
   const theme = user?.theme_preference || 'morning';

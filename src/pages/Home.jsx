@@ -68,6 +68,7 @@ export default function Home() {
   const [showSignatureModal, setShowSignatureModal] = useState(false);
   const [pendingAcceptLoan, setPendingAcceptLoan] = useState(null);
   const [isSigning, setIsSigning] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   const safeEntityCall = async (entityCall, fallback = []) => {
     try {
@@ -100,6 +101,7 @@ export default function Home() {
       setLoans(allLoans);
       setPayments(recentPayments);
       setPublicProfiles(allProfiles);
+      setDataLoaded(true);
 
       // Sync profile in background (don't await)
       syncPublicProfile(currentUser);
@@ -114,10 +116,13 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (!isLoadingAuth) {
+    // Only load data once when auth is ready and we haven't loaded yet
+    if (!isLoadingAuth && !dataLoaded && authUser) {
       loadData();
+    } else if (!isLoadingAuth && !authUser) {
+      setIsLoading(false);
     }
-  }, [isLoadingAuth, authUser]);
+  }, [isLoadingAuth]);
 
   const handleLogin = async () => {
     setIsAuthenticating(true);
