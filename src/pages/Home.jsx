@@ -219,7 +219,7 @@ export default function Home() {
               <h1 className="text-3xl font-bold text-slate-800 mb-2 tracking-tight">
                 Welcome to <span style={{color: `rgb(var(--theme-primary))`}}>Vony</span>
               </h1>
-              <p className="text-slate-600 mb-6 leading-relaxed">
+              <p className="mb-6 leading-relaxed" style={{ color: '#475569' }}>
                 Your trusted platform for managing personal loans.
               </p>
               <Button
@@ -290,7 +290,7 @@ export default function Home() {
                   return <>{greeting}, <span style={{color: `rgb(var(--theme-primary))`}}>{user.full_name?.split(' ')[0] || 'User'}</span> {emoji}</>;
                 })()}
               </h1>
-              <p className="text-lg text-slate-600 text-center">
+              <p className="text-lg text-center" style={{ color: '#475569' }}>
                 Your trusted platform for managing personal loans. Connect, lend, and borrow with confidence.
               </p>
           </motion.div>
