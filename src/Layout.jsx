@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { User as AppUser } from "@/entities/all";
+import { useAuth } from "@/lib/AuthContext";
 import TopNav from "@/components/TopNav";
 import { 
   Home, 
@@ -68,10 +69,17 @@ const navigationItems = [
 
 export default function Layout({ children }) {
   const location = useLocation();
+  const { user: authUser, isLoadingAuth } = useAuth();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchUser = async () => {
+  // Fetch full profile only when needed (for theme preference)
+  const fetchUserProfile = async () => {
+    if (!authUser) {
+      setUser(null);
+      setIsLoading(false);
+      return;
+    }
     try {
       const currentUser = await AppUser.me();
       setUser(currentUser);
@@ -84,19 +92,20 @@ export default function Layout({ children }) {
   };
 
   useEffect(() => {
-    // Fetch on mount
-    fetchUser();
+    if (!isLoadingAuth) {
+      fetchUserProfile();
+    }
 
     // Listen for theme changes from Profile page
     const handleThemeChange = () => {
-      fetchUser();
+      fetchUserProfile();
     };
     window.addEventListener('themeChanged', handleThemeChange);
 
     return () => {
       window.removeEventListener('themeChanged', handleThemeChange);
     };
-  }, []);
+  }, [isLoadingAuth, authUser]);
 
   // Use user preference or default to morning
   const theme = user?.theme_preference || 'morning';

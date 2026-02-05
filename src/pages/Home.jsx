@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Loan, LoanAgreement, Payment, User, PublicProfile } from "@/entities/all";
-      import SignatureModal from "@/components/loans/SignatureModal";
-      import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-      import { Button } from "@/components/ui/button";
-      import { Link } from "react-router-dom";
-      import { createPageUrl } from "@/utils";
-      import { toast } from "sonner";
+import { useAuth } from "@/lib/AuthContext";
+import SignatureModal from "@/components/loans/SignatureModal";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { toast } from "sonner";
 import {
   DollarSign,
   TrendingUp,
@@ -57,6 +58,7 @@ const syncPublicProfile = async (userData) => {
 };
 
 export default function Home() {
+  const { user: authUser, isLoadingAuth, navigateToLogin } = useAuth();
   const [loans, setLoans] = useState([]);
   const [payments, setPayments] = useState([]);
   const [user, setUser] = useState(null);
@@ -66,10 +68,6 @@ export default function Home() {
   const [showSignatureModal, setShowSignatureModal] = useState(false);
   const [pendingAcceptLoan, setPendingAcceptLoan] = useState(null);
   const [isSigning, setIsSigning] = useState(false);
-
-  useEffect(() => {
-    loadData();
-  }, []);
 
   const safeEntityCall = async (entityCall, fallback = []) => {
     try {
@@ -82,21 +80,31 @@ export default function Home() {
   };
 
   const loadData = async () => {
+    if (!authUser) {
+      setUser(null);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const currentUser = await User.me();
-      setUser(currentUser);
-      await syncPublicProfile(currentUser);
-      const [allLoans, recentPayments, allProfiles] = await Promise.all([
+      // Get full user profile and data in parallel
+      const [currentUser, allLoans, recentPayments, allProfiles] = await Promise.all([
+        User.me(),
         safeEntityCall(() => Loan.list('-created_date')),
         safeEntityCall(() => Payment.list('-created_date', 10)),
         safeEntityCall(() => PublicProfile.list()),
       ]);
+
+      setUser(currentUser);
       setLoans(allLoans);
       setPayments(recentPayments);
       setPublicProfiles(allProfiles);
+
+      // Sync profile in background (don't await)
+      syncPublicProfile(currentUser);
     } catch (error) {
-      console.error("User not authenticated or data load error:", error);
+      console.error("Data load error:", error);
       setUser(null);
       setLoans([]);
       setPayments([]);
@@ -105,15 +113,20 @@ export default function Home() {
     setIsLoading(false);
   };
 
+  useEffect(() => {
+    if (!isLoadingAuth) {
+      loadData();
+    }
+  }, [isLoadingAuth, authUser]);
+
   const handleLogin = async () => {
     setIsAuthenticating(true);
     try {
-      await User.loginWithGoogle();
-      await loadData();
+      navigateToLogin();
     } catch (error) {
       console.error("Login failed:", error);
+      setIsAuthenticating(false);
     }
-    setIsAuthenticating(false);
   };
 
   const handleAcceptOffer = async (loanId) => {

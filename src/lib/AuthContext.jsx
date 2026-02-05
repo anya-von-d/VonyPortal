@@ -80,9 +80,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   const navigateToLogin = () => {
+    // Use production URL for OAuth redirect (works for both web and mobile)
+    const redirectUrl = 'https://lend-with-vony.com';
+
     supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin }
+      options: { redirectTo: redirectUrl }
     });
   };
 
