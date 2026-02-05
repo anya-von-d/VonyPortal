@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 
 const AuthContext = createContext();
@@ -9,6 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [authError, setAuthError] = useState(null);
+  const authCheckInProgress = useRef(false);
 
   // Fetch full profile from profiles table
   const fetchUserProfile = async (userId) => {
@@ -29,70 +30,80 @@ export const AuthProvider = ({ children }) => {
     return null;
   };
 
-  useEffect(() => {
-    const handleAuth = async () => {
-      // Check for tokens in URL hash (OAuth callback)
-      const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      const accessToken = hashParams.get('access_token');
-      const refreshToken = hashParams.get('refresh_token');
+  const checkUserAuth = async () => {
+    // Prevent duplicate auth checks
+    if (authCheckInProgress.current) return;
+    authCheckInProgress.current = true;
 
-      if (accessToken && refreshToken) {
-        // Manually set the session from URL params
-        await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken
-        });
-        // Clear the hash from URL after setting session
-        window.history.replaceState(null, '', window.location.pathname);
-      }
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
 
-      await checkUserAuth();
-    };
-
-    handleAuth();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!session?.user) {
         setUser(null);
         setUserProfile(null);
         setIsAuthenticated(false);
-        return;
-      }
-      await checkUserAuth();
-    });
-    return () => {
-      authListener?.subscription?.unsubscribe();
-    };
-  }, []);
-
-  const checkUserAuth = async () => {
-    try {
-      setIsLoadingAuth(true);
-
-      const { data: sessionData } = await supabase.auth.getSession();
-      const { data: authData, error } = await supabase.auth.getUser();
-
-      if (error || !authData?.user) {
-        setUser(null);
-        setUserProfile(null);
-        setIsAuthenticated(false);
         setIsLoadingAuth(false);
+        authCheckInProgress.current = false;
         return;
       }
 
-      setUser(authData.user);
+      setUser(session.user);
       setIsAuthenticated(true);
-
-      // Fetch profile in parallel - don't block auth
-      fetchUserProfile(authData.user.id);
-
       setIsLoadingAuth(false);
+
+      // Fetch profile in background
+      fetchUserProfile(session.user.id);
     } catch (error) {
       console.error('User auth check failed:', error);
       setIsLoadingAuth(false);
       setIsAuthenticated(false);
     }
+    authCheckInProgress.current = false;
   };
+
+  useEffect(() => {
+    // Handle OAuth callback tokens in URL
+    const handleOAuthCallback = async () => {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = hashParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token');
+
+      if (accessToken && refreshToken) {
+        await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken
+        });
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+    };
+
+    const init = async () => {
+      await handleOAuthCallback();
+      await checkUserAuth();
+    };
+
+    init();
+
+    // Listen for auth changes (login/logout from other tabs, token refresh)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        setUser(null);
+        setUserProfile(null);
+        setIsAuthenticated(false);
+      } else if (event === 'SIGNED_IN' && session?.user) {
+        setUser(session.user);
+        setIsAuthenticated(true);
+        setIsLoadingAuth(false);
+        fetchUserProfile(session.user.id);
+      } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+        setUser(session.user);
+      }
+    });
+
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, []);
 
   const refreshProfile = async () => {
     if (user?.id) {
@@ -102,6 +113,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = (shouldRedirect = true) => {
     setUser(null);
+    setUserProfile(null);
     setIsAuthenticated(false);
     supabase.auth.signOut();
     if (shouldRedirect) {
@@ -110,9 +122,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const navigateToLogin = () => {
-    // Use production URL for OAuth redirect (works for both web and mobile)
     const redirectUrl = 'https://lend-with-vony.com';
-
     supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: redirectUrl }
