@@ -161,30 +161,39 @@ export const AuthProvider = ({ children }) => {
   };
 
   const navigateToLogin = async () => {
-    // Determine the redirect URL based on platform
-    const redirectUrl = isNativeApp()
-      ? 'com.vony.lend://auth/callback'
-      : 'https://lend-with-vony.com';
+    try {
+      if (isNativeApp()) {
+        // Mobile: Use deep link redirect and open in browser
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: 'com.vony.lend://auth/callback',
+            skipBrowserRedirect: true
+          }
+        });
 
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: redirectUrl,
-        skipBrowserRedirect: isNativeApp() // Don't auto-redirect on mobile
+        if (error) {
+          console.error('OAuth error:', error);
+          return;
+        }
+
+        if (data?.url) {
+          await Browser.open({
+            url: data.url,
+            presentationStyle: 'fullscreen'
+          });
+        }
+      } else {
+        // Web: Normal OAuth redirect
+        await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: 'https://lend-with-vony.com'
+          }
+        });
       }
-    });
-
-    if (error) {
-      console.error('OAuth error:', error);
-      return;
-    }
-
-    // On mobile, open the OAuth URL in system browser
-    if (isNativeApp() && data?.url) {
-      await Browser.open({
-        url: data.url,
-        windowName: '_self'
-      });
+    } catch (error) {
+      console.error('Login error:', error);
     }
   };
 
