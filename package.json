@@ -9,7 +9,13 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -p ./jsconfig.json",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "mobile:setup": "npm install @capacitor/core @capacitor/cli @capacitor/ios @capacitor/android @capacitor/splash-screen @capacitor/status-bar @capacitor/keyboard",
+    "mobile:sync": "npm run build && npx cap sync",
+    "mobile:ios": "npx cap open ios",
+    "mobile:android": "npx cap open android",
+    "mobile:add-ios": "npx cap add ios",
+    "mobile:add-android": "npx cap add android"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^17.0.0",
