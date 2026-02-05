@@ -162,6 +162,8 @@ export const AuthProvider = ({ children }) => {
 
   const navigateToLogin = async () => {
     try {
+      console.log('Starting login, isNative:', isNativeApp());
+
       if (isNativeApp()) {
         // Mobile: Use deep link redirect and open in browser
         const { data, error } = await supabase.auth.signInWithOAuth({
@@ -172,28 +174,45 @@ export const AuthProvider = ({ children }) => {
           }
         });
 
+        console.log('OAuth response:', { data, error });
+
         if (error) {
           console.error('OAuth error:', error);
-          return;
+          throw error;
         }
 
         if (data?.url) {
-          await Browser.open({
-            url: data.url,
-            presentationStyle: 'fullscreen'
-          });
+          console.log('Opening browser with URL:', data.url);
+          try {
+            await Browser.open({
+              url: data.url,
+              presentationStyle: 'popover'
+            });
+          } catch (browserError) {
+            console.error('Browser open error:', browserError);
+            // Fallback: try opening with window.open
+            window.open(data.url, '_blank');
+          }
+        } else {
+          console.error('No URL returned from OAuth');
         }
       } else {
         // Web: Normal OAuth redirect
-        await supabase.auth.signInWithOAuth({
+        const { error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
             redirectTo: 'https://lend-with-vony.com'
           }
         });
+
+        if (error) {
+          console.error('OAuth error:', error);
+          throw error;
+        }
       }
     } catch (error) {
       console.error('Login error:', error);
+      throw error;
     }
   };
 

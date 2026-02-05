@@ -127,10 +127,12 @@ export default function Home() {
   const handleLogin = async () => {
     setIsAuthenticating(true);
     try {
-      navigateToLogin();
+      await navigateToLogin();
     } catch (error) {
       console.error("Login failed:", error);
-      setIsAuthenticating(false);
+    } finally {
+      // Reset after a delay in case browser doesn't open
+      setTimeout(() => setIsAuthenticating(false), 3000);
     }
   };
 
