@@ -36,13 +36,6 @@ export default function MyLoans() {
 
   useEffect(() => {
     loadData();
-    
-    // Poll for updates every 10 seconds (silent refresh)
-    const interval = setInterval(() => {
-      loadData(false);
-    }, 10000);
-    
-    return () => clearInterval(interval);
   }, []);
 
   const safeEntityCall = async (entityCall, fallback = []) => {

@@ -28,8 +28,6 @@ export default function RecentActivityPage() {
 
   useEffect(() => {
     loadData();
-    const interval = setInterval(loadData, 10000);
-    return () => clearInterval(interval);
   }, []);
 
   const safeEntityCall = async (entityCall, fallback = []) => {

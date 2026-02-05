@@ -15,13 +15,6 @@ export default function MyLoanOffersPage() {
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     loadData();
-    
-    // Poll for updates every 10 seconds
-    const interval = setInterval(() => {
-      loadData(false);
-    }, 10000);
-    
-    return () => clearInterval(interval);
   }, []);
 
   const loadData = async (showLoadingState = true) => {
