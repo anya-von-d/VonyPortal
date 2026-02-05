@@ -22,12 +22,18 @@ export default function MyLoanOffersPage() {
     try {
       const currentUser = await User.me();
       setUser(currentUser);
+      console.log('Current user:', currentUser?.id);
 
       const [allLoans, profiles] = await Promise.all([
-        Loan.list('-updated_date').catch(() => []),
-        PublicProfile.list().catch(() => [])
+        Loan.list('-updated_date').catch((e) => { console.error('Error loading loans:', e); return []; }),
+        PublicProfile.list().catch((e) => { console.error('Error loading profiles:', e); return []; })
       ]);
-      
+
+      console.log('All loans loaded:', allLoans?.length, allLoans);
+      console.log('User loans (lender or borrower):', allLoans?.filter(loan =>
+        loan.lender_id === currentUser?.id || loan.borrower_id === currentUser?.id
+      ));
+
       setLoans(allLoans || []);
       setPublicProfiles(profiles || []);
     } catch (error) {
@@ -42,6 +48,26 @@ export default function MyLoanOffersPage() {
       loadData();
     } catch (error) {
       console.error("Error deleting loan offer:", error);
+    }
+  };
+
+  const handleAcceptOffer = async (loanId) => {
+    try {
+      // Update loan status to active when borrower accepts
+      await Loan.update(loanId, { status: 'active' });
+      loadData();
+    } catch (error) {
+      console.error("Error accepting loan offer:", error);
+    }
+  };
+
+  const handleDeclineOffer = async (loanId) => {
+    try {
+      // Update loan status to declined
+      await Loan.update(loanId, { status: 'declined' });
+      loadData();
+    } catch (error) {
+      console.error("Error declining loan offer:", error);
     }
   };
 
@@ -93,6 +119,8 @@ export default function MyLoanOffersPage() {
              users={publicProfiles}
              currentUser={user}
              onDelete={handleDeleteOffer}
+             onAccept={handleAcceptOffer}
+             onDecline={handleDeclineOffer}
            />
          ) : (
            <Card className="bg-white border-slate-200">

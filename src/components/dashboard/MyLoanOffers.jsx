@@ -2,14 +2,16 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Send, 
-  Trash2, 
-  DollarSign, 
-  Calendar, 
-  Percent, 
+import {
+  Send,
+  Trash2,
+  DollarSign,
+  Calendar,
+  Percent,
   User as UserIcon,
-  AlertTriangle
+  AlertTriangle,
+  Check,
+  X as XIcon
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
@@ -24,9 +26,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-export default function MyLoanOffers({ offers, users, currentUser, onDelete }) {
+export default function MyLoanOffers({ offers, users, currentUser, onDelete, onAccept, onDecline }) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [loanToDelete, setLoanToDelete] = useState(null);
+  const [processingOfferId, setProcessingOfferId] = useState(null);
 
   const getUserById = (userId) => {
     const safeUsers = Array.isArray(users) ? users : [];
@@ -71,9 +74,17 @@ export default function MyLoanOffers({ offers, users, currentUser, onDelete }) {
             <div className="space-y-4">
               {safeOffers.map((offer, index) => {
                 if (!offer) return null;
-                
-                const borrower = getUserById(offer.borrower_id);
-                
+
+                // Determine if current user is lender or borrower
+                const isLender = currentUser && offer.lender_id === currentUser.id;
+                const isBorrower = currentUser && offer.borrower_id === currentUser.id;
+
+                // Get the other party's info
+                const otherPartyId = isLender ? offer.borrower_id : offer.lender_id;
+                const otherParty = getUserById(otherPartyId);
+                const otherPartyRole = isLender ? 'Borrower' : 'Lender';
+                const myRole = isLender ? 'Lender' : 'Borrower';
+
                 return (
                   <motion.div
                     key={offer.id}
@@ -85,22 +96,32 @@ export default function MyLoanOffers({ offers, users, currentUser, onDelete }) {
                   >
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div className="flex-1">
+                        {/* Show your role badge */}
+                        <div className="mb-2">
+                          <Badge
+                            variant="outline"
+                            className={isLender ? "bg-green-50 text-green-700 border-green-200" : "bg-blue-50 text-blue-700 border-blue-200"}
+                          >
+                            You are the {myRole}
+                          </Badge>
+                        </div>
+
                         <div className="flex items-center gap-3 mb-3">
-                          <img 
-                            src={borrower?.profile_picture_url || `https://ui-avatars.com/api/?name=${borrower?.full_name || 'User'}&background=4f46e5&color=fff`} 
-                            alt={borrower?.full_name || 'User'} 
+                          <img
+                            src={otherParty?.profile_picture_url || `https://ui-avatars.com/api/?name=${otherParty?.full_name || 'User'}&background=4f46e5&color=fff`}
+                            alt={otherParty?.full_name || 'User'}
                             className="w-10 h-10 rounded-full"
                           />
                           <div className="flex-1">
                             <p className="font-semibold text-slate-800">
-                              {borrower?.full_name || 'Unknown User'}
+                              {otherParty?.full_name || 'Unknown User'}
                             </p>
                             <div className="flex items-center gap-2">
                               <p className="text-sm text-slate-500">
-                                {currentUser && offer.lender_id === currentUser.id ? 'Borrower' : 'Lender'}: @{borrower?.username || 'unknown'} • {format(new Date(offer.created_date), 'MMM d, yyyy')}
+                                {otherPartyRole}: @{otherParty?.username || 'unknown'} • {format(new Date(offer.created_date), 'MMM d, yyyy')}
                               </p>
-                              <Badge 
-                                variant={offer.status === 'pending' ? 'secondary' : 
+                              <Badge
+                                variant={offer.status === 'pending' ? 'secondary' :
                                         offer.status === 'active' ? 'default' : 'destructive'}
                                 className="text-xs"
                               >
@@ -136,16 +157,52 @@ export default function MyLoanOffers({ offers, users, currentUser, onDelete }) {
                         )}
                       </div>
                       
-                      <div className="flex gap-3">
-                        <Button
-                          onClick={() => handleDeleteClick(offer)}
-                          variant="outline"
-                          className="border-red-200 text-red-600 hover:bg-red-50"
-                          size="sm"
-                        >
-                          <Trash2 className="w-4 h-4 mr-1" />
-                          Delete
-                        </Button>
+                      <div className="flex gap-2 flex-wrap">
+                        {/* Lender can delete the offer */}
+                        {isLender && (
+                          <Button
+                            onClick={() => handleDeleteClick(offer)}
+                            variant="outline"
+                            className="border-red-200 text-red-600 hover:bg-red-50"
+                            size="sm"
+                          >
+                            <Trash2 className="w-4 h-4 mr-1" />
+                            Cancel Offer
+                          </Button>
+                        )}
+
+                        {/* Borrower can accept or decline */}
+                        {isBorrower && offer.status === 'pending' && (
+                          <>
+                            <Button
+                              onClick={async () => {
+                                setProcessingOfferId(offer.id);
+                                if (onAccept) await onAccept(offer.id);
+                                setProcessingOfferId(null);
+                              }}
+                              disabled={processingOfferId === offer.id}
+                              className="bg-green-600 hover:bg-green-700 text-white"
+                              size="sm"
+                            >
+                              <Check className="w-4 h-4 mr-1" />
+                              Accept
+                            </Button>
+                            <Button
+                              onClick={async () => {
+                                setProcessingOfferId(offer.id);
+                                if (onDecline) await onDecline(offer.id);
+                                setProcessingOfferId(null);
+                              }}
+                              disabled={processingOfferId === offer.id}
+                              variant="outline"
+                              className="border-red-200 text-red-600 hover:bg-red-50"
+                              size="sm"
+                            >
+                              <XIcon className="w-4 h-4 mr-1" />
+                              Decline
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </div>
                   </motion.div>

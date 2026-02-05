@@ -4,15 +4,17 @@ import { createPageUrl } from "@/utils";
 import { User as AppUser } from "@/entities/all";
 import { useAuth } from "@/lib/AuthContext";
 import TopNav from "@/components/TopNav";
-import { 
-  Home, 
-  Plus, 
-  CreditCard, 
+import {
+  Home,
+  Plus,
+  CreditCard,
   User as UserIcon,
   PiggyBank,
   Sparkles,
   LogOut,
-  Send
+  Send,
+  Menu,
+  X
 } from "lucide-react";
 import {
   Sidebar,
@@ -70,6 +72,7 @@ const navigationItems = [
 export default function Layout({ children }) {
   const location = useLocation();
   const { userProfile, isLoadingAuth, refreshProfile } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     // Listen for theme changes from Profile page
@@ -82,6 +85,11 @@ export default function Layout({ children }) {
       window.removeEventListener('themeChanged', handleThemeChange);
     };
   }, []);
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const user = userProfile;
   const isLoading = isLoadingAuth;
@@ -176,30 +184,64 @@ export default function Layout({ children }) {
           <TopNav location={location} colors={colors} user={user} isLoading={isLoading} theme={theme} />
         </div>
 
-        {/* Horizontal navigation for small screens */}
+        {/* Mobile navigation header */}
         <nav className={`lg:hidden sticky top-0 z-40 bg-gradient-to-r ${colors.sidebarBg} border-b ${colors.sidebarBorder} backdrop-blur-xl shadow-sm`}>
-          <div className="flex items-center justify-between px-4 py-3 overflow-x-auto">
-            <img
-              src={theme === 'afternoon'
-                ? "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/689b5da4ed66944b2307218f/0cdfad9ab_newLogoBlackOutline.png"
-                : "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/689b5da4ed66944b2307218f/922791a92_newLogo.png"}
-              alt="Vony Logo"
-              className="h-8 w-auto mr-4 flex-shrink-0"
-            />
-            <div className="flex items-center gap-2">
-              {navigationItems.map((item) => (
-                <Link key={item.title} to={item.url} className={`flex flex-row items-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 whitespace-nowrap text-sm font-medium ${
-                  location.pathname === item.url 
-                    ? `${colors.activeItem} shadow-sm` 
-                    : `${colors.hoverItem} ${colors.navText}`
-                }`}>
-                  <item.icon className="w-4 h-4" />
-                  <span>{item.title}</span>
-                </Link>
-              ))}
-            </div>
+          <div className="flex items-center justify-between px-4 py-4 safe-area-inset-top">
+            {/* Logo on the left */}
+            <Link to={createPageUrl("Home")} className="flex-shrink-0">
+              <img
+                src={theme === 'afternoon'
+                  ? "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/689b5da4ed66944b2307218f/0cdfad9ab_newLogoBlackOutline.png"
+                  : "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/689b5da4ed66944b2307218f/922791a92_newLogo.png"}
+                alt="Vony Logo"
+                className="h-10 w-auto"
+              />
+            </Link>
+
+            {/* Hamburger menu button on the right */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className={`p-2 rounded-lg transition-all duration-200 ${colors.hoverItem} ${colors.navText}`}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
           </div>
+
+          {/* Mobile menu dropdown */}
+          {mobileMenuOpen && (
+            <div className={`absolute top-full left-0 right-0 bg-gradient-to-b ${colors.sidebarBg} border-b ${colors.sidebarBorder} shadow-lg`}>
+              <div className="px-4 py-3 space-y-1">
+                {navigationItems.map((item) => (
+                  <Link
+                    key={item.title}
+                    to={item.url}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                      location.pathname === item.url
+                        ? `${colors.activeItem} shadow-sm`
+                        : `${colors.hoverItem} ${colors.navText}`
+                    }`}
+                  >
+                    <item.icon className="w-5 h-5" />
+                    <span className="font-medium">{item.title}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </nav>
+
+        {/* Overlay when mobile menu is open */}
+        {mobileMenuOpen && (
+          <div
+            className="lg:hidden fixed inset-0 bg-black/20 z-30"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+        )}
 
         {/* Main content container */}
         <main className="flex-1 overflow-auto">

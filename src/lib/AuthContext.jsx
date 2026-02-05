@@ -1,12 +1,23 @@
 import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabaseClient';
-import { Capacitor } from '@capacitor/core';
-import { Browser } from '@capacitor/browser';
 
 const AuthContext = createContext();
 
-// Check if running as native app
-const isNativeApp = () => Capacitor.isNativePlatform();
+// Check if running as native app - safely handle when Capacitor isn't available
+const isNativeApp = () => {
+  try {
+    // Dynamic import check
+    if (typeof window !== 'undefined' && window.Capacitor) {
+      return window.Capacitor.isNativePlatform();
+    }
+    return false;
+  } catch {
+    return false;
+  }
+};
+
+// Deep link URL for OAuth callback
+const DEEP_LINK_CALLBACK = 'com.vony.lend://auth/callback';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -74,11 +85,48 @@ export const AuthProvider = ({ children }) => {
       const refreshToken = hashParams.get('refresh_token');
 
       if (accessToken && refreshToken) {
+        console.log('Found tokens in URL hash, setting session...');
         await supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken
         });
         window.history.replaceState(null, '', window.location.pathname);
+      }
+    };
+
+    // Handle deep link URL (for mobile OAuth callback)
+    const handleDeepLink = async (url) => {
+      console.log('Handling deep link:', url);
+
+      // Parse the URL for tokens
+      const hashIndex = url.indexOf('#');
+      if (hashIndex === -1) return;
+
+      const hashParams = new URLSearchParams(url.substring(hashIndex + 1));
+      const accessToken = hashParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token');
+
+      if (accessToken && refreshToken) {
+        console.log('Found tokens in deep link, setting session...');
+        try {
+          await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          });
+          console.log('Session set successfully from deep link');
+
+          // Close the browser if on native
+          if (isNativeApp()) {
+            try {
+              const { Browser } = await import('@capacitor/browser');
+              await Browser.close();
+            } catch (e) {
+              console.log('Browser already closed or not available');
+            }
+          }
+        } catch (e) {
+          console.error('Error setting session from deep link:', e);
+        }
       }
     };
 
@@ -90,7 +138,8 @@ export const AuthProvider = ({ children }) => {
     init();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state change:', event);
       if (event === 'SIGNED_OUT') {
         setUser(null);
         setUserProfile(null);
@@ -104,9 +153,10 @@ export const AuthProvider = ({ children }) => {
         // Close browser if on mobile after successful login
         if (isNativeApp()) {
           try {
-            Browser.close();
+            const { Browser } = await import('@capacitor/browser');
+            await Browser.close();
           } catch (e) {
-            // Browser might already be closed
+            // Browser might already be closed or not available
           }
         }
       } else if (event === 'TOKEN_REFRESHED' && session?.user) {
@@ -114,34 +164,55 @@ export const AuthProvider = ({ children }) => {
       }
     });
 
-    // For mobile: re-check auth when app becomes active (after returning from browser login)
-    if (isNativeApp()) {
-      import('@capacitor/app').then(({ App }) => {
-        App.addListener('appStateChange', async ({ isActive }) => {
-          if (isActive) {
-            console.log('App became active, checking auth...');
-            // Small delay to let any pending auth complete
-            setTimeout(async () => {
-              const { data: { session } } = await supabase.auth.getSession();
-              if (session?.user && !user) {
-                console.log('Found session after returning to app');
-                setUser(session.user);
-                setIsAuthenticated(true);
-                setIsLoadingAuth(false);
-                fetchUserProfile(session.user.id);
-                // Close the browser if still open
-                try {
-                  await Browser.close();
-                } catch (e) {}
-              }
-            }, 500);
-          }
-        });
-      });
-    }
+    // For mobile: listen for deep links (OAuth callback) and app state changes
+    let appUrlListener = null;
+    let appStateListener = null;
+
+    const setupMobileListeners = async () => {
+      if (isNativeApp()) {
+        try {
+          const { App: CapApp } = await import('@capacitor/app');
+          const { Browser } = await import('@capacitor/browser');
+
+          // Listen for deep link URLs (OAuth callback)
+          appUrlListener = await CapApp.addListener('appUrlOpen', async ({ url }) => {
+            console.log('App URL opened:', url);
+            if (url.startsWith('com.vony.lend://auth/callback')) {
+              await handleDeepLink(url);
+            }
+          });
+
+          // Also re-check auth when app becomes active
+          appStateListener = await CapApp.addListener('appStateChange', async ({ isActive }) => {
+            if (isActive) {
+              console.log('App became active, checking auth...');
+              setTimeout(async () => {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session?.user && !user) {
+                  console.log('Found session after returning to app');
+                  setUser(session.user);
+                  setIsAuthenticated(true);
+                  setIsLoadingAuth(false);
+                  fetchUserProfile(session.user.id);
+                  try {
+                    await Browser.close();
+                  } catch (e) {}
+                }
+              }, 500);
+            }
+          });
+        } catch (e) {
+          console.log('Capacitor plugins not available:', e);
+        }
+      }
+    };
+
+    setupMobileListeners();
 
     return () => {
       subscription?.unsubscribe();
+      if (appUrlListener) appUrlListener.remove();
+      if (appStateListener) appStateListener.remove();
     };
   }, []);
 
@@ -165,21 +236,15 @@ export const AuthProvider = ({ children }) => {
     try {
       console.log('Starting login, isNative:', isNativeApp());
 
-      // Always use the website URL for OAuth redirect
-      // The website will handle the tokens and the app will pick them up
-      const redirectUrl = 'https://lend-with-vony.com';
-
       if (isNativeApp()) {
-        // Mobile: Open OAuth in system browser
+        // Mobile: Use Browser plugin to open OAuth in system browser
         const { data, error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: redirectUrl,
+            redirectTo: DEEP_LINK_CALLBACK,
             skipBrowserRedirect: true
           }
         });
-
-        console.log('OAuth response:', { data, error });
 
         if (error) {
           console.error('OAuth error:', error);
@@ -187,18 +252,22 @@ export const AuthProvider = ({ children }) => {
         }
 
         if (data?.url) {
-          console.log('Opening browser with URL:', data.url);
-          await Browser.open({
-            url: data.url,
-            presentationStyle: 'popover'
-          });
+          console.log('Opening OAuth URL in browser:', data.url);
+          try {
+            const { Browser } = await import('@capacitor/browser');
+            await Browser.open({ url: data.url });
+          } catch (e) {
+            console.error('Failed to open browser:', e);
+            // Fallback to window.open
+            window.open(data.url, '_blank');
+          }
         }
       } else {
         // Web: Normal OAuth redirect
         const { error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: redirectUrl
+            redirectTo: 'https://lend-with-vony.com'
           }
         });
 

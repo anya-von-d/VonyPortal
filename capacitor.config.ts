@@ -6,7 +6,15 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   server: {
     androidScheme: 'https',
-    iosScheme: 'https',
+    iosScheme: 'capacitor',
+    hostname: 'localhost',
+    // Allow navigation to Supabase auth URLs
+    allowNavigation: [
+      '*.supabase.co',
+      'accounts.google.com',
+      '*.google.com',
+      'lend-with-vony.com'
+    ]
   },
   plugins: {
     CapacitorHttp: {
