@@ -1,0 +1,82 @@
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { Plus, CreditCard, Zap, Send } from "lucide-react";
+import { motion } from "framer-motion";
+
+const actions = [
+  {
+    title: "Create Loan Offer",
+    description: "Lend money to others",
+    icon: Plus,
+    color: "green",
+    url: "CreateLoan"
+  },
+  {
+    title: "My Loans",
+    description: "Manage active loans",
+    icon: CreditCard,
+    color: "purple",
+    url: "MyLoans"
+  },
+  {
+    title: "My Loan Offers",
+    description: "View sent offers",
+    icon: Send,
+    color: "orange",
+    url: "MyLoanOffers"
+  }
+];
+
+const colorClasses = {
+  green: "bg-[#35B276] opacity-100 hover:opacity-90 shadow-[#35B276]/20",
+  blue: "bg-[#35B276] opacity-100 hover:opacity-90 shadow-[#35B276]/20", 
+  purple: "bg-[#35B276] opacity-100 hover:opacity-90 shadow-[#35B276]/20",
+  orange: "bg-[#35B276] opacity-100 hover:opacity-90 shadow-[#35B276]/20"
+};
+
+export default function QuickActions() {
+  return (
+    <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
+      <CardHeader className="border-b border-slate-200/40 pb-4">
+        <CardTitle className="flex items-center gap-2 text-slate-800">
+          <Zap className="w-5 h-5 text-green-600" />
+          Quick Actions
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-6">
+        <div className="space-y-4">
+          {actions.map((action, index) => (
+            <motion.div
+              key={action.title}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: index * 0.1 }}
+            >
+              <Link to={createPageUrl(action.url)}>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start h-auto p-4 hover:bg-slate-50 group transition-all duration-200"
+                >
+                  <div className={`p-2 rounded-lg ${colorClasses[action.color]} shadow-lg mr-4 group-hover:scale-110 transition-transform duration-200`}>
+                    <action.icon className="w-4 h-4 text-[#F3F0EC] opacity-90" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-semibold text-slate-800 group-hover:text-slate-900">
+                      {action.title}
+                    </p>
+                    <p className="text-sm text-slate-500 group-hover:text-slate-600">
+                      {action.description}
+                    </p>
+                  </div>
+                </Button>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
