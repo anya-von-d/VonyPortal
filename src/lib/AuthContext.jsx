@@ -1,7 +1,12 @@
 import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 
 const AuthContext = createContext();
+
+// Check if running as native app
+const isNativeApp = () => Capacitor.isNativePlatform();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -62,7 +67,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    // Handle OAuth callback tokens in URL
+    // Handle OAuth callback tokens in URL (for web)
     const handleOAuthCallback = async () => {
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
       const accessToken = hashParams.get('access_token');
@@ -84,7 +89,7 @@ export const AuthProvider = ({ children }) => {
 
     init();
 
-    // Listen for auth changes (login/logout from other tabs, token refresh)
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT') {
         setUser(null);
@@ -95,10 +100,44 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
         setIsLoadingAuth(false);
         fetchUserProfile(session.user.id);
+
+        // Close browser if on mobile after successful login
+        if (isNativeApp()) {
+          try {
+            Browser.close();
+          } catch (e) {
+            // Browser might already be closed
+          }
+        }
       } else if (event === 'TOKEN_REFRESHED' && session?.user) {
         setUser(session.user);
       }
     });
+
+    // Listen for deep link URL changes (for mobile OAuth callback)
+    if (isNativeApp()) {
+      const handleUrlOpen = async (event) => {
+        const url = event.url || event;
+        if (url && url.includes('access_token')) {
+          // Parse tokens from URL
+          const urlParams = new URLSearchParams(url.split('#')[1] || url.split('?')[1]);
+          const accessToken = urlParams.get('access_token');
+          const refreshToken = urlParams.get('refresh_token');
+
+          if (accessToken && refreshToken) {
+            await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken
+            });
+          }
+        }
+      };
+
+      // Listen for app URL open events
+      import('@capacitor/app').then(({ App }) => {
+        App.addListener('appUrlOpen', handleUrlOpen);
+      });
+    }
 
     return () => {
       subscription?.unsubscribe();
@@ -116,17 +155,37 @@ export const AuthProvider = ({ children }) => {
     setUserProfile(null);
     setIsAuthenticated(false);
     supabase.auth.signOut();
-    if (shouldRedirect) {
+    if (shouldRedirect && !isNativeApp()) {
       window.location.href = '/';
     }
   };
 
-  const navigateToLogin = () => {
-    const redirectUrl = 'https://lend-with-vony.com';
-    supabase.auth.signInWithOAuth({
+  const navigateToLogin = async () => {
+    // Determine the redirect URL based on platform
+    const redirectUrl = isNativeApp()
+      ? 'com.vony.lend://auth/callback'
+      : 'https://lend-with-vony.com';
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: redirectUrl }
+      options: {
+        redirectTo: redirectUrl,
+        skipBrowserRedirect: isNativeApp() // Don't auto-redirect on mobile
+      }
     });
+
+    if (error) {
+      console.error('OAuth error:', error);
+      return;
+    }
+
+    // On mobile, open the OAuth URL in system browser
+    if (isNativeApp() && data?.url) {
+      await Browser.open({
+        url: data.url,
+        windowName: '_self'
+      });
+    }
   };
 
   return (
