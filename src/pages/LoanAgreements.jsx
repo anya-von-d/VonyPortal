@@ -39,8 +39,12 @@ export default function LoanAgreements() {
       setLoans(allLoans || []);
       setPayments(allPayments || []);
       
+      // Only show agreements that are fully signed (both lender and borrower have signed)
       const myAgreements = (allAgreements || []).filter(
-        agreement => agreement.lender_id === currentUser.id || agreement.borrower_id === currentUser.id
+        agreement =>
+          (agreement.lender_id === currentUser.id || agreement.borrower_id === currentUser.id) &&
+          agreement.lender_signed_date &&
+          agreement.borrower_signed_date
       );
       setAgreements(myAgreements);
       

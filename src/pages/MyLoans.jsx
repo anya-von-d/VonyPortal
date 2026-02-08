@@ -121,8 +121,10 @@ export default function MyLoans() {
 
 
 
-  const lentLoans = loans.filter(loan => loan.lender_id === user?.id);
-  const borrowedLoans = loans.filter(loan => loan.borrower_id === user?.id);
+  // Only show loans that are active, completed, or cancelled (not pending or declined)
+  const validStatuses = ['active', 'completed', 'cancelled'];
+  const lentLoans = loans.filter(loan => loan.lender_id === user?.id && validStatuses.includes(loan.status));
+  const borrowedLoans = loans.filter(loan => loan.borrower_id === user?.id && validStatuses.includes(loan.status));
 
   const renderLoanSection = (loanList, type, status) => {
     if (loanList.length === 0) {
@@ -249,7 +251,8 @@ export default function MyLoans() {
                     <div className="pt-4 border-t border-slate-200/40">
                       <h3 className="font-semibold text-slate-700 mb-3">Inactive</h3>
                       <div className="space-y-4">
-                        {renderLoanSection(borrowedLoans.filter(l => l.status !== 'active'), 'borrowed', 'inactive')}
+                        {/* Only show completed or cancelled loans in inactive section */}
+                        {renderLoanSection(borrowedLoans.filter(l => l.status === 'completed' || l.status === 'cancelled'), 'borrowed', 'inactive')}
                       </div>
                     </div>
                   </>
@@ -281,7 +284,8 @@ export default function MyLoans() {
                     <div className="pt-4 border-t border-slate-200/40">
                       <h3 className="font-semibold text-slate-700 mb-3">Inactive</h3>
                       <div className="space-y-4">
-                        {renderLoanSection(lentLoans.filter(l => l.status !== 'active'), 'lent', 'inactive')}
+                        {/* Only show completed or cancelled loans in inactive section */}
+                        {renderLoanSection(lentLoans.filter(l => l.status === 'completed' || l.status === 'cancelled'), 'lent', 'inactive')}
                       </div>
                     </div>
                   </>

@@ -1,22 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Loan, LoanAgreement, Payment, User, PublicProfile } from "@/entities/all";
+import { Loan, Payment, PublicProfile } from "@/entities/all";
 import { useAuth } from "@/lib/AuthContext";
-import SignatureModal from "@/components/loans/SignatureModal";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
-import { toast } from "sonner";
 import {
   DollarSign,
-  TrendingUp,
   Clock,
-  CheckCircle,
-  Plus,
-  ArrowRight,
   PiggyBank,
-  Handshake,
-  User as UserIcon,
   LogIn
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -64,9 +54,6 @@ export default function Home() {
   const [publicProfiles, setPublicProfiles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
-  const [showSignatureModal, setShowSignatureModal] = useState(false);
-  const [pendingAcceptLoan, setPendingAcceptLoan] = useState(null);
-  const [isSigning, setIsSigning] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
 
   // Use profile from context
@@ -133,61 +120,6 @@ export default function Home() {
     } finally {
       // Reset after a delay in case browser doesn't open
       setTimeout(() => setIsAuthenticating(false), 3000);
-    }
-  };
-
-  const handleAcceptOffer = async (loanId) => {
-    try {
-      const loan = loans.find(l => l.id === loanId);
-      if (loan) {
-        setPendingAcceptLoan(loan);
-        setShowSignatureModal(true);
-      }
-    } catch (error) {
-      console.error("Error accepting loan offer:", error);
-    }
-  };
-
-  const handleBorrowerSign = async (signature) => {
-    try {
-      setIsSigning(true);
-      // Update loan to active
-      await Loan.update(pendingAcceptLoan.id, { status: 'active' });
-
-      // Find and update the agreement with borrower signature
-      const agreements = await LoanAgreement.filter({ loan_id: { eq: pendingAcceptLoan.id } });
-      if (agreements && agreements.length > 0) {
-        const agreement = agreements[0];
-        const borrowerSignedDate = new Date().toISOString();
-        const isFullySigned = agreement.lender_signed_date ? true : false;
-
-        // Save borrower signature and date
-        const updateResult = await LoanAgreement.update(agreement.id, {
-          borrower_name: signature,
-          borrower_signed_date: borrowerSignedDate,
-          is_fully_signed: isFullySigned
-        });
-        console.log('Borrower signature saved:', { borrower_name: signature, borrower_signed_date: borrowerSignedDate });
-      }
-
-      setShowSignatureModal(false);
-      setPendingAcceptLoan(null);
-      await loadData();
-      toast.success('Agreement signed successfully!');
-    } catch (error) {
-      console.error("Error signing agreement:", error);
-      toast.error(`Error: ${error.message || "Please try again."}`);
-    } finally {
-      setIsSigning(false);
-    }
-  };
-
-  const handleDeclineOffer = async (loanId) => {
-    try {
-      await Loan.update(loanId, { status: 'declined' });
-      loadData();
-    } catch (error) {
-      console.error("Error declining loan offer:", error);
     }
   };
 
@@ -269,18 +201,6 @@ export default function Home() {
     const paymentStatus = getPaymentStatus();
 
     return (
-      <>
-        <SignatureModal
-          isOpen={showSignatureModal}
-          onClose={() => {
-            setShowSignatureModal(false);
-            setPendingAcceptLoan(null);
-          }}
-          onSign={handleBorrowerSign}
-          loanDetails={pendingAcceptLoan || {}}
-          userFullName={user?.full_name || ''}
-          signingAs="Borrower"
-        />
         <div className="min-h-screen p-6"  style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
            <div className="max-w-4xl mx-auto space-y-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="py-6">
@@ -299,12 +219,7 @@ export default function Home() {
 
           <div className="space-y-8">
             {pendingOffers.length > 0 && (
-              <PendingLoanOffers
-                offers={pendingOffers}
-                users={safeAllProfiles} /* Pass profiles */
-                onAccept={handleAcceptOffer}
-                onDecline={handleDeclineOffer}
-              />
+              <PendingLoanOffers offers={pendingOffers} />
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -325,7 +240,6 @@ export default function Home() {
 
             </div>
             </div>
-            </>
             );
             }
 
