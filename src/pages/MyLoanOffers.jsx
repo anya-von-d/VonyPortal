@@ -113,9 +113,9 @@ export default function MyLoanOffersPage() {
         </motion.div>
 
         {/* Pending Offers Section - only show offers that haven't been signed by both parties */}
-         {allOffers.filter(offer => offer.status === 'pending').length > 0 ? (
+         {allOffers.filter(offer => offer.status === 'pending' || !offer.status).length > 0 ? (
            <MyLoanOffers
-             offers={allOffers.filter(offer => offer.status === 'pending')}
+             offers={allOffers.filter(offer => offer.status === 'pending' || !offer.status)}
              users={publicProfiles}
              currentUser={user}
              onDelete={handleDeleteOffer}
