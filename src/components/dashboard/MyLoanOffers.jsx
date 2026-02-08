@@ -111,16 +111,6 @@ export default function MyLoanOffers({ offers, users, currentUser, onDelete, onS
                   >
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div className="flex-1">
-                        {/* Show your role badge */}
-                        <div className="mb-2">
-                          <Badge
-                            variant="outline"
-                            className={isLender ? "bg-green-50 text-green-700 border-green-200" : "bg-blue-50 text-blue-700 border-blue-200"}
-                          >
-                            You are the {myRole}
-                          </Badge>
-                        </div>
-
                         <div className="flex items-center gap-3 mb-3">
                           <img
                             src={otherParty?.profile_picture_url || `https://ui-avatars.com/api/?name=${otherParty?.full_name || 'User'}&background=4f46e5&color=fff`}
@@ -131,18 +121,9 @@ export default function MyLoanOffers({ offers, users, currentUser, onDelete, onS
                             <p className="font-semibold text-slate-800">
                               {otherParty?.full_name || 'Unknown User'}
                             </p>
-                            <div className="flex items-center gap-2">
-                              <p className="text-sm text-slate-500">
-                                {otherPartyRole}: @{otherParty?.username || 'unknown'} • {offer.created_at ? format(new Date(offer.created_at), 'MMM d, yyyy') : 'N/A'}
-                              </p>
-                              <Badge
-                                variant={offer.status === 'pending' ? 'secondary' :
-                                        offer.status === 'active' ? 'default' : 'destructive'}
-                                className="text-xs"
-                              >
-                                {offer.status || 'pending'}
-                              </Badge>
-                            </div>
+                            <p className="text-sm text-slate-500">
+                              {otherPartyRole}: @{otherParty?.username || 'unknown'} • {offer.created_at ? format(new Date(offer.created_at), 'MMM d, yyyy') : 'N/A'}
+                            </p>
                           </div>
                         </div>
 
@@ -172,7 +153,20 @@ export default function MyLoanOffers({ offers, users, currentUser, onDelete, onS
                         )}
                       </div>
 
-                      <div className="flex gap-2 flex-wrap">
+                      <div className="flex gap-2 flex-wrap items-center">
+                        {/* Status Badge */}
+                        <Badge
+                          className={
+                            offer.status === 'pending'
+                              ? 'bg-amber-100 text-amber-800 border-amber-300 border'
+                              : offer.status === 'active'
+                              ? 'bg-green-100 text-green-800 border-green-200'
+                              : 'bg-red-100 text-red-800 border-red-200'
+                          }
+                        >
+                          {offer.status || 'pending'}
+                        </Badge>
+
                         {/* Lender can delete the offer */}
                         {isLender && (
                           <Button

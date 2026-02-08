@@ -17,6 +17,7 @@ import StatsCard from "../components/dashboard/StatsCard";
 import RecentActivity from "../components/dashboard/RecentActivity";
 import QuickActions from "../components/dashboard/QuickActions";
 import PendingLoanOffers from "../components/dashboard/PendingLoanOffers";
+import PendingPaymentConfirmations from "../components/dashboard/PendingPaymentConfirmations";
 import LoanProgress from "../components/dashboard/LoanProgress";
 
 // Helper function to sync public profile, moved here to adhere to file structure rules
@@ -218,6 +219,8 @@ export default function Home() {
           </motion.div>
 
           <div className="space-y-8">
+            <PendingPaymentConfirmations userId={user.id} onUpdate={loadData} />
+
             {pendingOffers.length > 0 && (
               <PendingLoanOffers offers={pendingOffers} />
             )}

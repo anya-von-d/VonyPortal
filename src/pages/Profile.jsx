@@ -29,6 +29,7 @@ import {
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import PaymentMethodsConnect from "@/components/profile/PaymentMethodsConnect";
 
 // Helper function to sync public profile, moved here to adhere to file structure rules
 const syncPublicProfile = async (userData) => {
@@ -393,6 +394,9 @@ export default function Profile() {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Profile Info */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Payment Methods */}
+            <PaymentMethodsConnect />
+
             <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
               <CardHeader className="border-b border-slate-200/40">
                 <CardTitle className="flex items-center gap-2">
