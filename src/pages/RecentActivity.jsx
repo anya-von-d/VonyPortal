@@ -2,18 +2,18 @@ import React, { useState, useEffect } from "react";
 import { Loan, Payment, User, PublicProfile } from "@/entities/all";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Activity, ArrowUpRight, ArrowDownRight, DollarSign } from "lucide-react";
+import { Activity, ArrowUpRight, ArrowDownRight, DollarSign, Send, Check, X, Ban } from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const statusColors = {
   pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
-  active: "bg-green-100 text-green-800 border-green-200", 
+  active: "bg-green-100 text-green-800 border-green-200",
   completed: "bg-blue-100 text-blue-800 border-blue-200",
   defaulted: "bg-red-100 text-red-800 border-red-200",
   cancelled: "bg-gray-100 text-gray-800 border-gray-200",
-  declined: "bg-gray-100 text-gray-800 border-gray-200"
+  declined: "bg-red-100 text-red-800 border-red-200"
 };
 
 export default function RecentActivityPage() {
@@ -47,8 +47,8 @@ export default function RecentActivityPage() {
       setUser(currentUser);
       
       const [allLoans, allPayments, allProfiles] = await Promise.all([
-        safeEntityCall(() => Loan.list('-updated_date')),
-        safeEntityCall(() => Payment.list('-created_date')),
+        safeEntityCall(() => Loan.list('-created_at')),
+        safeEntityCall(() => Payment.list('-created_at')),
         safeEntityCall(() => PublicProfile.list()),
       ]);
       
@@ -114,16 +114,16 @@ export default function RecentActivityPage() {
   const myLoanIds = myLoans.map(l => l && l.id).filter(Boolean);
   const myPayments = safePayments.filter(p => p && myLoanIds.includes(p.loan_id));
   
-  const loanActivities = myLoans.map(loan => ({ 
-    type: 'loan', 
-    ...loan, 
-    date: loan.updated_date || loan.created_date 
+  const loanActivities = myLoans.map(loan => ({
+    type: 'loan',
+    ...loan,
+    date: loan.created_at
   }));
-  
-  const paymentActivities = myPayments.map(payment => ({ 
-    type: 'payment', 
-    ...payment, 
-    date: payment.payment_date || payment.created_date 
+
+  const paymentActivities = myPayments.map(payment => ({
+    type: 'payment',
+    ...payment,
+    date: payment.payment_date || payment.created_at
   }));
 
   let allActivities = [...loanActivities, ...paymentActivities]
@@ -154,7 +154,7 @@ export default function RecentActivityPage() {
 
   const renderActivityItem = (activity) => {
     if (!activity) return null;
-    
+
     let title = "Activity";
     let description = "";
     let icon = <Activity className="w-5 h-5 text-slate-500" />;
@@ -165,29 +165,95 @@ export default function RecentActivityPage() {
       const isLender = activity.lender_id === user.id;
       const otherPartyId = isLender ? activity.borrower_id : activity.lender_id;
       const otherParty = getUserById(otherPartyId);
+      const amount = `$${activity.amount?.toLocaleString() || '0'}`;
+      const username = `@${otherParty?.username || 'user'}`;
 
-      title = isLender 
-        ? `Sent $${activity.amount?.toLocaleString() || '0'} Loan Offer to @${otherParty?.username || 'user'}`
-        : `Received $${activity.amount?.toLocaleString() || '0'} Loan Offer from @${otherParty?.username || 'user'}`;
-      
-      description = `${format(new Date(activity.date), 'MMM d, yyyy • h:mm a')}`;
-      icon = isLender ? <ArrowUpRight className="w-5 h-5" style={{color: `rgb(var(--theme-primary))`}} /> : <ArrowDownRight className="w-5 h-5 text-blue-600" />;
-      iconBg = isLender ? 'bg-green-100' : 'bg-blue-100';
+      // Determine the activity description based on status and role
+      if (activity.status === 'pending' || !activity.status) {
+        // Loan offer sent or received
+        if (isLender) {
+          title = `Sent ${amount} loan offer to ${username}`;
+          icon = <Send className="w-5 h-5 text-green-600" />;
+          iconBg = 'bg-green-100';
+        } else {
+          title = `Received ${amount} loan offer from ${username}`;
+          icon = <ArrowDownRight className="w-5 h-5 text-blue-600" />;
+          iconBg = 'bg-blue-100';
+        }
+      } else if (activity.status === 'active') {
+        // Loan accepted
+        if (isLender) {
+          title = `${username} accepted your ${amount} loan offer`;
+          icon = <Check className="w-5 h-5 text-green-600" />;
+          iconBg = 'bg-green-100';
+        } else {
+          title = `You accepted ${amount} loan from ${username}`;
+          icon = <Check className="w-5 h-5 text-green-600" />;
+          iconBg = 'bg-green-100';
+        }
+      } else if (activity.status === 'declined') {
+        // Loan declined
+        if (isLender) {
+          title = `${username} declined your ${amount} loan offer`;
+          icon = <X className="w-5 h-5 text-red-600" />;
+          iconBg = 'bg-red-100';
+        } else {
+          title = `You declined ${amount} loan from ${username}`;
+          icon = <X className="w-5 h-5 text-red-600" />;
+          iconBg = 'bg-red-100';
+        }
+      } else if (activity.status === 'cancelled') {
+        // Loan cancelled by lender
+        if (isLender) {
+          title = `You cancelled ${amount} loan offer to ${username}`;
+          icon = <Ban className="w-5 h-5 text-gray-600" />;
+          iconBg = 'bg-gray-100';
+        } else {
+          title = `${username} cancelled their ${amount} loan offer`;
+          icon = <Ban className="w-5 h-5 text-gray-600" />;
+          iconBg = 'bg-gray-100';
+        }
+      } else if (activity.status === 'completed') {
+        // Loan fully paid off
+        if (isLender) {
+          title = `${username} fully repaid your ${amount} loan`;
+          icon = <Check className="w-5 h-5 text-blue-600" />;
+          iconBg = 'bg-blue-100';
+        } else {
+          title = `You fully repaid ${amount} loan to ${username}`;
+          icon = <Check className="w-5 h-5 text-blue-600" />;
+          iconBg = 'bg-blue-100';
+        }
+      } else {
+        // Fallback for any other status
+        title = isLender
+          ? `${amount} loan to ${username}`
+          : `${amount} loan from ${username}`;
+        icon = <Activity className="w-5 h-5 text-slate-600" />;
+        iconBg = 'bg-slate-100';
+      }
+
+      description = activity.date ? format(new Date(activity.date), 'MMM d, yyyy • h:mm a') : 'N/A';
     }
 
     if (activity.type === 'payment') {
       const associatedLoan = safeLoans.find(l => l && l.id === activity.loan_id);
       if (!associatedLoan) return null;
-      
+
       const isBorrower = associatedLoan.borrower_id === user.id;
       const otherPartyId = isBorrower ? associatedLoan.lender_id : associatedLoan.borrower_id;
       const otherParty = getUserById(otherPartyId);
+      const amount = `$${activity.amount?.toLocaleString() || '0'}`;
+      const username = `@${otherParty?.username || 'user'}`;
 
-      title = isBorrower 
-        ? `You Paid $${activity.amount?.toLocaleString() || '0'} to @${otherParty?.username || 'user'}` 
-        : `Received $${activity.amount?.toLocaleString() || '0'} Payment from @${otherParty?.username || 'user'}`;
-      description = `${format(new Date(activity.date), 'MMM d, yyyy • h:mm a')}`;
-      icon = <DollarSign className="w-5 h-5 text-purple-600" />;
+      if (isBorrower) {
+        title = `You made a ${amount} payment to ${username}`;
+        icon = <ArrowUpRight className="w-5 h-5 text-purple-600" />;
+      } else {
+        title = `Received ${amount} payment from ${username}`;
+        icon = <ArrowDownRight className="w-5 h-5 text-purple-600" />;
+      }
+      description = activity.date ? format(new Date(activity.date), 'MMM d, yyyy • h:mm a') : 'N/A';
       iconBg = 'bg-purple-100';
       status = 'completed';
     }

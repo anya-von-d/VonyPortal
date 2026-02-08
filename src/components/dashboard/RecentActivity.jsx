@@ -4,16 +4,18 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Activity, ArrowUpRight, ArrowDownRight, DollarSign } from "lucide-react";
+import { Activity, ArrowUpRight, ArrowDownRight, DollarSign, Send, Check, X, Ban } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 
 const statusColors = {
   pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
-  active: "bg-green-100 text-green-800 border-green-200", 
+  active: "bg-green-100 text-green-800 border-green-200",
   completed: "bg-blue-100 text-blue-800 border-blue-200",
-  defaulted: "bg-red-100 text-red-800 border-red-200"
+  defaulted: "bg-red-100 text-red-800 border-red-200",
+  cancelled: "bg-gray-100 text-gray-800 border-gray-200",
+  declined: "bg-red-100 text-red-800 border-red-200"
 };
 
 export default function RecentActivity({ loans, payments, isLoading, user, allUsers }) {
@@ -70,8 +72,8 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
   const myLoanIds = safeLoans.map(l => l && l.id).filter(Boolean);
   const myPayments = safePayments.filter(p => p && myLoanIds.includes(p.loan_id));
   
-  const loanActivities = safeLoans.map(loan => ({ type: 'loan', ...loan, date: loan.updated_date || loan.created_date }));
-  const paymentActivities = myPayments.map(payment => ({ type: 'payment', ...payment, date: payment.payment_date || payment.created_date }));
+  const loanActivities = safeLoans.map(loan => ({ type: 'loan', ...loan, date: loan.created_at }));
+  const paymentActivities = myPayments.map(payment => ({ type: 'payment', ...payment, date: payment.payment_date || payment.created_at }));
 
   const recentActivity = [...loanActivities, ...paymentActivities]
     .filter(activity => activity && activity.date)
@@ -91,31 +93,89 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
       const isLender = activity.lender_id === user.id;
       const otherPartyId = isLender ? activity.borrower_id : activity.lender_id;
       const otherParty = getUserById(otherPartyId);
+      const amount = `$${activity.amount?.toLocaleString() || '0'}`;
+      const username = `@${otherParty?.username || 'user'}`;
 
-      title = isLender 
-        ? `Sent $${activity.amount?.toLocaleString() || '0'} Loan Offer to @${otherParty?.username || 'user'}`
-        : `Received $${activity.amount?.toLocaleString() || '0'} Loan Offer from @${otherParty?.username || 'user'}`;
-      
-      description = `${format(new Date(activity.date), 'MMM d, yyyy')}`;
-      icon = isLender ? <ArrowUpRight className="w-5 h-5 text-[#F3F0EC] opacity-90" /> : <ArrowDownRight className="w-5 h-5 text-[#F3F0EC] opacity-90" />;
-      iconBg = 'bg-[#35B276] opacity-100';
+      // Determine the activity description based on status and role
+      if (activity.status === 'pending' || !activity.status) {
+        if (isLender) {
+          title = `Sent ${amount} loan offer to ${username}`;
+          icon = <Send className="w-5 h-5 text-[#F3F0EC]" />;
+          iconBg = 'bg-[#35B276]';
+        } else {
+          title = `Received ${amount} loan offer from ${username}`;
+          icon = <ArrowDownRight className="w-5 h-5 text-[#F3F0EC]" />;
+          iconBg = 'bg-blue-500';
+        }
+      } else if (activity.status === 'active') {
+        if (isLender) {
+          title = `${username} accepted your ${amount} loan`;
+          icon = <Check className="w-5 h-5 text-[#F3F0EC]" />;
+          iconBg = 'bg-[#35B276]';
+        } else {
+          title = `You accepted ${amount} loan from ${username}`;
+          icon = <Check className="w-5 h-5 text-[#F3F0EC]" />;
+          iconBg = 'bg-[#35B276]';
+        }
+      } else if (activity.status === 'declined') {
+        if (isLender) {
+          title = `${username} declined your ${amount} loan`;
+          icon = <X className="w-5 h-5 text-white" />;
+          iconBg = 'bg-red-500';
+        } else {
+          title = `You declined ${amount} loan from ${username}`;
+          icon = <X className="w-5 h-5 text-white" />;
+          iconBg = 'bg-red-500';
+        }
+      } else if (activity.status === 'cancelled') {
+        if (isLender) {
+          title = `You cancelled ${amount} loan offer to ${username}`;
+          icon = <Ban className="w-5 h-5 text-white" />;
+          iconBg = 'bg-gray-500';
+        } else {
+          title = `${username} cancelled their ${amount} loan offer`;
+          icon = <Ban className="w-5 h-5 text-white" />;
+          iconBg = 'bg-gray-500';
+        }
+      } else if (activity.status === 'completed') {
+        if (isLender) {
+          title = `${username} fully repaid your ${amount} loan`;
+          icon = <Check className="w-5 h-5 text-white" />;
+          iconBg = 'bg-blue-500';
+        } else {
+          title = `You fully repaid ${amount} loan to ${username}`;
+          icon = <Check className="w-5 h-5 text-white" />;
+          iconBg = 'bg-blue-500';
+        }
+      } else {
+        title = isLender ? `${amount} loan to ${username}` : `${amount} loan from ${username}`;
+        icon = <Activity className="w-5 h-5 text-[#F3F0EC]" />;
+        iconBg = 'bg-[#35B276]';
+      }
+
+      description = activity.date ? format(new Date(activity.date), 'MMM d, yyyy') : 'N/A';
     }
 
     if (activity.type === 'payment') {
       const associatedLoan = safeLoans.find(l => l && l.id === activity.loan_id);
       if (!associatedLoan) return null;
-      
+
       const isBorrower = associatedLoan.borrower_id === user.id;
       const otherPartyId = isBorrower ? associatedLoan.lender_id : associatedLoan.borrower_id;
       const otherParty = getUserById(otherPartyId);
+      const amount = `$${activity.amount?.toLocaleString() || '0'}`;
+      const username = `@${otherParty?.username || 'user'}`;
 
-      title = isBorrower 
-        ? `You Paid $${activity.amount?.toLocaleString() || '0'} to @${otherParty?.username || 'user'}` 
-        : `Received $${activity.amount?.toLocaleString() || '0'} Payment from @${otherParty?.username || 'user'}`;
-      description = `${format(new Date(activity.date), 'MMM d, yyyy')}`;
-      icon = <DollarSign className="w-5 h-5 text-[#F3F0EC] opacity-90" />;
-      iconBg = 'bg-[#35B276] opacity-100';
-      status = 'completed'; // Payments are always completed here
+      if (isBorrower) {
+        title = `Made ${amount} payment to ${username}`;
+        icon = <ArrowUpRight className="w-5 h-5 text-white" />;
+      } else {
+        title = `Received ${amount} payment from ${username}`;
+        icon = <ArrowDownRight className="w-5 h-5 text-white" />;
+      }
+      description = activity.date ? format(new Date(activity.date), 'MMM d, yyyy') : 'N/A';
+      iconBg = 'bg-purple-500';
+      status = 'completed';
     }
 
     return (
