@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Calendar, DollarSign, Percent, Clock, Send } from "lucide-react";
+import { Calendar, DollarSign, Percent, Clock, Send, CircleDollarSign } from "lucide-react";
 import { PublicProfile } from "@/entities/all";
 import { format, differenceInDays } from "date-fns";
 
@@ -119,16 +119,15 @@ export default function LoanCard({ loan, type, onMakePayment, onDetails }) {
             >
               Details
             </Button>
-            {type === 'borrowed' && loan.status === 'active' && onMakePayment && (
+            {loan.status === 'active' && onMakePayment && (
               <Button
                 onClick={onMakePayment}
                 className="flex-1 bg-green-600 hover:bg-green-700 font-semibold"
               >
-                <Send className="w-4 h-4 mr-2" />
-                Send Money
+                <CircleDollarSign className="w-4 h-4 mr-2" />
+                Record Payment
               </Button>
             )}
-
           </div>
         </div>
       </CardContent>

@@ -19,7 +19,7 @@ import { motion } from "framer-motion";
 import { format } from "date-fns";
 
 import LoanCard from "../components/loans/LoanCard";
-import SendMoneyModal from "../components/loans/SendMoneyModal";
+import RecordPaymentModal from "../components/loans/RecordPaymentModal";
 import LoanDetailsModal from "../components/loans/LoanDetailsModal";
 import LoanProgress from "../components/dashboard/LoanProgress";
 
@@ -141,10 +141,10 @@ export default function MyLoans() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: index * 0.1 }}
       >
-        <LoanCard 
+        <LoanCard
           loan={loan}
           type={type}
-          onMakePayment={type === 'borrowed' ? () => handleMakePayment(loan) : undefined}
+          onMakePayment={() => handleMakePayment(loan)}
           onDetails={() => handleViewDetails(loan, type)}
         />
       </motion.div>
@@ -297,10 +297,11 @@ export default function MyLoans() {
 
         {/* Modals */}
         {showPaymentModal && selectedLoan && (
-          <SendMoneyModal
+          <RecordPaymentModal
             loan={selectedLoan}
             onClose={() => setShowPaymentModal(false)}
             onPaymentComplete={handlePaymentComplete}
+            isLender={selectedLoan.lender_id === user?.id}
           />
         )}
 
