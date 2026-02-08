@@ -194,7 +194,6 @@ export default function MyLoanOffers({ offers, users, currentUser, onDelete, onS
                             className="bg-green-600 hover:bg-green-700 text-white"
                             size="sm"
                           >
-                            <Eye className="w-4 h-4 mr-1" />
                             Details
                           </Button>
                         )}
