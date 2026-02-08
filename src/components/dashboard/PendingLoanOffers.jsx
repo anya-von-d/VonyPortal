@@ -31,7 +31,7 @@ export default function PendingLoanOffers({ offers, users, onAccept, onDecline }
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card style={{backgroundColor: '#f0fdf4', borderColor: '#bbf7d0'}} className="backdrop-blur-sm border-2">
+      <Card style={{backgroundColor: '#dcfce7', borderColor: '#86efac'}} className="backdrop-blur-sm border-2">
         <CardHeader className="pb-4" style={{borderBottomColor: 'rgb(var(--theme-border))'}}>
           <CardTitle className="flex items-center gap-2" style={{color: 'rgb(var(--theme-primary))'}}>
             <Bell className="w-5 h-5" style={{color: 'rgb(var(--theme-primary))'}} />
