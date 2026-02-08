@@ -34,7 +34,7 @@ export default function PendingLoanOffers({ offers }) {
                   You have {offerCount} pending {offerText}! 🎉
                 </h3>
                 <p className="text-slate-600 text-sm">
-                  Review and accept offers from lenders
+                  Review and accept offers from your friends
                 </p>
               </div>
             </div>
