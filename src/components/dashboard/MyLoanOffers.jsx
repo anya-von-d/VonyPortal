@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import BorrowerSignatureModal from "@/components/loans/BorrowerSignatureModal";
 
-export default function MyLoanOffers({ offers, users, currentUser, onDelete, onSign, onDecline }) {
+export default function MyLoanOffers({ offers, users, currentUser, onDelete, onSign, onDecline, hideHeader = false }) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [loanToDelete, setLoanToDelete] = useState(null);
   const [selectedOffer, setSelectedOffer] = useState(null);
@@ -85,23 +85,9 @@ export default function MyLoanOffers({ offers, users, currentUser, onDelete, onS
   // Get lender info for the selected offer
   const selectedOfferLender = selectedOffer ? getUserById(selectedOffer.lender_id) : null;
 
-  return (
-    <>
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
-          <CardHeader className="pb-4 border-b border-slate-200">
-            <CardTitle className="flex items-center gap-2 text-slate-800">
-              <Send className="w-5 h-5 text-green-600" />
-              My Loan Offers ({safeOffers.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              {safeOffers.map((offer, index) => {
+  const renderOffersList = () => (
+    <div className="space-y-4">
+      {safeOffers.map((offer, index) => {
                 if (!offer) return null;
 
                 // Determine if current user is lender or borrower
@@ -217,10 +203,32 @@ export default function MyLoanOffers({ offers, users, currentUser, onDelete, onS
                   </motion.div>
                 );
               })}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+    </div>
+  );
+
+  return (
+    <>
+      {hideHeader ? (
+        renderOffersList()
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
+            <CardHeader className="pb-4 border-b border-slate-200">
+              <CardTitle className="flex items-center gap-2 text-slate-800">
+                <Send className="w-5 h-5 text-green-600" />
+                My Loan Offers ({safeOffers.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              {renderOffersList()}
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
