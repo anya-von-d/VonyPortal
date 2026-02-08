@@ -118,7 +118,7 @@ export default function MyLoanOffers({ offers, users, currentUser, onDelete, onA
                             </p>
                             <div className="flex items-center gap-2">
                               <p className="text-sm text-slate-500">
-                                {otherPartyRole}: @{otherParty?.username || 'unknown'} • {format(new Date(offer.created_date), 'MMM d, yyyy')}
+                                {otherPartyRole}: @{otherParty?.username || 'unknown'} • {offer.created_at ? format(new Date(offer.created_at), 'MMM d, yyyy') : 'N/A'}
                               </p>
                               <Badge
                                 variant={offer.status === 'pending' ? 'secondary' :
