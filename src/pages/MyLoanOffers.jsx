@@ -25,7 +25,7 @@ export default function MyLoanOffersPage() {
       console.log('Current user:', currentUser?.id);
 
       const [allLoans, profiles] = await Promise.all([
-        Loan.list('-created_date').catch((e) => { console.error('Error loading loans:', e); return []; }),
+        Loan.list('-created_at').catch((e) => { console.error('Error loading loans:', e); return []; }),
         PublicProfile.list().catch((e) => { console.error('Error loading profiles:', e); return []; })
       ]);
 
