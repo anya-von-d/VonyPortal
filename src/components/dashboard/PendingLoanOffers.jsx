@@ -67,7 +67,7 @@ export default function PendingLoanOffers({ offers, users, onAccept, onDecline }
                             {lender?.full_name || 'Unknown User'}
                           </p>
                           <p className="text-sm text-slate-500">
-                            @{lender?.username || 'unknown'} • {format(new Date(offer.created_date), 'MMM d, yyyy')}
+                            @{lender?.username || 'unknown'} • {offer.created_at ? format(new Date(offer.created_at), 'MMM d, yyyy') : 'N/A'}
                           </p>
                         </div>
                       </div>

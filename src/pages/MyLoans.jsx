@@ -61,7 +61,7 @@ export default function MyLoans() {
       return;
     }
 
-    const allLoans = await safeEntityCall(() => Loan.list('-updated_date'));
+    const allLoans = await safeEntityCall(() => Loan.list('-created_at'));
     const userLoans = allLoans.filter(loan => 
       loan.lender_id === currentUser.id || loan.borrower_id === currentUser.id
     );

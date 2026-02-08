@@ -82,7 +82,7 @@ export default function LoanActivity({ agreement, loan, user }) {
     // Add completion
     if (loan?.status === 'completed') {
       activities.push({
-        timestamp: new Date(loan.updated_date),
+        timestamp: new Date(loan.created_at),
         type: 'completion',
         person: 'System',
         description: 'loan repaid in full'

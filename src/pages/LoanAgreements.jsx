@@ -28,7 +28,7 @@ export default function LoanAgreements() {
     try {
       const [currentUser, allAgreements, profiles, allLoans, allPayments] = await Promise.all([
         User.me(),
-        LoanAgreement.list('-created_date'),
+        LoanAgreement.list('-created_at'),
         PublicProfile.list(),
         Loan.list(),
         Payment.list()
@@ -132,7 +132,7 @@ export default function LoanAgreements() {
 
     doc.setFontSize(10);
     doc.setFont(undefined, 'normal');
-    doc.text(`Date: ${format(new Date(agreement.created_date), 'MMMM d, yyyy')}`, 20, 35);
+    doc.text(`Date: ${format(new Date(agreement.created_at), 'MMMM d, yyyy')}`, 20, 35);
 
     doc.setFontSize(12);
     doc.setFont(undefined, 'bold');
@@ -324,7 +324,7 @@ export default function LoanAgreements() {
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-slate-800 truncate">{otherParty.full_name}</h3>
                 <p className="text-xs text-slate-500 truncate">
-                  {isLender ? 'Borrower' : 'Lender'}: @{otherParty.username} • {format(new Date(agreement.created_date), 'MMM d, yyyy')}
+                  {isLender ? 'Borrower' : 'Lender'}: @{otherParty.username} • {format(new Date(agreement.created_at), 'MMM d, yyyy')}
                 </p>
               </div>
               <div className="text-right">
@@ -371,7 +371,7 @@ export default function LoanAgreements() {
                         Agreement with @{getUserById(selectedAgreement.lender_id === user?.id ? selectedAgreement.borrower_id : selectedAgreement.lender_id).username}
                       </CardTitle>
                       <p className="text-sm text-slate-500 mt-1">
-                        Created {format(new Date(selectedAgreement.created_date), 'MMMM d, yyyy')}
+                        Created {selectedAgreement.created_at ? format(new Date(selectedAgreement.created_at), 'MMMM d, yyyy') : 'N/A'}
                       </p>
                     </div>
                   </div>

@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Loan, User, PublicProfile } from "@/entities/all";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Loan, User, PublicProfile, LoanAgreement } from "@/entities/all";
+import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { Send } from "lucide-react";
 
 import MyLoanOffers from "../components/dashboard/MyLoanOffers";
 
@@ -13,6 +10,7 @@ export default function MyLoanOffersPage() {
   const [user, setUser] = useState(null);
   const [publicProfiles, setPublicProfiles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     loadData();
   }, []);
@@ -51,13 +49,28 @@ export default function MyLoanOffersPage() {
     }
   };
 
-  const handleAcceptOffer = async (loanId) => {
+  const handleSignOffer = async (loanId, signature) => {
     try {
-      // Update loan status to active when borrower accepts
+      // Update loan status to active when borrower signs
       await Loan.update(loanId, { status: 'active' });
+
+      // Find the existing loan agreement and update it with borrower's signature
+      const agreements = await LoanAgreement.list();
+      const agreement = agreements.find(a => a.loan_id === loanId);
+
+      if (agreement) {
+        await LoanAgreement.update(agreement.id, {
+          borrower_name: signature,
+          borrower_signed_date: new Date().toISOString(),
+          is_fully_signed: true
+        });
+      } else {
+        console.warn('No loan agreement found for loan:', loanId);
+      }
+
       loadData();
     } catch (error) {
-      console.error("Error accepting loan offer:", error);
+      console.error("Error signing loan offer:", error);
     }
   };
 
@@ -90,11 +103,6 @@ export default function MyLoanOffersPage() {
 
   const allOffers = user ? loans.filter(loan => loan.lender_id === user.id || loan.borrower_id === user.id) : [];
 
-  const getUserById = (userId) => {
-    const profile = publicProfiles.find(p => p.user_id === userId);
-    return profile || { username: 'user', full_name: 'Unknown User' };
-  };
-
   return (
     <div className="min-h-screen p-6" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
       <div className="max-w-4xl mx-auto space-y-8">
@@ -113,22 +121,22 @@ export default function MyLoanOffersPage() {
         </motion.div>
 
         {/* Pending Offers Section - only show offers that haven't been signed by both parties */}
-         {allOffers.filter(offer => offer.status === 'pending' || !offer.status).length > 0 ? (
-           <MyLoanOffers
-             offers={allOffers.filter(offer => offer.status === 'pending' || !offer.status)}
-             users={publicProfiles}
-             currentUser={user}
-             onDelete={handleDeleteOffer}
-             onAccept={handleAcceptOffer}
-             onDecline={handleDeclineOffer}
-           />
-         ) : (
-           <Card className="bg-white border-slate-200">
-             <CardContent className="p-8 text-center text-slate-500">
-               No pending loan offers
-             </CardContent>
-           </Card>
-         )}
+        {allOffers.filter(offer => offer.status === 'pending' || !offer.status).length > 0 ? (
+          <MyLoanOffers
+            offers={allOffers.filter(offer => offer.status === 'pending' || !offer.status)}
+            users={publicProfiles}
+            currentUser={user}
+            onDelete={handleDeleteOffer}
+            onSign={handleSignOffer}
+            onDecline={handleDeclineOffer}
+          />
+        ) : (
+          <Card className="bg-white border-slate-200">
+            <CardContent className="p-8 text-center text-slate-500">
+              No pending loan offers
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

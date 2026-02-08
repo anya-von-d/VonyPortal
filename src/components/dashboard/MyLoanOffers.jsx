@@ -8,10 +8,9 @@ import {
   DollarSign,
   Calendar,
   Percent,
-  User as UserIcon,
   AlertTriangle,
-  Check,
-  X as XIcon
+  FileText,
+  Eye
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
@@ -25,15 +24,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import BorrowerSignatureModal from "@/components/loans/BorrowerSignatureModal";
 
-export default function MyLoanOffers({ offers, users, currentUser, onDelete, onAccept, onDecline }) {
+export default function MyLoanOffers({ offers, users, currentUser, onDelete, onSign, onDecline }) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [loanToDelete, setLoanToDelete] = useState(null);
+  const [selectedOffer, setSelectedOffer] = useState(null);
+  const [showSignatureModal, setShowSignatureModal] = useState(false);
   const [processingOfferId, setProcessingOfferId] = useState(null);
 
   const getUserById = (userId) => {
     const safeUsers = Array.isArray(users) ? users : [];
-    // The users prop is now a list of Public Profiles, so we find by user_id
     return safeUsers.find(u => u && u.user_id === userId);
   };
 
@@ -50,11 +51,39 @@ export default function MyLoanOffers({ offers, users, currentUser, onDelete, onA
     }
   };
 
+  const handleDetailsClick = (offer) => {
+    setSelectedOffer(offer);
+    setShowSignatureModal(true);
+  };
+
+  const handleSignComplete = async (signature) => {
+    if (selectedOffer && onSign) {
+      setProcessingOfferId(selectedOffer.id);
+      await onSign(selectedOffer.id, signature);
+      setProcessingOfferId(null);
+      setShowSignatureModal(false);
+      setSelectedOffer(null);
+    }
+  };
+
+  const handleDeclineFromModal = async () => {
+    if (selectedOffer && onDecline) {
+      setProcessingOfferId(selectedOffer.id);
+      await onDecline(selectedOffer.id);
+      setProcessingOfferId(null);
+      setShowSignatureModal(false);
+      setSelectedOffer(null);
+    }
+  };
+
   const safeOffers = Array.isArray(offers) ? offers : [];
 
   if (safeOffers.length === 0) {
     return null;
   }
+
+  // Get lender info for the selected offer
+  const selectedOfferLender = selectedOffer ? getUserById(selectedOffer.lender_id) : null;
 
   return (
     <>
@@ -130,7 +159,7 @@ export default function MyLoanOffers({ offers, users, currentUser, onDelete, onA
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm mb-3">
                           <div className="flex items-center gap-2">
                             <DollarSign className="w-4 h-4 text-green-600" />
@@ -148,7 +177,7 @@ export default function MyLoanOffers({ offers, users, currentUser, onDelete, onA
                             <span>${offer.payment_amount?.toFixed(2) || '0.00'} {offer.payment_frequency || 'monthly'}</span>
                           </div>
                         </div>
-                        
+
                         {offer.purpose && (
                           <div className="mb-3">
                             <p className="text-sm font-medium text-slate-700 mb-1">Purpose</p>
@@ -156,7 +185,7 @@ export default function MyLoanOffers({ offers, users, currentUser, onDelete, onA
                           </div>
                         )}
                       </div>
-                      
+
                       <div className="flex gap-2 flex-wrap">
                         {/* Lender can delete the offer */}
                         {isLender && (
@@ -171,37 +200,17 @@ export default function MyLoanOffers({ offers, users, currentUser, onDelete, onA
                           </Button>
                         )}
 
-                        {/* Borrower can accept or decline */}
+                        {/* Borrower sees Details button to view and sign contract */}
                         {isBorrower && offer.status === 'pending' && (
-                          <>
-                            <Button
-                              onClick={async () => {
-                                setProcessingOfferId(offer.id);
-                                if (onAccept) await onAccept(offer.id);
-                                setProcessingOfferId(null);
-                              }}
-                              disabled={processingOfferId === offer.id}
-                              className="bg-green-600 hover:bg-green-700 text-white"
-                              size="sm"
-                            >
-                              <Check className="w-4 h-4 mr-1" />
-                              Accept
-                            </Button>
-                            <Button
-                              onClick={async () => {
-                                setProcessingOfferId(offer.id);
-                                if (onDecline) await onDecline(offer.id);
-                                setProcessingOfferId(null);
-                              }}
-                              disabled={processingOfferId === offer.id}
-                              variant="outline"
-                              className="border-red-200 text-red-600 hover:bg-red-50"
-                              size="sm"
-                            >
-                              <XIcon className="w-4 h-4 mr-1" />
-                              Decline
-                            </Button>
-                          </>
+                          <Button
+                            onClick={() => handleDetailsClick(offer)}
+                            disabled={processingOfferId === offer.id}
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                            size="sm"
+                          >
+                            <Eye className="w-4 h-4 mr-1" />
+                            Details
+                          </Button>
                         )}
                       </div>
                     </div>
@@ -213,6 +222,7 @@ export default function MyLoanOffers({ offers, users, currentUser, onDelete, onA
         </Card>
       </motion.div>
 
+      {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -231,7 +241,7 @@ export default function MyLoanOffers({ offers, users, currentUser, onDelete, onA
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={handleConfirmDelete}
               className="bg-red-600 hover:bg-red-700"
             >
@@ -240,6 +250,22 @@ export default function MyLoanOffers({ offers, users, currentUser, onDelete, onA
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Borrower Signature Modal */}
+      {showSignatureModal && selectedOffer && (
+        <BorrowerSignatureModal
+          isOpen={showSignatureModal}
+          onClose={() => {
+            setShowSignatureModal(false);
+            setSelectedOffer(null);
+          }}
+          onSign={handleSignComplete}
+          onDecline={handleDeclineFromModal}
+          loanDetails={selectedOffer}
+          lenderName={selectedOfferLender?.full_name || 'Lender'}
+          borrowerFullName={currentUser?.full_name || ''}
+        />
+      )}
     </>
   );
 }

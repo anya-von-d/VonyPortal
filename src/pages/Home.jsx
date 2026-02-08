@@ -92,8 +92,8 @@ export default function Home() {
     try {
       // Only fetch loan data - user profile comes from context
       const [allLoans, recentPayments, allProfiles] = await Promise.all([
-        safeEntityCall(() => Loan.list('-created_date')),
-        safeEntityCall(() => Payment.list('-created_date', 10)),
+        safeEntityCall(() => Loan.list('-created_at')),
+        safeEntityCall(() => Payment.list('-created_at', 10)),
         safeEntityCall(() => PublicProfile.list()),
       ]);
 
