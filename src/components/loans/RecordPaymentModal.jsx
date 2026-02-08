@@ -139,16 +139,39 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
         // Get payment handles
         const handles = {};
 
-        // Venmo
-        const venmoConnections = await VenmoConnection.filter({ user_id: recipientId });
-        if (venmoConnections.length > 0) {
+        // Venmo - use { eq: } syntax for filtering
+        const venmoConnections = await VenmoConnection.filter({ user_id: { eq: recipientId } });
+        if (venmoConnections && venmoConnections.length > 0) {
           handles.venmo = venmoConnections[0].venmo_username;
         }
 
-        // PayPal
-        const paypalConnections = await PayPalConnection.filter({ user_id: recipientId });
-        if (paypalConnections.length > 0) {
+        // PayPal - use { eq: } syntax for filtering
+        const paypalConnections = await PayPalConnection.filter({ user_id: { eq: recipientId } });
+        if (paypalConnections && paypalConnections.length > 0) {
           handles.paypal = paypalConnections[0].paypal_email || paypalConnections[0].paypal_username;
+        }
+
+        // CashApp and Zelle are stored on User profile, need to fetch from users
+        // Get user data directly if available through profiles
+        if (recipientProfile) {
+          // These would be on the user object, but we might need to fetch User data
+          // For now, check if the profile has these fields synced
+        }
+
+        // Try to get CashApp and Zelle from the user entity
+        try {
+          const users = await User.list();
+          const recipientUser = users?.find(u => u.id === recipientId);
+          if (recipientUser) {
+            if (recipientUser.cashapp_handle) {
+              handles.cashapp = recipientUser.cashapp_handle;
+            }
+            if (recipientUser.zelle_email) {
+              handles.zelle = recipientUser.zelle_email;
+            }
+          }
+        } catch (err) {
+          console.log("Could not fetch user payment handles:", err);
         }
 
         setRecipientPaymentHandles(handles);
