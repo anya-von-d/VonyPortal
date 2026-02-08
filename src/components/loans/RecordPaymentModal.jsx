@@ -130,39 +130,48 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
       try {
         // Determine who the recipient is (opposite party)
         const recipientId = isLender ? loan.borrower_id : loan.lender_id;
+        console.log("RecordPaymentModal - Looking for recipient:", recipientId, "isLender:", isLender);
+        console.log("RecordPaymentModal - Loan:", loan);
 
         // Get recipient's profile
         const profiles = await PublicProfile.list();
         const recipientProfile = profiles.find(p => p.user_id === recipientId);
         setRecipientInfo(recipientProfile);
+        console.log("RecordPaymentModal - Recipient profile:", recipientProfile);
 
         // Get payment handles
         const handles = {};
 
-        // Venmo - use { eq: } syntax for filtering
-        const venmoConnections = await VenmoConnection.filter({ user_id: { eq: recipientId } });
-        if (venmoConnections && venmoConnections.length > 0) {
-          handles.venmo = venmoConnections[0].venmo_username;
+        // Venmo - fetch ALL connections first to debug
+        const allVenmoConnections = await VenmoConnection.list();
+        console.log("RecordPaymentModal - ALL Venmo connections:", allVenmoConnections);
+
+        // Find the one matching our recipient
+        const recipientVenmo = allVenmoConnections.find(vc => vc.user_id === recipientId);
+        if (recipientVenmo) {
+          handles.venmo = recipientVenmo.venmo_username;
+          console.log("RecordPaymentModal - Found Venmo for recipient:", recipientVenmo);
+        } else {
+          console.log("RecordPaymentModal - No Venmo found for recipientId:", recipientId);
         }
 
-        // PayPal - use { eq: } syntax for filtering
-        const paypalConnections = await PayPalConnection.filter({ user_id: { eq: recipientId } });
-        if (paypalConnections && paypalConnections.length > 0) {
-          handles.paypal = paypalConnections[0].paypal_email || paypalConnections[0].paypal_username;
+        // PayPal - fetch ALL connections first to debug
+        const allPaypalConnections = await PayPalConnection.list();
+        console.log("RecordPaymentModal - ALL PayPal connections:", allPaypalConnections);
+
+        const recipientPaypal = allPaypalConnections.find(pc => pc.user_id === recipientId);
+        if (recipientPaypal) {
+          handles.paypal = recipientPaypal.paypal_email || recipientPaypal.paypal_username;
+          console.log("RecordPaymentModal - Found PayPal for recipient:", recipientPaypal);
         }
 
-        // CashApp and Zelle are stored on User profile, need to fetch from users
-        // Get user data directly if available through profiles
-        if (recipientProfile) {
-          // These would be on the user object, but we might need to fetch User data
-          // For now, check if the profile has these fields synced
-        }
-
-        // Try to get CashApp and Zelle from the user entity
+        // Try to get CashApp and Zelle from the user/profiles
         try {
           const users = await User.list();
+          console.log("RecordPaymentModal - All users/profiles:", users);
           const recipientUser = users?.find(u => u.id === recipientId);
           if (recipientUser) {
+            console.log("RecordPaymentModal - Found recipient user:", recipientUser);
             if (recipientUser.cashapp_handle) {
               handles.cashapp = recipientUser.cashapp_handle;
             }
@@ -174,6 +183,7 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
           console.log("Could not fetch user payment handles:", err);
         }
 
+        console.log("RecordPaymentModal - Final handles:", handles);
         setRecipientPaymentHandles(handles);
       } catch (error) {
         console.error("Error fetching recipient info:", error);
