@@ -386,34 +386,38 @@ export default function MyLoans() {
         {/* Bottom Section - Active Lending, Active Borrowing, and Loan Progress */}
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Left side - Active Lending and Active Borrowing stacked */}
-          <div className="lg:col-span-1 grid grid-rows-2 gap-4">
-            <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm flex flex-col justify-center">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
+          <div className="lg:col-span-1 flex flex-col gap-4">
+            <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-slate-600">Active Lending</p>
-                  <div className="p-2.5 rounded-xl bg-[#35B276] ring-4 ring-[#35B276]/20">
-                    <ArrowUpRight className="w-5 h-5 text-white" />
+                  <div className="p-2 rounded-xl bg-[#35B276] ring-4 ring-[#35B276]/20">
+                    <ArrowUpRight className="w-4 h-4 text-white" />
                   </div>
                 </div>
-                <p className="text-3xl font-bold text-slate-800 mb-1">
-                  ${totalLentActive.toLocaleString()}
-                </p>
-                <p className="text-sm text-slate-500 font-medium">{lentLoans.filter(l => l.status === 'active').length} active loans</p>
+                <div className="flex items-baseline justify-between">
+                  <p className="text-2xl font-bold text-slate-800">
+                    ${totalLentActive.toLocaleString()}
+                  </p>
+                  <p className="text-sm text-slate-500 font-medium">{lentLoans.filter(l => l.status === 'active').length} active loans</p>
+                </div>
               </CardContent>
             </Card>
 
-            <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm flex flex-col justify-center">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
+            <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-slate-600">Active Borrowing</p>
-                  <div className="p-2.5 rounded-xl bg-[#35B276] ring-4 ring-[#35B276]/20">
-                    <ArrowDownRight className="w-5 h-5 text-white" />
+                  <div className="p-2 rounded-xl bg-[#35B276] ring-4 ring-[#35B276]/20">
+                    <ArrowDownRight className="w-4 h-4 text-white" />
                   </div>
                 </div>
-                <p className="text-3xl font-bold text-slate-800 mb-1">
-                  ${totalBorrowedActive.toLocaleString()}
-                </p>
-                <p className="text-sm text-slate-500 font-medium">{borrowedLoans.filter(l => l.status === 'active').length} active loans</p>
+                <div className="flex items-baseline justify-between">
+                  <p className="text-2xl font-bold text-slate-800">
+                    ${totalBorrowedActive.toLocaleString()}
+                  </p>
+                  <p className="text-sm text-slate-500 font-medium">{borrowedLoans.filter(l => l.status === 'active').length} active loans</p>
+                </div>
               </CardContent>
             </Card>
           </div>
