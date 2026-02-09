@@ -16,16 +16,16 @@ export default function LoanProgress({ loans, userId }) {
   const borrowedProgress = totalBorrowed > 0 ? (borrowedPaid / totalBorrowed) * 100 : 0;
 
   return (
-    <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
-      <CardHeader className="pb-2 pt-4 px-4">
+    <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60 h-full">
+      <CardHeader className="pb-4 pt-4 px-4">
         <CardTitle className="flex items-center gap-2 text-base">
           <BarChart3 className="w-4 h-4 text-green-600" />
           Loan Progress
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4 pt-2 px-4 pb-4">
+      <CardContent className="space-y-6 pt-2 px-4 pb-6">
         {/* Lending Progress */}
-        <div className="space-y-1">
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <TrendingUp className="w-3 h-3 text-green-600" />
@@ -47,7 +47,7 @@ export default function LoanProgress({ loans, userId }) {
         </div>
 
         {/* Borrowing Progress */}
-        <div className="space-y-1">
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <TrendingDown className="w-3 h-3" style={{color: '#347571'}} />
