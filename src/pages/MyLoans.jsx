@@ -384,44 +384,46 @@ export default function MyLoans() {
         )}
 
         {/* Bottom Section - Active Lending, Active Borrowing, and Loan Progress */}
-        <div className="grid lg:grid-cols-2 gap-6">
+        <div className="grid lg:grid-cols-3 gap-6">
           {/* Left side - Active Lending and Active Borrowing stacked */}
-          <div className="space-y-4">
-            <Card className="text-white" style={{backgroundColor: '#35B276'}}>
+          <div className="lg:col-span-1 space-y-4">
+            <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
               <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2">
-                  <ArrowUpRight className="w-5 h-5" />
+                <CardTitle className="flex items-center gap-2 text-slate-800">
+                  <ArrowUpRight className="w-5 h-5" style={{color: '#35B276'}} />
                   Active Lending
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                <div className="text-3xl font-bold mb-1">
+                <div className="text-3xl font-bold mb-1 text-slate-800">
                   ${totalLentActive.toLocaleString()}
                 </div>
-                <p className="opacity-80">{lentLoans.filter(l => l.status === 'active').length} active loans</p>
+                <p className="text-slate-500">{lentLoans.filter(l => l.status === 'active').length} active loans</p>
               </CardContent>
             </Card>
 
-            <Card className="text-white" style={{backgroundColor: '#35B276'}}>
+            <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
               <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2">
-                  <ArrowDownRight className="w-5 h-5" />
+                <CardTitle className="flex items-center gap-2 text-slate-800">
+                  <ArrowDownRight className="w-5 h-5" style={{color: '#35B276'}} />
                   Active Borrowing
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                <div className="text-3xl font-bold mb-1">
+                <div className="text-3xl font-bold mb-1 text-slate-800">
                   ${totalBorrowedActive.toLocaleString()}
                 </div>
-                <p className="opacity-80">{borrowedLoans.filter(l => l.status === 'active').length} active loans</p>
+                <p className="text-slate-500">{borrowedLoans.filter(l => l.status === 'active').length} active loans</p>
               </CardContent>
             </Card>
           </div>
 
           {/* Right side - Loan Progress */}
-          {user && loans.length > 0 && (
-            <LoanProgress loans={loans} userId={user.id} />
-          )}
+          <div className="lg:col-span-2">
+            {user && loans.length > 0 && (
+              <LoanProgress loans={loans} userId={user.id} />
+            )}
+          </div>
         </div>
 
         {/* Modals */}
