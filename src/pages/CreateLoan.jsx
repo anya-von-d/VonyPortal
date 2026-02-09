@@ -504,7 +504,7 @@ export default function CreateLoan() {
               </div>
               <p className="text-xs text-slate-500 text-center mt-3">
                 {loanType === 'flexible'
-                  ? "Perfect for casual loans between friends — no interest, no strict schedule. Pay back whenever works for both of you."
+                  ? "Perfect for casual loans between friends, no interest, no strict schedule. Pay back whenever works for both of you."
                   : "For formal agreements with interest rates and set payment schedules. Ideal for larger amounts that need structure."}
               </p>
             </div>
