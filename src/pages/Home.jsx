@@ -216,7 +216,7 @@ export default function Home() {
                 })()}
               </h1>
               <p className="text-lg text-center" style={{ color: '#475569' }}>
-                Your trusted platform for managing personal loans. Connect, lend, and borrow with confidence.
+                Lending between friends made simple.
               </p>
           </motion.div>
 
