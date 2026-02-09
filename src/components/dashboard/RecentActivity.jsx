@@ -100,56 +100,56 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
       if (activity.status === 'pending' || !activity.status) {
         if (isLender) {
           title = `Sent ${amount} loan offer to ${username}`;
-          icon = <Send className="w-5 h-5 text-[#F3F0EC]" />;
+          icon = <Send className="w-5 h-5 text-white" />;
           iconBg = 'bg-[#35B276]';
         } else {
           title = `Received ${amount} loan offer from ${username}`;
-          icon = <ArrowDownRight className="w-5 h-5 text-[#F3F0EC]" />;
-          iconBg = 'bg-blue-500';
+          icon = <ArrowDownRight className="w-5 h-5 text-white" />;
+          iconBg = 'bg-[#35B276]';
         }
       } else if (activity.status === 'active') {
         if (isLender) {
           title = `${username} accepted your ${amount} loan`;
-          icon = <Check className="w-5 h-5 text-[#F3F0EC]" />;
+          icon = <Check className="w-5 h-5 text-white" />;
           iconBg = 'bg-[#35B276]';
         } else {
           title = `You accepted ${amount} loan from ${username}`;
-          icon = <Check className="w-5 h-5 text-[#F3F0EC]" />;
+          icon = <Check className="w-5 h-5 text-white" />;
           iconBg = 'bg-[#35B276]';
         }
       } else if (activity.status === 'declined') {
         if (isLender) {
           title = `${username} declined your ${amount} loan`;
           icon = <X className="w-5 h-5 text-white" />;
-          iconBg = 'bg-red-500';
+          iconBg = 'bg-[#35B276]';
         } else {
           title = `You declined ${amount} loan from ${username}`;
           icon = <X className="w-5 h-5 text-white" />;
-          iconBg = 'bg-red-500';
+          iconBg = 'bg-[#35B276]';
         }
       } else if (activity.status === 'cancelled') {
         if (isLender) {
           title = `You cancelled ${amount} loan offer to ${username}`;
           icon = <Ban className="w-5 h-5 text-white" />;
-          iconBg = 'bg-gray-500';
+          iconBg = 'bg-[#35B276]';
         } else {
           title = `${username} cancelled their ${amount} loan offer`;
           icon = <Ban className="w-5 h-5 text-white" />;
-          iconBg = 'bg-gray-500';
+          iconBg = 'bg-[#35B276]';
         }
       } else if (activity.status === 'completed') {
         if (isLender) {
           title = `${username} fully repaid your ${amount} loan`;
           icon = <Check className="w-5 h-5 text-white" />;
-          iconBg = 'bg-blue-500';
+          iconBg = 'bg-[#35B276]';
         } else {
           title = `You fully repaid ${amount} loan to ${username}`;
           icon = <Check className="w-5 h-5 text-white" />;
-          iconBg = 'bg-blue-500';
+          iconBg = 'bg-[#35B276]';
         }
       } else {
         title = isLender ? `${amount} loan to ${username}` : `${amount} loan from ${username}`;
-        icon = <Activity className="w-5 h-5 text-[#F3F0EC]" />;
+        icon = <Activity className="w-5 h-5 text-white" />;
         iconBg = 'bg-[#35B276]';
       }
 
@@ -174,7 +174,7 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
         icon = <ArrowDownRight className="w-5 h-5 text-white" />;
       }
       description = activity.date ? format(new Date(activity.date), 'MMM d, yyyy') : 'N/A';
-      iconBg = 'bg-purple-500';
+      iconBg = 'bg-[#35B276]';
       status = 'completed';
     }
 
