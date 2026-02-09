@@ -437,7 +437,9 @@ export default function Profile() {
             <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-xl">
-                  <UserIcon className="w-5 h-5 text-green-600" />
+                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                    <UserIcon className="w-4 h-4 text-green-600" />
+                  </div>
                   Personal Information
                 </CardTitle>
               </CardHeader>
