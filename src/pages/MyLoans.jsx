@@ -12,7 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { CreditCard, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { CreditCard, ArrowUpRight, ArrowDownRight, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
@@ -154,6 +154,24 @@ export default function MyLoans() {
   const totalLentActive = lentLoans.filter(l => l.status === 'active').reduce((sum, loan) => sum + (loan.amount || 0), 0);
   const totalBorrowedActive = borrowedLoans.filter(l => l.status === 'active').reduce((sum, loan) => sum + (loan.amount || 0), 0);
 
+  // Find next payment due (as borrower)
+  const nextPaymentLoan = borrowedLoans
+    .filter(loan => loan.status === 'active' && loan.next_payment_date)
+    .map(loan => ({ ...loan, date: new Date(loan.next_payment_date) }))
+    .sort((a, b) => a.date - b.date)[0];
+
+  const getNextPaymentDays = () => {
+    if (!nextPaymentLoan) return null;
+    const today = new Date();
+    const paymentDate = new Date(nextPaymentLoan.date);
+    const diffTime = paymentDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const nextPaymentDays = getNextPaymentDays();
+  const nextPaymentAmount = nextPaymentLoan?.payment_amount || 0;
+
   return (
     <div className="min-h-screen p-6" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
       <div className="max-w-4xl mx-auto space-y-8">
@@ -172,7 +190,7 @@ export default function MyLoans() {
         </motion.div>
 
         {/* Summary Cards */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
           <Card className="text-white" style={{backgroundColor: '#35B276'}}>
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2">
@@ -200,6 +218,27 @@ export default function MyLoans() {
                 ${totalBorrowedActive.toLocaleString()}
               </div>
               <p className="opacity-80">{borrowedLoans.filter(l => l.status === 'active').length} active loans</p>
+            </CardContent>
+          </Card>
+
+          <Card className="text-white" style={{backgroundColor: '#35B276'}}>
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="w-5 h-5" />
+                Next Payment
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold mb-2">
+                {nextPaymentLoan ? `$${nextPaymentAmount.toLocaleString()}` : '-'}
+              </div>
+              <p className="opacity-80">
+                {nextPaymentDays !== null
+                  ? (nextPaymentDays < 0
+                      ? 'Overdue'
+                      : `${nextPaymentDays} day${nextPaymentDays !== 1 ? 's' : ''} left`)
+                  : 'No payments due'}
+              </p>
             </CardContent>
           </Card>
         </div>
