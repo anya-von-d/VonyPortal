@@ -70,7 +70,7 @@ export default function TopNav({ location, colors, user, isLoading, theme }) {
   // Light mode (morning) uses the standard logo, dark mode (afternoon) uses the black outline logo
   const logoUrl = theme === 'afternoon'
     ? "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/689b5da4ed66944b2307218f/0cdfad9ab_newLogoBlackOutline.png"
-    : "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/689b5da4ed66944b2307218f/922791a92_newLogo.png";
+    : "https://wvgqxgximcuhqhesoycw.supabase.co/storage/v1/object/public/Image%20Storage/LowercaseLogo.png";
 
   return (
     <div className={`border-b ${colors.sidebarBorder} bg-gradient-to-r ${colors.sidebarBg} backdrop-blur-xl px-6 py-3`}>
