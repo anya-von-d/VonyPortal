@@ -430,23 +430,23 @@ export default function Profile() {
           </DialogContent>
         </Dialog>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Profile Info */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6 min-w-0">
             {/* Personal Information - First */}
-            <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-xl">
+            <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60 overflow-hidden">
+              <CardHeader className="pb-3 px-4 md:px-6">
+                <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
                   <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
                     <UserIcon className="w-4 h-4 text-green-600" />
                   </div>
                   Personal Information
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-6 pt-3">
-                <div className="space-y-6">
+              <CardContent className="p-4 md:p-6 pt-3">
+                <div className="space-y-4 md:space-y-6">
                   {/* Name and Email fields */}
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid md:grid-cols-2 gap-4 md:gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="full_name" className="flex items-center gap-2">
                         <UserIcon className={`w-4 h-4 ${isEditing ? 'text-green-600' : 'text-slate-500'}`} />
@@ -502,7 +502,7 @@ export default function Profile() {
                   </div>
 
                   {/* Editable fields */}
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid md:grid-cols-2 gap-4 md:gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="phone" className="flex items-center gap-2">
                         <Phone className="w-4 h-4 text-blue-600" />
@@ -552,16 +552,16 @@ export default function Profile() {
           </div>
 
           {/* Stats & Verification */}
-          <div className="space-y-6">
+          <div className="space-y-6 min-w-0">
             {/* Bank Account Connection */}
-            <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+            <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60 overflow-hidden">
+              <CardHeader className="px-4 md:px-6">
+                <CardTitle className="flex items-center gap-2 text-base md:text-lg">
                   <Landmark className="w-5 h-5 text-green-600" />
                   Bank Account
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 px-4 md:px-6">
                 <p className="text-sm text-slate-600">
                   Securely connect your bank account using Plaid & Dwolla to enable bank transfers.
                 </p>
@@ -579,14 +579,14 @@ export default function Profile() {
             </Card>
 
             {/* Verification Status */}
-            <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+            <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60 overflow-hidden">
+              <CardHeader className="px-4 md:px-6">
+                <CardTitle className="flex items-center gap-2 text-base md:text-lg">
                   <Shield className="w-5 h-5 text-green-600" />
                   Verification
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 px-4 md:px-6">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Email Verified</span>
                   <Badge className="bg-green-100 text-green-800 border-green-200">
@@ -624,14 +624,14 @@ export default function Profile() {
             </Card>
 
             {/* Theme Preference */}
-            <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+            <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60 overflow-hidden">
+              <CardHeader className="px-4 md:px-6">
+                <CardTitle className="flex items-center gap-2 text-base md:text-lg">
                   <Palette className="w-5 h-5 text-purple-600" />
                   Theme
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-4 md:px-6">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-slate-600">Appearance</span>
                   <button
