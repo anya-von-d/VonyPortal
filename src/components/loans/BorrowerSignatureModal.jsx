@@ -59,25 +59,30 @@ export default function BorrowerSignatureModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-2xl">
-            <FileText className="w-6 h-6 text-green-600" />
-            Loan Agreement
-          </DialogTitle>
-          <DialogDescription>
-            Review the loan terms carefully before signing
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 gap-0">
+        {/* Header with solid green */}
+        <div className="bg-[#35B276] p-6 rounded-t-lg">
+          <DialogHeader className="space-y-2">
+            <DialogTitle className="flex items-center gap-3 text-2xl text-[#F3F0EC]">
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <FileText className="w-5 h-5 text-[#F3F0EC]" />
+              </div>
+              Loan Agreement
+            </DialogTitle>
+            <DialogDescription className="text-[#F3F0EC]/90">
+              Review the loan terms carefully before signing
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <div className="space-y-6 py-4">
+        <div className="p-6 space-y-6">
           {/* Lender Info */}
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="bg-[#35B276]/10 border border-[#35B276]/30 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
-              <CheckCircle2 className="w-5 h-5 text-green-600" />
-              <span className="font-semibold text-green-800">Lender has signed</span>
+              <CheckCircle2 className="w-5 h-5 text-[#35B276]" />
+              <span className="font-semibold text-[#35B276]">Lender has signed</span>
             </div>
-            <p className="text-sm text-green-700">
+            <p className="text-sm text-slate-700">
               {lenderName} has reviewed and signed this loan agreement.
             </p>
           </div>
@@ -130,13 +135,11 @@ export default function BorrowerSignatureModal({
           </div>
 
           {/* Agreement Text */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="bg-[#35B276]/10 border border-[#35B276]/30 rounded-lg p-4">
             <p className="text-sm text-slate-700 leading-relaxed">
-              By signing this agreement, I, <strong>{borrowerFullName}</strong>, acknowledge that I have read
-              and understood the loan terms stated above. I agree to repay the full amount of{' '}
-              <strong>{formatMoney(loanDetails.total_amount)}</strong> according to the payment schedule.
-              I understand that failure to make timely payments may result in additional fees and affect
-              my relationship with the lender.
+              By signing below, you acknowledge and agree to the loan terms stated above as the{' '}
+              <span className="font-semibold text-[#35B276]">Borrower</span>.
+              You commit to fulfilling all obligations outlined in this agreement.
             </p>
           </div>
 
@@ -175,7 +178,7 @@ export default function BorrowerSignatureModal({
             <Button
               variant="outline"
               onClick={handleDecline}
-              className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
+              className="flex-1 border-red-200 text-red-600 hover:bg-red-50 h-12"
               disabled={isSigning || isDeclining}
             >
               <X className="w-4 h-4 mr-1" />
@@ -183,7 +186,7 @@ export default function BorrowerSignatureModal({
             </Button>
             <Button
               onClick={handleSign}
-              className="flex-1 bg-green-600 hover:bg-green-700"
+              className="flex-1 bg-[#35B276] hover:bg-[#2d9a65] h-12 shadow-lg shadow-green-600/25"
               disabled={isSigning || isDeclining}
             >
               {isSigning ? 'Signing...' : 'Sign & Accept'}

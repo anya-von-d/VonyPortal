@@ -363,31 +363,32 @@ export default function LoanAgreements() {
             onClick={(e) => e.stopPropagation()}
             className="max-w-4xl w-full max-h-[90vh] overflow-y-auto"
           >
-            <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`}} className="backdrop-blur-sm">
-              <CardHeader className="border-b border-slate-200/40">
+            <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`}} className="backdrop-blur-sm overflow-hidden">
+              {/* Header with solid green */}
+              <div className="bg-[#35B276] p-6">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-3 rounded-lg" style={{backgroundColor: `rgb(var(--theme-primary-light))`}}>
-                      <FileText className="w-6 h-6" style={{color: `rgb(var(--theme-primary))`}} />
+                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                      <FileText className="w-6 h-6 text-[#F3F0EC]" />
                     </div>
                     <div>
-                      <CardTitle className="text-xl">
-                        Agreement with @{getUserById(selectedAgreement.lender_id === user?.id ? selectedAgreement.borrower_id : selectedAgreement.lender_id).username}
+                      <CardTitle className="text-xl text-[#F3F0EC]">
+                        Loan Agreement
                       </CardTitle>
-                      <p className="text-sm text-slate-500 mt-1">
-                        Created {selectedAgreement.created_at ? format(new Date(selectedAgreement.created_at), 'MMMM d, yyyy') : 'N/A'}
+                      <p className="text-sm text-[#F3F0EC]/80 mt-1">
+                        Agreement with @{getUserById(selectedAgreement.lender_id === user?.id ? selectedAgreement.borrower_id : selectedAgreement.lender_id).username} • Created {selectedAgreement.created_at ? format(new Date(selectedAgreement.created_at), 'MMMM d, yyyy') : 'N/A'}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button onClick={() => downloadPDF(selectedAgreement)} variant="outline" size="sm" className="gap-2">
+                    <Button onClick={() => downloadPDF(selectedAgreement)} variant="outline" size="sm" className="gap-2 bg-white/10 border-white/30 text-[#F3F0EC] hover:bg-white/20">
                       <Download className="w-4 h-4" />
                       Download PDF
                     </Button>
-                    <Button onClick={() => setSelectedAgreement(null)} variant="ghost" size="sm">✕</Button>
+                    <Button onClick={() => setSelectedAgreement(null)} variant="ghost" size="sm" className="text-[#F3F0EC] hover:bg-white/10">✕</Button>
                   </div>
                 </div>
-              </CardHeader>
+              </div>
 
               <CardContent className="p-6">
                 <div className="mb-4">
@@ -454,7 +455,11 @@ export default function LoanAgreements() {
 
                 <div className="border-t border-slate-200/40 pt-6">
                   <h4 className="font-semibold text-slate-800 mb-4">Agreement</h4>
-                  <p className="text-slate-700 mb-6">The Lender agrees to lend the Borrower the specified loan amount under the terms outlined above. The Borrower agrees to repay the full amount plus interest according to the payment schedule. Both parties acknowledge and accept these terms.</p>
+                  <div className="bg-[#35B276]/10 border border-[#35B276]/30 rounded-xl p-4">
+                    <p className="text-sm text-slate-700 leading-relaxed">
+                      This loan agreement confirms that both the <span className="font-semibold text-[#35B276]">Lender</span> and <span className="font-semibold text-[#35B276]">Borrower</span> have reviewed and agreed to the terms stated above. The Lender commits to providing the loan amount, and the Borrower commits to repaying the full amount plus interest according to the agreed payment schedule.
+                    </p>
+                  </div>
                 </div>
 
                 <div className="border-t border-slate-200/40 pt-6">

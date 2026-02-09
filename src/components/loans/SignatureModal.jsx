@@ -40,16 +40,16 @@ export default function SignatureModal({ isOpen, onClose, onSign, loanDetails, u
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto p-0 gap-0">
-        {/* Header with gradient */}
-        <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-6 rounded-t-lg">
+        {/* Header with solid green */}
+        <div className="bg-[#35B276] p-6 rounded-t-lg">
           <DialogHeader className="space-y-2">
-            <DialogTitle className="flex items-center gap-3 text-2xl text-white">
+            <DialogTitle className="flex items-center gap-3 text-2xl text-[#F3F0EC]">
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <FileText className="w-5 h-5 text-white" />
+                <FileText className="w-5 h-5 text-[#F3F0EC]" />
               </div>
               Loan Agreement
             </DialogTitle>
-            <DialogDescription className="text-green-100">
+            <DialogDescription className="text-[#F3F0EC]/90">
               Review the terms and sign to {signingAs === 'Lender' ? 'create this loan offer' : 'accept this loan'}
             </DialogDescription>
           </DialogHeader>
@@ -106,10 +106,10 @@ export default function SignatureModal({ isOpen, onClose, onSign, loanDetails, u
           </div>
 
           {/* Agreement Notice */}
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-            <p className="text-sm text-amber-800 leading-relaxed">
+          <div className="bg-[#35B276]/10 border border-[#35B276]/30 rounded-xl p-4">
+            <p className="text-sm text-slate-700 leading-relaxed">
               By signing below, you acknowledge and agree to the loan terms stated above as the{' '}
-              <span className="font-semibold text-amber-900">{signingAs}</span>.
+              <span className="font-semibold text-[#35B276]">{signingAs}</span>.
               You commit to fulfilling all obligations outlined in this agreement.
             </p>
           </div>
