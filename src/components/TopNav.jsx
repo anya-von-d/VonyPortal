@@ -70,7 +70,7 @@ export default function TopNav({ location, colors, user, isLoading, theme }) {
   // Light mode (morning) uses the standard logo, green mode (afternoon) uses the green mode logo
   const logoUrl = theme === 'afternoon'
     ? "https://wvgqxgximcuhqhesoycw.supabase.co/storage/v1/object/public/Image%20Storage/LowercaseLogoGreenMode.png"
-    : "https://wvgqxgximcuhqhesoycw.supabase.co/storage/v1/object/public/Image%20Storage/LowercaseLogo.png";
+    : "https://wvgqxgximcuhqhesoycw.supabase.co/storage/v1/object/public/Image%20Storage/all_lowercase_logo.png";
 
   return (
     <div className={`border-b ${colors.sidebarBorder} bg-gradient-to-r ${colors.sidebarBg} backdrop-blur-xl px-6 py-3`}>

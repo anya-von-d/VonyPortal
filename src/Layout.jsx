@@ -144,14 +144,6 @@ export default function Layout({ children }) {
           document.documentElement.style.setProperty(key, value);
         });
 
-        // Update favicon based on theme
-        const faviconLink = document.querySelector("link[rel='icon']");
-        if (faviconLink) {
-          faviconLink.href = theme === 'afternoon'
-            ? "https://wvgqxgximcuhqhesoycw.supabase.co/storage/v1/object/public/Image%20Storage/LowercaseLogoGreenMode.png"
-            : "https://wvgqxgximcuhqhesoycw.supabase.co/storage/v1/object/public/Image%20Storage/favicon_square.png";
-        }
-
         // Load Inter font
         if (!document.getElementById('inter-font-link')) {
           const link = document.createElement('link');
@@ -203,7 +195,7 @@ export default function Layout({ children }) {
               <img
                 src={theme === 'afternoon'
                   ? "https://wvgqxgximcuhqhesoycw.supabase.co/storage/v1/object/public/Image%20Storage/LowercaseLogoGreenMode.png"
-                  : "https://wvgqxgximcuhqhesoycw.supabase.co/storage/v1/object/public/Image%20Storage/LowercaseLogo.png"}
+                  : "https://wvgqxgximcuhqhesoycw.supabase.co/storage/v1/object/public/Image%20Storage/all_lowercase_logo.png"}
                 alt="Vony Logo"
                 className="h-12 w-auto"
               />
