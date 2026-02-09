@@ -100,14 +100,14 @@ export default function SignatureModal({ isOpen, onClose, onSign, loanDetails, u
         {/* Header with solid green */}
         <div className="bg-[#35B276] p-6 rounded-t-lg">
           <DialogHeader className="space-y-2">
-            <DialogTitle className="flex items-center gap-3 text-2xl text-[#F3F0EC]">
+            <DialogTitle className="flex items-center gap-3 text-2xl" style={{ color: '#F3F0EC' }}>
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <FileText className="w-5 h-5 text-[#F3F0EC]" />
+                <FileText className="w-5 h-5" style={{ color: '#F3F0EC' }} />
               </div>
-              Loan Agreement
+              <span style={{ color: '#F3F0EC' }}>Loan Agreement</span>
             </DialogTitle>
             <p className="text-sm mt-1" style={{ color: '#F3F0EC' }}>
-              Review the terms and sign to {signingAs === 'Lender' ? 'create this loan offer' : 'accept this loan'}
+              <span style={{ color: '#F3F0EC' }}>Review the terms and sign to {signingAs === 'Lender' ? 'create this loan offer' : 'accept this loan'}</span>
             </p>
           </DialogHeader>
         </div>
