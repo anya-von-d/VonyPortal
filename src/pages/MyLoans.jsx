@@ -384,10 +384,10 @@ export default function MyLoans() {
         )}
 
         {/* Bottom Section - Active Lending, Active Borrowing, and Loan Progress */}
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-3 gap-6 items-stretch">
           {/* Left side - Active Lending and Active Borrowing stacked */}
-          <div className="lg:col-span-1 space-y-4">
-            <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
+          <div className="lg:col-span-1 flex flex-col gap-4">
+            <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm flex-1 flex flex-col justify-center">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-sm font-medium text-slate-600">Active Lending</p>
@@ -402,7 +402,7 @@ export default function MyLoans() {
               </CardContent>
             </Card>
 
-            <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
+            <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm flex-1 flex flex-col justify-center">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-sm font-medium text-slate-600">Active Borrowing</p>
