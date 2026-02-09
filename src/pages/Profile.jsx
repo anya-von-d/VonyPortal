@@ -527,31 +527,6 @@ export default function Profile() {
                     </div>
                   </div>
 
-                  {/* Theme Preference Toggle - Always editable */}
-                  <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
-                    <Label htmlFor="theme" className="flex items-center gap-2">
-                      <Palette className="w-4 h-4 text-purple-600" />
-                      Theme
-                    </Label>
-                    <button
-                      type="button"
-                      onClick={() => handleInputChange('theme_preference', formData.theme_preference === 'morning' ? 'afternoon' : 'morning')}
-                      className={`relative w-24 h-12 rounded-full transition-all duration-300 ${
-                        formData.theme_preference === 'afternoon' ? 'bg-[#35B276]/30' : 'bg-[#F5DEB3]/30'
-                      }`}
-                    >
-                      <div className={`absolute top-1 left-1 w-10 h-10 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 ${
-                        formData.theme_preference === 'afternoon' ? 'translate-x-12 bg-[#35B276]' : 'translate-x-0 bg-[#F5DEB3]'
-                      }`}>
-                        {formData.theme_preference === 'morning' ? (
-                          <Sun className="w-5 h-5 text-white" />
-                        ) : (
-                          <PiggyBank className="w-5 h-5 text-white" />
-                        )}
-                      </div>
-                    </button>
-                  </div>
-
                   {isEditing && (
                     <Button
                       onClick={handleSave}
@@ -621,7 +596,7 @@ export default function Profile() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Profile Complete</span>
-                  <Badge className={user.profile_completed ? 
+                  <Badge className={user.profile_completed ?
                     "bg-green-100 text-green-800 border-green-200" :
                     "bg-gray-100 text-gray-800 border-gray-200"
                   }>
@@ -641,6 +616,37 @@ export default function Profile() {
               </CardContent>
             </Card>
 
+            {/* Theme Preference */}
+            <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Palette className="w-5 h-5 text-purple-600" />
+                  Theme
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-slate-600">Appearance</span>
+                  <button
+                    type="button"
+                    onClick={() => handleInputChange('theme_preference', formData.theme_preference === 'morning' ? 'afternoon' : 'morning')}
+                    className={`relative w-20 h-10 rounded-full transition-all duration-300 ${
+                      formData.theme_preference === 'afternoon' ? 'bg-[#35B276]/30' : 'bg-[#F5DEB3]/30'
+                    }`}
+                  >
+                    <div className={`absolute top-1 left-1 w-8 h-8 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 ${
+                      formData.theme_preference === 'afternoon' ? 'translate-x-10 bg-[#35B276]' : 'translate-x-0 bg-[#F5DEB3]'
+                    }`}>
+                      {formData.theme_preference === 'morning' ? (
+                        <Sun className="w-4 h-4 text-white" />
+                      ) : (
+                        <PiggyBank className="w-4 h-4 text-white" />
+                      )}
+                    </div>
+                  </button>
+                </div>
+              </CardContent>
+            </Card>
 
           </div>
         </div>

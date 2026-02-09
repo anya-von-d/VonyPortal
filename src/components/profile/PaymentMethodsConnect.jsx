@@ -242,7 +242,7 @@ export default function PaymentMethodsConnect() {
           </p>
         </CardHeader>
 
-        <CardContent className="p-6 space-y-6">
+        <CardContent className="p-6 space-y-4">
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
@@ -250,219 +250,200 @@ export default function PaymentMethodsConnect() {
             </div>
           )}
 
-          {/* Venmo */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-                <Smartphone className="w-4 h-4 text-white" />
-              </div>
-              <Label className="font-medium text-slate-700">Venmo</Label>
-              {venmoConnection && (
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1">
-                  <Check className="w-3 h-3" /> Connected
-                </span>
-              )}
+          {/* Venmo - Single Line */}
+          <div className="flex items-center gap-3 p-3 bg-slate-50/50 rounded-xl">
+            <div className="w-9 h-9 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Smartphone className="w-4 h-4 text-white" />
             </div>
-            <div className="flex gap-2">
-              <Input
-                placeholder="@username"
-                value={venmoUsername}
-                onChange={(e) => setVenmoUsername(e.target.value)}
-                className="flex-1"
-              />
-              {venmoConnection ? (
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleSaveVenmo}
-                    disabled={isSaving.venmo || venmoUsername === venmoConnection.venmo_username}
-                    size="sm"
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    {isSaving.venmo ? "..." : "Update"}
-                  </Button>
-                  <Button
-                    onClick={handleDisconnectVenmo}
-                    disabled={isSaving.venmo}
-                    size="sm"
-                    variant="outline"
-                    className="text-red-600 border-red-200 hover:bg-red-50"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              ) : (
+            <span className="font-medium text-slate-700 w-20 flex-shrink-0">Venmo</span>
+            {venmoConnection && (
+              <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1 flex-shrink-0">
+                <Check className="w-3 h-3" /> Connected
+              </span>
+            )}
+            <Input
+              placeholder="@username"
+              value={venmoUsername}
+              onChange={(e) => setVenmoUsername(e.target.value)}
+              className="flex-1 min-w-0"
+            />
+            {venmoConnection ? (
+              <>
                 <Button
                   onClick={handleSaveVenmo}
-                  disabled={isSaving.venmo || !venmoUsername.trim()}
+                  disabled={isSaving.venmo || venmoUsername === venmoConnection.venmo_username}
                   size="sm"
-                  className="bg-blue-500 hover:bg-blue-600"
+                  className="bg-green-600 hover:bg-green-700 flex-shrink-0"
                 >
-                  {isSaving.venmo ? "..." : "Connect"}
+                  {isSaving.venmo ? "..." : "Update"}
                 </Button>
-              )}
-            </div>
+                <Button
+                  onClick={handleDisconnectVenmo}
+                  disabled={isSaving.venmo}
+                  size="sm"
+                  variant="outline"
+                  className="text-red-600 border-red-200 hover:bg-red-50 flex-shrink-0"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </>
+            ) : (
+              <Button
+                onClick={handleSaveVenmo}
+                disabled={isSaving.venmo || !venmoUsername.trim()}
+                size="sm"
+                className="bg-blue-500 hover:bg-blue-600 flex-shrink-0"
+              >
+                {isSaving.venmo ? "..." : "Connect"}
+              </Button>
+            )}
           </div>
 
-          {/* Cash App */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-                <DollarSign className="w-4 h-4 text-white" />
-              </div>
-              <Label className="font-medium text-slate-700">Cash App</Label>
-              {cashappHandle && (
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1">
-                  <Check className="w-3 h-3" /> Connected
-                </span>
-              )}
+          {/* Cash App - Single Line */}
+          <div className="flex items-center gap-3 p-3 bg-slate-50/50 rounded-xl">
+            <div className="w-9 h-9 bg-green-500 rounded-lg flex items-center justify-center flex-shrink-0">
+              <DollarSign className="w-4 h-4 text-white" />
             </div>
-            <div className="flex gap-2">
-              <Input
-                placeholder="$cashtag"
-                value={cashappHandle}
-                onChange={(e) => setCashappHandle(e.target.value)}
-                className="flex-1"
-              />
-              {cashappHandle && user?.cashapp_handle ? (
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleSaveCashapp}
-                    disabled={isSaving.cashapp || cashappHandle === user.cashapp_handle}
-                    size="sm"
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    {isSaving.cashapp ? "..." : "Update"}
-                  </Button>
-                  <Button
-                    onClick={handleDisconnectCashapp}
-                    disabled={isSaving.cashapp}
-                    size="sm"
-                    variant="outline"
-                    className="text-red-600 border-red-200 hover:bg-red-50"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              ) : (
+            <span className="font-medium text-slate-700 w-20 flex-shrink-0">Cash App</span>
+            {cashappHandle && user?.cashapp_handle && (
+              <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1 flex-shrink-0">
+                <Check className="w-3 h-3" /> Connected
+              </span>
+            )}
+            <Input
+              placeholder="$cashtag"
+              value={cashappHandle}
+              onChange={(e) => setCashappHandle(e.target.value)}
+              className="flex-1 min-w-0"
+            />
+            {cashappHandle && user?.cashapp_handle ? (
+              <>
                 <Button
                   onClick={handleSaveCashapp}
-                  disabled={isSaving.cashapp || !cashappHandle.trim()}
+                  disabled={isSaving.cashapp || cashappHandle === user.cashapp_handle}
                   size="sm"
-                  className="bg-green-500 hover:bg-green-600"
+                  className="bg-green-600 hover:bg-green-700 flex-shrink-0"
                 >
-                  {isSaving.cashapp ? "..." : "Connect"}
+                  {isSaving.cashapp ? "..." : "Update"}
                 </Button>
-              )}
-            </div>
+                <Button
+                  onClick={handleDisconnectCashapp}
+                  disabled={isSaving.cashapp}
+                  size="sm"
+                  variant="outline"
+                  className="text-red-600 border-red-200 hover:bg-red-50 flex-shrink-0"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </>
+            ) : (
+              <Button
+                onClick={handleSaveCashapp}
+                disabled={isSaving.cashapp || !cashappHandle.trim()}
+                size="sm"
+                className="bg-green-500 hover:bg-green-600 flex-shrink-0"
+              >
+                {isSaving.cashapp ? "..." : "Connect"}
+              </Button>
+            )}
           </div>
 
-          {/* Zelle */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
-                <Smartphone className="w-4 h-4 text-white" />
-              </div>
-              <Label className="font-medium text-slate-700">Zelle</Label>
-              {zelleEmail && user?.zelle_email && (
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1">
-                  <Check className="w-3 h-3" /> Connected
-                </span>
-              )}
+          {/* Zelle - Single Line */}
+          <div className="flex items-center gap-3 p-3 bg-slate-50/50 rounded-xl">
+            <div className="w-9 h-9 bg-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Smartphone className="w-4 h-4 text-white" />
             </div>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Email or phone number"
-                value={zelleEmail}
-                onChange={(e) => setZelleEmail(e.target.value)}
-                className="flex-1"
-              />
-              {zelleEmail && user?.zelle_email ? (
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleSaveZelle}
-                    disabled={isSaving.zelle || zelleEmail === user.zelle_email}
-                    size="sm"
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    {isSaving.zelle ? "..." : "Update"}
-                  </Button>
-                  <Button
-                    onClick={handleDisconnectZelle}
-                    disabled={isSaving.zelle}
-                    size="sm"
-                    variant="outline"
-                    className="text-red-600 border-red-200 hover:bg-red-50"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              ) : (
+            <span className="font-medium text-slate-700 w-20 flex-shrink-0">Zelle</span>
+            {zelleEmail && user?.zelle_email && (
+              <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1 flex-shrink-0">
+                <Check className="w-3 h-3" /> Connected
+              </span>
+            )}
+            <Input
+              placeholder="Email or phone"
+              value={zelleEmail}
+              onChange={(e) => setZelleEmail(e.target.value)}
+              className="flex-1 min-w-0"
+            />
+            {zelleEmail && user?.zelle_email ? (
+              <>
                 <Button
                   onClick={handleSaveZelle}
-                  disabled={isSaving.zelle || !zelleEmail.trim()}
+                  disabled={isSaving.zelle || zelleEmail === user.zelle_email}
                   size="sm"
-                  className="bg-purple-500 hover:bg-purple-600"
+                  className="bg-green-600 hover:bg-green-700 flex-shrink-0"
                 >
-                  {isSaving.zelle ? "..." : "Connect"}
+                  {isSaving.zelle ? "..." : "Update"}
                 </Button>
-              )}
-            </div>
-            <p className="text-xs text-slate-500">
-              Zelle transfers are done through your bank app
-            </p>
+                <Button
+                  onClick={handleDisconnectZelle}
+                  disabled={isSaving.zelle}
+                  size="sm"
+                  variant="outline"
+                  className="text-red-600 border-red-200 hover:bg-red-50 flex-shrink-0"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </>
+            ) : (
+              <Button
+                onClick={handleSaveZelle}
+                disabled={isSaving.zelle || !zelleEmail.trim()}
+                size="sm"
+                className="bg-purple-500 hover:bg-purple-600 flex-shrink-0"
+              >
+                {isSaving.zelle ? "..." : "Connect"}
+              </Button>
+            )}
           </div>
 
-          {/* PayPal */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <CreditCard className="w-4 h-4 text-white" />
-              </div>
-              <Label className="font-medium text-slate-700">PayPal</Label>
-              {paypalConnection && (
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1">
-                  <Check className="w-3 h-3" /> Connected
-                </span>
-              )}
+          {/* PayPal - Single Line */}
+          <div className="flex items-center gap-3 p-3 bg-slate-50/50 rounded-xl">
+            <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+              <CreditCard className="w-4 h-4 text-white" />
             </div>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Email or PayPal.me username"
-                value={paypalEmail}
-                onChange={(e) => setPaypalEmail(e.target.value)}
-                className="flex-1"
-              />
-              {paypalConnection ? (
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleSavePaypal}
-                    disabled={isSaving.paypal || paypalEmail === paypalConnection.paypal_email}
-                    size="sm"
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    {isSaving.paypal ? "..." : "Update"}
-                  </Button>
-                  <Button
-                    onClick={handleDisconnectPaypal}
-                    disabled={isSaving.paypal}
-                    size="sm"
-                    variant="outline"
-                    className="text-red-600 border-red-200 hover:bg-red-50"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              ) : (
+            <span className="font-medium text-slate-700 w-20 flex-shrink-0">PayPal</span>
+            {paypalConnection && (
+              <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1 flex-shrink-0">
+                <Check className="w-3 h-3" /> Connected
+              </span>
+            )}
+            <Input
+              placeholder="Email or PayPal.me"
+              value={paypalEmail}
+              onChange={(e) => setPaypalEmail(e.target.value)}
+              className="flex-1 min-w-0"
+            />
+            {paypalConnection ? (
+              <>
                 <Button
                   onClick={handleSavePaypal}
-                  disabled={isSaving.paypal || !paypalEmail.trim()}
+                  disabled={isSaving.paypal || paypalEmail === paypalConnection.paypal_email}
                   size="sm"
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className="bg-green-600 hover:bg-green-700 flex-shrink-0"
                 >
-                  {isSaving.paypal ? "..." : "Connect"}
+                  {isSaving.paypal ? "..." : "Update"}
                 </Button>
-              )}
-            </div>
+                <Button
+                  onClick={handleDisconnectPaypal}
+                  disabled={isSaving.paypal}
+                  size="sm"
+                  variant="outline"
+                  className="text-red-600 border-red-200 hover:bg-red-50 flex-shrink-0"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </>
+            ) : (
+              <Button
+                onClick={handleSavePaypal}
+                disabled={isSaving.paypal || !paypalEmail.trim()}
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700 flex-shrink-0"
+              >
+                {isSaving.paypal ? "..." : "Connect"}
+              </Button>
+            )}
           </div>
 
         </CardContent>
