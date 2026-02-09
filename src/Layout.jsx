@@ -203,9 +203,15 @@ export default function Layout({ children }) {
 
             {/* Hamburger menu button on the right */}
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`p-2 rounded-lg transition-all duration-200 ${colors.hoverItem} ${colors.navText}`}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setMobileMenuOpen(prev => !prev);
+              }}
+              className={`p-2 rounded-lg transition-all duration-200 ${colors.hoverItem} ${colors.navText} cursor-pointer`}
               aria-label="Toggle menu"
+              aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? (
                 <X className="w-6 h-6" />
