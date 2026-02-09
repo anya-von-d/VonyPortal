@@ -190,7 +190,45 @@ export default function Home() {
       .filter(loan => loan && loan.borrower_id === user.id && loan.status === 'active' && loan.next_payment_date)
       .map(loan => ({ ...loan, date: new Date(loan.next_payment_date) }))
       .sort((a, b) => a.date - b.date)[0];
-    
+
+    // Calculate remaining payment amount after subtracting payments made in current period
+    const getNextPaymentAmount = () => {
+      if (!nextPayment) return 0;
+
+      const safePayments = Array.isArray(payments) ? payments : [];
+      const loanPayments = safePayments.filter(p => p && p.loan_id === nextPayment.id);
+
+      // Determine the start of the current billing period based on payment frequency
+      const now = new Date();
+      const nextPaymentDate = new Date(nextPayment.next_payment_date);
+      let periodStartDate = new Date(nextPaymentDate);
+
+      // Calculate period start based on payment frequency
+      const frequency = nextPayment.payment_frequency || 'monthly';
+      if (frequency === 'weekly') {
+        periodStartDate.setDate(periodStartDate.getDate() - 7);
+      } else if (frequency === 'bi-weekly') {
+        periodStartDate.setDate(periodStartDate.getDate() - 14);
+      } else {
+        // monthly - go back one month
+        periodStartDate.setMonth(periodStartDate.getMonth() - 1);
+      }
+
+      // Sum payments made in the current billing period (confirmed payments only)
+      const paymentsInPeriod = loanPayments.filter(p => {
+        const paymentDate = new Date(p.payment_date || p.created_at);
+        return paymentDate >= periodStartDate && paymentDate <= now && p.status === 'confirmed';
+      });
+
+      const paidThisPeriod = paymentsInPeriod.reduce((sum, p) => sum + (p.amount || 0), 0);
+      const originalAmount = nextPayment.payment_amount || 0;
+      const remainingAmount = Math.max(0, originalAmount - paidThisPeriod);
+
+      return remainingAmount;
+    };
+
+    const nextPaymentAmount = getNextPaymentAmount();
+
     const getPaymentStatus = () => {
       if (!nextPayment) return 'None';
       const today = new Date();
@@ -229,7 +267,7 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <StatsCard title="Total Lent" value={formatMoney(totalLent)} icon={PiggyBank} color="green" change={`${myLoans.filter(l => l && l.lender_id === user.id && l.status === 'active').length} active loans`} index={0} />
-              <StatsCard title="Next Payment" value={nextPayment ? formatMoney(nextPayment.payment_amount) : '-'} icon={DollarSign} color="blue" change={nextPayment ? `to @${safeAllProfiles.find(p => p.user_id === nextPayment.lender_id)?.username || 'user'}` : 'N/A'} index={1} />
+              <StatsCard title="Next Payment" value={nextPayment ? formatMoney(nextPaymentAmount) : '-'} icon={DollarSign} color="blue" change={nextPayment ? `to @${safeAllProfiles.find(p => p.user_id === nextPayment.lender_id)?.username || 'user'}` : 'N/A'} index={1} />
               <StatsCard title="Next Payment Due" value={paymentStatus} icon={Clock} color="orange" change={nextPayment ? format(nextPayment.date, 'MMM d, yyyy') : 'N/A'} index={2} />
             </div>
 
