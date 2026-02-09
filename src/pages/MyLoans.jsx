@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Loan, Payment, User, LoanAgreement } from "@/entities/all";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,6 +32,7 @@ export default function MyLoans() {
   const [selectedLoanDetails, setSelectedLoanDetails] = useState(null);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [loanToCancel, setLoanToCancel] = useState(null);
+  const [activeTab, setActiveTab] = useState('borrowing');
 
   useEffect(() => {
     loadData();
@@ -169,6 +169,34 @@ export default function MyLoans() {
           <p className="text-lg text-slate-600 text-center">
             Manage your lending and borrowing activity
           </p>
+
+          {/* Toggle Buttons */}
+          <div className="flex justify-center gap-3 mt-6">
+            <Button
+              onClick={() => setActiveTab('borrowing')}
+              variant={activeTab === 'borrowing' ? 'default' : 'outline'}
+              className={`flex items-center gap-2 ${
+                activeTab === 'borrowing'
+                  ? 'bg-[#35B276] hover:bg-[#2d9a65] text-white'
+                  : 'border-slate-300 text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              <ArrowDownRight className="w-4 h-4" />
+              Borrowing ({borrowedLoans.length})
+            </Button>
+            <Button
+              onClick={() => setActiveTab('lending')}
+              variant={activeTab === 'lending' ? 'default' : 'outline'}
+              className={`flex items-center gap-2 ${
+                activeTab === 'lending'
+                  ? 'bg-[#35B276] hover:bg-[#2d9a65] text-white'
+                  : 'border-slate-300 text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              <ArrowUpRight className="w-4 h-4" />
+              Lending ({lentLoans.length})
+            </Button>
+          </div>
         </motion.div>
 
         {/* Summary Cards */}
@@ -209,24 +237,25 @@ export default function MyLoans() {
           <LoanProgress loans={loans} userId={user.id} />
         )}
 
-        {/* Loans Tabs */}
-        <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
-          <Tabs defaultValue="borrowed" className="w-full">
-            <CardHeader className="border-b border-slate-200/40">
-              <TabsList className="grid w-full grid-cols-2 bg-slate-100">
-                <TabsTrigger value="borrowed" className="flex items-center gap-2">
-                  <ArrowDownRight className="w-4 h-4" />
-                  Borrowed ({borrowedLoans.length})
-                </TabsTrigger>
-                <TabsTrigger value="lent" className="flex items-center gap-2">
-                  <ArrowUpRight className="w-4 h-4" />
-                  Lent ({lentLoans.length})
-                </TabsTrigger>
-              </TabsList>
-            </CardHeader>
-            
-            <CardContent className="p-6">
-              <TabsContent value="borrowed" className="space-y-6">
+        {/* Content based on active tab */}
+        {activeTab === 'borrowing' ? (
+          <motion.div
+            key="borrowing"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
+              <CardHeader className="pb-4 border-b border-slate-200">
+                <CardTitle className="flex items-center gap-2 text-slate-800">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                    <ArrowDownRight className="w-4 h-4 text-blue-600" />
+                  </div>
+                  Borrowing
+                </CardTitle>
+                <p className="text-sm text-slate-500 mt-1">Loans you've received from others</p>
+              </CardHeader>
+              <CardContent className="p-6 space-y-6">
                 {isLoading ? (
                   Array(3).fill(0).map((_, i) => (
                     <Card key={i} className="bg-white/70 backdrop-blur-sm border-slate-200/60 animate-pulse p-6">
@@ -251,15 +280,32 @@ export default function MyLoans() {
                     <div className="pt-4 border-t border-slate-200/40">
                       <h3 className="font-semibold text-slate-700 mb-3">Inactive</h3>
                       <div className="space-y-4">
-                        {/* Only show completed or cancelled loans in inactive section */}
                         {renderLoanSection(borrowedLoans.filter(l => l.status === 'completed' || l.status === 'cancelled'), 'borrowed', 'inactive')}
                       </div>
                     </div>
                   </>
                 )}
-              </TabsContent>
-
-              <TabsContent value="lent" className="space-y-6">
+              </CardContent>
+            </Card>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="lending"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
+              <CardHeader className="pb-4 border-b border-slate-200">
+                <CardTitle className="flex items-center gap-2 text-slate-800">
+                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                    <ArrowUpRight className="w-4 h-4 text-green-600" />
+                  </div>
+                  Lending
+                </CardTitle>
+                <p className="text-sm text-slate-500 mt-1">Loans you've given to others</p>
+              </CardHeader>
+              <CardContent className="p-6 space-y-6">
                 {isLoading ? (
                   Array(3).fill(0).map((_, i) => (
                     <Card key={i} className="bg-white/70 backdrop-blur-sm border-slate-200/60 animate-pulse p-6">
@@ -284,16 +330,15 @@ export default function MyLoans() {
                     <div className="pt-4 border-t border-slate-200/40">
                       <h3 className="font-semibold text-slate-700 mb-3">Inactive</h3>
                       <div className="space-y-4">
-                        {/* Only show completed or cancelled loans in inactive section */}
                         {renderLoanSection(lentLoans.filter(l => l.status === 'completed' || l.status === 'cancelled'), 'lent', 'inactive')}
                       </div>
                     </div>
                   </>
                 )}
-              </TabsContent>
-            </CardContent>
-          </Tabs>
-        </Card>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         {/* Modals */}
         {showPaymentModal && selectedLoan && (
