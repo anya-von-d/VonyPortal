@@ -234,14 +234,19 @@ export default function Profile() {
     setSaving(true);
     setError(null);
     try {
+      // Only include fields that exist in the database schema
       const updateData = {
-        ...formData,
-        profile_completed: true // Mark profile as completed
+        full_name: formData.full_name,
+        username: formData.username,
+        phone: formData.phone,
+        location: formData.location,
+        profile_picture_url: formData.profile_picture_url,
+        theme_preference: formData.theme_preference
       };
-      
+
       const updatedUser = await User.updateMyUserData(updateData);
       // Sync public profile with all latest data including updatedUser and updateData
-      await syncPublicProfile({ ...user, ...updatedUser, ...updateData }); 
+      await syncPublicProfile({ ...user, ...updatedUser, ...updateData });
       await loadUserData();
       setIsEditing(false);
     } catch (error) {
@@ -596,11 +601,11 @@ export default function Profile() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Profile Complete</span>
-                  <Badge className={user.profile_completed ?
+                  <Badge className={user.full_name && user.username ?
                     "bg-green-100 text-green-800 border-green-200" :
                     "bg-gray-100 text-gray-800 border-gray-200"
                   }>
-                    {user.profile_completed ? (
+                    {user.full_name && user.username ? (
                       <>
                         <CheckCircle className="w-3 h-3 mr-1" />
                         Complete
