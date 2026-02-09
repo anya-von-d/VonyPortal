@@ -207,14 +207,16 @@ export default function MyLoans() {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <div className="text-3xl font-bold mb-1">
-                {nextPaymentLoan ? `$${nextPaymentAmount.toLocaleString()}` : '-'}
+              <div className="flex items-end justify-between">
+                <div className="text-3xl font-bold">
+                  {nextPaymentLoan ? `$${nextPaymentAmount.toLocaleString()}` : '-'}
+                </div>
+                <p className="opacity-80">
+                  {nextPaymentLoan
+                    ? `to @${nextPaymentLenderUsername}`
+                    : 'No payments due'}
+                </p>
               </div>
-              <p className="opacity-80">
-                {nextPaymentLoan
-                  ? `to @${nextPaymentLenderUsername}`
-                  : 'No payments due'}
-              </p>
             </CardContent>
           </Card>
 
@@ -226,18 +228,20 @@ export default function MyLoans() {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <div className="text-3xl font-bold mb-1">
-                {nextPaymentLoan
-                  ? (nextPaymentDays < 0
-                      ? 'Overdue'
-                      : `${nextPaymentDays} day${nextPaymentDays !== 1 ? 's' : ''}`)
-                  : '-'}
+              <div className="flex items-end justify-between">
+                <div className="text-3xl font-bold">
+                  {nextPaymentLoan
+                    ? (nextPaymentDays < 0
+                        ? 'Overdue'
+                        : `${nextPaymentDays} day${nextPaymentDays !== 1 ? 's' : ''}`)
+                    : '-'}
+                </div>
+                <p className="opacity-80">
+                  {nextPaymentLoan
+                    ? format(new Date(nextPaymentLoan.next_payment_date), 'MMM d, yyyy')
+                    : 'No due date'}
+                </p>
               </div>
-              <p className="opacity-80">
-                {nextPaymentLoan
-                  ? format(new Date(nextPaymentLoan.next_payment_date), 'MMM d, yyyy')
-                  : 'No due date'}
-              </p>
             </CardContent>
           </Card>
         </div>
