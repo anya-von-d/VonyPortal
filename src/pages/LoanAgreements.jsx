@@ -315,13 +315,14 @@ export default function LoanAgreements() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <Card 
-          style={{backgroundColor: `rgb(var(--theme-card-bg))`}} 
+        <Card
+          style={{backgroundColor: `rgb(var(--theme-card-bg))`}}
           className="backdrop-blur-sm border-slate-200/60 hover:shadow-lg transition-all"
         >
           <CardContent className="p-4">
-            <div className="flex items-center gap-4">
-              <img 
+            {/* Desktop layout */}
+            <div className="hidden md:flex items-center gap-4">
+              <img
                 src={otherParty.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((otherParty.full_name || 'User').charAt(0))}&background=22c55e&color=fff&size=128`}
                 alt={otherParty.full_name}
                 className="w-12 h-12 rounded-full object-cover border-2 border-slate-200 flex-shrink-0"
@@ -348,6 +349,40 @@ export default function LoanAgreements() {
                 </Button>
               </div>
             </div>
+
+            {/* Mobile layout */}
+            <div className="md:hidden space-y-3">
+              <div className="flex items-center gap-3">
+                <img
+                  src={otherParty.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((otherParty.full_name || 'User').charAt(0))}&background=22c55e&color=fff&size=128`}
+                  alt={otherParty.full_name}
+                  className="w-10 h-10 rounded-full object-cover border-2 border-slate-200 flex-shrink-0"
+                />
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-slate-800 truncate">{otherParty.full_name}</h3>
+                  <p className="text-xs text-slate-500 truncate">
+                    {isLender ? 'Borrower' : 'Lender'}: @{otherParty.username}
+                  </p>
+                </div>
+                <Badge className={`${getStatusColor(loanStatus)} text-xs capitalize flex-shrink-0`}>
+                  {loanStatus}
+                </Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-slate-500">{format(new Date(agreement.created_at), 'MMM d, yyyy')}</p>
+                  <p className="font-bold text-lg" style={{color: `rgb(var(--theme-primary))`}}>{formatMoney(agreement.total_amount)}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button onClick={() => downloadPDF(agreement)} variant="outline" size="sm">
+                    <Download className="w-4 h-4" />
+                  </Button>
+                  <Button onClick={onClick} className="bg-black hover:bg-gray-800 text-white" size="sm">
+                    Details
+                  </Button>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </motion.div>
@@ -366,25 +401,26 @@ export default function LoanAgreements() {
           >
             <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`}} className="backdrop-blur-sm overflow-hidden">
               {/* Header with solid green */}
-              <div className="bg-[#35B276] p-6">
-                <div className="flex items-start justify-between">
+              <div className="bg-[#35B276] p-4 md:p-6">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                      <FileText className="w-6 h-6 text-[#F3F0EC]" />
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-5 h-5 md:w-6 md:h-6 text-[#F3F0EC]" />
                     </div>
-                    <div>
-                      <CardTitle className="text-xl text-[#F3F0EC]">
+                    <div className="min-w-0">
+                      <CardTitle className="text-lg md:text-xl text-[#F3F0EC]">
                         Loan Agreement
                       </CardTitle>
-                      <p className="text-sm text-[#F3F0EC]/80 mt-1">
-                        Agreement with @{getUserById(selectedAgreement.lender_id === user?.id ? selectedAgreement.borrower_id : selectedAgreement.lender_id).username} • Created {selectedAgreement.created_at ? format(new Date(selectedAgreement.created_at), 'MMMM d, yyyy') : 'N/A'}
+                      <p className="text-xs md:text-sm text-[#F3F0EC]/80 mt-1 truncate">
+                        Agreement with @{getUserById(selectedAgreement.lender_id === user?.id ? selectedAgreement.borrower_id : selectedAgreement.lender_id).username} • {selectedAgreement.created_at ? format(new Date(selectedAgreement.created_at), 'MMM d, yyyy') : 'N/A'}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Button onClick={() => downloadPDF(selectedAgreement)} variant="outline" size="sm" className="gap-2 bg-white/10 border-white/30 text-[#F3F0EC] hover:bg-white/20">
+                  <div className="flex items-center gap-2 justify-end">
+                    <Button onClick={() => downloadPDF(selectedAgreement)} variant="outline" size="sm" className="gap-1 md:gap-2 bg-white/10 border-white/30 text-[#F3F0EC] hover:bg-white/20 text-xs md:text-sm">
                       <Download className="w-4 h-4" />
-                      Download PDF
+                      <span className="hidden md:inline">Download PDF</span>
+                      <span className="md:hidden">PDF</span>
                     </Button>
                     <Button onClick={() => setSelectedAgreement(null)} variant="ghost" size="sm" className="text-[#F3F0EC] hover:bg-white/10">✕</Button>
                   </div>
@@ -502,8 +538,8 @@ export default function LoanAgreements() {
         </div>
       )}
 
-      <div className="min-h-screen p-4 md:p-6" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
-        <div className="max-w-4xl mx-auto space-y-7">
+      <div className="min-h-screen p-4 md:p-6 overflow-x-hidden" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
+        <div className="max-w-4xl mx-auto space-y-7 overflow-hidden">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="py-5">
             <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-center">My Loan Agreements</h1>
             <p className="text-lg text-slate-600 text-center">View all your signed loan agreements</p>
