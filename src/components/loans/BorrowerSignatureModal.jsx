@@ -69,9 +69,9 @@ export default function BorrowerSignatureModal({
               </div>
               Loan Agreement
             </DialogTitle>
-            <DialogDescription className="text-[#F3F0EC]/90">
+            <p className="text-[#F3F0EC] text-sm mt-1">
               Review the loan terms carefully before signing
-            </DialogDescription>
+            </p>
           </DialogHeader>
         </div>
 

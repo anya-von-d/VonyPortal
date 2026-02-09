@@ -49,9 +49,9 @@ export default function SignatureModal({ isOpen, onClose, onSign, loanDetails, u
               </div>
               Loan Agreement
             </DialogTitle>
-            <DialogDescription className="text-[#F3F0EC]/90">
+            <p className="text-[#F3F0EC] text-sm mt-1">
               Review the terms and sign to {signingAs === 'Lender' ? 'create this loan offer' : 'accept this loan'}
-            </DialogDescription>
+            </p>
           </DialogHeader>
         </div>
 
