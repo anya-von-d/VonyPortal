@@ -251,11 +251,6 @@ export default function MyLoans() {
           </Card>
         </div>
 
-        {/* Loan Progress */}
-        {user && loans.length > 0 && (
-          <LoanProgress loans={loans} userId={user.id} />
-        )}
-
         {/* Content based on active tab */}
         {activeTab === 'borrowing' ? (
           <motion.div
@@ -395,6 +390,11 @@ export default function MyLoans() {
               </CardContent>
             </Card>
           </motion.div>
+        )}
+
+        {/* Loan Progress */}
+        {user && loans.length > 0 && (
+          <LoanProgress loans={loans} userId={user.id} />
         )}
 
         {/* Modals */}
