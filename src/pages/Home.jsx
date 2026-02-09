@@ -214,10 +214,10 @@ export default function Home() {
         periodStartDate.setMonth(periodStartDate.getMonth() - 1);
       }
 
-      // Sum payments made in the current billing period (confirmed payments only)
+      // Sum payments made in the current billing period (completed payments only)
       const paymentsInPeriod = loanPayments.filter(p => {
         const paymentDate = new Date(p.payment_date || p.created_at);
-        return paymentDate >= periodStartDate && paymentDate <= now && p.status === 'confirmed';
+        return paymentDate >= periodStartDate && paymentDate <= now && p.status === 'completed';
       });
 
       const paidThisPeriod = paymentsInPeriod.reduce((sum, p) => sum + (p.amount || 0), 0);
