@@ -241,9 +241,6 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
               transition={{ delay: 0.2 }}
               className="text-center py-8"
             >
-              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Activity className="w-8 h-8 text-slate-400" />
-              </div>
               <p className="text-slate-500 mb-4">No recent activity</p>
               <Link to={createPageUrl("CreateLoan")}>
                 <Button className="bg-green-600 hover:bg-green-700">
