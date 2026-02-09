@@ -8,8 +8,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { formatMoney } from "@/components/utils/formatMoney";
 import { AnimatedCheckmark, SuccessAnimation, ConfettiBurst } from "@/components/ui/animations";
 
-// Trust checklist items
-const AGREEMENT_CHECKLIST = [
+// Trust checklist items for Lender
+const LENDER_CHECKLIST = [
+  { id: 1, text: "I confirm the terms above are correct, including the loan amount, interest rate, and payment schedule" },
+  { id: 2, text: "I agree to lend the Borrower the amount shown above" },
+  { id: 3, text: "I'm comfortable moving forward with lending to this borrower and understand that lending money can involve some risks" },
+];
+
+// Trust checklist items for Borrower (fallback)
+const BORROWER_CHECKLIST = [
   { id: 1, text: "I understand the loan amount and interest rate" },
   { id: 2, text: "I agree to the repayment schedule" },
   { id: 3, text: "I have reviewed all terms carefully" },
@@ -21,26 +28,32 @@ export default function SignatureModal({ isOpen, onClose, onSign, loanDetails, u
   const [isSigning, setIsSigning] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
+  const [showChecklistError, setShowChecklistError] = useState(false);
+
+  // Use lender checklist for lenders, borrower checklist for borrowers
+  const AGREEMENT_CHECKLIST = signingAs === 'Lender' ? LENDER_CHECKLIST : BORROWER_CHECKLIST;
 
   const handleCheckItem = (id) => {
     setCheckedItems(prev =>
       prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
     );
+    setShowChecklistError(false);
   };
 
   const allItemsChecked = AGREEMENT_CHECKLIST.every(item => checkedItems.includes(item.id));
 
   const handleSign = async () => {
+    if (!allItemsChecked) {
+      setShowChecklistError(true);
+      setError("Please confirm all items in the checklist");
+      return;
+    }
     if (!signature.trim()) {
       setError("Please type your full name to sign");
       return;
     }
     if (signature.trim().toLowerCase() !== userFullName.toLowerCase()) {
       setError("Signature must match your full name");
-      return;
-    }
-    if (!allItemsChecked) {
-      setError("Please confirm all items in the checklist");
       return;
     }
 
@@ -83,7 +96,7 @@ export default function SignatureModal({ isOpen, onClose, onSign, loanDetails, u
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto p-0 gap-0">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto p-0 gap-0 border-2 border-[#35B276]">
         {/* Header with solid green */}
         <div className="bg-[#35B276] p-6 rounded-t-lg">
           <DialogHeader className="space-y-2">
@@ -93,7 +106,7 @@ export default function SignatureModal({ isOpen, onClose, onSign, loanDetails, u
               </div>
               Loan Agreement
             </DialogTitle>
-            <p className="text-sm mt-1" style={{ color: '#F3F0EC' }}>
+            <p className="text-sm mt-1 text-[#F3F0EC]">
               Review the terms and sign to {signingAs === 'Lender' ? 'create this loan offer' : 'accept this loan'}
             </p>
           </DialogHeader>
@@ -199,10 +212,16 @@ export default function SignatureModal({ isOpen, onClose, onSign, loanDetails, u
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white border border-slate-200 rounded-xl p-4 space-y-3"
+            className={`bg-white rounded-xl p-4 space-y-3 border-2 transition-colors ${
+              showChecklistError && !allItemsChecked
+                ? 'border-red-400 bg-red-50/30'
+                : 'border-slate-200'
+            }`}
           >
-            <h4 className="font-medium text-slate-800 flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-[#35B276]" />
+            <h4 className={`font-medium flex items-center gap-2 ${
+              showChecklistError && !allItemsChecked ? 'text-red-600' : 'text-slate-800'
+            }`}>
+              <CheckCircle className={`w-4 h-4 ${showChecklistError && !allItemsChecked ? 'text-red-500' : 'text-[#35B276]'}`} />
               What you're agreeing to
             </h4>
             <div className="space-y-2">
@@ -212,13 +231,15 @@ export default function SignatureModal({ isOpen, onClose, onSign, loanDetails, u
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 + index * 0.1 }}
-                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors group"
+                  className="flex items-start gap-3 p-2 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors group"
                 >
                   <div
                     onClick={() => handleCheckItem(item.id)}
-                    className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all cursor-pointer ${
+                    className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all cursor-pointer flex-shrink-0 mt-0.5 ${
                       checkedItems.includes(item.id)
                         ? 'bg-[#35B276] border-[#35B276]'
+                        : showChecklistError && !checkedItems.includes(item.id)
+                        ? 'border-red-400 bg-red-50'
                         : 'border-slate-300 group-hover:border-[#35B276]'
                     }`}
                   >
@@ -234,7 +255,13 @@ export default function SignatureModal({ isOpen, onClose, onSign, loanDetails, u
                       )}
                     </AnimatePresence>
                   </div>
-                  <span className={`text-sm ${checkedItems.includes(item.id) ? 'text-slate-800' : 'text-slate-600'}`}>
+                  <span className={`text-sm leading-snug ${
+                    checkedItems.includes(item.id)
+                      ? 'text-slate-800'
+                      : showChecklistError && !checkedItems.includes(item.id)
+                      ? 'text-red-600'
+                      : 'text-slate-600'
+                  }`}>
                     {item.text}
                   </span>
                 </motion.label>
