@@ -12,7 +12,7 @@ import { AnimatedCheckmark, SuccessAnimation, ConfettiBurst } from "@/components
 const LENDER_CHECKLIST = [
   { id: 1, text: "I confirm the terms above are correct, including the loan amount, interest rate, and payment schedule" },
   { id: 2, text: "I agree to lend the Borrower the amount shown above" },
-  { id: 3, text: "I'm comfortable moving forward with lending to this borrower and understand that lending money can involve some risks" },
+  { id: 3, text: "I am comfortable moving forward with lending to the Borrower and understand that lending money can involve some risk" },
 ];
 
 // Trust checklist items for Borrower (fallback)
@@ -106,7 +106,7 @@ export default function SignatureModal({ isOpen, onClose, onSign, loanDetails, u
               </div>
               Loan Agreement
             </DialogTitle>
-            <p className="text-sm mt-1 text-[#F3F0EC]">
+            <p className="text-sm mt-1" style={{ color: '#F3F0EC' }}>
               Review the terms and sign to {signingAs === 'Lender' ? 'create this loan offer' : 'accept this loan'}
             </p>
           </DialogHeader>
