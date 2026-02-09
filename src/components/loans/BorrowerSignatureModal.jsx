@@ -31,27 +31,30 @@ export default function BorrowerSignatureModal({
   const [isDeclining, setIsDeclining] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
+  const [showChecklistError, setShowChecklistError] = useState(false);
 
   const handleCheckItem = (id) => {
     setCheckedItems(prev =>
       prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
     );
+    setShowChecklistError(false);
   };
 
   const allItemsChecked = BORROWER_CHECKLIST.every(item => checkedItems.includes(item.id));
   const isSignatureValid = signature.trim().toLowerCase() === borrowerFullName?.toLowerCase();
 
   const handleSign = async () => {
+    if (!allItemsChecked) {
+      setShowChecklistError(true);
+      setError("Please confirm all items in the checklist");
+      return;
+    }
     if (!signature.trim()) {
       setError("Please type your full name to sign");
       return;
     }
     if (signature.trim().toLowerCase() !== borrowerFullName.toLowerCase()) {
       setError("Signature must match your full name");
-      return;
-    }
-    if (!allItemsChecked) {
-      setError("Please confirm all items in the checklist");
       return;
     }
 
@@ -104,18 +107,18 @@ export default function BorrowerSignatureModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 gap-0">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 gap-0 border-2 border-[#35B276]">
         {/* Header with solid green */}
         <div className="bg-[#35B276] p-6 rounded-t-lg">
           <DialogHeader className="space-y-2">
-            <DialogTitle className="flex items-center gap-3 text-2xl text-[#F3F0EC]">
+            <DialogTitle className="flex items-center gap-3 text-2xl" style={{ color: '#F3F0EC' }}>
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <FileText className="w-5 h-5 text-[#F3F0EC]" />
+                <FileText className="w-5 h-5" style={{ color: '#F3F0EC' }} />
               </div>
-              Loan Agreement
+              <span style={{ color: '#F3F0EC' }}>Loan Agreement</span>
             </DialogTitle>
             <p className="text-sm mt-1" style={{ color: '#F3F0EC' }}>
-              Review the loan terms carefully before signing
+              <span style={{ color: '#F3F0EC' }}>Review the loan terms carefully before signing</span>
             </p>
           </DialogHeader>
         </div>
@@ -250,10 +253,16 @@ export default function BorrowerSignatureModal({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-white border border-slate-200 rounded-xl p-4 space-y-3"
+            className={`bg-white rounded-xl p-4 space-y-3 border-2 transition-colors ${
+              showChecklistError && !allItemsChecked
+                ? 'border-red-400 bg-red-50/30'
+                : 'border-slate-200'
+            }`}
           >
-            <h4 className="font-medium text-slate-800 flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-[#35B276]" />
+            <h4 className={`font-medium flex items-center gap-2 ${
+              showChecklistError && !allItemsChecked ? 'text-red-600' : 'text-slate-800'
+            }`}>
+              <CheckCircle className={`w-4 h-4 ${showChecklistError && !allItemsChecked ? 'text-red-500' : 'text-[#35B276]'}`} />
               What you're agreeing to
             </h4>
             <div className="space-y-2">
@@ -263,13 +272,15 @@ export default function BorrowerSignatureModal({
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.4 + index * 0.1 }}
-                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors group"
+                  className="flex items-start gap-3 p-2 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors group"
                 >
                   <div
                     onClick={() => handleCheckItem(item.id)}
-                    className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all cursor-pointer ${
+                    className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all cursor-pointer flex-shrink-0 mt-0.5 ${
                       checkedItems.includes(item.id)
                         ? 'bg-[#35B276] border-[#35B276]'
+                        : showChecklistError && !checkedItems.includes(item.id)
+                        ? 'border-red-400 bg-red-50'
                         : 'border-slate-300 group-hover:border-[#35B276]'
                     }`}
                   >
@@ -285,7 +296,13 @@ export default function BorrowerSignatureModal({
                       )}
                     </AnimatePresence>
                   </div>
-                  <span className={`text-sm ${checkedItems.includes(item.id) ? 'text-slate-800' : 'text-slate-600'}`}>
+                  <span className={`text-sm leading-snug ${
+                    checkedItems.includes(item.id)
+                      ? 'text-slate-800'
+                      : showChecklistError && !checkedItems.includes(item.id)
+                      ? 'text-red-600'
+                      : 'text-slate-600'
+                  }`}>
                     {item.text}
                   </span>
                 </motion.label>
