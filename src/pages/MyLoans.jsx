@@ -209,34 +209,6 @@ export default function MyLoans() {
           <LoanProgress loans={loans} userId={user.id} />
         )}
 
-        {/* Toggle Buttons */}
-        <div className="flex justify-center gap-3">
-          <Button
-            onClick={() => setActiveTab('borrowing')}
-            variant={activeTab === 'borrowing' ? 'default' : 'outline'}
-            className={`flex items-center gap-2 ${
-              activeTab === 'borrowing'
-                ? 'bg-[#35B276] hover:bg-[#2d9a65] text-white'
-                : 'border-slate-300 text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            <ArrowDownRight className="w-4 h-4" />
-            Borrowing ({borrowedLoans.length})
-          </Button>
-          <Button
-            onClick={() => setActiveTab('lending')}
-            variant={activeTab === 'lending' ? 'default' : 'outline'}
-            className={`flex items-center gap-2 ${
-              activeTab === 'lending'
-                ? 'bg-[#35B276] hover:bg-[#2d9a65] text-white'
-                : 'border-slate-300 text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            <ArrowUpRight className="w-4 h-4" />
-            Lending ({lentLoans.length})
-          </Button>
-        </div>
-
         {/* Content based on active tab */}
         {activeTab === 'borrowing' ? (
           <motion.div
@@ -247,12 +219,42 @@ export default function MyLoans() {
           >
             <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
               <CardHeader className="pb-4 border-b border-slate-200">
-                <CardTitle className="flex items-center gap-2 text-slate-800">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                    <ArrowDownRight className="w-4 h-4 text-blue-600" />
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2 text-slate-800">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                      <ArrowDownRight className="w-4 h-4 text-blue-600" />
+                    </div>
+                    Borrowing
+                  </CardTitle>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => setActiveTab('borrowing')}
+                      variant={activeTab === 'borrowing' ? 'default' : 'outline'}
+                      size="sm"
+                      className={`flex items-center gap-1 ${
+                        activeTab === 'borrowing'
+                          ? 'bg-[#35B276] hover:bg-[#2d9a65] text-white'
+                          : 'border-slate-300 text-slate-600 hover:bg-slate-50'
+                      }`}
+                    >
+                      <ArrowDownRight className="w-3 h-3" />
+                      Borrowing ({borrowedLoans.length})
+                    </Button>
+                    <Button
+                      onClick={() => setActiveTab('lending')}
+                      variant={activeTab === 'lending' ? 'default' : 'outline'}
+                      size="sm"
+                      className={`flex items-center gap-1 ${
+                        activeTab === 'lending'
+                          ? 'bg-[#35B276] hover:bg-[#2d9a65] text-white'
+                          : 'border-slate-300 text-slate-600 hover:bg-slate-50'
+                      }`}
+                    >
+                      <ArrowUpRight className="w-3 h-3" />
+                      Lending ({lentLoans.length})
+                    </Button>
                   </div>
-                  Borrowing
-                </CardTitle>
+                </div>
                 <p className="text-sm text-slate-500 mt-1">Loans you've received from others</p>
               </CardHeader>
               <CardContent className="p-6 space-y-6">
@@ -297,12 +299,42 @@ export default function MyLoans() {
           >
             <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
               <CardHeader className="pb-4 border-b border-slate-200">
-                <CardTitle className="flex items-center gap-2 text-slate-800">
-                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                    <ArrowUpRight className="w-4 h-4 text-green-600" />
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2 text-slate-800">
+                    <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                      <ArrowUpRight className="w-4 h-4 text-green-600" />
+                    </div>
+                    Lending
+                  </CardTitle>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => setActiveTab('borrowing')}
+                      variant={activeTab === 'borrowing' ? 'default' : 'outline'}
+                      size="sm"
+                      className={`flex items-center gap-1 ${
+                        activeTab === 'borrowing'
+                          ? 'bg-[#35B276] hover:bg-[#2d9a65] text-white'
+                          : 'border-slate-300 text-slate-600 hover:bg-slate-50'
+                      }`}
+                    >
+                      <ArrowDownRight className="w-3 h-3" />
+                      Borrowing ({borrowedLoans.length})
+                    </Button>
+                    <Button
+                      onClick={() => setActiveTab('lending')}
+                      variant={activeTab === 'lending' ? 'default' : 'outline'}
+                      size="sm"
+                      className={`flex items-center gap-1 ${
+                        activeTab === 'lending'
+                          ? 'bg-[#35B276] hover:bg-[#2d9a65] text-white'
+                          : 'border-slate-300 text-slate-600 hover:bg-slate-50'
+                      }`}
+                    >
+                      <ArrowUpRight className="w-3 h-3" />
+                      Lending ({lentLoans.length})
+                    </Button>
                   </div>
-                  Lending
-                </CardTitle>
+                </div>
                 <p className="text-sm text-slate-500 mt-1">Loans you've given to others</p>
               </CardHeader>
               <CardContent className="p-6 space-y-6">
