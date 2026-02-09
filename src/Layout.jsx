@@ -194,8 +194,8 @@ export default function Layout({ children }) {
             <Link to={createPageUrl("Home")} className="flex-shrink-0">
               <img
                 src={theme === 'afternoon'
-                  ? "https://wvgqxgximcuhqhesoycw.supabase.co/storage/v1/object/public/Image%20Storage/all_lowercase_logo.png"
-                  : "https://wvgqxgximcuhqhesoycw.supabase.co/storage/v1/object/public/Image%20Storage/all_lowercase_dark_logo.png"}
+                  ? "https://wvgqxgximcuhqhesoycw.supabase.co/storage/v1/object/public/Image%20Storage/all_lowercase_dark_logo.png"
+                  : "https://wvgqxgximcuhqhesoycw.supabase.co/storage/v1/object/public/Image%20Storage/all_lowercase_logo.png"}
                 alt="Vony Logo"
                 className="h-12 w-auto"
               />
