@@ -321,95 +321,101 @@ export default function CreateLoan() {
                     />
                   </div>
 
-                  {/* Interest Rate */}
-                  <div className="space-y-2">
-                    <Label htmlFor="interest_rate" className="flex items-center gap-2">
-                      <Percent className="w-4 h-4 text-green-600" />
-                      Interest Rate (% per year)
-                    </Label>
-                    <Input
-                      id="interest_rate"
-                      type="number"
-                      step="0.1"
-                      min="0"
-                      max="8"
-                      placeholder="Enter rate (max 8%)"
-                      value={formData.interest_rate}
-                      onChange={(e) => handleInputChange('interest_rate', e.target.value)}
-                      required
-                    />
-                  </div>
+                  {/* Interest Rate - Only show for scheduled loans */}
+                  {loanType === 'scheduled' && (
+                    <div className="space-y-2">
+                      <Label htmlFor="interest_rate" className="flex items-center gap-2">
+                        <Percent className="w-4 h-4 text-green-600" />
+                        Interest Rate (% per year)
+                      </Label>
+                      <Input
+                        id="interest_rate"
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        max="8"
+                        placeholder="Enter rate (max 8%)"
+                        value={formData.interest_rate}
+                        onChange={(e) => handleInputChange('interest_rate', e.target.value)}
+                        required={loanType === 'scheduled'}
+                      />
+                    </div>
+                  )}
 
-                  {/* Repayment Period */}
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-green-600" />
-                      Repayment Period
-                    </Label>
-                    <div className="grid grid-cols-2 gap-3">
+                  {/* Repayment Period - Only show for scheduled loans */}
+                  {loanType === 'scheduled' && (
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-green-600" />
+                        Repayment Period
+                      </Label>
+                      <div className="grid grid-cols-2 gap-3">
+                        <Select
+                          value={formData.repayment_unit}
+                          onValueChange={(value) => handleInputChange('repayment_unit', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select time unit" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="days">Days</SelectItem>
+                            <SelectItem value="weeks">Weeks</SelectItem>
+                            <SelectItem value="months">Months</SelectItem>
+                            <SelectItem value="custom">Custom Date</SelectItem>
+                          </SelectContent>
+                        </Select>
+
+                        {formData.repayment_unit === 'custom' ? (
+                          <Input
+                            type="text"
+                            placeholder="MM/DD/YYYY"
+                            value={formData.custom_due_date}
+                            onChange={(e) => handleInputChange('custom_due_date', e.target.value)}
+                            required={loanType === 'scheduled'}
+                          />
+                        ) : (
+                          <Input
+                            id="repayment_period"
+                            type="number"
+                            min="1"
+                            placeholder={`Enter ${formData.repayment_unit}`}
+                            value={formData.repayment_period}
+                            onChange={(e) => handleInputChange('repayment_period', e.target.value)}
+                            required={loanType === 'scheduled'}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Payment Frequency - Only show for scheduled loans */}
+                  {loanType === 'scheduled' && (
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-green-600" />
+                        Payment Frequency
+                      </Label>
                       <Select
-                        value={formData.repayment_unit}
-                        onValueChange={(value) => handleInputChange('repayment_unit', value)}
+                        value={formData.payment_frequency}
+                        onValueChange={(value) => handleInputChange('payment_frequency', value)}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Select time unit" />
+                          <SelectValue placeholder="Select payment frequency" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="days">Days</SelectItem>
-                          <SelectItem value="weeks">Weeks</SelectItem>
-                          <SelectItem value="months">Months</SelectItem>
-                          <SelectItem value="custom">Custom Date</SelectItem>
+                          <SelectItem value="none">None</SelectItem>
+                          <SelectItem value="weekly">Weekly</SelectItem>
+                          <SelectItem value="biweekly">Bi-weekly</SelectItem>
+                          <SelectItem value="monthly">Monthly</SelectItem>
                         </SelectContent>
                       </Select>
-                      
-                      {formData.repayment_unit === 'custom' ? (
-                        <Input
-                          type="text"
-                          placeholder="MM/DD/YYYY"
-                          value={formData.custom_due_date}
-                          onChange={(e) => handleInputChange('custom_due_date', e.target.value)}
-                          required
-                        />
-                      ) : (
-                        <Input
-                          id="repayment_period"
-                          type="number"
-                          min="1"
-                          placeholder={`Enter ${formData.repayment_unit}`}
-                          value={formData.repayment_period}
-                          onChange={(e) => handleInputChange('repayment_period', e.target.value)}
-                          required
-                        />
-                      )}
                     </div>
-                  </div>
-
-                  {/* Payment Frequency */}
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-green-600" />
-                      Payment Frequency
-                    </Label>
-                    <Select
-                      value={formData.payment_frequency}
-                      onValueChange={(value) => handleInputChange('payment_frequency', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select payment frequency" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">None</SelectItem>
-                        <SelectItem value="weekly">Weekly</SelectItem>
-                        <SelectItem value="biweekly">Bi-weekly</SelectItem>
-                        <SelectItem value="monthly">Monthly</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  )}
 
                   {/* Submit Button */}
                   <Button
                     type="submit"
-                    disabled={isSubmitting || !formData.borrower_username || !formData.amount || !formData.interest_rate || (formData.repayment_unit === 'custom' ? !formData.custom_due_date : !formData.repayment_period)}
+                    disabled={isSubmitting || !formData.borrower_username || !formData.amount || (loanType === 'scheduled' && (!formData.interest_rate || (formData.repayment_unit === 'custom' ? !formData.custom_due_date : !formData.repayment_period)))}
                     className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-lg font-semibold"
                   >
                     {isSubmitting ? "Sending Loan Offer..." : "Send Loan Offer"}
@@ -420,32 +426,12 @@ export default function CreateLoan() {
           </div>
 
           {/* Loan Summary */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 space-y-4">
             <Card className="text-white sticky top-6" style={{backgroundColor: '#35B276'}}>
               <CardHeader>
                 <CardTitle className="text-2xl">Loan Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Flexible/Scheduled Switch */}
-                <div className="flex items-center justify-between pb-3 border-b border-white/20">
-                  <span className="text-sm font-medium opacity-90">Flexible</span>
-                  <button
-                    type="button"
-                    onClick={() => setLoanType(loanType === 'flexible' ? 'scheduled' : 'flexible')}
-                    className="relative w-16 h-8 rounded-full transition-all duration-300 bg-white/20"
-                  >
-                    <div className={`absolute top-1 left-1 w-6 h-6 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 bg-white ${
-                      loanType === 'scheduled' ? 'translate-x-8' : 'translate-x-0'
-                    }`}>
-                      {loanType === 'flexible' ? (
-                        <Zap className="w-3 h-3 text-[#35B276]" />
-                      ) : (
-                        <ClipboardList className="w-3 h-3 text-[#35B276]" />
-                      )}
-                    </div>
-                  </button>
-                  <span className="text-sm font-medium opacity-90">Scheduled</span>
-                </div>
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="opacity-90">Loan Amount:</span>
@@ -453,25 +439,29 @@ export default function CreateLoan() {
                       ${parseFloat(formData.amount || 0).toLocaleString()}
                     </span>
                   </div>
-                  
-                  <div className="flex justify-between">
-                    <span className="opacity-90">Total Interest:</span>
-                    <span className="font-bold">
-                      ${details.totalInterest.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                    </span>
-                  </div>
-                  
+
+                  {loanType === 'scheduled' && (
+                    <div className="flex justify-between">
+                      <span className="opacity-90">Total Interest:</span>
+                      <span className="font-bold">
+                        ${details.totalInterest.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                      </span>
+                    </div>
+                  )}
+
                   <div className="border-t opacity-80 pt-3">
                     <div className="flex justify-between text-lg">
                       <span>Total Repayment:</span>
                       <span className="font-bold">
-                        ${details.totalAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                        ${loanType === 'flexible'
+                          ? parseFloat(formData.amount || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                          : details.totalAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {((formData.repayment_period && formData.repayment_unit !== 'custom') || (formData.repayment_unit === 'custom' && formData.custom_due_date)) && (
+                {loanType === 'scheduled' && ((formData.repayment_period && formData.repayment_unit !== 'custom') || (formData.repayment_unit === 'custom' && formData.custom_due_date)) && (
                   <div className="text-sm opacity-90 border-t border-green-400 pt-3">
                     <p>Loan will be fully repaid by:</p>
                     <p className="font-semibold text-green-100">
@@ -488,6 +478,36 @@ export default function CreateLoan() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Flexible/Scheduled Switch */}
+            <div className="bg-white/70 backdrop-blur-sm border border-slate-200/60 rounded-lg p-4">
+              <div className="flex items-center justify-center gap-4">
+                <span className={`text-sm font-medium ${loanType === 'flexible' ? 'text-[#35B276]' : 'text-slate-400'}`}>Flexible</span>
+                <button
+                  type="button"
+                  onClick={() => setLoanType(loanType === 'flexible' ? 'scheduled' : 'flexible')}
+                  className={`relative w-16 h-8 rounded-full transition-all duration-300 ${
+                    loanType === 'scheduled' ? 'bg-[#35B276]' : 'bg-slate-300'
+                  }`}
+                >
+                  <div className={`absolute top-1 left-1 w-6 h-6 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 bg-white ${
+                    loanType === 'scheduled' ? 'translate-x-8' : 'translate-x-0'
+                  }`}>
+                    {loanType === 'flexible' ? (
+                      <Zap className="w-3 h-3 text-slate-500" />
+                    ) : (
+                      <ClipboardList className="w-3 h-3 text-[#35B276]" />
+                    )}
+                  </div>
+                </button>
+                <span className={`text-sm font-medium ${loanType === 'scheduled' ? 'text-[#35B276]' : 'text-slate-400'}`}>Scheduled</span>
+              </div>
+              <p className="text-xs text-slate-500 text-center mt-3">
+                {loanType === 'flexible'
+                  ? "Perfect for casual loans between friends — no interest, no strict schedule. Pay back whenever works for both of you."
+                  : "For formal agreements with interest rates and set payment schedules. Ideal for larger amounts that need structure."}
+              </p>
+            </div>
           </div>
         </div>
         </div>
