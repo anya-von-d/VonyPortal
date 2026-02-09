@@ -319,20 +319,9 @@ export default function MyLoans() {
                     </Card>
                   ))
                 ) : (
-                  <>
-                    <div>
-                      <h3 className="font-semibold text-slate-700 mb-3">Active</h3>
-                      <div className="space-y-4">
-                        {renderLoanSection(borrowedLoans.filter(l => l.status === 'active'), 'borrowed', 'active')}
-                      </div>
-                    </div>
-                    <div className="pt-4 border-t border-slate-200/40">
-                      <h3 className="font-semibold text-slate-700 mb-3">Inactive</h3>
-                      <div className="space-y-4">
-                        {renderLoanSection(borrowedLoans.filter(l => l.status === 'completed' || l.status === 'cancelled'), 'borrowed', 'inactive')}
-                      </div>
-                    </div>
-                  </>
+                  <div className="space-y-4">
+                    {renderLoanSection(borrowedLoans.filter(l => l.status === 'active'), 'borrowed', 'active')}
+                  </div>
                 )}
               </CardContent>
             </Card>
@@ -399,20 +388,9 @@ export default function MyLoans() {
                     </Card>
                   ))
                 ) : (
-                  <>
-                    <div>
-                      <h3 className="font-semibold text-slate-700 mb-3">Active</h3>
-                      <div className="space-y-4">
-                        {renderLoanSection(lentLoans.filter(l => l.status === 'active'), 'lent', 'active')}
-                      </div>
-                    </div>
-                    <div className="pt-4 border-t border-slate-200/40">
-                      <h3 className="font-semibold text-slate-700 mb-3">Inactive</h3>
-                      <div className="space-y-4">
-                        {renderLoanSection(lentLoans.filter(l => l.status === 'completed' || l.status === 'cancelled'), 'lent', 'inactive')}
-                      </div>
-                    </div>
-                  </>
+                  <div className="space-y-4">
+                    {renderLoanSection(lentLoans.filter(l => l.status === 'active'), 'lent', 'active')}
+                  </div>
                 )}
               </CardContent>
             </Card>
