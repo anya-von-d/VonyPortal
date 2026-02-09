@@ -77,7 +77,7 @@ export default function StatsCard({ title, value, icon: Icon, color, change, isL
             </motion.p>
             {change && (
               <motion.p
-                className="text-xs text-slate-500 font-medium"
+                className="text-xs text-slate-500 font-medium text-right"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 + index * 0.1 }}
