@@ -243,8 +243,8 @@ export default function Home() {
 
     return (
         <div className="min-h-screen p-6"  style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
-           <div className="max-w-4xl mx-auto space-y-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="py-4">
+           <div className="max-w-4xl mx-auto space-y-7">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="py-5">
               <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-center">
                 {(() => {
                   const hour = new Date().getHours();
@@ -258,7 +258,7 @@ export default function Home() {
               </p>
           </motion.div>
 
-          <div className="space-y-6">
+          <div className="space-y-7">
             <PendingPaymentConfirmations userId={user.id} onUpdate={loadData} />
 
             {pendingOffers.length > 0 && (
