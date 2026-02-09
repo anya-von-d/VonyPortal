@@ -130,48 +130,34 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
       try {
         // Determine who the recipient is (opposite party)
         const recipientId = isLender ? loan.borrower_id : loan.lender_id;
-        console.log("RecordPaymentModal - Looking for recipient:", recipientId, "isLender:", isLender);
-        console.log("RecordPaymentModal - Loan:", loan);
 
         // Get recipient's profile
         const profiles = await PublicProfile.list();
         const recipientProfile = profiles.find(p => p.user_id === recipientId);
         setRecipientInfo(recipientProfile);
-        console.log("RecordPaymentModal - Recipient profile:", recipientProfile);
 
         // Get payment handles
         const handles = {};
 
-        // Venmo - fetch ALL connections first to debug
+        // Venmo - fetch all connections and find recipient's
         const allVenmoConnections = await VenmoConnection.list();
-        console.log("RecordPaymentModal - ALL Venmo connections:", allVenmoConnections);
-
-        // Find the one matching our recipient
         const recipientVenmo = allVenmoConnections.find(vc => vc.user_id === recipientId);
         if (recipientVenmo) {
           handles.venmo = recipientVenmo.venmo_username;
-          console.log("RecordPaymentModal - Found Venmo for recipient:", recipientVenmo);
-        } else {
-          console.log("RecordPaymentModal - No Venmo found for recipientId:", recipientId);
         }
 
-        // PayPal - fetch ALL connections first to debug
+        // PayPal - fetch all connections and find recipient's
         const allPaypalConnections = await PayPalConnection.list();
-        console.log("RecordPaymentModal - ALL PayPal connections:", allPaypalConnections);
-
         const recipientPaypal = allPaypalConnections.find(pc => pc.user_id === recipientId);
         if (recipientPaypal) {
           handles.paypal = recipientPaypal.paypal_email || recipientPaypal.paypal_username;
-          console.log("RecordPaymentModal - Found PayPal for recipient:", recipientPaypal);
         }
 
         // Try to get CashApp and Zelle from the user/profiles
         try {
           const users = await User.list();
-          console.log("RecordPaymentModal - All users/profiles:", users);
           const recipientUser = users?.find(u => u.id === recipientId);
           if (recipientUser) {
-            console.log("RecordPaymentModal - Found recipient user:", recipientUser);
             if (recipientUser.cashapp_handle) {
               handles.cashapp = recipientUser.cashapp_handle;
             }
@@ -180,10 +166,9 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
             }
           }
         } catch (err) {
-          console.log("Could not fetch user payment handles:", err);
+          // Silently fail - CashApp/Zelle handles are optional
         }
 
-        console.log("RecordPaymentModal - Final handles:", handles);
         setRecipientPaymentHandles(handles);
       } catch (error) {
         console.error("Error fetching recipient info:", error);
@@ -193,6 +178,11 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
     fetchRecipientInfo();
   }, [loan, isLender]);
 
+  // Detect if user is on mobile device
+  const isMobileDevice = () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  };
+
   const handleOpenPaymentApp = () => {
     const handle = recipientPaymentHandles[paymentMethod];
     const paymentAmount = parseFloat(amount) || suggestedPayment;
@@ -200,8 +190,16 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
 
     const links = generateDeepLink(paymentMethod, paymentAmount, handle, paymentNote);
 
+    // On desktop, always use web links
+    if (!isMobileDevice()) {
+      if (links.web) {
+        window.open(links.web, '_blank');
+      }
+      return;
+    }
+
+    // On mobile, try deep link first with web fallback
     if (links.mobile) {
-      // Try mobile deep link first
       const startTime = Date.now();
       window.location.href = links.mobile;
 
