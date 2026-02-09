@@ -10,7 +10,7 @@ import { UserSelector } from "@/components/ui/user-selector";
 import SignatureModal from "@/components/loans/SignatureModal";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { PlusCircle, DollarSign, Calendar, Percent, FileText, User as UserIcon, AlertCircle } from "lucide-react";
+import { PlusCircle, DollarSign, Calendar, Percent, FileText, User as UserIcon, AlertCircle, Zap, ClipboardList } from "lucide-react";
 import { motion } from "framer-motion";
 import { addMonths, format } from "date-fns";
 
@@ -22,6 +22,7 @@ export default function CreateLoan() {
   const [currentUser, setCurrentUser] = useState(null);
   const [showSignatureModal, setShowSignatureModal] = useState(false);
   const [pendingLoanData, setPendingLoanData] = useState(null);
+  const [loanType, setLoanType] = useState('flexible'); // 'flexible' or 'scheduled'
   const [formData, setFormData] = useState({
     borrower_username: '',
     amount: '',
@@ -425,6 +426,26 @@ export default function CreateLoan() {
                 <CardTitle className="text-2xl">Loan Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Flexible/Scheduled Switch */}
+                <div className="flex items-center justify-between pb-3 border-b border-white/20">
+                  <span className="text-sm font-medium opacity-90">Flexible</span>
+                  <button
+                    type="button"
+                    onClick={() => setLoanType(loanType === 'flexible' ? 'scheduled' : 'flexible')}
+                    className="relative w-16 h-8 rounded-full transition-all duration-300 bg-white/20"
+                  >
+                    <div className={`absolute top-1 left-1 w-6 h-6 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 bg-white ${
+                      loanType === 'scheduled' ? 'translate-x-8' : 'translate-x-0'
+                    }`}>
+                      {loanType === 'flexible' ? (
+                        <Zap className="w-3 h-3 text-[#35B276]" />
+                      ) : (
+                        <ClipboardList className="w-3 h-3 text-[#35B276]" />
+                      )}
+                    </div>
+                  </button>
+                  <span className="text-sm font-medium opacity-90">Scheduled</span>
+                </div>
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="opacity-90">Loan Amount:</span>
