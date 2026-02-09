@@ -3,7 +3,7 @@ import { LoanAgreement, User, PublicProfile, Loan, Payment } from "@/entities/al
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileText, CheckCircle, Users, Download } from "lucide-react";
+import { FileText, CheckCircle, Users, Download, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { jsPDF } from "jspdf";
@@ -18,6 +18,7 @@ export default function LoanAgreements() {
   const [payments, setPayments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedAgreement, setSelectedAgreement] = useState(null);
+  const [activeTab, setActiveTab] = useState('borrowing');
 
   useEffect(() => {
     loadData();
@@ -503,9 +504,37 @@ export default function LoanAgreements() {
 
       <div className="min-h-screen p-4 md:p-6" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
         <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="py-6">
-              <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-center">My Loan Agreements</h1>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="py-6">
+            <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-center">My Loan Agreements</h1>
             <p className="text-lg text-slate-600 text-center">View all your signed loan agreements</p>
+
+            {/* Toggle Buttons */}
+            <div className="flex justify-center gap-3 mt-6">
+              <Button
+                onClick={() => setActiveTab('borrowing')}
+                variant={activeTab === 'borrowing' ? 'default' : 'outline'}
+                className={`flex items-center gap-2 ${
+                  activeTab === 'borrowing'
+                    ? 'bg-[#35B276] hover:bg-[#2d9a65] text-white'
+                    : 'border-slate-300 text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                <ArrowDownRight className="w-4 h-4" />
+                Borrowing ({borrowingAgreements.length})
+              </Button>
+              <Button
+                onClick={() => setActiveTab('lending')}
+                variant={activeTab === 'lending' ? 'default' : 'outline'}
+                className={`flex items-center gap-2 ${
+                  activeTab === 'lending'
+                    ? 'bg-[#35B276] hover:bg-[#2d9a65] text-white'
+                    : 'border-slate-300 text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                <ArrowUpRight className="w-4 h-4" />
+                Lending ({lendingAgreements.length})
+              </Button>
+            </div>
           </motion.div>
 
           {agreements.length === 0 ? (
@@ -519,37 +548,69 @@ export default function LoanAgreements() {
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-6 md:space-y-8">
-              <div>
-                <h2 className="text-xl md:text-2xl font-bold text-slate-800 mb-3 md:mb-4">Lent</h2>
-                {lendingAgreements.length === 0 ? (
-                  <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`}} className="backdrop-blur-sm">
-                    <CardContent className="p-8 text-center text-slate-500">No lending agreements</CardContent>
+            <>
+              {activeTab === 'borrowing' ? (
+                <motion.div
+                  key="borrowing"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
+                    <CardHeader className="pb-4 border-b border-slate-200">
+                      <CardTitle className="flex items-center gap-2 text-slate-800">
+                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                          <ArrowDownRight className="w-4 h-4 text-blue-600" />
+                        </div>
+                        Borrowing
+                      </CardTitle>
+                      <p className="text-sm text-slate-500 mt-1">Loan agreements where you are the borrower</p>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      {borrowingAgreements.length === 0 ? (
+                        <p className="text-slate-500 text-center py-4">No borrowing agreements</p>
+                      ) : (
+                        <div className="space-y-4">
+                          {borrowingAgreements.map(agreement => (
+                            <AgreementPreview key={agreement.id} agreement={agreement} onClick={() => setSelectedAgreement(agreement)} type="Borrowing" />
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
                   </Card>
-                ) : (
-                  <div className="space-y-4">
-                    {lendingAgreements.map(agreement => (
-                      <AgreementPreview key={agreement.id} agreement={agreement} onClick={() => setSelectedAgreement(agreement)} type="Lending" />
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <h2 className="text-xl md:text-2xl font-bold text-slate-800 mb-3 md:mb-4">Borrowed</h2>
-                {borrowingAgreements.length === 0 ? (
-                  <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`}} className="backdrop-blur-sm">
-                    <CardContent className="p-8 text-center text-slate-500">No borrowing agreements</CardContent>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="lending"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
+                    <CardHeader className="pb-4 border-b border-slate-200">
+                      <CardTitle className="flex items-center gap-2 text-slate-800">
+                        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                          <ArrowUpRight className="w-4 h-4 text-green-600" />
+                        </div>
+                        Lending
+                      </CardTitle>
+                      <p className="text-sm text-slate-500 mt-1">Loan agreements where you are the lender</p>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      {lendingAgreements.length === 0 ? (
+                        <p className="text-slate-500 text-center py-4">No lending agreements</p>
+                      ) : (
+                        <div className="space-y-4">
+                          {lendingAgreements.map(agreement => (
+                            <AgreementPreview key={agreement.id} agreement={agreement} onClick={() => setSelectedAgreement(agreement)} type="Lending" />
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
                   </Card>
-                ) : (
-                  <div className="space-y-4">
-                    {borrowingAgreements.map(agreement => (
-                      <AgreementPreview key={agreement.id} agreement={agreement} onClick={() => setSelectedAgreement(agreement)} type="Borrowing" />
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+                </motion.div>
+              )}
+            </>
           )}
         </div>
       </div>
