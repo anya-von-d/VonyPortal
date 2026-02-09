@@ -157,7 +157,7 @@ export default function Home() {
                 Welcome to <span style={{color: `rgb(var(--theme-primary))`}}>Vony</span>
               </h1>
               <p className="mb-6 leading-relaxed" style={{ color: '#475569' }}>
-                Your trusted platform for managing personal loans.
+                Lending money to friends made simple.
               </p>
               <Button
                 onClick={handleLogin}
