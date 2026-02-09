@@ -21,9 +21,14 @@ import {
   Clock,
   ExternalLink,
   Copy,
-  Check
+  Check,
+  ArrowRight,
+  ArrowLeft,
+  Shield
 } from "lucide-react";
 import { format } from "date-fns";
+import { motion, AnimatePresence } from "framer-motion";
+import { SuccessAnimation, TransactionId, AnimatedProgress } from "@/components/ui/animations";
 
 const PAYMENT_METHODS = [
   { id: 'venmo', label: 'Venmo', icon: Smartphone, color: 'text-blue-500', bgColor: 'bg-blue-500' },
@@ -108,6 +113,13 @@ const generateDeepLink = (method, amount, recipientHandle, note) => {
   }
 };
 
+// Generate a unique transaction ID
+const generateTransactionId = () => {
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36).substring(2, 8);
+  return `VNY-${timestamp}-${random}`.toUpperCase();
+};
+
 export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, isLender = false, currentUserId = null }) {
   const [amount, setAmount] = useState(loan.payment_amount?.toFixed(2) || "");
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -121,8 +133,29 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
   const [copiedHandle, setCopiedHandle] = useState(false);
   const [showDeepLinkOption, setShowDeepLinkOption] = useState(false);
 
+  // New states for multi-step flow
+  const [step, setStep] = useState(1); // 1: Enter details, 2: Confirm, 3: Success
+  const [transactionId, setTransactionId] = useState("");
+  const [showConfirmWarning, setShowConfirmWarning] = useState(false);
+
   const remainingBalance = (loan.total_amount || 0) - (loan.amount_paid || 0);
   const suggestedPayment = Math.min(loan.payment_amount || 0, remainingBalance);
+
+  // Inline validation states
+  const [amountError, setAmountError] = useState("");
+  const [methodError, setMethodError] = useState("");
+
+  // Validate amount in real-time
+  useEffect(() => {
+    const paymentAmount = parseFloat(amount);
+    if (amount && paymentAmount <= 0) {
+      setAmountError("Amount must be greater than $0");
+    } else if (amount && paymentAmount > remainingBalance + 0.01) {
+      setAmountError(`Cannot exceed remaining balance of $${remainingBalance.toFixed(2)}`);
+    } else {
+      setAmountError("");
+    }
+  }, [amount, remainingBalance]);
 
   // Fetch recipient's payment handles
   useEffect(() => {
@@ -223,26 +256,36 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
     }
   };
 
+  // Proceed to confirmation step
+  const handleProceedToConfirm = () => {
+    setError("");
+    setMethodError("");
+
+    const paymentAmount = parseFloat(amount);
+
+    if (paymentAmount <= 0) {
+      setAmountError("Please enter a valid amount");
+      return;
+    }
+
+    if (paymentAmount > remainingBalance + 0.01) {
+      setAmountError(`Payment amount cannot exceed remaining balance of $${remainingBalance.toFixed(2)}`);
+      return;
+    }
+
+    if (!paymentMethod) {
+      setMethodError("Please select a payment method");
+      return;
+    }
+
+    setStep(2);
+  };
+
   const handleRecordPayment = async (e) => {
     e.preventDefault();
     setError("");
 
     const paymentAmount = parseFloat(amount);
-
-    if (paymentAmount <= 0) {
-      setError("Please enter a valid amount");
-      return;
-    }
-
-    if (paymentAmount > remainingBalance + 0.01) {
-      setError(`Payment amount cannot exceed remaining balance of $${remainingBalance.toFixed(2)}`);
-      return;
-    }
-
-    if (!paymentMethod) {
-      setError("Please select a payment method");
-      return;
-    }
 
     setIsProcessing(true);
 
@@ -250,6 +293,10 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
       // Get current user ID
       const user = await User.me();
       const recordedById = user?.id || currentUserId;
+
+      // Generate transaction ID
+      const txnId = generateTransactionId();
+      setTransactionId(txnId);
 
       // Create the payment record with pending_confirmation status
       // Only use columns that exist in the database
@@ -259,18 +306,20 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
         amount: paymentAmount,
         payment_date: paymentDate,
         status: 'pending_confirmation',
-        notes: notes || `${methodLabel} payment of $${paymentAmount.toFixed(2)} via ${methodLabel}`
+        notes: notes || `${methodLabel} payment of $${paymentAmount.toFixed(2)} via ${methodLabel} [Ref: ${txnId}]`
       });
 
       // Don't update the loan yet - wait for confirmation from the other party
 
+      setStep(3);
       setIsSuccess(true);
       setTimeout(() => {
         onPaymentComplete();
-      }, 2000);
+      }, 3000);
     } catch (error) {
       console.error("Error recording payment:", error);
       setError(error.message || "Failed to record payment");
+      setStep(1);
     }
     setIsProcessing(false);
   };
@@ -284,27 +333,158 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
     `Loan payment`
   ) : null;
 
-  if (isSuccess) {
+  // Step 3: Success
+  if (step === 3 && isSuccess) {
     return (
-      <Dialog open={true} onOpenChange={onClose}>
+      <Dialog open={true} onOpenChange={() => {}}>
         <DialogContent className="sm:max-w-md">
-          <div className="flex flex-col items-center justify-center py-8">
-            <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mb-4">
-              <Clock className="w-10 h-10 text-amber-600" />
-            </div>
-            <h3 className="text-xl font-bold text-slate-800 mb-2">Payment Recorded!</h3>
-            <p className="text-slate-600 text-center">
-              Waiting for {isLender ? 'the borrower' : 'your lender'} to confirm this payment of ${parseFloat(amount).toFixed(2)}.
-            </p>
-            <p className="text-sm text-slate-500 mt-2 text-center">
-              The loan balance will update once both parties confirm.
-            </p>
+          <div className="relative">
+            <SuccessAnimation
+              show={true}
+              title="Payment Recorded!"
+              subtitle={`Waiting for ${isLender ? 'the borrower' : 'your lender'} to confirm`}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="flex flex-col items-center gap-4 mt-4"
+            >
+              <div className="text-center">
+                <p className="text-2xl font-bold text-slate-800">
+                  ${parseFloat(amount).toFixed(2)}
+                </p>
+                <p className="text-sm text-slate-500">
+                  via {PAYMENT_METHODS.find(m => m.id === paymentMethod)?.label}
+                </p>
+              </div>
+              {transactionId && (
+                <TransactionId id={transactionId} />
+              )}
+              <p className="text-xs text-slate-400 text-center max-w-xs">
+                The loan balance will update once both parties confirm this payment.
+              </p>
+            </motion.div>
           </div>
         </DialogContent>
       </Dialog>
     );
   }
 
+  // Step 2: Confirmation
+  if (step === 2) {
+    const methodInfo = PAYMENT_METHODS.find(m => m.id === paymentMethod);
+    const MethodIcon = methodInfo?.icon || DollarSign;
+
+    return (
+      <Dialog open={true} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Shield className="w-5 h-5 text-[#35B276]" />
+              Confirm Payment
+            </DialogTitle>
+            <DialogDescription>
+              Please review and confirm the payment details
+            </DialogDescription>
+          </DialogHeader>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-4"
+          >
+            {/* Payment Summary Card */}
+            <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-5 border border-slate-200 space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-slate-600">Amount</span>
+                <span className="text-2xl font-bold text-slate-800">${parseFloat(amount).toFixed(2)}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-slate-600">Method</span>
+                <div className="flex items-center gap-2">
+                  <MethodIcon className={`w-4 h-4 ${methodInfo?.color}`} />
+                  <span className="font-medium text-slate-800">{methodInfo?.label}</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-slate-600">Date</span>
+                <span className="font-medium text-slate-800">
+                  {format(new Date(paymentDate), 'MMM d, yyyy')}
+                </span>
+              </div>
+              {recipientInfo && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-slate-600">To</span>
+                  <span className="font-medium text-slate-800">{recipientInfo.full_name}</span>
+                </div>
+              )}
+              {notes && (
+                <div className="pt-3 border-t border-slate-200">
+                  <span className="text-sm text-slate-600">Notes</span>
+                  <p className="text-sm text-slate-800 mt-1">{notes}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Warning Notice */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2"
+            >
+              <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-amber-700">
+                {isLender ? 'The borrower' : 'Your lender'} will need to confirm this payment. Make sure the details are correct.
+              </p>
+            </motion.div>
+
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 pt-2">
+              <Button
+                variant="outline"
+                onClick={() => setStep(1)}
+                className="flex-1"
+                disabled={isProcessing}
+              >
+                <ArrowLeft className="w-4 h-4 mr-1" />
+                Back
+              </Button>
+              <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  onClick={handleRecordPayment}
+                  disabled={isProcessing}
+                  className="w-full bg-[#35B276] hover:bg-[#2d9a65] shadow-lg shadow-green-600/25"
+                >
+                  {isProcessing ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                      Recording...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-4 h-4 mr-1" />
+                      Confirm Payment
+                    </>
+                  )}
+                </Button>
+              </motion.div>
+            </div>
+          </motion.div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // Step 1: Enter Details
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
@@ -321,20 +501,46 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
           </DialogDescription>
         </DialogHeader>
 
+        {/* Step Indicator */}
+        <div className="flex items-center justify-center gap-2 py-2">
+          <div className="flex items-center gap-1">
+            <div className="w-8 h-8 rounded-full bg-[#35B276] text-white flex items-center justify-center text-sm font-medium">1</div>
+            <span className="text-xs text-slate-600 hidden sm:inline">Details</span>
+          </div>
+          <div className="w-8 h-0.5 bg-slate-200" />
+          <div className="flex items-center gap-1">
+            <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-sm font-medium">2</div>
+            <span className="text-xs text-slate-400 hidden sm:inline">Confirm</span>
+          </div>
+          <div className="w-8 h-0.5 bg-slate-200" />
+          <div className="flex items-center gap-1">
+            <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-sm font-medium">3</div>
+            <span className="text-xs text-slate-400 hidden sm:inline">Done</span>
+          </div>
+        </div>
+
         {/* Info banner about confirmation */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-start gap-2">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-start gap-2"
+        >
           <Clock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <p className="text-sm text-blue-700">
             {isLender ? 'The borrower' : 'Your lender'} will need to confirm this payment before it updates the loan balance.
           </p>
-        </div>
+        </motion.div>
 
-        <form onSubmit={handleRecordPayment} className="space-y-5">
+        <form onSubmit={(e) => { e.preventDefault(); handleProceedToConfirm(); }} className="space-y-5">
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2"
+            >
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-red-700">{error}</p>
-            </div>
+            </motion.div>
           )}
 
           {/* Loan Summary */}
@@ -355,23 +561,28 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
 
           {/* Payment Method */}
           <div className="space-y-2">
-            <Label>Payment Method</Label>
+            <Label className={methodError ? 'text-red-600' : ''}>Payment Method</Label>
             <div className="grid grid-cols-3 gap-2">
               {PAYMENT_METHODS.map((method) => {
                 const Icon = method.icon;
                 const hasHandle = !!recipientPaymentHandles[method.id];
                 return (
-                  <button
+                  <motion.button
                     key={method.id}
                     type="button"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => {
                       setPaymentMethod(method.id);
+                      setMethodError("");
                       setShowDeepLinkOption(false);
                     }}
                     className={`flex flex-col items-center gap-1 p-3 rounded-lg border-2 transition-all relative ${
                       paymentMethod === method.id
-                        ? 'border-green-500 bg-green-50'
-                        : 'border-slate-200 hover:border-slate-300 bg-white'
+                        ? 'border-green-500 bg-green-50 shadow-md'
+                        : methodError
+                        ? 'border-red-200 hover:border-red-300 bg-white'
+                        : 'border-slate-200 hover:border-slate-300 bg-white hover:shadow-sm'
                     }`}
                   >
                     <Icon className={`w-5 h-5 ${method.color}`} />
@@ -379,10 +590,20 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
                     {hasHandle && (
                       <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
                     )}
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
+            {methodError && (
+              <motion.p
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-xs text-red-600 flex items-center gap-1"
+              >
+                <AlertCircle className="w-3 h-3" />
+                {methodError}
+              </motion.p>
+            )}
             <p className="text-xs text-slate-500">
               <span className="inline-flex items-center gap-1">
                 <span className="w-2 h-2 bg-green-500 rounded-full"></span>
@@ -468,41 +689,72 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
 
           {/* Amount Input */}
           <div className="space-y-2">
-            <Label htmlFor="amount" className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-green-600" />
+            <Label htmlFor="amount" className={`flex items-center gap-2 ${amountError ? 'text-red-600' : ''}`}>
+              <DollarSign className={`w-4 h-4 ${amountError ? 'text-red-600' : 'text-green-600'}`} />
               Payment Amount
             </Label>
-            <Input
-              id="amount"
-              type="number"
-              step="0.01"
-              min="0.01"
-              max={remainingBalance}
-              placeholder={suggestedPayment.toFixed(2)}
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              required
-              className="text-lg"
-            />
+            <div className="relative">
+              <Input
+                id="amount"
+                type="number"
+                step="0.01"
+                min="0.01"
+                max={remainingBalance}
+                placeholder={suggestedPayment.toFixed(2)}
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                required
+                className={`text-lg transition-all ${
+                  amountError
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+                    : amount && !amountError
+                    ? 'border-green-300 focus:border-green-500'
+                    : ''
+                }`}
+              />
+              {amount && !amountError && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                >
+                  <Check className="w-5 h-5 text-green-500" />
+                </motion.div>
+              )}
+            </div>
+            {amountError && (
+              <motion.p
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-xs text-red-600 flex items-center gap-1"
+              >
+                <AlertCircle className="w-3 h-3" />
+                {amountError}
+              </motion.p>
+            )}
             <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => setAmount(suggestedPayment.toFixed(2))}
-                className="text-xs"
-              >
-                Suggested: ${suggestedPayment.toFixed(2)}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => setAmount(remainingBalance.toFixed(2))}
-                className="text-xs"
-              >
-                Pay Full: ${remainingBalance.toFixed(2)}
-              </Button>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAmount(suggestedPayment.toFixed(2))}
+                  className="text-xs hover:border-green-300 hover:bg-green-50"
+                >
+                  Suggested: ${suggestedPayment.toFixed(2)}
+                </Button>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAmount(remainingBalance.toFixed(2))}
+                  className="text-xs hover:border-green-300 hover:bg-green-50"
+                >
+                  Pay Full: ${remainingBalance.toFixed(2)}
+                </Button>
+              </motion.div>
             </div>
           </div>
 
@@ -537,18 +789,21 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
               type="button"
               variant="outline"
               onClick={onClose}
-              className="flex-1"
+              className="flex-1 hover:bg-slate-50 transition-colors"
               disabled={isProcessing}
             >
               Cancel
             </Button>
-            <Button
-              type="submit"
-              disabled={isProcessing || !amount || !paymentMethod}
-              className="flex-1 bg-green-600 hover:bg-green-700"
-            >
-              {isProcessing ? 'Recording...' : 'Record Payment'}
-            </Button>
+            <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                type="submit"
+                disabled={isProcessing || !amount || !paymentMethod || !!amountError}
+                className="w-full bg-[#35B276] hover:bg-[#2d9a65] shadow-lg shadow-green-600/25 transition-all"
+              >
+                Continue
+                <ArrowRight className="w-4 h-4 ml-1" />
+              </Button>
+            </motion.div>
           </div>
         </form>
       </DialogContent>

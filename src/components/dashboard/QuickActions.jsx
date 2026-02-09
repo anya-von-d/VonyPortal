@@ -39,44 +39,55 @@ const colorClasses = {
 
 export default function QuickActions() {
   return (
-    <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
-      <CardHeader className="border-b border-slate-200/40 pb-4">
-        <CardTitle className="flex items-center gap-2 text-slate-800">
-          <Zap className="w-5 h-5 text-green-600" />
-          Quick Actions
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-6">
-        <div className="space-y-4">
-          {actions.map((action, index) => (
-            <motion.div
-              key={action.title}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
-            >
-              <Link to={createPageUrl(action.url)}>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start h-auto p-4 hover:bg-slate-50 group transition-all duration-200"
-                >
-                  <div className={`p-2 rounded-lg ${colorClasses[action.color]} shadow-lg mr-4 group-hover:scale-110 transition-transform duration-200`}>
-                    <action.icon className="w-4 h-4 text-[#F3F0EC] opacity-90" />
-                  </div>
-                  <div className="text-left">
-                    <p className="font-semibold text-slate-800 group-hover:text-slate-900">
-                      {action.title}
-                    </p>
-                    <p className="text-sm text-slate-500 group-hover:text-slate-600">
-                      {action.description}
-                    </p>
-                  </div>
-                </Button>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.2 }}
+    >
+      <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
+        <CardHeader className="border-b border-slate-200/40 pb-4">
+          <CardTitle className="flex items-center gap-2 text-slate-800">
+            <Zap className="w-5 h-5 text-green-600" />
+            Quick Actions
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="space-y-3">
+            {actions.map((action, index) => (
+              <motion.div
+                key={action.title}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: 0.3 + index * 0.1 }}
+                whileHover={{ x: 4 }}
+              >
+                <Link to={createPageUrl(action.url)}>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start h-auto p-4 hover:bg-slate-50/80 group transition-all duration-200 rounded-xl border border-transparent hover:border-slate-200/60"
+                  >
+                    <motion.div
+                      className={`p-2.5 rounded-xl ${colorClasses[action.color]} shadow-lg mr-4`}
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                    >
+                      <action.icon className="w-4 h-4 text-[#F3F0EC] opacity-90" />
+                    </motion.div>
+                    <div className="text-left">
+                      <p className="font-semibold text-slate-800 group-hover:text-slate-900">
+                        {action.title}
+                      </p>
+                      <p className="text-sm text-slate-500 group-hover:text-slate-600">
+                        {action.description}
+                      </p>
+                    </div>
+                  </Button>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }

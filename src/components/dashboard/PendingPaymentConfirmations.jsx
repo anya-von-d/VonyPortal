@@ -12,10 +12,12 @@ import {
   Banknote,
   CreditCard,
   AlertCircle,
-  Hourglass
+  Hourglass,
+  AlertTriangle
 } from "lucide-react";
 import { format, addMonths } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
+import { SkeletonShimmer } from "@/components/ui/animations";
 
 const PAYMENT_METHOD_ICONS = {
   venmo: { icon: Smartphone, color: 'text-blue-500', label: 'Venmo' },
@@ -34,6 +36,8 @@ export default function PendingPaymentConfirmations({ userId, onUpdate }) {
   const [profiles, setProfiles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [processingId, setProcessingId] = useState(null);
+  const [confirmingDeny, setConfirmingDeny] = useState(null); // For warning before deny
+  const [confirmingCancel, setConfirmingCancel] = useState(null); // For warning before cancel
 
   useEffect(() => {
     loadPendingPayments();
@@ -120,8 +124,15 @@ export default function PendingPaymentConfirmations({ userId, onUpdate }) {
     setProcessingId(null);
   };
 
-  const handleDeny = async (payment) => {
+  const handleDenyClick = (payment) => {
+    setConfirmingDeny(payment);
+  };
+
+  const handleDenyConfirm = async () => {
+    if (!confirmingDeny) return;
+    const payment = confirmingDeny;
     setProcessingId(payment.id);
+    setConfirmingDeny(null);
     try {
       // Update payment status to denied
       // Only update status - other fields may not exist in the database
@@ -139,8 +150,15 @@ export default function PendingPaymentConfirmations({ userId, onUpdate }) {
     setProcessingId(null);
   };
 
-  const handleCancel = async (payment) => {
+  const handleCancelClick = (payment) => {
+    setConfirmingCancel(payment);
+  };
+
+  const handleCancelConfirm = async () => {
+    if (!confirmingCancel) return;
+    const payment = confirmingCancel;
     setProcessingId(payment.id);
+    setConfirmingCancel(null);
     try {
       // Delete the payment
       await Payment.delete(payment.id);
@@ -173,7 +191,19 @@ export default function PendingPaymentConfirmations({ userId, onUpdate }) {
   };
 
   if (isLoading) {
-    return null;
+    return (
+      <Card className="bg-amber-50/50 border-amber-200/50">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-3">
+            <SkeletonShimmer className="w-10 h-10 rounded-full" />
+            <div className="space-y-2 flex-1">
+              <SkeletonShimmer className="h-4 w-48" />
+              <SkeletonShimmer className="h-3 w-32" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   if (paymentsToConfirm.length === 0 && paymentsAwaitingConfirmation.length === 0) {
@@ -182,6 +212,98 @@ export default function PendingPaymentConfirmations({ userId, onUpdate }) {
 
   return (
     <div className="space-y-4">
+      {/* Warning Dialog for Deny */}
+      <AnimatePresence>
+        {confirmingDeny && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            onClick={() => setConfirmingDeny(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-red-100 rounded-full">
+                  <AlertTriangle className="w-5 h-5 text-red-600" />
+                </div>
+                <h3 className="font-semibold text-lg text-slate-800">Deny Payment?</h3>
+              </div>
+              <p className="text-sm text-slate-600 mb-6">
+                Are you sure you want to deny this payment of ${confirmingDeny.amount?.toFixed(2)}? This action cannot be undone.
+              </p>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setConfirmingDeny(null)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                  onClick={handleDenyConfirm}
+                >
+                  Deny Payment
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Warning Dialog for Cancel */}
+      <AnimatePresence>
+        {confirmingCancel && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            onClick={() => setConfirmingCancel(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-amber-100 rounded-full">
+                  <AlertTriangle className="w-5 h-5 text-amber-600" />
+                </div>
+                <h3 className="font-semibold text-lg text-slate-800">Cancel Payment?</h3>
+              </div>
+              <p className="text-sm text-slate-600 mb-6">
+                Are you sure you want to cancel this payment of ${confirmingCancel.amount?.toFixed(2)}? This will remove the payment record.
+              </p>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setConfirmingCancel(null)}
+                >
+                  Keep
+                </Button>
+                <Button
+                  className="flex-1 bg-amber-600 hover:bg-amber-700 text-white"
+                  onClick={handleCancelConfirm}
+                >
+                  Cancel Payment
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Payments needing user's confirmation */}
       {paymentsToConfirm.length > 0 && (
         <motion.div
@@ -242,7 +364,7 @@ export default function PendingPaymentConfirmations({ userId, onUpdate }) {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleDeny(payment)}
+                            onClick={() => handleDenyClick(payment)}
                             disabled={processingId === payment.id}
                             className="border-red-200 text-red-600 hover:bg-red-50"
                           >
@@ -335,7 +457,7 @@ export default function PendingPaymentConfirmations({ userId, onUpdate }) {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleCancel(payment)}
+                            onClick={() => handleCancelClick(payment)}
                             disabled={processingId === payment.id}
                             className="border-slate-200 text-slate-600 hover:bg-slate-50"
                           >

@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Activity, ArrowUpRight, ArrowDownRight, DollarSign, Send, Check, X, Ban } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
+import { SkeletonShimmer } from "@/components/ui/animations";
 
 const statusColors = {
   pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
@@ -35,17 +35,23 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
         </CardHeader>
         <CardContent className="p-6">
           <div className="space-y-4">
-            {Array(5).fill(0).map((_, i) => (
-              <div key={i} className="flex items-center justify-between p-4 rounded-xl border border-slate-200/40">
+            {Array(3).fill(0).map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="flex items-center justify-between p-4 rounded-xl border border-slate-200/40"
+              >
                 <div className="flex items-center gap-3">
-                  <Skeleton className="w-10 h-10 rounded-lg" />
-                  <div>
-                    <Skeleton className="h-4 w-32 mb-2" />
-                    <Skeleton className="h-3 w-24" />
+                  <SkeletonShimmer className="w-10 h-10 rounded-lg" />
+                  <div className="space-y-2">
+                    <SkeletonShimmer className="h-4 w-32" />
+                    <SkeletonShimmer className="h-3 w-24" />
                   </div>
                 </div>
-                <Skeleton className="h-6 w-16 rounded-full" />
-              </div>
+                <SkeletonShimmer className="h-6 w-16 rounded-full" />
+              </motion.div>
             ))}
           </div>
         </CardContent>
@@ -208,48 +214,60 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
   };
 
   return (
-    <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
-      <CardHeader className="border-b border-slate-200/40 pb-4">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-slate-800">
-            <Activity className="w-5 h-5 text-green-600" />
-            Recent Activity
-          </CardTitle>
-          <Link to={createPageUrl("RecentActivity")}>
-            <Button variant="ghost" size="sm" className="text-green-600 hover:text-green-700 hover:bg-green-50">
-              View All
-            </Button>
-          </Link>
-        </div>
-      </CardHeader>
-      <CardContent className="p-6">
-        {recentActivity.length === 0 ? (
-          <div className="text-center py-8">
-            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Activity className="w-8 h-8 text-slate-400" />
-            </div>
-            <p className="text-slate-500 mb-4">No recent activity</p>
-            <Link to={createPageUrl("CreateLoan")}>
-              <Button className="bg-green-600 hover:bg-green-700">
-                Get Started
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.3 }}
+    >
+      <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
+        <CardHeader className="border-b border-slate-200/40 pb-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-slate-800">
+              <Activity className="w-5 h-5 text-green-600" />
+              Recent Activity
+            </CardTitle>
+            <Link to={createPageUrl("RecentActivity")}>
+              <Button variant="ghost" size="sm" className="text-green-600 hover:text-green-700 hover:bg-green-50">
+                View All
               </Button>
             </Link>
           </div>
-        ) : (
-          <div className="space-y-4">
-            {recentActivity.map((activity, index) => 
-              <motion.div
-                key={`${activity.type}-${activity.id}-${index}`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-              >
-                {renderActivityItem(activity)}
-              </motion.div>
-            )}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        </CardHeader>
+        <CardContent className="p-6">
+          {recentActivity.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-center py-8"
+            >
+              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Activity className="w-8 h-8 text-slate-400" />
+              </div>
+              <p className="text-slate-500 mb-4">No recent activity</p>
+              <Link to={createPageUrl("CreateLoan")}>
+                <Button className="bg-green-600 hover:bg-green-700">
+                  Get Started
+                </Button>
+              </Link>
+            </motion.div>
+          ) : (
+            <div className="space-y-3">
+              {recentActivity.map((activity, index) =>
+                <motion.div
+                  key={`${activity.type}-${activity.id}-${index}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.4 + index * 0.1 }}
+                  whileHover={{ x: 4 }}
+                >
+                  {renderActivityItem(activity)}
+                </motion.div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }

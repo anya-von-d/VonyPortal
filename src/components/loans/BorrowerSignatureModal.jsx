@@ -3,10 +3,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileText, AlertCircle, CheckCircle2, X } from "lucide-react";
-import { motion } from "framer-motion";
+import { FileText, AlertCircle, CheckCircle2, X, Shield, Lock, Clock, DollarSign, Percent, Calendar, CreditCard, CheckCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { formatMoney } from "@/components/utils/formatMoney";
 import { format } from "date-fns";
+import { SuccessAnimation } from "@/components/ui/animations";
+
+// Trust checklist items for borrower
+const BORROWER_CHECKLIST = [
+  { id: 1, text: "I understand I must repay this loan with interest" },
+  { id: 2, text: "I agree to the payment schedule and amounts" },
+  { id: 3, text: "I have reviewed all terms and conditions" },
+];
 
 export default function BorrowerSignatureModal({
   isOpen,
@@ -21,6 +29,17 @@ export default function BorrowerSignatureModal({
   const [error, setError] = useState("");
   const [isSigning, setIsSigning] = useState(false);
   const [isDeclining, setIsDeclining] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [checkedItems, setCheckedItems] = useState([]);
+
+  const handleCheckItem = (id) => {
+    setCheckedItems(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const allItemsChecked = BORROWER_CHECKLIST.every(item => checkedItems.includes(item.id));
+  const isSignatureValid = signature.trim().toLowerCase() === borrowerFullName?.toLowerCase();
 
   const handleSign = async () => {
     if (!signature.trim()) {
@@ -31,12 +50,21 @@ export default function BorrowerSignatureModal({
       setError("Signature must match your full name");
       return;
     }
+    if (!allItemsChecked) {
+      setError("Please confirm all items in the checklist");
+      return;
+    }
 
     setIsSigning(true);
     try {
       await onSign(signature.trim());
-      setSignature("");
-      setError("");
+      setIsSuccess(true);
+      setTimeout(() => {
+        setSignature("");
+        setError("");
+        setCheckedItems([]);
+        setIsSuccess(false);
+      }, 2500);
     } catch (error) {
       console.error("Error signing:", error);
       setError("Failed to sign agreement. Please try again.");
@@ -57,6 +85,23 @@ export default function BorrowerSignatureModal({
     }
   };
 
+  // Success state
+  if (isSuccess) {
+    return (
+      <Dialog open={isOpen} onOpenChange={() => {}}>
+        <DialogContent className="max-w-lg p-0 gap-0">
+          <div className="relative">
+            <SuccessAnimation
+              show={true}
+              title="Loan Accepted!"
+              subtitle={`You have accepted the loan from ${lenderName}`}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 gap-0">
@@ -76,8 +121,28 @@ export default function BorrowerSignatureModal({
         </div>
 
         <div className="p-6 space-y-6">
+          {/* Trust Badges */}
+          <div className="flex items-center justify-center gap-6">
+            <div className="flex items-center gap-1.5 text-xs text-slate-500">
+              <Shield className="w-4 h-4 text-[#35B276]" />
+              <span>Secure Agreement</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-slate-500">
+              <Lock className="w-4 h-4 text-[#35B276]" />
+              <span>Encrypted</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-slate-500">
+              <Clock className="w-4 h-4 text-[#35B276]" />
+              <span>Time-stamped</span>
+            </div>
+          </div>
+
           {/* Lender Info */}
-          <div className="bg-[#35B276]/10 border border-[#35B276]/30 rounded-lg p-4">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-[#35B276]/10 border border-[#35B276]/30 rounded-xl p-4"
+          >
             <div className="flex items-center gap-2 mb-2">
               <CheckCircle2 className="w-5 h-5 text-[#35B276]" />
               <span className="font-semibold text-[#35B276]">Lender has signed</span>
@@ -85,113 +150,250 @@ export default function BorrowerSignatureModal({
             <p className="text-sm text-slate-700">
               {lenderName} has reviewed and signed this loan agreement.
             </p>
-          </div>
+          </motion.div>
 
-          {/* Loan Terms */}
-          <div className="bg-slate-50 rounded-lg p-6 space-y-4">
-            <h3 className="font-semibold text-lg text-slate-800 mb-4">Loan Terms</h3>
+          {/* Terms at a Glance */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-5 border border-slate-200"
+          >
+            <h3 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+              <CreditCard className="w-4 h-4 text-green-600" />
+              Terms at a Glance
+            </h3>
 
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-slate-600">Loan Amount</p>
-                <p className="font-semibold text-slate-900">{formatMoney(loanDetails.amount)}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-600">Interest Rate</p>
-                <p className="font-semibold text-slate-900">{loanDetails.interest_rate}% APR</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-600">Repayment Period</p>
-                <p className="font-semibold text-slate-900">{loanDetails.repayment_period} months</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-600">Payment Frequency</p>
-                <p className="font-semibold text-slate-900 capitalize">{loanDetails.payment_frequency || 'Monthly'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-600">Total Amount Due</p>
-                <p className="font-semibold text-slate-900">{formatMoney(loanDetails.total_amount)}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-600">Payment Amount</p>
-                <p className="font-semibold text-slate-900">{formatMoney(loanDetails.payment_amount)}</p>
-              </div>
-              {loanDetails.due_date && (
-                <div>
-                  <p className="text-sm text-slate-600">Due Date</p>
-                  <p className="font-semibold text-slate-900">
-                    {format(new Date(loanDetails.due_date), 'MMMM d, yyyy')}
-                  </p>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.15 }}
+                className="bg-white rounded-lg p-3 border border-slate-200 shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <DollarSign className="w-4 h-4 text-green-600" />
+                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Amount</p>
                 </div>
-              )}
+                <p className="text-xl font-bold text-slate-800">{formatMoney(loanDetails.amount)}</p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
+                className="bg-white rounded-lg p-3 border border-slate-200 shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <Percent className="w-4 h-4 text-blue-600" />
+                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Interest</p>
+                </div>
+                <p className="text-xl font-bold text-slate-800">{loanDetails.interest_rate}% APR</p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.25 }}
+                className="bg-white rounded-lg p-3 border border-slate-200 shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <Calendar className="w-4 h-4 text-purple-600" />
+                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Term</p>
+                </div>
+                <p className="text-xl font-bold text-slate-800">{loanDetails.repayment_period} <span className="text-sm font-normal text-slate-500">months</span></p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3 }}
+                className="bg-white rounded-lg p-3 border border-slate-200 shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <CreditCard className="w-4 h-4 text-orange-600" />
+                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Payment</p>
+                </div>
+                <p className="text-xl font-bold text-slate-800">{formatMoney(loanDetails.payment_amount)}</p>
+                <p className="text-xs text-slate-500 capitalize">{loanDetails.payment_frequency || 'Monthly'}</p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.35 }}
+                className="bg-white rounded-lg p-3 border border-slate-200 shadow-sm hover:shadow-md transition-shadow col-span-2 md:col-span-1"
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <DollarSign className="w-4 h-4 text-green-600" />
+                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Total Due</p>
+                </div>
+                <p className="text-xl font-bold text-green-600">{formatMoney(loanDetails.total_amount)}</p>
+              </motion.div>
             </div>
 
             {loanDetails.purpose && (
-              <div className="pt-3 border-t border-slate-200">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="mt-4 pt-4 border-t border-slate-200"
+              >
                 <p className="text-sm text-slate-600">Purpose</p>
                 <p className="font-semibold text-slate-900">{loanDetails.purpose}</p>
-              </div>
+              </motion.div>
             )}
-          </div>
+          </motion.div>
+
+          {/* What You're Agreeing To - Checklist */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-white border border-slate-200 rounded-xl p-4 space-y-3"
+          >
+            <h4 className="font-medium text-slate-800 flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-[#35B276]" />
+              What you're agreeing to
+            </h4>
+            <div className="space-y-2">
+              {BORROWER_CHECKLIST.map((item, index) => (
+                <motion.label
+                  key={item.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 + index * 0.1 }}
+                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors group"
+                >
+                  <div
+                    onClick={() => handleCheckItem(item.id)}
+                    className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all cursor-pointer ${
+                      checkedItems.includes(item.id)
+                        ? 'bg-[#35B276] border-[#35B276]'
+                        : 'border-slate-300 group-hover:border-[#35B276]'
+                    }`}
+                  >
+                    <AnimatePresence>
+                      {checkedItems.includes(item.id) && (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          exit={{ scale: 0 }}
+                        >
+                          <CheckCircle className="w-3 h-3 text-white" />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                  <span className={`text-sm ${checkedItems.includes(item.id) ? 'text-slate-800' : 'text-slate-600'}`}>
+                    {item.text}
+                  </span>
+                </motion.label>
+              ))}
+            </div>
+          </motion.div>
 
           {/* Agreement Text */}
-          <div className="bg-[#35B276]/10 border border-[#35B276]/30 rounded-lg p-4">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="bg-[#35B276]/10 border border-[#35B276]/30 rounded-xl p-4"
+          >
             <p className="text-sm text-slate-700 leading-relaxed">
               By signing below, you acknowledge and agree to the loan terms stated above as the{' '}
               <span className="font-semibold text-[#35B276]">Borrower</span>.
               You commit to fulfilling all obligations outlined in this agreement.
             </p>
-          </div>
+          </motion.div>
 
           {/* Signature Input */}
-          <div className="space-y-2">
-            <Label htmlFor="signature" className="text-base">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="space-y-3"
+          >
+            <Label htmlFor="signature" className="text-base font-medium text-slate-700 flex items-center gap-2">
+              <FileText className="w-4 h-4 text-green-600" />
               Type your full name to sign <span className="text-red-500">*</span>
             </Label>
-            <Input
-              id="signature"
-              value={signature}
-              onChange={(e) => {
-                setSignature(e.target.value);
-                setError("");
-              }}
-              placeholder="Enter your full name"
-              className="text-lg font-serif"
-            />
-            <p className="text-sm text-slate-500">
-              Please type: <strong>{borrowerFullName}</strong>
+            <div className="relative">
+              <Input
+                id="signature"
+                value={signature}
+                onChange={(e) => {
+                  setSignature(e.target.value);
+                  setError("");
+                }}
+                placeholder="Enter your full name"
+                className={`text-lg h-14 font-serif italic border-2 transition-all ${
+                  signature && isSignatureValid
+                    ? 'border-green-500 bg-green-50/50 focus:ring-green-500'
+                    : signature && !isSignatureValid
+                    ? 'border-amber-400 bg-amber-50/30'
+                    : 'border-slate-200 focus:border-green-500'
+                }`}
+              />
+              {signature && isSignatureValid && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                >
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                </motion.div>
+              )}
+            </div>
+            <p className="text-sm text-slate-500 flex items-center gap-1">
+              <span className="text-slate-400">Please type:</span>
+              <span className="font-medium text-slate-700">{borrowerFullName}</span>
             </p>
             {error && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex items-center gap-2 text-red-600 text-sm"
+                className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-2 rounded-lg"
               >
-                <AlertCircle className="w-4 h-4" />
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 {error}
               </motion.div>
             )}
-          </div>
+          </motion.div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7 }}
+            className="flex gap-3 pt-4"
+          >
             <Button
               variant="outline"
               onClick={handleDecline}
-              className="flex-1 border-red-200 text-red-600 hover:bg-red-50 h-12"
+              className="flex-1 border-red-200 text-red-600 hover:bg-red-50 h-12 transition-colors"
               disabled={isSigning || isDeclining}
             >
               <X className="w-4 h-4 mr-1" />
               {isDeclining ? 'Declining...' : 'Decline Offer'}
             </Button>
-            <Button
-              onClick={handleSign}
-              className="flex-1 bg-[#35B276] hover:bg-[#2d9a65] h-12 shadow-lg shadow-green-600/25"
-              disabled={isSigning || isDeclining}
-            >
-              {isSigning ? 'Signing...' : 'Sign & Accept'}
-            </Button>
-          </div>
+            <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                onClick={handleSign}
+                className="w-full bg-[#35B276] hover:bg-[#2d9a65] h-12 shadow-lg shadow-green-600/25 transition-all"
+                disabled={isSigning || isDeclining || !isSignatureValid || !allItemsChecked}
+              >
+                {isSigning ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                    Signing...
+                  </>
+                ) : (
+                  'Sign & Accept'
+                )}
+              </Button>
+            </motion.div>
+          </motion.div>
         </div>
       </DialogContent>
     </Dialog>
