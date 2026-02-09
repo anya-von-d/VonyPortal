@@ -67,9 +67,9 @@ const allNavItems = [...mainNavItems, ...moreMenuItems];
 export default function TopNav({ location, colors, user, isLoading, theme }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Light mode (morning) uses the standard logo, green mode (afternoon) uses the green mode logo
+  // Light mode (morning) uses the standard logo, green mode (afternoon) uses the dark logo
   const logoUrl = theme === 'afternoon'
-    ? "https://wvgqxgximcuhqhesoycw.supabase.co/storage/v1/object/public/Image%20Storage/LowercaseLogoGreenMode.png"
+    ? "https://wvgqxgximcuhqhesoycw.supabase.co/storage/v1/object/public/Image%20Storage/all_lowercase_dark_logo.png"
     : "https://wvgqxgximcuhqhesoycw.supabase.co/storage/v1/object/public/Image%20Storage/all_lowercase_logo.png";
 
   return (
