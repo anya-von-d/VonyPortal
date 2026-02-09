@@ -12,7 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { CreditCard, ArrowUpRight, ArrowDownRight, Clock } from "lucide-react";
+import { CreditCard, ArrowUpRight, ArrowDownRight, Clock, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
@@ -197,27 +197,50 @@ export default function MyLoans() {
           </p>
         </motion.div>
 
-        {/* Next Payment Card - Top */}
-        <Card className="text-white" style={{backgroundColor: '#35B276'}}>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="w-5 h-5" />
-              Next Payment
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="text-3xl font-bold mb-1">
-              {nextPaymentLoan ? `$${nextPaymentAmount.toLocaleString()}` : '-'}
-            </div>
-            <p className="opacity-80">
-              {nextPaymentLoan
-                ? (nextPaymentDays < 0
-                    ? `to @${nextPaymentLenderUsername} - Overdue`
-                    : `to @${nextPaymentLenderUsername} due in ${nextPaymentDays} day${nextPaymentDays !== 1 ? 's' : ''}`)
-                : 'No payments due'}
-            </p>
-          </CardContent>
-        </Card>
+        {/* Next Payment Cards - Top Row */}
+        <div className="grid md:grid-cols-2 gap-6">
+          <Card className="text-white" style={{backgroundColor: '#35B276'}}>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="w-5 h-5" />
+                Next Payment
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="text-3xl font-bold mb-1">
+                {nextPaymentLoan ? `$${nextPaymentAmount.toLocaleString()}` : '-'}
+              </div>
+              <p className="opacity-80">
+                {nextPaymentLoan
+                  ? `to @${nextPaymentLenderUsername}`
+                  : 'No payments due'}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="text-white" style={{backgroundColor: '#35B276'}}>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="w-5 h-5" />
+                Next Payment Due
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="text-3xl font-bold mb-1">
+                {nextPaymentLoan
+                  ? (nextPaymentDays < 0
+                      ? 'Overdue'
+                      : `${nextPaymentDays} day${nextPaymentDays !== 1 ? 's' : ''}`)
+                  : '-'}
+              </div>
+              <p className="opacity-80">
+                {nextPaymentLoan
+                  ? format(new Date(nextPaymentLoan.next_payment_date), 'MMM d, yyyy')
+                  : 'No due date'}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Content based on active tab */}
         {activeTab === 'borrowing' ? (
