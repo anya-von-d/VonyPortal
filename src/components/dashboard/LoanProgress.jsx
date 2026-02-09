@@ -19,7 +19,9 @@ export default function LoanProgress({ loans, userId }) {
     <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60 h-full">
       <CardHeader className="pb-4 pt-4 px-4">
         <CardTitle className="flex items-center gap-2 text-base">
-          <BarChart3 className="w-4 h-4 text-green-600" />
+          <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+            <BarChart3 className="w-4 h-4 text-green-600" />
+          </div>
           Loan Progress
         </CardTitle>
       </CardHeader>
