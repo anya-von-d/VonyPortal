@@ -557,7 +557,7 @@ export default function LoanAgreements() {
                   transition={{ duration: 0.3 }}
                 >
                   <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
-                    <CardHeader className="pb-4 border-b border-slate-200">
+                    <CardHeader className="pb-3">
                       <CardTitle className="flex items-center gap-2 text-slate-800">
                         <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
                           <ArrowDownRight className="w-4 h-4 text-blue-600" />
@@ -566,7 +566,7 @@ export default function LoanAgreements() {
                       </CardTitle>
                       <p className="text-sm text-slate-500 mt-1">Loan agreements where you are the borrower</p>
                     </CardHeader>
-                    <CardContent className="p-6">
+                    <CardContent className="p-6 pt-3">
                       {borrowingAgreements.length === 0 ? (
                         <p className="text-slate-500 text-center py-4">No borrowing agreements</p>
                       ) : (
@@ -587,7 +587,7 @@ export default function LoanAgreements() {
                   transition={{ duration: 0.3 }}
                 >
                   <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
-                    <CardHeader className="pb-4 border-b border-slate-200">
+                    <CardHeader className="pb-3">
                       <CardTitle className="flex items-center gap-2 text-slate-800">
                         <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
                           <ArrowUpRight className="w-4 h-4 text-green-600" />
@@ -596,7 +596,7 @@ export default function LoanAgreements() {
                       </CardTitle>
                       <p className="text-sm text-slate-500 mt-1">Loan agreements where you are the lender</p>
                     </CardHeader>
-                    <CardContent className="p-6">
+                    <CardContent className="p-6 pt-3">
                       {lendingAgreements.length === 0 ? (
                         <p className="text-slate-500 text-center py-4">No lending agreements</p>
                       ) : (

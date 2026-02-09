@@ -157,7 +157,7 @@ export default function MyLoanOffersPage() {
             transition={{ duration: 0.3 }}
           >
             <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
-              <CardHeader className="pb-4 border-b border-slate-200">
+              <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-slate-800">
                   <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
                     <Inbox className="w-4 h-4 text-blue-600" />
@@ -166,7 +166,7 @@ export default function MyLoanOffersPage() {
                 </CardTitle>
                 <p className="text-sm text-slate-500 mt-1">Loan offers from your friends waiting for your response</p>
               </CardHeader>
-              <CardContent className="p-6">
+              <CardContent className="p-6 pt-3">
                 {receivedOffers.length > 0 ? (
                   <MyLoanOffers
                     offers={receivedOffers}
@@ -191,7 +191,7 @@ export default function MyLoanOffersPage() {
             transition={{ duration: 0.3 }}
           >
             <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
-              <CardHeader className="pb-4 border-b border-slate-200">
+              <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-slate-800">
                   <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
                     <Send className="w-4 h-4 text-green-600" />
@@ -200,7 +200,7 @@ export default function MyLoanOffersPage() {
                 </CardTitle>
                 <p className="text-sm text-slate-500 mt-1">Loan offers you've sent waiting for acceptance</p>
               </CardHeader>
-              <CardContent className="p-6">
+              <CardContent className="p-6 pt-3">
                 {sentOffers.length > 0 ? (
                   <MyLoanOffers
                     offers={sentOffers}

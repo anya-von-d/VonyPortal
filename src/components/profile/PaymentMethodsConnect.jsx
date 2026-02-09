@@ -232,7 +232,7 @@ export default function PaymentMethodsConnect() {
       animate={{ opacity: 1, y: 0 }}
     >
       <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
-        <CardHeader className="border-b border-slate-200/40">
+        <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-slate-800">
             <CreditCard className="w-5 h-5 text-green-600" />
             Payment Methods
@@ -242,7 +242,7 @@ export default function PaymentMethodsConnect() {
           </p>
         </CardHeader>
 
-        <CardContent className="p-6 space-y-4">
+        <CardContent className="p-6 pt-3 space-y-4">
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />

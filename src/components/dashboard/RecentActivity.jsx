@@ -39,13 +39,13 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
   if (isLoading || !user) {
     return (
       <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
-        <CardHeader className="border-b border-slate-200/40 pb-4">
+        <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2">
             <Activity className="w-5 h-5 text-green-600" />
             Recent Activity
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-6">
+        <CardContent className="p-6 pt-3">
           <div className="space-y-4">
             {Array(3).fill(0).map((_, i) => (
               <motion.div
@@ -232,7 +232,7 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
       transition={{ duration: 0.4, delay: 0.3 }}
     >
       <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
-        <CardHeader className="border-b border-slate-200/40 pb-4">
+        <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-slate-800">
               <Activity className="w-5 h-5 text-green-600" />
@@ -245,7 +245,7 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
             </Link>
           </div>
         </CardHeader>
-        <CardContent className="p-6">
+        <CardContent className="p-6 pt-3">
           {recentActivity.length === 0 ? (
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}

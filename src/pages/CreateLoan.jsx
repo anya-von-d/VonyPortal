@@ -261,13 +261,13 @@ export default function CreateLoan() {
           {/* Form */}
           <div className="lg:col-span-2">
             <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
-              <CardHeader className="border-b border-slate-200/40">
+              <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-slate-800">
                   <PlusCircle className="w-5 h-5 text-green-600" />
                   Loan Details
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-6">
+              <CardContent className="p-6 pt-3">
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Borrower Selection */}
                   <div className="space-y-2">

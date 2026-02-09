@@ -17,13 +17,13 @@ export default function LoanProgress({ loans, userId }) {
 
   return (
     <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
-      <CardHeader className="border-b border-slate-200/40">
+      <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2">
           <BarChart3 className="w-5 h-5 text-green-600" />
           Loan Progress
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6 pt-6">
+      <CardContent className="space-y-6 pt-3">
         {/* Lending Progress */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
