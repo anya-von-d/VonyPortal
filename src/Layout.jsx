@@ -197,7 +197,7 @@ export default function Layout({ children }) {
                   ? "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/689b5da4ed66944b2307218f/0cdfad9ab_newLogoBlackOutline.png"
                   : "https://wvgqxgximcuhqhesoycw.supabase.co/storage/v1/object/public/Image%20Storage/LowercaseLogo.png"}
                 alt="Vony Logo"
-                className="h-10 w-auto"
+                className="h-14 w-auto"
               />
             </Link>
 

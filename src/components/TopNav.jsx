@@ -79,7 +79,7 @@ export default function TopNav({ location, colors, user, isLoading, theme }) {
         <img
           src={logoUrl}
           alt="Vony Logo"
-          className="h-10 w-auto"
+          className="h-14 w-auto"
         />
 
         {/* Mobile Hamburger Menu */}
