@@ -169,34 +169,6 @@ export default function MyLoans() {
           <p className="text-lg text-slate-600 text-center">
             Manage your lending and borrowing activity
           </p>
-
-          {/* Toggle Buttons */}
-          <div className="flex justify-center gap-3 mt-6">
-            <Button
-              onClick={() => setActiveTab('borrowing')}
-              variant={activeTab === 'borrowing' ? 'default' : 'outline'}
-              className={`flex items-center gap-2 ${
-                activeTab === 'borrowing'
-                  ? 'bg-[#35B276] hover:bg-[#2d9a65] text-white'
-                  : 'border-slate-300 text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              <ArrowDownRight className="w-4 h-4" />
-              Borrowing ({borrowedLoans.length})
-            </Button>
-            <Button
-              onClick={() => setActiveTab('lending')}
-              variant={activeTab === 'lending' ? 'default' : 'outline'}
-              className={`flex items-center gap-2 ${
-                activeTab === 'lending'
-                  ? 'bg-[#35B276] hover:bg-[#2d9a65] text-white'
-                  : 'border-slate-300 text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              <ArrowUpRight className="w-4 h-4" />
-              Lending ({lentLoans.length})
-            </Button>
-          </div>
         </motion.div>
 
         {/* Summary Cards */}
@@ -236,6 +208,34 @@ export default function MyLoans() {
         {user && loans.length > 0 && (
           <LoanProgress loans={loans} userId={user.id} />
         )}
+
+        {/* Toggle Buttons */}
+        <div className="flex justify-center gap-3">
+          <Button
+            onClick={() => setActiveTab('borrowing')}
+            variant={activeTab === 'borrowing' ? 'default' : 'outline'}
+            className={`flex items-center gap-2 ${
+              activeTab === 'borrowing'
+                ? 'bg-[#35B276] hover:bg-[#2d9a65] text-white'
+                : 'border-slate-300 text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <ArrowDownRight className="w-4 h-4" />
+            Borrowing ({borrowedLoans.length})
+          </Button>
+          <Button
+            onClick={() => setActiveTab('lending')}
+            variant={activeTab === 'lending' ? 'default' : 'outline'}
+            className={`flex items-center gap-2 ${
+              activeTab === 'lending'
+                ? 'bg-[#35B276] hover:bg-[#2d9a65] text-white'
+                : 'border-slate-300 text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <ArrowUpRight className="w-4 h-4" />
+            Lending ({lentLoans.length})
+          </Button>
+        </div>
 
         {/* Content based on active tab */}
         {activeTab === 'borrowing' ? (
