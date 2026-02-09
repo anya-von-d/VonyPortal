@@ -342,7 +342,7 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
             <SuccessAnimation
               show={true}
               title="Payment Recorded!"
-              subtitle={`Waiting for ${isLender ? 'the borrower' : 'your lender'} to confirm`}
+              subtitle={`Waiting for ${isLender ? 'the Borrower' : 'the Lender'} to confirm`}
             />
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -436,7 +436,7 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
             >
               <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-amber-700">
-                {isLender ? 'The borrower' : 'Your lender'} will need to confirm this payment. Make sure the details are correct.
+                {isLender ? 'The Borrower' : 'The Lender'} will need to confirm this payment. Make sure the details are correct.
               </p>
             </motion.div>
 
@@ -527,7 +527,7 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
         >
           <Clock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <p className="text-sm text-blue-700">
-            {isLender ? 'The borrower' : 'Your lender'} will need to confirm this payment before it updates the loan balance.
+            {isLender ? 'The Borrower' : 'The Lender'} will need to confirm this payment before it updates the loan balance.
           </p>
         </motion.div>
 
