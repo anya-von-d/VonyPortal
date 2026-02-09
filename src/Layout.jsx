@@ -179,12 +179,15 @@ export default function Layout({ children }) {
 
   return (
       <div className="min-h-screen flex flex-col w-full" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
-        {/* Top Nav for big screens */}
-        <div className="hidden lg:block sticky top-0 z-50 shadow-lg bg-white/95">
-          <TopNav location={location} colors={colors} user={user} isLoading={isLoading} theme={theme} />
-        </div>
+        {/* Top Nav for big screens - only show when logged in */}
+        {user && (
+          <div className="hidden lg:block sticky top-0 z-50 shadow-lg bg-white/95">
+            <TopNav location={location} colors={colors} user={user} isLoading={isLoading} theme={theme} />
+          </div>
+        )}
 
-        {/* Mobile navigation header */}
+        {/* Mobile navigation header - only show when logged in */}
+        {user && (
         <nav className={`lg:hidden sticky top-0 z-40 bg-gradient-to-r ${colors.sidebarBg} border-b ${colors.sidebarBorder} backdrop-blur-xl shadow-sm`}>
           <div className="flex items-center justify-between px-4 py-4 safe-area-inset-top">
             {/* Logo on the left */}
@@ -234,6 +237,7 @@ export default function Layout({ children }) {
             </div>
           )}
         </nav>
+        )}
 
         {/* Overlay when mobile menu is open */}
         {mobileMenuOpen && (

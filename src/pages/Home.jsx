@@ -150,7 +150,9 @@ export default function Home() {
         >
           <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm shadow-2xl">
             <CardContent className="p-8 text-center">
-              <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/e492d87a7_Logo.png" alt="Vony Logo" className="w-24 h-24 mx-auto mb-6" />
+              <div className="w-24 h-24 mx-auto mb-6 rounded-full overflow-hidden bg-white shadow-md">
+                <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/e492d87a7_Logo.png" alt="Vony Logo" className="w-full h-full object-cover" />
+              </div>
               <h1 className="text-3xl font-bold text-slate-800 mb-2 tracking-tight">
                 Welcome to <span style={{color: `rgb(var(--theme-primary))`}}>Vony</span>
               </h1>
