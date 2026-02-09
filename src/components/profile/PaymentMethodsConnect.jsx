@@ -233,7 +233,7 @@ export default function PaymentMethodsConnect() {
     >
       <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-slate-800">
+          <CardTitle className="flex items-center gap-2 text-slate-800 text-xl">
             <CreditCard className="w-5 h-5 text-green-600" />
             Payment Methods
           </CardTitle>

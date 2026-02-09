@@ -436,7 +436,7 @@ export default function Profile() {
             {/* Personal Information - First */}
             <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
               <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-xl">
                   <UserIcon className="w-5 h-5 text-green-600" />
                   Personal Information
                 </CardTitle>
