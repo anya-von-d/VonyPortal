@@ -303,8 +303,8 @@ export default function Profile() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen p-6" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
-      <div className="max-w-4xl mx-auto space-y-8">
+    <div className="min-h-screen p-4 md:p-6 overflow-x-hidden" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
+      <div className="max-w-4xl mx-auto space-y-8 overflow-hidden">
         {/* Error Alert */}
         {error && (
           <motion.div
