@@ -188,7 +188,7 @@ export default function Layout({ children }) {
 
         {/* Mobile navigation header - only show when logged in */}
         {user && (
-        <nav className={`lg:hidden sticky top-0 z-40 bg-gradient-to-r ${colors.sidebarBg} border-b ${colors.sidebarBorder} backdrop-blur-xl shadow-sm`}>
+        <nav className={`lg:hidden sticky top-0 z-50 bg-gradient-to-r ${colors.sidebarBg} border-b ${colors.sidebarBorder} backdrop-blur-xl shadow-sm`}>
           <div className="flex items-center justify-between px-4 py-4 safe-area-inset-top">
             {/* Logo on the left */}
             <Link to={createPageUrl("Home")} className="flex-shrink-0">
@@ -214,15 +214,25 @@ export default function Layout({ children }) {
               )}
             </button>
           </div>
+        </nav>
+        )}
 
-          {/* Mobile menu dropdown */}
-          {mobileMenuOpen && (
-            <div className={`absolute top-full left-0 right-0 bg-gradient-to-b ${colors.sidebarBg} border-b ${colors.sidebarBorder} shadow-lg`}>
+        {/* Mobile menu dropdown - separate from nav for proper positioning */}
+        {user && mobileMenuOpen && (
+          <>
+            {/* Overlay */}
+            <div
+              className="lg:hidden fixed inset-0 bg-black/20 z-40"
+              onClick={() => setMobileMenuOpen(false)}
+            />
+            {/* Menu */}
+            <div className={`lg:hidden fixed top-[72px] left-0 right-0 z-50 bg-gradient-to-b ${colors.sidebarBg} border-b ${colors.sidebarBorder} shadow-lg`}>
               <div className="px-4 py-3 space-y-1">
                 {navigationItems.map((item) => (
                   <Link
                     key={item.title}
                     to={item.url}
+                    onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                       location.pathname === item.url
                         ? `${colors.activeItem} shadow-sm`
@@ -235,16 +245,7 @@ export default function Layout({ children }) {
                 ))}
               </div>
             </div>
-          )}
-        </nav>
-        )}
-
-        {/* Overlay when mobile menu is open */}
-        {mobileMenuOpen && (
-          <div
-            className="lg:hidden fixed inset-0 bg-black/20 z-30"
-            onClick={() => setMobileMenuOpen(false)}
-          />
+          </>
         )}
 
         {/* Main content container */}
