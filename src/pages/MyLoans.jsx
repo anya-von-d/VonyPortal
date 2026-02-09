@@ -197,58 +197,66 @@ export default function MyLoans() {
           </p>
         </motion.div>
 
-        {/* Summary Cards */}
-        <div className="grid md:grid-cols-3 gap-6">
-          <Card className="text-white" style={{backgroundColor: '#35B276'}}>
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-2">
-                <ArrowUpRight className="w-5 h-5" />
-                Active Lending
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold mb-2">
-                ${totalLentActive.toLocaleString()}
-              </div>
-              <p className="opacity-80">{lentLoans.filter(l => l.status === 'active').length} active loans</p>
-            </CardContent>
-          </Card>
+        {/* Summary Cards and Loan Progress Row */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Left side - Summary Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Card className="text-white" style={{backgroundColor: '#35B276'}}>
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <ArrowUpRight className="w-4 h-4" />
+                  Active Lending
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="text-2xl font-bold mb-1">
+                  ${totalLentActive.toLocaleString()}
+                </div>
+                <p className="opacity-80 text-sm">{lentLoans.filter(l => l.status === 'active').length} active loans</p>
+              </CardContent>
+            </Card>
 
-          <Card className="text-white" style={{backgroundColor: '#35B276'}}>
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-2">
-                <ArrowDownRight className="w-5 h-5" />
-                Active Borrowing
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold mb-2">
-                ${totalBorrowedActive.toLocaleString()}
-              </div>
-              <p className="opacity-80">{borrowedLoans.filter(l => l.status === 'active').length} active loans</p>
-            </CardContent>
-          </Card>
+            <Card className="text-white" style={{backgroundColor: '#35B276'}}>
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <ArrowDownRight className="w-4 h-4" />
+                  Active Borrowing
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="text-2xl font-bold mb-1">
+                  ${totalBorrowedActive.toLocaleString()}
+                </div>
+                <p className="opacity-80 text-sm">{borrowedLoans.filter(l => l.status === 'active').length} active loans</p>
+              </CardContent>
+            </Card>
 
-          <Card className="text-white" style={{backgroundColor: '#35B276'}}>
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="w-5 h-5" />
-                Next Payment
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold mb-2">
-                {nextPaymentLoan ? `$${nextPaymentAmount.toLocaleString()}` : '-'}
-              </div>
-              <p className="opacity-80">
-                {nextPaymentLoan
-                  ? (nextPaymentDays < 0
-                      ? `to @${nextPaymentLenderUsername} - Overdue`
-                      : `to @${nextPaymentLenderUsername} due in ${nextPaymentDays} day${nextPaymentDays !== 1 ? 's' : ''}`)
-                  : 'No payments due'}
-              </p>
-            </CardContent>
-          </Card>
+            <Card className="text-white sm:col-span-2" style={{backgroundColor: '#35B276'}}>
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Clock className="w-4 h-4" />
+                  Next Payment
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="text-2xl font-bold mb-1">
+                  {nextPaymentLoan ? `$${nextPaymentAmount.toLocaleString()}` : '-'}
+                </div>
+                <p className="opacity-80 text-sm">
+                  {nextPaymentLoan
+                    ? (nextPaymentDays < 0
+                        ? `to @${nextPaymentLenderUsername} - Overdue`
+                        : `to @${nextPaymentLenderUsername} due in ${nextPaymentDays} day${nextPaymentDays !== 1 ? 's' : ''}`)
+                    : 'No payments due'}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right side - Loan Progress */}
+          {user && loans.length > 0 && (
+            <LoanProgress loans={loans} userId={user.id} />
+          )}
         </div>
 
         {/* Content based on active tab */}
@@ -390,11 +398,6 @@ export default function MyLoans() {
               </CardContent>
             </Card>
           </motion.div>
-        )}
-
-        {/* Loan Progress */}
-        {user && loans.length > 0 && (
-          <LoanProgress loans={loans} userId={user.id} />
         )}
 
         {/* Modals */}
