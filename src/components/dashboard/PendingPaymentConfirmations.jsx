@@ -85,10 +85,9 @@ export default function PendingPaymentConfirmations({ userId, onUpdate }) {
     setProcessingId(payment.id);
     try {
       // Update payment status to completed
+      // Only update status - other fields may not exist in the database
       await Payment.update(payment.id, {
-        status: 'completed',
-        confirmed_by: userId,
-        confirmed_date: new Date().toISOString()
+        status: 'completed'
       });
 
       // Update the loan balance
@@ -125,10 +124,9 @@ export default function PendingPaymentConfirmations({ userId, onUpdate }) {
     setProcessingId(payment.id);
     try {
       // Update payment status to denied
+      // Only update status - other fields may not exist in the database
       await Payment.update(payment.id, {
-        status: 'denied',
-        denied_by: userId,
-        denied_date: new Date().toISOString()
+        status: 'denied'
       });
 
       // Remove from local state

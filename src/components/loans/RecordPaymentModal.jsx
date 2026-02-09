@@ -252,16 +252,14 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
       const recordedById = user?.id || currentUserId;
 
       // Create the payment record with pending_confirmation status
+      // Only use columns that exist in the database
       const methodLabel = PAYMENT_METHODS.find(m => m.id === paymentMethod)?.label || paymentMethod;
       await Payment.create({
         loan_id: loan.id,
         amount: paymentAmount,
         payment_date: paymentDate,
-        payment_method: paymentMethod,
         status: 'pending_confirmation',
-        recorded_by: recordedById,
-        recorded_by_role: isLender ? 'lender' : 'borrower',
-        notes: notes || `${methodLabel} payment of $${paymentAmount.toFixed(2)}`
+        notes: notes || `${methodLabel} payment of $${paymentAmount.toFixed(2)} via ${methodLabel}`
       });
 
       // Don't update the loan yet - wait for confirmation from the other party
