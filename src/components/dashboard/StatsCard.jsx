@@ -66,9 +66,9 @@ export default function StatsCard({ title, value, icon: Icon, color, change, isL
               <Icon className={`w-5 h-5 ${colors.text}`} />
             </motion.div>
           </div>
-          <div>
+          <div className="flex items-end justify-between">
             <motion.p
-              className="text-2xl font-bold text-slate-800 mb-1"
+              className="text-2xl font-bold text-slate-800"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 + index * 0.1 }}
@@ -77,7 +77,7 @@ export default function StatsCard({ title, value, icon: Icon, color, change, isL
             </motion.p>
             {change && (
               <motion.p
-                className="text-xs text-slate-500 font-medium text-right"
+                className="text-xs text-slate-500 font-medium"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 + index * 0.1 }}
