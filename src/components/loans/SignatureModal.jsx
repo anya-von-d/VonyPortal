@@ -12,7 +12,7 @@ import { AnimatedCheckmark, SuccessAnimation, ConfettiBurst } from "@/components
 const LENDER_CHECKLIST = [
   { id: 1, text: "I confirm the terms above are correct, including the loan amount, interest rate, and payment schedule" },
   { id: 2, text: "I agree to lend the Borrower the amount shown above" },
-  { id: 3, text: "I am comfortable moving forward with lending to the Borrower and understand that lending money can involve some risk" },
+  { id: 3, text: "I am comfortable lending to the Borrower, and understand that lending money can involve some risk" },
 ];
 
 // Trust checklist items for Borrower (fallback)
