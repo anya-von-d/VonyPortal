@@ -364,16 +364,17 @@ export default function LoanAgreements() {
                     {isLender ? 'Borrower' : 'Lender'}: @{otherParty.username}
                   </p>
                 </div>
-                <Badge className={`${getStatusColor(loanStatus)} text-xs capitalize flex-shrink-0`}>
-                  {loanStatus}
-                </Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-slate-500">{format(new Date(agreement.created_at), 'MMM d, yyyy')}</p>
+                <div className="text-right flex-shrink-0">
+                  <p className="text-xs text-slate-500">Total Due</p>
                   <p className="font-bold text-lg" style={{color: `rgb(var(--theme-primary))`}}>{formatMoney(agreement.total_amount)}</p>
                 </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-slate-500">{format(new Date(agreement.created_at), 'MMM d, yyyy')}</p>
                 <div className="flex items-center gap-2">
+                  <Badge className={`${getStatusColor(loanStatus)} text-xs capitalize`}>
+                    {loanStatus}
+                  </Badge>
                   <Button onClick={() => downloadPDF(agreement)} variant="outline" size="sm">
                     <Download className="w-4 h-4" />
                   </Button>
