@@ -18,6 +18,18 @@ const statusColors = {
   declined: "bg-red-100 text-red-800 border-red-200"
 };
 
+// Helper to parse date strings without timezone shifting
+const parseLocalDate = (dateStr) => {
+  if (!dateStr) return null;
+  // If it's just a date string (YYYY-MM-DD), parse it as local time
+  if (typeof dateStr === 'string' && dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  }
+  // Otherwise parse normally
+  return new Date(dateStr);
+};
+
 export default function RecentActivity({ loans, payments, isLoading, user, allUsers }) {
   // Always ensure we have arrays to work with
   const safeLoans = Array.isArray(loans) ? loans : [];
@@ -159,7 +171,7 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
         iconBg = 'bg-[#35B276]';
       }
 
-      description = activity.date ? format(new Date(activity.date), 'MMM d, yyyy') : 'N/A';
+      description = activity.date ? format(parseLocalDate(activity.date), 'MMM d, yyyy') : 'N/A';
     }
 
     if (activity.type === 'payment') {
@@ -179,7 +191,7 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
         title = `Received ${amount} payment from ${username}`;
         icon = <ArrowDownRight className="w-5 h-5 text-white" />;
       }
-      description = activity.date ? format(new Date(activity.date), 'MMM d, yyyy') : 'N/A';
+      description = activity.date ? format(parseLocalDate(activity.date), 'MMM d, yyyy') : 'N/A';
       iconBg = 'bg-[#35B276]';
       status = 'completed';
     }
