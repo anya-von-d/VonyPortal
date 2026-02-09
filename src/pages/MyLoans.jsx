@@ -246,6 +246,36 @@ export default function MyLoans() {
           </Card>
         </div>
 
+        {/* Mobile Toggle Buttons - Only show on mobile */}
+        <div className="flex gap-2 justify-center mb-4 lg:hidden">
+          <Button
+            onClick={() => setActiveTab('borrowing')}
+            variant={activeTab === 'borrowing' ? 'default' : 'outline'}
+            size="sm"
+            className={`flex items-center gap-1 ${
+              activeTab === 'borrowing'
+                ? 'bg-[#35B276] hover:bg-[#2d9a65] text-white'
+                : 'border-slate-300 text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <ArrowDownRight className="w-3 h-3" />
+            Borrowing ({borrowedLoans.length})
+          </Button>
+          <Button
+            onClick={() => setActiveTab('lending')}
+            variant={activeTab === 'lending' ? 'default' : 'outline'}
+            size="sm"
+            className={`flex items-center gap-1 ${
+              activeTab === 'lending'
+                ? 'bg-[#35B276] hover:bg-[#2d9a65] text-white'
+                : 'border-slate-300 text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <ArrowUpRight className="w-3 h-3" />
+            Lending ({lentLoans.length})
+          </Button>
+        </div>
+
         {/* Content based on active tab */}
         {activeTab === 'borrowing' ? (
           <motion.div
@@ -263,7 +293,8 @@ export default function MyLoans() {
                     </div>
                     Borrowing
                   </CardTitle>
-                  <div className="flex gap-2">
+                  {/* Desktop Toggle Buttons - Only show on desktop */}
+                  <div className="hidden lg:flex gap-2">
                     <Button
                       onClick={() => setActiveTab('borrowing')}
                       variant={activeTab === 'borrowing' ? 'default' : 'outline'}
@@ -332,7 +363,8 @@ export default function MyLoans() {
                     </div>
                     Lending
                   </CardTitle>
-                  <div className="flex gap-2">
+                  {/* Desktop Toggle Buttons - Only show on desktop */}
+                  <div className="hidden lg:flex gap-2">
                     <Button
                       onClick={() => setActiveTab('borrowing')}
                       variant={activeTab === 'borrowing' ? 'default' : 'outline'}
