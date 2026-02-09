@@ -179,11 +179,34 @@ export default function PendingPaymentConfirmations({ userId, onUpdate }) {
 
     // If the user recorded this, get the other party's name
     // If the user didn't record this, get the recorder's name
-    const otherUserId = isRecordedByUser
-      ? (loan.lender_id === userId ? loan.borrower_id : loan.lender_id)
-      : payment.recorded_by;
+    let otherUserId;
+    if (isRecordedByUser) {
+      // User recorded this payment, get the other party
+      otherUserId = loan.lender_id === userId ? loan.borrower_id : loan.lender_id;
+    } else {
+      // User needs to confirm this payment, get who recorded it
+      // If recorded_by is set, use it; otherwise infer from the loan
+      otherUserId = payment.recorded_by || (loan.lender_id === userId ? loan.borrower_id : loan.lender_id);
+    }
     const profile = profiles.find(p => p.user_id === otherUserId);
     return profile?.full_name || profile?.username || 'Unknown';
+  };
+
+  const getPaymentMethodLabel = (payment) => {
+    // First try to get from payment_method field
+    if (payment.payment_method) {
+      const methodInfo = PAYMENT_METHOD_ICONS[payment.payment_method];
+      if (methodInfo) return methodInfo.label;
+    }
+    // Fallback: try to extract from notes
+    if (payment.notes) {
+      for (const [key, info] of Object.entries(PAYMENT_METHOD_ICONS)) {
+        if (payment.notes.toLowerCase().includes(info.label.toLowerCase())) {
+          return info.label;
+        }
+      }
+    }
+    return 'Other';
   };
 
   const getPaymentMethodInfo = (method) => {
@@ -325,6 +348,7 @@ export default function PendingPaymentConfirmations({ userId, onUpdate }) {
                   const MethodIcon = methodInfo.icon;
                   const loan = loans.find(l => l.id === payment.loan_id);
                   const isLender = loan?.lender_id === userId;
+                  const methodLabel = getPaymentMethodLabel(payment);
 
                   return (
                     <motion.div
@@ -341,12 +365,12 @@ export default function PendingPaymentConfirmations({ userId, onUpdate }) {
                           </div>
                           <div>
                             <p className="font-semibold text-slate-800">
-                              ${payment.amount.toFixed(2)} via {methodInfo.label}
+                              ${payment.amount.toFixed(2)} via {methodLabel}
                             </p>
                             <p className="text-sm text-slate-600">
                               {isLender
-                                ? `Recorded by borrower: ${getOtherPartyName(payment)}`
-                                : `Recorded by lender: ${getOtherPartyName(payment)}`
+                                ? `Recorded by Borrower: ${getOtherPartyName(payment)}`
+                                : `Recorded by Lender: ${getOtherPartyName(payment)}`
                               }
                             </p>
                             <p className="text-xs text-slate-500 mt-1">
@@ -417,6 +441,7 @@ export default function PendingPaymentConfirmations({ userId, onUpdate }) {
                   const MethodIcon = methodInfo.icon;
                   const loan = loans.find(l => l.id === payment.loan_id);
                   const isLender = loan?.lender_id === userId;
+                  const methodLabel = getPaymentMethodLabel(payment);
 
                   return (
                     <motion.div
@@ -433,7 +458,7 @@ export default function PendingPaymentConfirmations({ userId, onUpdate }) {
                           </div>
                           <div>
                             <p className="font-semibold text-slate-800">
-                              ${payment.amount.toFixed(2)} via {methodInfo.label}
+                              ${payment.amount.toFixed(2)} via {methodLabel}
                             </p>
                             <p className="text-sm text-slate-600">
                               Waiting for {getOtherPartyName(payment, true)} to confirm
