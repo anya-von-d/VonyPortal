@@ -11,9 +11,9 @@ import { SuccessAnimation } from "@/components/ui/animations";
 
 // Trust checklist items for borrower
 const BORROWER_CHECKLIST = [
-  { id: 1, text: "I understand I must repay this loan with interest" },
-  { id: 2, text: "I agree to the payment schedule and amounts" },
-  { id: 3, text: "I have reviewed all terms and conditions" },
+  { id: 1, text: "I confirm the terms above are correct, including the loan amount, interest rate, and payment schedule" },
+  { id: 2, text: "I understand that, depending on the terms outlined above, this loan may include interest" },
+  { id: 3, text: "I agree to repay the amount shown above to the Lender according to the terms above" },
 ];
 
 export default function BorrowerSignatureModal({
