@@ -8,6 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   User as UserIcon,
   Mail,
   Phone,
@@ -24,7 +30,8 @@ import {
   Trash2,
   PiggyBank,
   Sun,
-  Landmark
+  Landmark,
+  Clock
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -68,6 +75,7 @@ export default function Profile() {
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [usernameError, setUsernameError] = useState(null);
   const [showPhotoMenu, setShowPhotoMenu] = useState(false);
+  const [showComingSoonModal, setShowComingSoonModal] = useState(false);
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
   const navigate = useNavigate();
@@ -391,12 +399,36 @@ export default function Profile() {
           </Button>
         </motion.div>
 
+        {/* Coming Soon Modal */}
+        <Dialog open={showComingSoonModal} onOpenChange={setShowComingSoonModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-xl">
+                <Clock className="w-6 h-6 text-green-600" />
+                Feature Coming Soon
+              </DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <p className="text-slate-600">
+                Bank account connections via Plaid & Dwolla are coming soon! This feature will enable secure bank transfers directly through Vony.
+              </p>
+              <p className="text-sm text-slate-500 mt-3">
+                In the meantime, you can use Venmo, Cash App, PayPal, or Zelle for payments.
+              </p>
+            </div>
+            <Button
+              onClick={() => setShowComingSoonModal(false)}
+              className="w-full bg-green-600 hover:bg-green-700"
+            >
+              Got it!
+            </Button>
+          </DialogContent>
+        </Dialog>
+
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Profile Info */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Payment Methods */}
-            <PaymentMethodsConnect />
-
+            {/* Personal Information - First */}
             <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
               <CardHeader className="border-b border-slate-200/40">
                 <CardTitle className="flex items-center gap-2">
@@ -532,6 +564,9 @@ export default function Profile() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Payment Methods - Second */}
+            <PaymentMethodsConnect />
           </div>
 
           {/* Stats & Verification */}
@@ -548,7 +583,10 @@ export default function Profile() {
                 <p className="text-sm text-slate-600">
                   Securely connect your bank account using Plaid & Dwolla to enable bank transfers.
                 </p>
-                <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
+                <Button
+                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                  onClick={() => setShowComingSoonModal(true)}
+                >
                   <Landmark className="w-4 h-4 mr-2" />
                   Connect Bank Account
                 </Button>
