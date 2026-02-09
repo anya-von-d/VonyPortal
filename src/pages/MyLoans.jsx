@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Loan, Payment, User, LoanAgreement } from "@/entities/all";
+import { Loan, Payment, User, LoanAgreement, PublicProfile } from "@/entities/all";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -33,6 +33,7 @@ export default function MyLoans() {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [loanToCancel, setLoanToCancel] = useState(null);
   const [activeTab, setActiveTab] = useState('borrowing');
+  const [publicProfiles, setPublicProfiles] = useState([]);
 
   useEffect(() => {
     loadData();
@@ -61,12 +62,16 @@ export default function MyLoans() {
       return;
     }
 
-    const allLoans = await safeEntityCall(() => Loan.list('-created_at'));
-    const userLoans = allLoans.filter(loan => 
+    const [allLoans, allProfiles] = await Promise.all([
+      safeEntityCall(() => Loan.list('-created_at')),
+      safeEntityCall(() => PublicProfile.list())
+    ]);
+    const userLoans = allLoans.filter(loan =>
       loan.lender_id === currentUser.id || loan.borrower_id === currentUser.id
     );
-    
+
     setLoans(userLoans);
+    setPublicProfiles(allProfiles);
     setIsLoading(false);
   };
 
@@ -171,6 +176,9 @@ export default function MyLoans() {
 
   const nextPaymentDays = getNextPaymentDays();
   const nextPaymentAmount = nextPaymentLoan?.payment_amount || 0;
+  const nextPaymentLenderUsername = nextPaymentLoan
+    ? publicProfiles.find(p => p.user_id === nextPaymentLoan.lender_id)?.username || 'user'
+    : null;
 
   return (
     <div className="min-h-screen p-6" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
@@ -233,10 +241,10 @@ export default function MyLoans() {
                 {nextPaymentLoan ? `$${nextPaymentAmount.toLocaleString()}` : '-'}
               </div>
               <p className="opacity-80">
-                {nextPaymentDays !== null
+                {nextPaymentLoan
                   ? (nextPaymentDays < 0
-                      ? 'Overdue'
-                      : `${nextPaymentDays} day${nextPaymentDays !== 1 ? 's' : ''} left`)
+                      ? `to @${nextPaymentLenderUsername} - Overdue`
+                      : `to @${nextPaymentLenderUsername} due in ${nextPaymentDays} day${nextPaymentDays !== 1 ? 's' : ''}`)
                   : 'No payments due'}
               </p>
             </CardContent>
