@@ -164,7 +164,7 @@ export default function MyLoanOffers({ offers, users, currentUser, onDelete, onS
                               : 'bg-red-100 text-red-800 border-red-200'
                           }
                         >
-                          {offer.status || 'pending'}
+                          {offer.status ? offer.status.charAt(0).toUpperCase() + offer.status.slice(1) : 'Pending'}
                         </Badge>
 
                         {/* Lender can delete the offer */}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Loan, User, PublicProfile, LoanAgreement } from "@/entities/all";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ArrowUpRight, ArrowDownLeft, Send, Inbox } from "lucide-react";
 
@@ -11,6 +12,7 @@ export default function MyLoanOffersPage() {
   const [user, setUser] = useState(null);
   const [publicProfiles, setPublicProfiles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('received');
 
   useEffect(() => {
     loadData();
@@ -116,84 +118,105 @@ export default function MyLoanOffersPage() {
           <p className="text-lg text-slate-600 text-center">
             Manage all your pending offers
           </p>
+
+          {/* Toggle Buttons */}
+          <div className="flex justify-center gap-3 mt-6">
+            <Button
+              onClick={() => setActiveTab('received')}
+              variant={activeTab === 'received' ? 'default' : 'outline'}
+              className={`flex items-center gap-2 ${
+                activeTab === 'received'
+                  ? 'bg-[#35B276] hover:bg-[#2d9a65] text-white'
+                  : 'border-slate-300 text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              <Inbox className="w-4 h-4" />
+              Offers Received ({receivedOffers.length})
+            </Button>
+            <Button
+              onClick={() => setActiveTab('sent')}
+              variant={activeTab === 'sent' ? 'default' : 'outline'}
+              className={`flex items-center gap-2 ${
+                activeTab === 'sent'
+                  ? 'bg-[#35B276] hover:bg-[#2d9a65] text-white'
+                  : 'border-slate-300 text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              <Send className="w-4 h-4" />
+              Offers Sent ({sentOffers.length})
+            </Button>
+          </div>
         </motion.div>
 
-        {hasNoOffers ? (
-          <Card className="bg-white border-slate-200">
-            <CardContent className="p-8 text-center text-slate-500">
-              No pending loan offers
-            </CardContent>
-          </Card>
+        {/* Content based on active tab */}
+        {activeTab === 'received' ? (
+          <motion.div
+            key="received"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
+              <CardHeader className="pb-4 border-b border-slate-200">
+                <CardTitle className="flex items-center gap-2 text-slate-800">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                    <Inbox className="w-4 h-4 text-blue-600" />
+                  </div>
+                  Offers Received
+                </CardTitle>
+                <p className="text-sm text-slate-500 mt-1">Loan offers from your friends waiting for your response</p>
+              </CardHeader>
+              <CardContent className="p-6">
+                {receivedOffers.length > 0 ? (
+                  <MyLoanOffers
+                    offers={receivedOffers}
+                    users={publicProfiles}
+                    currentUser={user}
+                    onDelete={handleDeleteOffer}
+                    onSign={handleSignOffer}
+                    onDecline={handleDeclineOffer}
+                    hideHeader={true}
+                  />
+                ) : (
+                  <p className="text-slate-500 text-center py-4">No offers received</p>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
         ) : (
-          <div className="space-y-8">
-            {/* Received Offers Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
-                <CardHeader className="pb-4 border-b border-slate-200">
-                  <CardTitle className="flex items-center gap-2 text-slate-800">
-                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                      <Inbox className="w-4 h-4 text-blue-600" />
-                    </div>
-                    Offers Received ({receivedOffers.length})
-                  </CardTitle>
-                  <p className="text-sm text-slate-500 mt-1">Loan offers from your friends waiting for your response</p>
-                </CardHeader>
-                <CardContent className="p-6">
-                  {receivedOffers.length > 0 ? (
-                    <MyLoanOffers
-                      offers={receivedOffers}
-                      users={publicProfiles}
-                      currentUser={user}
-                      onDelete={handleDeleteOffer}
-                      onSign={handleSignOffer}
-                      onDecline={handleDeclineOffer}
-                      hideHeader={true}
-                    />
-                  ) : (
-                    <p className="text-slate-500 text-center py-4">No offers received</p>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* Sent Offers Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
-                <CardHeader className="pb-4 border-b border-slate-200">
-                  <CardTitle className="flex items-center gap-2 text-slate-800">
-                    <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                      <Send className="w-4 h-4 text-green-600" />
-                    </div>
-                    Offers Sent ({sentOffers.length})
-                  </CardTitle>
-                  <p className="text-sm text-slate-500 mt-1">Loan offers you've sent waiting for acceptance</p>
-                </CardHeader>
-                <CardContent className="p-6">
-                  {sentOffers.length > 0 ? (
-                    <MyLoanOffers
-                      offers={sentOffers}
-                      users={publicProfiles}
-                      currentUser={user}
-                      onDelete={handleDeleteOffer}
-                      onSign={handleSignOffer}
-                      onDecline={handleDeclineOffer}
-                      hideHeader={true}
-                    />
-                  ) : (
-                    <p className="text-slate-500 text-center py-4">No offers sent</p>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
+          <motion.div
+            key="sent"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">
+              <CardHeader className="pb-4 border-b border-slate-200">
+                <CardTitle className="flex items-center gap-2 text-slate-800">
+                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                    <Send className="w-4 h-4 text-green-600" />
+                  </div>
+                  Offers Sent
+                </CardTitle>
+                <p className="text-sm text-slate-500 mt-1">Loan offers you've sent waiting for acceptance</p>
+              </CardHeader>
+              <CardContent className="p-6">
+                {sentOffers.length > 0 ? (
+                  <MyLoanOffers
+                    offers={sentOffers}
+                    users={publicProfiles}
+                    currentUser={user}
+                    onDelete={handleDeleteOffer}
+                    onSign={handleSignOffer}
+                    onDecline={handleDeclineOffer}
+                    hideHeader={true}
+                  />
+                ) : (
+                  <p className="text-slate-500 text-center py-4">No offers sent</p>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
         )}
       </div>
     </div>
