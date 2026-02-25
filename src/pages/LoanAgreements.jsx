@@ -151,7 +151,7 @@ export default function LoanAgreements() {
     doc.setFont(undefined, 'normal');
     doc.text(`Loan Amount: ${formatMoney(agreement.amount)}`, 20, 95);
     doc.text(`Interest Rate: ${agreement.interest_rate}%`, 20, 105);
-    doc.text(`Repayment Period: ${agreement.repayment_period} months`, 20, 115);
+    doc.text(`Repayment Period: ${agreement.repayment_period} ${agreement.repayment_unit || 'months'}`, 20, 115);
     doc.text(`Payment Frequency: ${agreement.payment_frequency}`, 20, 125);
     doc.text(`Payment Amount: ${formatMoney(agreement.payment_amount)}`, 20, 135);
     doc.text(`Total Amount Due: ${formatMoney(agreement.total_amount)}`, 20, 145);
@@ -467,7 +467,7 @@ export default function LoanAgreements() {
                     <div className="space-y-4">
                       <div>
                         <p className="text-sm text-slate-600">Repayment Period</p>
-                        <p className="font-semibold text-slate-900">{selectedAgreement.repayment_period} months</p>
+                        <p className="font-semibold text-slate-900">{selectedAgreement.repayment_period} {selectedAgreement.repayment_unit || 'months'}</p>
                       </div>
                       <div>
                         <p className="text-sm text-slate-600">Payment Frequency</p>

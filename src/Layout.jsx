@@ -6,13 +6,14 @@ import { useAuth } from "@/lib/AuthContext";
 import TopNav from "@/components/TopNav";
 import {
   Home,
-  Plus,
-  CreditCard,
+  ArrowUpRight,
+  ArrowDownRight,
+  BookOpen,
+  ShoppingBag,
   User as UserIcon,
   PiggyBank,
   Sparkles,
   LogOut,
-  Send,
   Menu,
   X
 } from "lucide-react";
@@ -38,27 +39,32 @@ const navigationItems = [
     icon: Home,
   },
   {
-    title: "Create Offer",
-    url: createPageUrl("CreateLoan"),
-    icon: Plus,
+    title: "Lending",
+    url: createPageUrl("Lending"),
+    icon: ArrowUpRight,
   },
   {
-    title: "My Loans",
-    url: createPageUrl("MyLoans"),
-    icon: CreditCard,
+    title: "Borrowing",
+    url: createPageUrl("Borrowing"),
+    icon: ArrowDownRight,
   },
   {
-    title: "My Loan Offers",
-    url: createPageUrl("MyLoanOffers"),
-    icon: Send,
+    title: "Learn",
+    url: createPageUrl("Learn"),
+    icon: BookOpen,
   },
   {
-    title: "My Loan Agreements",
+    title: "Shop",
+    url: createPageUrl("Shop"),
+    icon: ShoppingBag,
+  },
+  {
+    title: "Agreements",
     url: createPageUrl("LoanAgreements"),
     icon: PiggyBank,
   },
   {
-    title: "Recent Activity",
+    title: "Activity",
     url: createPageUrl("RecentActivity"),
     icon: Sparkles,
   },

@@ -142,7 +142,7 @@ export default function LoanDetailsModal({ loan, type, isOpen, onClose, user, on
               <Calendar className="w-5 h-5 text-blue-600" />
               <div>
                 <p className="text-sm text-slate-600">Repayment Period</p>
-                <p className="font-semibold text-slate-900">{loan.repayment_period} months</p>
+                <p className="font-semibold text-slate-900">{loan.repayment_period} {loan.repayment_unit || 'months'}</p>
               </div>
             </div>
           </div>

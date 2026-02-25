@@ -94,6 +94,9 @@ export default function CreateLoan() {
         case 'none':
           paymentAmount = 0;
           break;
+        case 'daily':
+          paymentAmount = totalAmount / (periodInMonths * 30);
+          break;
         case 'weekly':
           paymentAmount = totalAmount / (periodInMonths * (52 / 12));
           break;
@@ -174,6 +177,7 @@ export default function CreateLoan() {
         amount: parseFloat(formData.amount),
         interest_rate: parseFloat(formData.interest_rate),
         repayment_period: parseInt(formData.repayment_period),
+        repayment_unit: formData.repayment_unit,
         payment_frequency: formData.payment_frequency,
         purpose: formData.purpose,
         status: 'pending',
@@ -321,6 +325,23 @@ export default function CreateLoan() {
                     />
                   </div>
 
+                  {/* What's this for? */}
+                  <div className="space-y-2">
+                    <Label htmlFor="purpose" className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-green-600" />
+                      What's this for?
+                    </Label>
+                    <Input
+                      id="purpose"
+                      type="text"
+                      placeholder="e.g., Concert tickets, Rent, Trip to Vegas..."
+                      value={formData.purpose}
+                      onChange={(e) => handleInputChange('purpose', e.target.value)}
+                      maxLength={100}
+                    />
+                    <p className="text-xs text-slate-500">Help your friend understand what this loan is for</p>
+                  </div>
+
                   {/* Interest Rate - Only show for scheduled loans */}
                   {loanType === 'scheduled' && (
                     <div className="space-y-2">
@@ -404,6 +425,7 @@ export default function CreateLoan() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="none">None</SelectItem>
+                          <SelectItem value="daily">Daily</SelectItem>
                           <SelectItem value="weekly">Weekly</SelectItem>
                           <SelectItem value="biweekly">Bi-weekly</SelectItem>
                           <SelectItem value="monthly">Monthly</SelectItem>
@@ -433,6 +455,13 @@ export default function CreateLoan() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3">
+                  {formData.purpose && (
+                    <div className="pb-2 border-b border-green-400/50">
+                      <span className="opacity-75 text-sm">For:</span>
+                      <p className="font-medium">{formData.purpose}</p>
+                    </div>
+                  )}
+
                   <div className="flex justify-between">
                     <span className="opacity-90">Loan Amount:</span>
                     <span className="font-bold">

@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import {
   Home,
-  Plus,
-  CreditCard,
-  Send,
+  ArrowUpRight,
+  ArrowDownRight,
+  BookOpen,
+  ShoppingBag,
   PiggyBank,
   Sparkles,
   User,
@@ -28,35 +29,40 @@ const mainNavItems = [
     icon: Home,
   },
   {
-    title: "Create Offer",
-    url: createPageUrl("CreateLoan"),
-    icon: Plus,
+    title: "Lending",
+    url: createPageUrl("Lending"),
+    icon: ArrowUpRight,
   },
   {
-    title: "My Loans",
-    url: createPageUrl("MyLoans"),
-    icon: CreditCard,
+    title: "Borrowing",
+    url: createPageUrl("Borrowing"),
+    icon: ArrowDownRight,
   },
   {
-    title: "My Loan Offers",
-    url: createPageUrl("MyLoanOffers"),
-    icon: Send,
+    title: "Learn",
+    url: createPageUrl("Learn"),
+    icon: BookOpen,
+  },
+  {
+    title: "Shop",
+    url: createPageUrl("Shop"),
+    icon: ShoppingBag,
   },
 ];
 
 const moreMenuItems = [
   {
-    title: "Loan Agreements",
+    title: "Agreements",
     url: createPageUrl("LoanAgreements"),
     icon: PiggyBank,
   },
   {
-    title: "Recent Activity",
+    title: "Activity",
     url: createPageUrl("RecentActivity"),
     icon: Sparkles,
   },
   {
-    title: "My Profile",
+    title: "Profile",
     url: createPageUrl("Profile"),
     icon: User,
   },

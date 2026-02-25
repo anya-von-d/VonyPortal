@@ -265,43 +265,45 @@ export default function PaymentMethodsConnect() {
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col md:flex-row gap-2">
               <Input
                 placeholder="@username"
                 value={venmoUsername}
                 onChange={(e) => setVenmoUsername(e.target.value)}
                 className="flex-1 min-w-0"
               />
-              {venmoConnection ? (
-                <>
+              <div className="flex items-center gap-2">
+                {venmoConnection ? (
+                  <>
+                    <Button
+                      onClick={handleSaveVenmo}
+                      disabled={isSaving.venmo || venmoUsername === venmoConnection.venmo_username}
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700 flex-shrink-0 flex-1 md:flex-none"
+                    >
+                      {isSaving.venmo ? "..." : "Update"}
+                    </Button>
+                    <Button
+                      onClick={handleDisconnectVenmo}
+                      disabled={isSaving.venmo}
+                      size="sm"
+                      variant="outline"
+                      className="text-red-600 border-red-200 hover:bg-red-50 flex-shrink-0"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </>
+                ) : (
                   <Button
                     onClick={handleSaveVenmo}
-                    disabled={isSaving.venmo || venmoUsername === venmoConnection.venmo_username}
+                    disabled={isSaving.venmo || !venmoUsername.trim()}
                     size="sm"
-                    className="bg-green-600 hover:bg-green-700 flex-shrink-0"
+                    className="bg-blue-500 hover:bg-blue-600 flex-shrink-0 w-full md:w-auto"
                   >
-                    {isSaving.venmo ? "..." : "Update"}
+                    {isSaving.venmo ? "..." : "Connect"}
                   </Button>
-                  <Button
-                    onClick={handleDisconnectVenmo}
-                    disabled={isSaving.venmo}
-                    size="sm"
-                    variant="outline"
-                    className="text-red-600 border-red-200 hover:bg-red-50 flex-shrink-0"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  onClick={handleSaveVenmo}
-                  disabled={isSaving.venmo || !venmoUsername.trim()}
-                  size="sm"
-                  className="bg-blue-500 hover:bg-blue-600 flex-shrink-0"
-                >
-                  {isSaving.venmo ? "..." : "Connect"}
-                </Button>
-              )}
+                )}
+              </div>
             </div>
           </div>
 
@@ -318,43 +320,45 @@ export default function PaymentMethodsConnect() {
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col md:flex-row gap-2">
               <Input
                 placeholder="$cashtag"
                 value={cashappHandle}
                 onChange={(e) => setCashappHandle(e.target.value)}
                 className="flex-1 min-w-0"
               />
-              {cashappHandle && user?.cashapp_handle ? (
-                <>
+              <div className="flex items-center gap-2">
+                {cashappHandle && user?.cashapp_handle ? (
+                  <>
+                    <Button
+                      onClick={handleSaveCashapp}
+                      disabled={isSaving.cashapp || cashappHandle === user.cashapp_handle}
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700 flex-shrink-0 flex-1 md:flex-none"
+                    >
+                      {isSaving.cashapp ? "..." : "Update"}
+                    </Button>
+                    <Button
+                      onClick={handleDisconnectCashapp}
+                      disabled={isSaving.cashapp}
+                      size="sm"
+                      variant="outline"
+                      className="text-red-600 border-red-200 hover:bg-red-50 flex-shrink-0"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </>
+                ) : (
                   <Button
                     onClick={handleSaveCashapp}
-                    disabled={isSaving.cashapp || cashappHandle === user.cashapp_handle}
+                    disabled={isSaving.cashapp || !cashappHandle.trim()}
                     size="sm"
-                    className="bg-green-600 hover:bg-green-700 flex-shrink-0"
+                    className="bg-green-500 hover:bg-green-600 flex-shrink-0 w-full md:w-auto"
                   >
-                    {isSaving.cashapp ? "..." : "Update"}
+                    {isSaving.cashapp ? "..." : "Connect"}
                   </Button>
-                  <Button
-                    onClick={handleDisconnectCashapp}
-                    disabled={isSaving.cashapp}
-                    size="sm"
-                    variant="outline"
-                    className="text-red-600 border-red-200 hover:bg-red-50 flex-shrink-0"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  onClick={handleSaveCashapp}
-                  disabled={isSaving.cashapp || !cashappHandle.trim()}
-                  size="sm"
-                  className="bg-green-500 hover:bg-green-600 flex-shrink-0"
-                >
-                  {isSaving.cashapp ? "..." : "Connect"}
-                </Button>
-              )}
+                )}
+              </div>
             </div>
           </div>
 
@@ -371,92 +375,100 @@ export default function PaymentMethodsConnect() {
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col md:flex-row gap-2">
               <Input
                 placeholder="Email or phone"
                 value={zelleEmail}
                 onChange={(e) => setZelleEmail(e.target.value)}
                 className="flex-1 min-w-0"
               />
-              {zelleEmail && user?.zelle_email ? (
-                <>
+              <div className="flex items-center gap-2">
+                {zelleEmail && user?.zelle_email ? (
+                  <>
+                    <Button
+                      onClick={handleSaveZelle}
+                      disabled={isSaving.zelle || zelleEmail === user.zelle_email}
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700 flex-shrink-0 flex-1 md:flex-none"
+                    >
+                      {isSaving.zelle ? "..." : "Update"}
+                    </Button>
+                    <Button
+                      onClick={handleDisconnectZelle}
+                      disabled={isSaving.zelle}
+                      size="sm"
+                      variant="outline"
+                      className="text-red-600 border-red-200 hover:bg-red-50 flex-shrink-0"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </>
+                ) : (
                   <Button
                     onClick={handleSaveZelle}
-                    disabled={isSaving.zelle || zelleEmail === user.zelle_email}
+                    disabled={isSaving.zelle || !zelleEmail.trim()}
                     size="sm"
-                    className="bg-green-600 hover:bg-green-700 flex-shrink-0"
+                    className="bg-purple-500 hover:bg-purple-600 flex-shrink-0 w-full md:w-auto"
                   >
-                    {isSaving.zelle ? "..." : "Update"}
+                    {isSaving.zelle ? "..." : "Connect"}
                   </Button>
-                  <Button
-                    onClick={handleDisconnectZelle}
-                    disabled={isSaving.zelle}
-                    size="sm"
-                    variant="outline"
-                    className="text-red-600 border-red-200 hover:bg-red-50 flex-shrink-0"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  onClick={handleSaveZelle}
-                  disabled={isSaving.zelle || !zelleEmail.trim()}
-                  size="sm"
-                  className="bg-purple-500 hover:bg-purple-600 flex-shrink-0"
-                >
-                  {isSaving.zelle ? "..." : "Connect"}
-                </Button>
-              )}
-          </div>
-
-          {/* PayPal - Single Line */}
-          <div className="flex items-center gap-3 p-3 bg-slate-50/50 rounded-xl">
-            <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
-              <CreditCard className="w-4 h-4 text-white" />
+                )}
+              </div>
             </div>
-            <span className="font-medium text-slate-700 w-20 flex-shrink-0">PayPal</span>
-            {paypalConnection && (
-              <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1 flex-shrink-0">
-                <Check className="w-3 h-3" /> Connected
-              </span>
-            )}
-            <Input
-              placeholder="Email or PayPal.me"
-              value={paypalEmail}
-              onChange={(e) => setPaypalEmail(e.target.value)}
-              className="flex-1 min-w-0"
-            />
-            {paypalConnection ? (
-              <>
-                <Button
-                  onClick={handleSavePaypal}
-                  disabled={isSaving.paypal || paypalEmail === paypalConnection.paypal_email}
-                  size="sm"
-                  className="bg-green-600 hover:bg-green-700 flex-shrink-0"
-                >
-                  {isSaving.paypal ? "..." : "Update"}
-                </Button>
-                <Button
-                  onClick={handleDisconnectPaypal}
-                  disabled={isSaving.paypal}
-                  size="sm"
-                  variant="outline"
-                  className="text-red-600 border-red-200 hover:bg-red-50 flex-shrink-0"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </>
-            ) : (
-              <Button
-                onClick={handleSavePaypal}
-                disabled={isSaving.paypal || !paypalEmail.trim()}
-                size="sm"
-                className="bg-blue-600 hover:bg-blue-700 flex-shrink-0"
-              >
-                {isSaving.paypal ? "..." : "Connect"}
-              </Button>
-            )}
+
+          {/* PayPal */}
+          <div className="p-3 bg-slate-50/50 rounded-xl space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                <CreditCard className="w-4 h-4 text-white" />
+              </div>
+              <span className="font-medium text-slate-700">PayPal</span>
+              {paypalConnection && (
+                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <Check className="w-3 h-3" /> Connected
+                </span>
+              )}
+            </div>
+            <div className="flex flex-col md:flex-row gap-2">
+              <Input
+                placeholder="Email or PayPal.me"
+                value={paypalEmail}
+                onChange={(e) => setPaypalEmail(e.target.value)}
+                className="flex-1 min-w-0"
+              />
+              <div className="flex items-center gap-2">
+                {paypalConnection ? (
+                  <>
+                    <Button
+                      onClick={handleSavePaypal}
+                      disabled={isSaving.paypal || paypalEmail === paypalConnection.paypal_email}
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700 flex-shrink-0 flex-1 md:flex-none"
+                    >
+                      {isSaving.paypal ? "..." : "Update"}
+                    </Button>
+                    <Button
+                      onClick={handleDisconnectPaypal}
+                      disabled={isSaving.paypal}
+                      size="sm"
+                      variant="outline"
+                      className="text-red-600 border-red-200 hover:bg-red-50 flex-shrink-0"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    onClick={handleSavePaypal}
+                    disabled={isSaving.paypal || !paypalEmail.trim()}
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700 flex-shrink-0 w-full md:w-auto"
+                  >
+                    {isSaving.paypal ? "..." : "Connect"}
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
 
         </CardContent>

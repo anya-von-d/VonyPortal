@@ -140,6 +140,13 @@ export default function SignatureModal({ isOpen, onClose, onSign, loanDetails, u
               Terms at a Glance
             </h3>
 
+            {loanDetails.purpose && (
+              <div className="mb-4 pb-3 border-b border-slate-200">
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">What it's for</p>
+                <p className="text-slate-800 font-medium">{loanDetails.purpose}</p>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-4">
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -177,7 +184,7 @@ export default function SignatureModal({ isOpen, onClose, onSign, loanDetails, u
                   <Calendar className="w-4 h-4 text-purple-600" />
                   <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Term</p>
                 </div>
-                <p className="text-xl font-bold text-slate-800">{loanDetails.repayment_period} <span className="text-sm font-normal text-slate-500">months</span></p>
+                <p className="text-xl font-bold text-slate-800">{loanDetails.repayment_period} <span className="text-sm font-normal text-slate-500">{loanDetails.repayment_unit || 'months'}</span></p>
               </motion.div>
 
               <motion.div

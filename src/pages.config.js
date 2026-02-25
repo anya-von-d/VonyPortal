@@ -47,24 +47,26 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
-import CreateLoan from './pages/CreateLoan';
+import Borrowing from './pages/Borrowing';
 import Home from './pages/Home';
+import Learn from './pages/Learn';
+import Lending from './pages/Lending';
 import LoanAgreements from './pages/LoanAgreements';
-import MyLoanOffers from './pages/MyLoanOffers';
-import MyLoans from './pages/MyLoans';
 import Profile from './pages/Profile';
 import RecentActivity from './pages/RecentActivity';
+import Shop from './pages/Shop';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "CreateLoan": CreateLoan,
+    "Borrowing": Borrowing,
     "Home": Home,
+    "Learn": Learn,
+    "Lending": Lending,
     "LoanAgreements": LoanAgreements,
-    "MyLoanOffers": MyLoanOffers,
-    "MyLoans": MyLoans,
     "Profile": Profile,
     "RecentActivity": RecentActivity,
+    "Shop": Shop,
 }
 
 export const pagesConfig = {
