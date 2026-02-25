@@ -381,20 +381,14 @@ export default function Lending() {
                 key={tab.id}
                 onClick={() => setActiveSection(tab.id)}
                 variant={activeSection === tab.id ? 'default' : 'outline'}
-                className={`flex items-center gap-2 whitespace-nowrap ${
+                className={`whitespace-nowrap ${
                   activeSection === tab.id
                     ? 'bg-[#35B276] hover:bg-[#2d9a65] text-white'
                     : 'border-slate-300 text-slate-600 hover:bg-slate-50'
                 }`}
               >
-                <tab.icon className="w-4 h-4" />
                 <span className="hidden sm:inline">{tab.label}</span>
                 <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
-                {tab.count !== null && (
-                  <Badge variant="secondary" className="ml-1 bg-white/20 text-current">
-                    {tab.count}
-                  </Badge>
-                )}
               </Button>
             ))}
           </div>
