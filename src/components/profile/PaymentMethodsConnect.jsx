@@ -415,6 +415,7 @@ export default function PaymentMethodsConnect() {
                 )}
               </div>
             </div>
+          </div>
 
           {/* PayPal */}
           <div className="p-3 bg-slate-50/50 rounded-xl space-y-3">
