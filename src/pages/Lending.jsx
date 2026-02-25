@@ -1163,44 +1163,58 @@ export default function Lending() {
 
                                 return (
                                   <div className="space-y-4">
-                                    <div className="relative">
-                                      {/* Y-axis label for expected payment */}
-                                      <div className="absolute -left-2 top-0 h-32 flex flex-col justify-between text-[9px] text-slate-400">
+                                    <div className="flex">
+                                      {/* Y-axis labels */}
+                                      <div className="flex flex-col justify-between h-32 pr-2 text-[9px] text-slate-400 text-right w-12">
                                         <span>${paymentAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                                        <span>${(paymentAmount / 2).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                                         <span>$0</span>
                                       </div>
 
-                                      <div className="flex items-end gap-1 h-40 px-8 relative">
-                                        {/* Dashed line at expected payment amount */}
+                                      {/* Chart area */}
+                                      <div className="flex-1 relative">
+                                        {/* Dashed line at expected payment amount - positioned at top of bar area */}
                                         <div
-                                          className="absolute left-8 right-0 border-t-2 border-dashed border-amber-500 z-10"
-                                          style={{ bottom: '32px' }} // Position at top of bar area (h-32 = 128px from bottom label)
-                                        />
-                                        <div className="absolute right-0 -top-1 text-[9px] text-amber-600 font-medium bg-white px-1 rounded">
-                                          Expected: ${paymentAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                          className="absolute left-0 right-0 border-t-2 border-dashed border-amber-500 z-10 flex items-center"
+                                          style={{ top: '0px' }}
+                                        >
+                                          <span className="absolute -right-1 -top-3 text-[9px] text-amber-600 font-medium bg-white px-1 rounded whitespace-nowrap">
+                                            Expected: ${paymentAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                          </span>
                                         </div>
 
-                                        {labels.map((label, index) => {
-                                          const isPaid = index < paidPeriods;
-                                          const isPartial = index === paidPeriods && (amountPaid % paymentAmount) > 0;
-                                          const partialPercent = isPartial ? ((amountPaid % paymentAmount) / paymentAmount) * 100 : 0;
+                                        {/* Bars */}
+                                        <div className="flex items-end gap-1 h-32">
+                                          {labels.map((label, index) => {
+                                            const isPaid = index < paidPeriods;
+                                            const isPartial = index === paidPeriods && (amountPaid % paymentAmount) > 0;
+                                            const partialPercent = isPartial ? ((amountPaid % paymentAmount) / paymentAmount) * 100 : 0;
 
-                                          return (
-                                            <div key={index} className="flex-1 flex flex-col items-center gap-1">
-                                              <div className="w-full h-32 bg-slate-100 rounded-t relative flex items-end">
-                                                <div
-                                                  className={`w-full rounded-t transition-all duration-300 ${
-                                                    isPaid ? 'bg-[#35B276]' : isPartial ? 'bg-[#35B276]/50' : 'bg-slate-200'
-                                                  }`}
-                                                  style={{ height: isPaid ? '100%' : isPartial ? `${partialPercent}%` : '10%' }}
-                                                />
+                                            return (
+                                              <div key={index} className="flex-1 flex flex-col items-center gap-1 h-full">
+                                                <div className="w-full flex-1 bg-slate-100 rounded-t relative flex items-end">
+                                                  <div
+                                                    className={`w-full rounded-t transition-all duration-300 ${
+                                                      isPaid ? 'bg-[#35B276]' : isPartial ? 'bg-[#35B276]/50' : 'bg-slate-200'
+                                                    }`}
+                                                    style={{ height: isPaid ? '100%' : isPartial ? `${partialPercent}%` : '10%' }}
+                                                  />
+                                                </div>
                                               </div>
-                                              <span className="text-[10px] text-slate-500 text-center leading-tight">
+                                            );
+                                          })}
+                                        </div>
+
+                                        {/* X-axis labels */}
+                                        <div className="flex gap-1 mt-1">
+                                          {labels.map((label, index) => (
+                                            <div key={index} className="flex-1 text-center">
+                                              <span className="text-[10px] text-slate-500 leading-tight">
                                                 {label}
                                               </span>
                                             </div>
-                                          );
-                                        })}
+                                          ))}
+                                        </div>
                                       </div>
                                     </div>
                                     <div className="flex items-center justify-center gap-4 text-xs">
