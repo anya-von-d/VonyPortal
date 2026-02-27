@@ -8,6 +8,7 @@ module.exports = {
   			sans: ['Outfit', 'system-ui', '-apple-system', 'sans-serif'],
   			serif: ['Libre Baskerville', 'Georgia', 'serif'],
   			mono: ['IBM Plex Mono', 'Fira Code', 'monospace'],
+  			display: ['Times New Roman', 'Times', 'Georgia', 'serif'],
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

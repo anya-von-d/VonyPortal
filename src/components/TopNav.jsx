@@ -105,7 +105,7 @@ export default function TopNav({ location }) {
           {/* Mobile: Centered Logo - positioned absolutely */}
           <Link
             to={createPageUrl("Home")}
-            className="md:hidden absolute left-1/2 -translate-x-1/2 font-serif italic text-3xl text-[#0A1A10] tracking-wide"
+            className="md:hidden absolute left-1/2 -translate-x-1/2 font-display italic text-3xl text-[#0A1A10] tracking-wide"
           >
             Vony
           </Link>
@@ -141,7 +141,7 @@ export default function TopNav({ location }) {
             {/* Center: Logo with extra horizontal margin */}
             <Link
               to={createPageUrl("Home")}
-              className="font-serif italic text-3xl text-[#0A1A10] tracking-wide mx-2"
+              className="font-display italic text-3xl text-[#0A1A10] tracking-wide mx-2"
             >
               Vony
             </Link>
