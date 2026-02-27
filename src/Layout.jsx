@@ -32,8 +32,8 @@ export default function Layout({ children }) {
         '--theme-primary': '0 168 107',
         '--theme-primary-light': '232 252 240',
         '--theme-primary-dark': '13 155 118',
-        '--theme-bg-from': '232 252 240',
-        '--theme-bg-to': '219 238 227',
+        '--theme-bg-from': '54 206 142',
+        '--theme-bg-to': '54 206 142',
         '--theme-card-bg': '255 255 255',
         '--theme-border': '122 212 160 / 0.3'
       }
@@ -43,8 +43,8 @@ export default function Layout({ children }) {
         '--theme-primary': '0 168 107',
         '--theme-primary-light': '208 237 111',
         '--theme-primary-dark': '13 155 118',
-        '--theme-bg-from': '232 252 240',
-        '--theme-bg-to': '219 238 227',
+        '--theme-bg-from': '54 206 142',
+        '--theme-bg-to': '54 206 142',
         '--theme-card-bg': '255 255 255',
         '--theme-border': '54 206 142 / 0.3'
       }
