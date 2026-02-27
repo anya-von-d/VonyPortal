@@ -3,8 +3,14 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-const allNavItems = [
+const leftNavItems = [
   {
     title: "Home",
     url: createPageUrl("Home"),
@@ -13,10 +19,16 @@ const allNavItems = [
     title: "Lending",
     url: createPageUrl("Lending"),
   },
+];
+
+const rightNavItems = [
   {
     title: "Borrowing",
     url: createPageUrl("Borrowing"),
   },
+];
+
+const moreMenuItems = [
   {
     title: "Agreements",
     url: createPageUrl("LoanAgreements"),
@@ -26,11 +38,11 @@ const allNavItems = [
     url: createPageUrl("RecentActivity"),
   },
   {
-    title: "Learn",
+    title: "Learn (Coming Soon)",
     url: createPageUrl("Learn"),
   },
   {
-    title: "Shop",
+    title: "Shop (Coming Soon)",
     url: createPageUrl("Shop"),
   },
   {
@@ -38,6 +50,8 @@ const allNavItems = [
     url: createPageUrl("Profile"),
   },
 ];
+
+const allNavItems = [...leftNavItems, ...rightNavItems, ...moreMenuItems];
 
 export default function TopNav({ location }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -138,13 +152,79 @@ export default function TopNav({ location }) {
             </AnimatePresence>
           </button>
 
-          {/* Centered Logo */}
+          {/* Mobile: Centered Logo */}
           <Link
             to={createPageUrl("Home")}
-            className="absolute left-1/2 -translate-x-1/2 font-display italic text-3xl text-[#0A1A10] tracking-wide"
+            className="md:hidden absolute left-1/2 -translate-x-1/2 font-display italic text-3xl text-[#0A1A10] tracking-wide"
           >
             Vony
           </Link>
+
+          {/* Desktop: Centered Nav Group (Links + Logo) */}
+          <div className="hidden md:flex items-center gap-10 absolute left-1/2 -translate-x-1/2">
+            {/* Left Nav Links */}
+            {leftNavItems.map((item) => (
+              <Link
+                key={item.title}
+                to={item.url}
+                className={`font-sans text-sm font-medium transition-colors duration-200 ${
+                  location.pathname === item.url
+                    ? "text-[#0A1A10]"
+                    : "text-[#4A6B55] hover:text-[#0A1A10]"
+                }`}
+              >
+                {item.title}
+              </Link>
+            ))}
+
+            {/* Center: Logo with extra horizontal margin */}
+            <Link
+              to={createPageUrl("Home")}
+              className="font-display italic text-3xl text-[#0A1A10] tracking-wide mx-2"
+            >
+              Vony
+            </Link>
+
+            {/* Right Nav Links */}
+            {rightNavItems.map((item) => (
+              <Link
+                key={item.title}
+                to={item.url}
+                className={`font-sans text-sm font-medium transition-colors duration-200 ${
+                  location.pathname === item.url
+                    ? "text-[#0A1A10]"
+                    : "text-[#4A6B55] hover:text-[#0A1A10]"
+                }`}
+              >
+                {item.title}
+              </Link>
+            ))}
+
+            {/* More Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="font-sans text-sm font-medium text-[#4A6B55] hover:text-[#0A1A10] transition-colors duration-200">
+                  More
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 bg-white border border-gray-100 shadow-lg">
+                {moreMenuItems.map((item) => (
+                  <DropdownMenuItem key={item.title} asChild>
+                    <Link
+                      to={item.url}
+                      className={`cursor-pointer ${
+                        location.pathname === item.url
+                          ? "text-[#0A1A10]"
+                          : "text-[#4A6B55] hover:text-[#0A1A10]"
+                      }`}
+                    >
+                      {item.title}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
           {/* My Profile Button (Right) */}
           <Link
