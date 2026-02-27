@@ -1,19 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import {
-  Home,
-  ArrowUpRight,
-  ArrowDownRight,
-  BookOpen,
-  ShoppingBag,
-  PiggyBank,
-  Sparkles,
-  User,
-  MoreHorizontal,
-  Menu,
-  X,
-} from "lucide-react";
+import { Menu, X } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,27 +14,22 @@ const mainNavItems = [
   {
     title: "Home",
     url: createPageUrl("Home"),
-    icon: Home,
   },
   {
     title: "Lending",
     url: createPageUrl("Lending"),
-    icon: ArrowUpRight,
   },
   {
     title: "Borrowing",
     url: createPageUrl("Borrowing"),
-    icon: ArrowDownRight,
   },
   {
     title: "Learn",
     url: createPageUrl("Learn"),
-    icon: BookOpen,
   },
   {
     title: "Shop",
     url: createPageUrl("Shop"),
-    icon: ShoppingBag,
   },
 ];
 
@@ -54,17 +37,14 @@ const moreMenuItems = [
   {
     title: "Agreements",
     url: createPageUrl("LoanAgreements"),
-    icon: PiggyBank,
   },
   {
     title: "Activity",
     url: createPageUrl("RecentActivity"),
-    icon: Sparkles,
   },
   {
     title: "Profile",
     url: createPageUrl("Profile"),
-    icon: User,
   },
 ];
 
@@ -73,92 +53,81 @@ const allNavItems = [...mainNavItems, ...moreMenuItems];
 export default function TopNav({ location, colors, user, isLoading, theme }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Light mode (morning) uses the standard logo, green mode (afternoon) uses the dark logo
-  const logoUrl = theme === 'afternoon'
-    ? "https://wvgqxgximcuhqhesoycw.supabase.co/storage/v1/object/public/Image%20Storage/all_lowercase_dark_logo.png"
-    : "https://wvgqxgximcuhqhesoycw.supabase.co/storage/v1/object/public/Image%20Storage/all_lowercase_logo.png";
-
   return (
-    <div className={`border-b ${colors.sidebarBorder} bg-gradient-to-r ${colors.sidebarBg} backdrop-blur-xl px-6 py-3`}>
-      <div className="flex items-center justify-between">
-        {/* Logo on the left - switches based on theme */}
-        <img
-          src={logoUrl}
-          alt="Vony Logo"
-          className="h-12 w-auto"
-        />
+    <div className="bg-white shadow-sm px-8 py-4">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        {/* Logo on the left - italic serif style like RebrandMainWebsite */}
+        <Link to={createPageUrl("Home")} className="font-serif italic text-2xl text-[#0A1A10] tracking-wide">
+          Vony
+        </Link>
 
         {/* Mobile Hamburger Menu */}
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <SheetTrigger asChild className="lg:hidden">
             <button className="p-2">
-              <Menu className="w-6 h-6 text-slate-600" />
+              <Menu className="w-6 h-6 text-[#0A1A10]" />
             </button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-64">
+          <SheetContent side="left" className="w-64 bg-white">
             <nav className="flex flex-col gap-2 mt-8">
               {allNavItems.map((item) => (
                 <Link
                   key={item.title}
                   to={item.url}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`px-4 py-3 rounded-lg transition-all flex items-center gap-3 text-sm font-medium ${
+                  className={`px-4 py-3 rounded-lg transition-all text-sm font-medium ${
                     location.pathname === item.url
-                      ? `${colors.activeItem}`
-                      : "text-slate-600 hover:bg-slate-100"
+                      ? "text-[#00A86B] bg-[#E8FCF0]"
+                      : "text-[#4A6B55] hover:text-[#00A86B] hover:bg-[#E8FCF0]"
                   }`}
                 >
-                  <item.icon className="w-5 h-5" />
-                  <span>{item.title}</span>
+                  {item.title}
                 </Link>
               ))}
             </nav>
           </SheetContent>
         </Sheet>
-        
-        {/* Centered navigation */}
-        <nav className="hidden lg:flex items-center gap-1 absolute left-1/2 transform -translate-x-1/2">
+
+        {/* Centered navigation - text only, no icons */}
+        <nav className="hidden lg:flex items-center gap-8">
           {mainNavItems.map((item) => (
             <Link
               key={item.title}
               to={item.url}
-              className={`px-4 py-2 rounded-lg transition-all duration-200 flex flex-row items-center gap-2 text-sm font-medium whitespace-nowrap ${
+              className={`text-sm font-medium transition-colors duration-200 ${
                 location.pathname === item.url
-                  ? `${colors.activeItem} shadow-sm`
-                  : `${colors.hoverItem} ${colors.navText}`
+                  ? "text-[#00A86B]"
+                  : "text-[#4A6B55] hover:text-[#00A86B]"
               }`}
             >
-              <item.icon className="w-4 h-4 flex-shrink-0" />
-              <span>{item.title}</span>
+              {item.title}
             </Link>
           ))}
-          
+
           {/* More dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className={`px-4 py-2 rounded-lg transition-all duration-200 flex flex-row items-center gap-2 text-sm font-medium whitespace-nowrap ${colors.hoverItem} ${colors.navText}`}>
-                <MoreHorizontal className="w-4 h-4 flex-shrink-0" />
-                <span>More</span>
+              <button className="text-sm font-medium text-[#4A6B55] hover:text-[#00A86B] transition-colors duration-200">
+                More
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuContent align="end" className="w-48 bg-white border border-[#7AD4A0]/30">
               {moreMenuItems.map((item) => (
                 <DropdownMenuItem key={item.title} asChild>
                   <Link
                     to={item.url}
-                    className="flex items-center gap-2 cursor-pointer"
+                    className="cursor-pointer text-[#4A6B55] hover:text-[#00A86B]"
                   >
-                    <item.icon className="w-4 h-4" />
-                    <span>{item.title}</span>
+                    {item.title}
                   </Link>
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
         </nav>
-        
+
         {/* Empty space on the right for balance */}
-        <div className="w-10 h-10"></div>
+        <div className="w-10 h-10 hidden lg:block"></div>
       </div>
     </div>
   );

@@ -1,169 +1,258 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Vony Design System - Matching RebrandMainWebsite */
+:root {
+  /* Primary Color Palette */
+  --vony-primary: #00A86B;
+  --vony-primary-hover: #36CE8E;
+  --vony-primary-light: #83F384;
+  --vony-primary-dark: #0D9B76;
+  --vony-accent: #50C878;
+  --vony-lime: #D0ED6F;
+  --vony-mint: #6EE8B5;
+  --vony-forest: #1B4332;
 
-/* :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* Background Colors */
+  --vony-bg-light: #E8FCF0;
+  --vony-bg-soft: #DBEEE3;
+  --vony-bg-card: #DBFFEB;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* Text Colors */
+  --vony-text: #0A1A10;
+  --vony-text-secondary: #4A6B55;
+  --vony-text-muted: #7A9A85;
+  --vony-text-on-dark: #E8F5ED;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Border & Accents */
+  --vony-border: #7AD4A0;
+  --vony-glow: #00A86B20;
+
+  /* Shadcn compatibility */
+  --background: 140 50% 96%;
+  --foreground: 150 30% 8%;
+  --card: 140 50% 97%;
+  --card-foreground: 150 30% 8%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 150 30% 8%;
+  --primary: 155 100% 33%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 145 30% 90%;
+  --secondary-foreground: 150 30% 8%;
+  --muted: 145 20% 92%;
+  --muted-foreground: 145 15% 40%;
+  --accent: 145 30% 90%;
+  --accent-foreground: 150 30% 8%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 145 35% 75%;
+  --input: 145 20% 85%;
+  --ring: 155 100% 33%;
+  --chart-1: 155 100% 33%;
+  --chart-2: 145 60% 45%;
+  --chart-3: 160 50% 40%;
+  --chart-4: 140 70% 50%;
+  --chart-5: 135 55% 55%;
+  --radius: 0.75rem;
+  --sidebar-background: 140 50% 97%;
+  --sidebar-foreground: 150 30% 8%;
+  --sidebar-primary: 155 100% 33%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 145 30% 92%;
+  --sidebar-accent-foreground: 150 30% 8%;
+  --sidebar-border: 145 35% 80%;
+  --sidebar-ring: 155 100% 33%;
+
+  /* Theme Variables for Portal */
+  --theme-primary: 0 168 107;
+  --theme-primary-light: 232 252 240;
+  --theme-primary-dark: 13 155 118;
+  --theme-bg-from: 232 252 240;
+  --theme-bg-to: 219 238 227;
+  --theme-card-bg: 219 255 235;
+  --theme-border: 122 212 160 / 0.3;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+.dark {
+  --background: 150 30% 6%;
+  --foreground: 140 20% 95%;
+  --card: 150 25% 8%;
+  --card-foreground: 140 20% 95%;
+  --popover: 150 25% 8%;
+  --popover-foreground: 140 20% 95%;
+  --primary: 155 100% 40%;
+  --primary-foreground: 150 30% 6%;
+  --secondary: 150 20% 15%;
+  --secondary-foreground: 140 20% 95%;
+  --muted: 150 20% 15%;
+  --muted-foreground: 145 15% 60%;
+  --accent: 150 20% 15%;
+  --accent-foreground: 140 20% 95%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 150 20% 18%;
+  --input: 150 20% 18%;
+  --ring: 155 100% 40%;
+  --chart-1: 155 100% 40%;
+  --chart-2: 145 60% 50%;
+  --chart-3: 160 50% 45%;
+  --chart-4: 140 70% 55%;
+  --chart-5: 135 55% 60%;
+  --sidebar-background: 150 25% 8%;
+  --sidebar-foreground: 140 20% 95%;
+  --sidebar-primary: 155 100% 40%;
+  --sidebar-primary-foreground: 150 30% 6%;
+  --sidebar-accent: 150 20% 12%;
+  --sidebar-accent-foreground: 140 20% 95%;
+  --sidebar-border: 150 20% 15%;
+  --sidebar-ring: 155 100% 40%;
 }
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-} */
-
-
-
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-  .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-}
-
-
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+    line-height: 1.7;
+    color: var(--vony-text);
+    background-color: var(--vony-bg-light);
+  }
+
+  /* Typography */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-weight: 700;
+    color: var(--vony-text);
+    line-height: 1.1;
+  }
+
+  /* Selection styling */
+  ::selection {
+    background-color: var(--vony-glow);
+    color: var(--vony-text);
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--vony-border);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--vony-text-muted);
   }
 }
 
-/* Safe area insets for mobile devices with notches */
-.safe-area-inset-top {
-  padding-top: env(safe-area-inset-top, 0px);
+@layer components {
+  /* Vony Button Styles */
+  .vony-btn-primary {
+    @apply px-8 py-3 rounded-lg font-semibold text-base transition-all cursor-pointer;
+    background-color: var(--vony-text);
+    color: white;
+    box-shadow: 0 10px 15px -3px rgba(10, 26, 16, 0.2);
+  }
+
+  .vony-btn-primary:hover {
+    opacity: 0.9;
+  }
+
+  .vony-btn-secondary {
+    @apply px-5 py-2 rounded-lg font-semibold text-sm transition-colors;
+    background-color: var(--vony-primary-hover);
+    color: var(--vony-text);
+  }
+
+  .vony-btn-secondary:hover {
+    opacity: 0.85;
+  }
+
+  /* Vony Card Styles */
+  .vony-card {
+    @apply rounded-xl p-5 transition-all duration-200;
+    background-color: white;
+    border: 1px solid var(--vony-border);
+  }
+
+  .vony-card:hover {
+    border-color: var(--vony-primary);
+  }
+
+  .vony-card-colored {
+    @apply rounded-xl p-5 transition-all duration-200;
+  }
+
+  /* Navigation Link Styles */
+  .vony-nav-link {
+    @apply px-4 py-2 rounded-lg transition-all duration-200 font-medium text-sm;
+    color: var(--vony-text-secondary);
+  }
+
+  .vony-nav-link:hover {
+    color: var(--vony-text);
+  }
+
+  .vony-nav-link-active {
+    color: var(--vony-text);
+  }
+
+  /* Input Styles */
+  .vony-input {
+    @apply w-full px-4 py-3 rounded-lg text-sm transition-all;
+    background-color: rgba(10, 26, 16, 0.1);
+    color: var(--vony-text);
+  }
+
+  .vony-input::placeholder {
+    color: rgba(10, 26, 16, 0.4);
+  }
+
+  .vony-input:focus {
+    @apply outline-none ring-2;
+    ring-color: rgba(10, 26, 16, 0.2);
+  }
 }
 
-.safe-area-inset-bottom {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+@layer utilities {
+  /* Logo text style */
+  .vony-logo {
+    font-family: 'Times New Roman', Georgia, serif;
+    font-style: italic;
+    letter-spacing: 0.05em;
+  }
+
+  /* Mono text for labels */
+  .vony-mono {
+    font-family: 'IBM Plex Mono', 'Fira Code', monospace;
+    letter-spacing: 0.12em;
+  }
+
+  /* Safe area padding for mobile devices */
+  .safe-area-inset-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
 }
 
 /* Mobile navigation styles */
@@ -171,4 +260,23 @@ button:focus-visible {
   .mobile-nav-header {
     padding-top: calc(env(safe-area-inset-top) + 1rem);
   }
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
 }

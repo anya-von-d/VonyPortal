@@ -16,8 +16,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
-  ArrowDownRight, Clock, Calendar, DollarSign, Inbox, TrendingDown,
-  CheckCircle, AlertCircle, CreditCard, Settings, BarChart3, FileText
+  Clock, Calendar, DollarSign, AlertCircle, FileText
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
@@ -206,10 +205,10 @@ export default function Borrowing() {
   const overallProgress = totalOwed > 0 ? (totalPaid / totalOwed) * 100 : 0;
 
   const tabs = [
-    { id: 'overview', label: 'All', icon: ArrowDownRight, count: null },
-    { id: 'active', label: 'Manage Loans', icon: Settings, count: activeLoans.length },
-    { id: 'offers', label: 'Loan Offers', icon: Inbox, count: pendingOffers.length },
-    { id: 'history', label: 'History', icon: Clock, count: completedLoans.length },
+    { id: 'overview', label: 'All' },
+    { id: 'active', label: 'Manage Loans' },
+    { id: 'offers', label: 'Loan Offers' },
+    { id: 'history', label: 'History' },
   ];
 
   return (
@@ -239,7 +238,7 @@ export default function Borrowing() {
                 variant={activeSection === tab.id ? 'default' : 'outline'}
                 className={`whitespace-nowrap ${
                   activeSection === tab.id
-                    ? 'bg-[#35B276] hover:bg-[#2d9a65] text-white'
+                    ? 'bg-[#00A86B] hover:bg-[#0D9B76] text-white'
                     : 'border-slate-300 text-slate-600 hover:bg-slate-50'
                 }`}
               >
@@ -313,49 +312,37 @@ export default function Borrowing() {
 
                   {/* Stats Cards - Right Side (2x2 Grid) */}
                   <div className="flex-1 grid grid-cols-2 gap-3 md:gap-4">
-                    <Card className="text-white" style={{backgroundColor: '#35B276'}}>
+                    <Card className="text-white" style={{backgroundColor: '#00A86B'}}>
                       <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-1">
-                          <p className="text-xs md:text-sm opacity-90">Total Borrowed</p>
-                          <ArrowDownRight className="w-4 h-4 opacity-75" />
-                        </div>
+                        <p className="text-xs md:text-sm opacity-90 mb-1">Total Borrowed</p>
                         <p className="text-xl md:text-2xl font-bold">${totalBorrowed.toLocaleString()}</p>
                         <p className="text-xs opacity-75">{activeLoans.length} active loans</p>
                       </CardContent>
                     </Card>
 
-                    <Card className="text-white" style={{backgroundColor: '#35B276'}}>
+                    <Card className="text-white" style={{backgroundColor: '#36CE8E'}}>
                       <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-1">
-                          <p className="text-xs md:text-sm opacity-90">Remaining</p>
-                          <TrendingDown className="w-4 h-4 opacity-75" />
-                        </div>
+                        <p className="text-xs md:text-sm opacity-90 mb-1">Remaining</p>
                         <p className="text-xl md:text-2xl font-bold">${remainingBalance.toLocaleString()}</p>
                         <p className="text-xs opacity-75">${totalPaid.toLocaleString()} paid</p>
                       </CardContent>
                     </Card>
 
-                    <Card className="text-white" style={{backgroundColor: '#35B276'}}>
+                    <Card className="text-white" style={{backgroundColor: '#83F384'}}>
                       <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-1">
-                          <p className="text-xs md:text-sm opacity-90">Pending Offers</p>
-                          <Inbox className="w-4 h-4 opacity-75" />
-                        </div>
-                        <p className="text-xl md:text-2xl font-bold">{pendingOffers.length}</p>
-                        <p className="text-xs opacity-75">Awaiting response</p>
+                        <p className="text-xs md:text-sm text-[#0A1A10] mb-1">Pending Offers</p>
+                        <p className="text-xl md:text-2xl font-bold text-[#0A1A10]">{pendingOffers.length}</p>
+                        <p className="text-xs text-[#0A1A10]/70">Awaiting response</p>
                       </CardContent>
                     </Card>
 
-                    <Card className="text-white" style={{backgroundColor: '#35B276'}}>
+                    <Card className="text-white" style={{backgroundColor: '#D0ED6F'}}>
                       <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-1">
-                          <p className="text-xs md:text-sm opacity-90">Next Payment</p>
-                          <Calendar className="w-4 h-4 opacity-75" />
-                        </div>
-                        <p className="text-xl md:text-2xl font-bold">
+                        <p className="text-xs md:text-sm text-[#0A1A10] mb-1">Next Payment</p>
+                        <p className="text-xl md:text-2xl font-bold text-[#0A1A10]">
                           {nextPaymentLoan ? format(new Date(nextPaymentLoan.next_payment_date), 'MMM d') : '-'}
                         </p>
-                        <p className="text-xs opacity-75">
+                        <p className="text-xs text-[#0A1A10]/70">
                           {nextPaymentLoan ? `$${nextPaymentAmount.toLocaleString()}` : 'No payments due'}
                         </p>
                       </CardContent>
@@ -366,12 +353,9 @@ export default function Borrowing() {
                 {/* Upcoming Payments + Individual Loan Progress */}
                 <div className="grid md:grid-cols-2 gap-4">
                   {/* Upcoming Payments - Left */}
-                  <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
+                  <Card className="bg-white border-[#7AD4A0]/30">
                     <CardHeader className="pb-2">
-                      <CardTitle className="flex items-center gap-2 text-base">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                          <Calendar className="w-4 h-4 text-blue-600" />
-                        </div>
+                      <CardTitle className="text-base text-[#0A1A10]">
                         Upcoming Payments
                       </CardTitle>
                     </CardHeader>
@@ -408,12 +392,9 @@ export default function Borrowing() {
                   </Card>
 
                   {/* Individual Loan Progress - Right */}
-                  <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
+                  <Card className="bg-white border-[#7AD4A0]/30">
                     <CardHeader className="pb-2">
-                      <CardTitle className="flex items-center gap-2 text-base">
-                        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                          <TrendingDown className="w-4 h-4 text-green-600" />
-                        </div>
+                      <CardTitle className="text-base text-[#0A1A10]">
                         Individual Loan Progress
                       </CardTitle>
                     </CardHeader>
@@ -432,8 +413,8 @@ export default function Borrowing() {
                               <div key={loan.id} className="space-y-1">
                                 <div className="flex items-center justify-between">
                                   <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 rounded-full bg-[#35B276]/20 flex items-center justify-center">
-                                      <span className="text-xs font-medium text-[#35B276]">
+                                    <div className="w-6 h-6 rounded-full bg-[#00A86B]/20 flex items-center justify-center">
+                                      <span className="text-xs font-medium text-[#00A86B]">
                                         {lender?.full_name?.charAt(0) || '?'}
                                       </span>
                                     </div>
@@ -443,7 +424,7 @@ export default function Borrowing() {
                                 </div>
                                 <div className="relative h-3 bg-slate-200 rounded-full overflow-hidden">
                                   <div
-                                    className="absolute top-0 left-0 h-full bg-[#35B276] rounded-full transition-all duration-500"
+                                    className="absolute top-0 left-0 h-full bg-[#00A86B] rounded-full transition-all duration-500"
                                     style={{ width: `${percentPaid}%` }}
                                   />
                                 </div>
@@ -457,7 +438,7 @@ export default function Borrowing() {
                           {activeLoans.length > 5 && (
                             <Button
                               variant="ghost"
-                              className="w-full text-[#35B276]"
+                              className="w-full text-[#00A86B]"
                               onClick={() => setActiveSection('active')}
                             >
                               View all {activeLoans.length} loans
@@ -471,21 +452,18 @@ export default function Borrowing() {
 
                 {/* Pending Offers Alert */}
                 {pendingOffers.length > 0 && (
-                  <Card className="bg-blue-50 border-blue-200">
+                  <Card className="bg-[#E8FCF0] border-[#7AD4A0]/30">
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                          <Inbox className="w-5 h-5 text-blue-600" />
-                        </div>
                         <div className="flex-1">
-                          <p className="font-medium text-blue-900">
+                          <p className="font-medium text-[#0A1A10]">
                             You have {pendingOffers.length} pending loan offer{pendingOffers.length !== 1 ? 's' : ''}
                           </p>
-                          <p className="text-sm text-blue-700">Review and respond to loan offers from friends</p>
+                          <p className="text-sm text-[#4A6B55]">Review and respond to loan offers from friends</p>
                         </div>
                         <Button
                           onClick={() => setActiveSection('offers')}
-                          className="bg-blue-600 hover:bg-blue-700"
+                          className="bg-[#00A86B] hover:bg-[#0D9B76]"
                         >
                           View Offers
                         </Button>
@@ -508,10 +486,10 @@ export default function Borrowing() {
                     <div className="w-8 h-8 border-2 border-green-600 border-t-transparent rounded-full animate-spin mx-auto" />
                   </div>
                 ) : activeLoans.length === 0 ? (
-                  <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
+                  <Card className="bg-white border-[#7AD4A0]/30">
                     <CardContent className="py-12">
-                      <div className="text-center text-slate-500">
-                        <CheckCircle className="w-12 h-12 mx-auto mb-3 text-green-500" />
+                      <div className="text-center text-[#4A6B55]">
+                        <p className="text-4xl mb-3">✓</p>
                         <p>No active loans</p>
                         <p className="text-sm">You're all caught up!</p>
                       </div>
@@ -520,12 +498,9 @@ export default function Borrowing() {
                 ) : (
                   <div className="space-y-4">
                     {/* Loan Selector Dropdown */}
-                    <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
+                    <Card className="bg-white border-[#7AD4A0]/30">
                       <CardHeader className="pb-2">
-                        <CardTitle className="flex items-center gap-2 text-base">
-                          <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                            <Settings className="w-4 h-4 text-green-600" />
-                          </div>
+                        <CardTitle className="text-base text-[#0A1A10]">
                           Manage Loans
                         </CardTitle>
                       </CardHeader>
@@ -543,14 +518,14 @@ export default function Borrowing() {
                                 const lender = publicProfiles.find(p => p.user_id === manageLoanSelected.lender_id);
                                 return (
                                   <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 rounded-full bg-[#35B276]/20 flex items-center justify-center">
-                                      <span className="text-xs font-medium text-[#35B276]">
+                                    <div className="w-6 h-6 rounded-full bg-[#00A86B]/20 flex items-center justify-center">
+                                      <span className="text-xs font-medium text-[#00A86B]">
                                         {lender?.full_name?.charAt(0) || '?'}
                                       </span>
                                     </div>
                                     <span>@{lender?.username || 'user'}</span>
                                     <span className="text-slate-400">•</span>
-                                    <span className="text-[#35B276] font-medium">${manageLoanSelected.amount?.toLocaleString()}</span>
+                                    <span className="text-[#00A86B] font-medium">${manageLoanSelected.amount?.toLocaleString()}</span>
                                     {manageLoanSelected.purpose && (
                                       <>
                                         <span className="text-slate-400">•</span>
@@ -568,14 +543,14 @@ export default function Borrowing() {
                               return (
                                 <SelectItem key={loan.id} value={loan.id}>
                                   <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 rounded-full bg-[#35B276]/20 flex items-center justify-center">
-                                      <span className="text-xs font-medium text-[#35B276]">
+                                    <div className="w-6 h-6 rounded-full bg-[#00A86B]/20 flex items-center justify-center">
+                                      <span className="text-xs font-medium text-[#00A86B]">
                                         {lender?.full_name?.charAt(0) || '?'}
                                       </span>
                                     </div>
                                     <span>@{lender?.username || 'user'}</span>
                                     <span className="text-slate-400">•</span>
-                                    <span className="text-[#35B276] font-medium">${loan.amount?.toLocaleString()}</span>
+                                    <span className="text-[#00A86B] font-medium">${loan.amount?.toLocaleString()}</span>
                                     {loan.purpose && (
                                       <>
                                         <span className="text-slate-400">•</span>
@@ -593,23 +568,20 @@ export default function Borrowing() {
 
                     {/* Loan Details - Below Dropdown */}
                     {!manageLoanSelected ? (
-                      <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
+                      <Card className="bg-white border-[#7AD4A0]/30">
                         <CardContent className="flex items-center justify-center py-16">
-                          <div className="text-center text-[#35B276]/60">
-                            <BarChart3 className="w-12 h-12 mx-auto mb-3" />
-                            <p className="text-slate-400">Select a loan above to view payment history</p>
+                          <div className="text-center text-[#4A6B55]">
+                            <p className="text-4xl mb-3">📊</p>
+                            <p>Select a loan above to view payment history</p>
                           </div>
                         </CardContent>
                       </Card>
                     ) : (
                       <>
                         {/* Payment History Bar Chart */}
-                        <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
+                        <Card className="bg-white border-[#7AD4A0]/30">
                           <CardHeader className="pb-2">
-                            <CardTitle className="flex items-center gap-2 text-base">
-                              <div className="w-8 h-8 rounded-full bg-[#35B276]/20 flex items-center justify-center">
-                                <BarChart3 className="w-4 h-4 text-[#35B276]" />
-                              </div>
+                            <CardTitle className="text-base text-[#0A1A10]">
                               Payment History
                             </CardTitle>
                           </CardHeader>
@@ -678,7 +650,7 @@ export default function Borrowing() {
                                         className="absolute left-0 right-0 border-t-2 border-dashed border-[#35B276] z-10 flex items-center"
                                         style={{ top: '0px' }}
                                       >
-                                        <span className="absolute -right-1 -top-3 text-[9px] text-[#35B276] font-medium bg-white px-1 rounded whitespace-nowrap">
+                                        <span className="absolute -right-1 -top-3 text-[9px] text-[#00A86B] font-medium bg-white px-1 rounded whitespace-nowrap">
                                           Expected: ${paymentAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                         </span>
                                       </div>
@@ -695,7 +667,7 @@ export default function Borrowing() {
                                               <div className="w-full flex-1 bg-slate-100 rounded-t relative flex items-end">
                                                 <div
                                                   className={`w-full rounded-t transition-all duration-300 ${
-                                                    isPaid ? 'bg-[#35B276]' : isPartial ? 'bg-[#35B276]/50' : 'bg-slate-200'
+                                                    isPaid ? 'bg-[#00A86B]' : isPartial ? 'bg-[#00A86B]/50' : 'bg-slate-200'
                                                   }`}
                                                   style={{ height: isPaid ? '100%' : isPartial ? `${partialPercent}%` : '10%' }}
                                                 />
@@ -719,7 +691,7 @@ export default function Borrowing() {
                                   </div>
                                   <div className="flex items-center justify-center gap-4 text-xs">
                                     <div className="flex items-center gap-1">
-                                      <div className="w-3 h-3 bg-[#35B276] rounded" />
+                                      <div className="w-3 h-3 bg-[#00A86B] rounded" />
                                       <span className="text-slate-600">Paid</span>
                                     </div>
                                     <div className="flex items-center gap-1">
@@ -750,7 +722,7 @@ export default function Borrowing() {
                           <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
                             <CardContent className="p-3">
                               <p className="text-xs text-slate-500 mb-1">Amount Paid</p>
-                              <p className="text-lg font-bold text-[#35B276]">
+                              <p className="text-lg font-bold text-[#00A86B]">
                                 ${(manageLoanSelected.amount_paid || 0).toLocaleString()}
                               </p>
                             </CardContent>
@@ -768,7 +740,7 @@ export default function Borrowing() {
                           <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
                             <CardContent className="p-3">
                               <p className="text-xs text-slate-500 mb-1">Percentage Paid</p>
-                              <p className="text-lg font-bold text-[#35B276]">
+                              <p className="text-lg font-bold text-[#00A86B]">
                                 {(() => {
                                   const total = manageLoanSelected.total_amount || manageLoanSelected.amount || 0;
                                   const paid = manageLoanSelected.amount_paid || 0;
@@ -783,7 +755,7 @@ export default function Borrowing() {
                         <div className="flex flex-wrap gap-3">
                           <Button
                             onClick={() => handleMakePayment(manageLoanSelected)}
-                            className="flex-1 min-w-[140px] bg-[#35B276] hover:bg-[#2d9a65]"
+                            className="flex-1 min-w-[140px] bg-[#00A86B] hover:bg-[#0D9B76]"
                           >
                             <DollarSign className="w-4 h-4 mr-2" />
                             Make Payment
@@ -811,20 +783,17 @@ export default function Borrowing() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
               >
-                <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
+                <Card className="bg-white border-[#7AD4A0]/30">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                        <Inbox className="w-4 h-4 text-blue-600" />
-                      </div>
+                    <CardTitle className="text-[#0A1A10]">
                       Loan Offers Received
                     </CardTitle>
-                    <p className="text-sm text-slate-500">Loan offers from friends waiting for your response</p>
+                    <p className="text-sm text-[#4A6B55]">Loan offers from friends waiting for your response</p>
                   </CardHeader>
                   <CardContent>
                     {pendingOffers.length === 0 ? (
-                      <div className="text-center py-8 text-slate-500">
-                        <Inbox className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                      <div className="text-center py-8 text-[#4A6B55]">
+                        <p className="text-4xl mb-3">📨</p>
                         <p>No pending offers</p>
                       </div>
                     ) : (
@@ -853,20 +822,17 @@ export default function Borrowing() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
               >
-                <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
+                <Card className="bg-white border-[#7AD4A0]/30">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                        <Clock className="w-4 h-4 text-slate-600" />
-                      </div>
+                    <CardTitle className="text-[#0A1A10]">
                       Loan History
                     </CardTitle>
-                    <p className="text-sm text-slate-500">Completed and cancelled loans</p>
+                    <p className="text-sm text-[#4A6B55]">Completed and cancelled loans</p>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {completedLoans.length === 0 ? (
-                      <div className="text-center py-8 text-slate-500">
-                        <Clock className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                      <div className="text-center py-8 text-[#4A6B55]">
+                        <p className="text-4xl mb-3">📋</p>
                         <p>No loan history yet</p>
                       </div>
                     ) : (

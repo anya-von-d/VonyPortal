@@ -4,74 +4,41 @@ import { createPageUrl } from "@/utils";
 import { User as AppUser } from "@/entities/all";
 import { useAuth } from "@/lib/AuthContext";
 import TopNav from "@/components/TopNav";
-import {
-  Home,
-  ArrowUpRight,
-  ArrowDownRight,
-  BookOpen,
-  ShoppingBag,
-  User as UserIcon,
-  PiggyBank,
-  Sparkles,
-  LogOut,
-  Menu,
-  X
-} from "lucide-react";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarHeader,
-  SidebarFooter,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navigationItems = [
   {
     title: "Home",
     url: createPageUrl("Home"),
-    icon: Home,
   },
   {
     title: "Lending",
     url: createPageUrl("Lending"),
-    icon: ArrowUpRight,
   },
   {
     title: "Borrowing",
     url: createPageUrl("Borrowing"),
-    icon: ArrowDownRight,
   },
   {
     title: "Learn",
     url: createPageUrl("Learn"),
-    icon: BookOpen,
   },
   {
     title: "Shop",
     url: createPageUrl("Shop"),
-    icon: ShoppingBag,
   },
   {
     title: "Agreements",
     url: createPageUrl("LoanAgreements"),
-    icon: PiggyBank,
   },
   {
     title: "Activity",
     url: createPageUrl("RecentActivity"),
-    icon: Sparkles,
   },
   {
     title: "Profile",
     url: createPageUrl("Profile"),
-    icon: UserIcon,
   },
 ];
 
@@ -103,85 +70,50 @@ export default function Layout({ children }) {
   // Use user preference or default to morning
   const theme = user?.theme_preference || 'morning';
 
+  // Updated theme colors to match RebrandMainWebsite
   const themeColors = {
     morning: {
-      sidebarBg: 'from-[#FCFBFA] to-[#FCFBFA]',
-      sidebarBorder: 'border-[#E5E1DC]/60',
-      activeItem: 'bg-[#35B276]/10 text-[#347571]',
-      hoverItem: 'hover:bg-[#F3F0EC] hover:text-[#347571]',
-      activeIcon: 'text-[#347571]',
-      accentIcon: 'text-[#35B276]',
-      navText: 'text-slate-600',
+      sidebarBg: 'from-white to-white',
+      sidebarBorder: 'border-[#7AD4A0]/30',
+      activeItem: 'text-[#00A86B] bg-[#E8FCF0]',
+      hoverItem: 'hover:text-[#00A86B] hover:bg-[#E8FCF0]',
+      navText: 'text-[#4A6B55]',
       cssVars: {
-        '--theme-primary': '53 178 118',
-        '--theme-primary-light': '243 240 236',
-        '--theme-primary-dark': '52 117 113',
-        '--theme-bg-from': '248 246 243',
-        '--theme-bg-to': '243 240 236',
-        '--theme-card-bg': '255 254 252',
-        '--theme-border': '53 178 118 / 0.2'
+        '--theme-primary': '0 168 107',
+        '--theme-primary-light': '232 252 240',
+        '--theme-primary-dark': '13 155 118',
+        '--theme-bg-from': '232 252 240',
+        '--theme-bg-to': '219 238 227',
+        '--theme-card-bg': '255 255 255',
+        '--theme-border': '122 212 160 / 0.3'
       }
     },
     afternoon: {
-      sidebarBg: 'from-[#35B276] to-[#2d9561]',
-      sidebarBorder: 'border-[#35B276]/60',
-      activeItem: 'bg-[#F3F0EC]/20 text-[#F3F0EC]',
-      hoverItem: 'hover:bg-[#F3F0EC]/10 hover:text-[#F3F0EC]',
-      activeIcon: 'text-[#F3F0EC]',
-      accentIcon: 'text-[#F3F0EC]',
-      navText: 'text-[#F3F0EC]',
+      sidebarBg: 'from-[#00A86B] to-[#0D9B76]',
+      sidebarBorder: 'border-[#36CE8E]/40',
+      activeItem: 'text-white bg-white/20',
+      hoverItem: 'hover:text-white hover:bg-white/10',
+      navText: 'text-white/90',
       cssVars: {
-        '--theme-primary': '53 178 118',
-        '--theme-primary-light': '209 250 229',
-        '--theme-primary-dark': '52 117 113',
-        '--theme-bg-from': '209 250 229',
-        '--theme-bg-to': '167 243 208',
-        '--theme-card-bg': '240 253 244',
-        '--theme-border': '53 178 118 / 0.3'
+        '--theme-primary': '0 168 107',
+        '--theme-primary-light': '208 237 111',
+        '--theme-primary-dark': '13 155 118',
+        '--theme-bg-from': '232 252 240',
+        '--theme-bg-to': '219 238 227',
+        '--theme-card-bg': '255 255 255',
+        '--theme-border': '54 206 142 / 0.3'
       }
     }
   };
 
   const colors = themeColors[theme] || themeColors['morning'];
 
-      // Apply CSS variables to root and load Inter font
-      React.useEffect(() => {
-        Object.entries(colors.cssVars).forEach(([key, value]) => {
-          document.documentElement.style.setProperty(key, value);
-        });
-
-        // Load Inter font
-        if (!document.getElementById('inter-font-link')) {
-          const link = document.createElement('link');
-          link.id = 'inter-font-link';
-          link.rel = 'stylesheet';
-          link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap';
-          document.head.appendChild(link);
-        }
-
-        // Apply Inter font and theme-specific heading colors
-        const existingStyle = document.getElementById('inter-font-style');
-        if (existingStyle) {
-          existingStyle.remove();
-        }
-        const style = document.createElement('style');
-        style.id = 'inter-font-style';
-
-        // Check if current page is Home or Profile
-        const isHomeOrProfile = location.pathname === createPageUrl("Home") || location.pathname === createPageUrl("Profile");
-
-        style.textContent = `
-          h1, h2, h3, h4, h5, h6 {
-            font-family: 'Inter', sans-serif !important;
-          }
-          ${!isHomeOrProfile ? `
-            .text-center p, .text-lg.text-slate-600, p.text-slate-600 {
-              color: #35B276 !important;
-            }
-          ` : ''}
-        `;
-        document.head.appendChild(style);
-        }, [theme, location.pathname]);
+  // Apply CSS variables to root
+  React.useEffect(() => {
+    Object.entries(colors.cssVars).forEach(([key, value]) => {
+      document.documentElement.style.setProperty(key, value);
+    });
+  }, [theme, location.pathname]);
 
   return (
       <div className="min-h-screen flex flex-col w-full" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
@@ -194,17 +126,11 @@ export default function Layout({ children }) {
 
         {/* Mobile navigation header - only show when logged in */}
         {user && (
-        <nav className={`lg:hidden sticky top-0 z-50 bg-gradient-to-r ${colors.sidebarBg} border-b ${colors.sidebarBorder} backdrop-blur-xl shadow-sm`}>
+        <nav className={`lg:hidden sticky top-0 z-50 bg-white shadow-sm`}>
           <div className="flex items-center justify-between px-4 py-4 safe-area-inset-top">
-            {/* Logo on the left */}
-            <Link to={createPageUrl("Home")} className="flex-shrink-0">
-              <img
-                src={theme === 'afternoon'
-                  ? "https://wvgqxgximcuhqhesoycw.supabase.co/storage/v1/object/public/Image%20Storage/all_lowercase_dark_logo.png"
-                  : "https://wvgqxgximcuhqhesoycw.supabase.co/storage/v1/object/public/Image%20Storage/all_lowercase_logo.png"}
-                alt="Vony Logo"
-                className="h-12 w-auto"
-              />
+            {/* Logo on the left - italic serif style */}
+            <Link to={createPageUrl("Home")} className="font-serif italic text-2xl text-[#0A1A10] tracking-wide">
+              Vony
             </Link>
 
             {/* Hamburger menu button on the right */}
@@ -215,7 +141,7 @@ export default function Layout({ children }) {
                 e.stopPropagation();
                 setMobileMenuOpen(prev => !prev);
               }}
-              className={`p-2 rounded-lg transition-all duration-200 ${colors.hoverItem} ${colors.navText} cursor-pointer`}
+              className="p-2 rounded-lg transition-all duration-200 text-[#0A1A10] hover:bg-[#E8FCF0] cursor-pointer"
               aria-label="Toggle menu"
               aria-expanded={mobileMenuOpen}
             >
@@ -238,21 +164,20 @@ export default function Layout({ children }) {
               onClick={() => setMobileMenuOpen(false)}
             />
             {/* Menu */}
-            <div className={`lg:hidden fixed top-[72px] left-0 right-0 z-50 bg-gradient-to-b ${colors.sidebarBg} border-b ${colors.sidebarBorder} shadow-lg`}>
+            <div className="lg:hidden fixed top-[72px] left-0 right-0 z-50 bg-white border-b border-[#7AD4A0]/30 shadow-lg">
               <div className="px-4 py-3 space-y-1">
                 {navigationItems.map((item) => (
                   <Link
                     key={item.title}
                     to={item.url}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                    className={`block px-4 py-3 rounded-lg transition-all duration-200 font-medium ${
                       location.pathname === item.url
-                        ? `${colors.activeItem} shadow-sm`
-                        : `${colors.hoverItem} ${colors.navText}`
+                        ? "text-[#00A86B] bg-[#E8FCF0]"
+                        : "text-[#4A6B55] hover:text-[#00A86B] hover:bg-[#E8FCF0]"
                     }`}
                   >
-                    <item.icon className="w-5 h-5" />
-                    <span className="font-medium">{item.title}</span>
+                    {item.title}
                   </Link>
                 ))}
               </div>

@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
   DollarSign,
   Clock,
-  PiggyBank,
-  LogIn
+  PiggyBank
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
@@ -163,10 +162,10 @@ export default function Home() {
                 onClick={handleLogin}
                 disabled={isAuthenticating}
                 className="w-full text-lg py-3 font-semibold shadow-lg text-white hover:opacity-90"
-                style={{backgroundColor: '#35B276'}}
+                style={{backgroundColor: '#00A86B'}}
                 size="lg"
               >
-                {isAuthenticating ? 'Signing you in...' : <><LogIn className="w-5 h-5 mr-2" /> Sign In to Get Started</>}
+                {isAuthenticating ? 'Signing you in...' : 'Sign In to Get Started'}
               </Button>
             </CardContent>
           </Card>
