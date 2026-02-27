@@ -68,13 +68,13 @@ export default function TopNav({ location }) {
     <>
       {/* Fixed Navigation Bar */}
       <nav className="fixed top-0 left-0 right-0 z-50 h-14 bg-white shadow-sm shadow-black/5">
-        <div className="h-full px-6 md:px-10 flex items-center justify-center">
+        <div className="h-full px-6 md:px-10 flex items-center justify-between">
 
-          {/* Mobile: Hamburger Menu (Left) - positioned absolutely */}
+          {/* Mobile: Hamburger Menu (Left) */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden absolute left-6 p-2 text-[#0A1A10]"
+            className="md:hidden p-2 text-[#0A1A10]"
             aria-label="Toggle menu"
           >
             <AnimatePresence mode="wait">
@@ -102,13 +102,24 @@ export default function TopNav({ location }) {
             </AnimatePresence>
           </button>
 
-          {/* Mobile: Centered Logo */}
+          {/* Mobile: Centered Logo - positioned absolutely */}
           <Link
             to={createPageUrl("Home")}
-            className="md:hidden font-serif italic text-3xl text-[#0A1A10] tracking-wide"
+            className="md:hidden absolute left-1/2 -translate-x-1/2 font-serif italic text-3xl text-[#0A1A10] tracking-wide"
           >
             Vony
           </Link>
+
+          {/* Mobile: My Profile Button (Right) */}
+          <Link
+            to={createPageUrl("Profile")}
+            className="md:hidden px-4 py-1.5 bg-[#36CE8E] hover:bg-[#36CE8E]/85 text-[#0A1A10] font-sans text-sm font-semibold rounded-lg shadow-md shadow-black/10 transition-all duration-200"
+          >
+            My Profile
+          </Link>
+
+          {/* Desktop: Empty left spacer for balance */}
+          <div className="hidden md:block w-24"></div>
 
           {/* Desktop: Centered Nav Group (Links + Logo) */}
           <div className="hidden md:flex items-center gap-10">
@@ -175,6 +186,14 @@ export default function TopNav({ location }) {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+
+          {/* Desktop: My Profile Button (Right) */}
+          <Link
+            to={createPageUrl("Profile")}
+            className="hidden md:block px-5 py-2 bg-[#36CE8E] hover:bg-[#36CE8E]/85 text-[#0A1A10] font-sans text-sm font-semibold rounded-lg shadow-md shadow-black/10 transition-all duration-200"
+          >
+            My Profile
+          </Link>
         </div>
       </nav>
 
