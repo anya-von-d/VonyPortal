@@ -68,13 +68,13 @@ export default function TopNav({ location }) {
     <>
       {/* Fixed Navigation Bar */}
       <nav className="fixed top-0 left-0 right-0 z-50 h-14 bg-white shadow-sm shadow-black/5">
-        <div className="h-full px-6 md:px-10 flex items-center justify-between">
+        <div className="h-full px-6 md:px-10 flex items-center justify-center">
 
-          {/* Mobile: Hamburger Menu (Left) */}
+          {/* Mobile: Hamburger Menu (Left) - positioned absolutely */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 -ml-2 text-[#0A1A10]"
+            className="md:hidden absolute left-6 p-2 text-[#0A1A10]"
             aria-label="Toggle menu"
           >
             <AnimatePresence mode="wait">
@@ -102,8 +102,17 @@ export default function TopNav({ location }) {
             </AnimatePresence>
           </button>
 
-          {/* Desktop: Left Nav Links */}
+          {/* Mobile: Centered Logo */}
+          <Link
+            to={createPageUrl("Home")}
+            className="md:hidden font-serif italic text-3xl text-[#0A1A10] tracking-wide"
+          >
+            Vony
+          </Link>
+
+          {/* Desktop: Centered Nav Group (Links + Logo) */}
           <div className="hidden md:flex items-center gap-10">
+            {/* Left Nav Links */}
             {leftNavItems.map((item) => (
               <Link
                 key={item.title}
@@ -117,18 +126,16 @@ export default function TopNav({ location }) {
                 {item.title}
               </Link>
             ))}
-          </div>
 
-          {/* Center: Logo - Absolutely centered */}
-          <Link
-            to={createPageUrl("Home")}
-            className="absolute left-1/2 -translate-x-1/2 font-serif italic text-3xl text-[#0A1A10] tracking-wide"
-          >
-            Vony
-          </Link>
+            {/* Center: Logo with extra horizontal margin */}
+            <Link
+              to={createPageUrl("Home")}
+              className="font-serif italic text-3xl text-[#0A1A10] tracking-wide mx-2"
+            >
+              Vony
+            </Link>
 
-          {/* Desktop: Right Nav Links + More */}
-          <div className="hidden md:flex items-center gap-10">
+            {/* Right Nav Links */}
             {rightNavItems.map((item) => (
               <Link
                 key={item.title}
@@ -168,9 +175,6 @@ export default function TopNav({ location }) {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-
-          {/* Mobile: Empty spacer for balance */}
-          <div className="md:hidden w-10"></div>
         </div>
       </nav>
 
