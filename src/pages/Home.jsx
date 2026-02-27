@@ -3,11 +3,6 @@ import { Loan, Payment, PublicProfile } from "@/entities/all";
 import { useAuth } from "@/lib/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  DollarSign,
-  Clock,
-  PiggyBank
-} from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { formatMoney } from "@/components/utils/formatMoney";
@@ -264,10 +259,12 @@ export default function Home() {
               <PendingLoanOffers offers={pendingOffers} />
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <StatsCard title="Total Lent" value={formatMoney(totalLent)} icon={PiggyBank} color="green" change={`${myLoans.filter(l => l && l.lender_id === user.id && l.status === 'active').length} active loans`} index={0} />
-              <StatsCard title="Next Payment" value={nextPayment ? formatMoney(nextPaymentAmount) : '-'} icon={DollarSign} color="blue" change={nextPayment ? `to @${safeAllProfiles.find(p => p.user_id === nextPayment.lender_id)?.username || 'user'}` : 'N/A'} index={1} />
-              <StatsCard title="Next Payment Due" value={paymentStatus} icon={Clock} color="orange" change={nextPayment ? format(nextPayment.date, 'MMM d, yyyy') : 'N/A'} index={2} />
+            <div className="bg-[#DBFFEB] rounded-2xl p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <StatsCard title="Total Lent" value={formatMoney(totalLent)} color="green" change={`${myLoans.filter(l => l && l.lender_id === user.id && l.status === 'active').length} active loans`} index={0} />
+                <StatsCard title="Next Payment" value={nextPayment ? formatMoney(nextPaymentAmount) : '-'} color="blue" change={nextPayment ? `to @${safeAllProfiles.find(p => p.user_id === nextPayment.lender_id)?.username || 'user'}` : 'N/A'} index={1} />
+                <StatsCard title="Next Payment Due" value={paymentStatus} color="orange" change={nextPayment ? format(nextPayment.date, 'MMM d, yyyy') : 'N/A'} index={2} />
+              </div>
             </div>
 
             <div className="grid lg:grid-cols-3 gap-8">

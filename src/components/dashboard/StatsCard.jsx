@@ -33,9 +33,8 @@ export default function StatsCard({ title, value, icon: Icon, color, change, isL
     return (
       <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
         <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-2">
             <SkeletonShimmer className="h-4 w-24" />
-            <SkeletonShimmer className="h-10 w-10 rounded-xl" />
           </div>
           <SkeletonShimmer className="h-8 w-20 mb-2" />
           <SkeletonShimmer className="h-3 w-16" />
@@ -52,19 +51,11 @@ export default function StatsCard({ title, value, icon: Icon, color, change, isL
       whileHover={{ y: -4, transition: { duration: 0.2 } }}
     >
       <Card
-        style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}}
-        className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 group h-full cursor-default"
+        className="bg-white backdrop-blur-sm hover:shadow-xl transition-all duration-300 group h-full cursor-default border-0"
       >
-        <CardContent className="p-6 flex flex-col justify-between h-full">
-          <div className="flex items-center justify-between mb-4">
+        <CardContent className="p-5 flex flex-col justify-between h-full">
+          <div className="mb-2">
             <p className="text-sm font-medium text-slate-600">{title}</p>
-            <motion.div
-              className={`p-2.5 rounded-xl ${colors.bg} ring-4 ${colors.ring}`}
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              transition={{ type: "spring", stiffness: 400, damping: 17 }}
-            >
-              <Icon className={`w-5 h-5 ${colors.text}`} />
-            </motion.div>
           </div>
           <div className="flex items-end justify-between">
             <motion.p
