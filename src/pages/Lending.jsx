@@ -1339,116 +1339,126 @@ export default function Lending() {
                   </div>
                 </div>
 
-                {/* Loan History */}
-                <div className="bg-white rounded-2xl p-5 border-0">
-                  <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                    Loan History
-                  </p>
-                  <div className="grid grid-cols-3 gap-3">
-                    {/* Total Amount Lent */}
-                    <div className="rounded-xl p-4 text-center" style={{ backgroundColor: '#D0ED6F' }}>
-                      <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center mx-auto mb-2">
-                        <DollarSign className="w-4 h-4 text-[#0A1A10]" />
+                {/* Loan History + Month Repayment */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  {/* Loan History - Left */}
+                  <div className="bg-white rounded-2xl p-5 border-0">
+                    <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                      Loan History
+                    </p>
+                    <div className="space-y-3">
+                      {/* Total Amount Lent */}
+                      <div className="rounded-xl p-4 flex items-center gap-3" style={{ backgroundColor: '#D0ED6F' }}>
+                        <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0">
+                          <DollarSign className="w-4 h-4 text-[#0A1A10]" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                            Total Lent
+                          </p>
+                          <p className="text-lg font-bold text-slate-800">
+                            ${lentLoans.reduce((sum, l) => sum + (l.amount || 0), 0).toLocaleString()}
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-lg font-bold text-slate-800">
-                        ${lentLoans.reduce((sum, l) => sum + (l.amount || 0), 0).toLocaleString()}
-                      </p>
-                      <p className="text-[10px] text-slate-500 uppercase tracking-wide mt-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                        Total Lent
-                      </p>
-                    </div>
 
-                    {/* Number of Loans */}
-                    <div className="rounded-xl p-4 text-center" style={{ backgroundColor: '#83F384' }}>
-                      <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center mx-auto mb-2">
-                        <FileText className="w-4 h-4 text-[#0A1A10]" />
+                      {/* Number of Loans */}
+                      <div className="rounded-xl p-4 flex items-center gap-3" style={{ backgroundColor: '#83F384' }}>
+                        <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0">
+                          <FileText className="w-4 h-4 text-[#0A1A10]" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                            Loans
+                          </p>
+                          <p className="text-lg font-bold text-slate-800">
+                            {lentLoans.length}
+                          </p>
+                        </div>
+                        <div className="flex flex-col gap-1 flex-shrink-0">
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/70 text-[#00A86B] font-medium">
+                            {activeLoans.length} active
+                          </span>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/70 text-slate-500 font-medium">
+                            {completedLoans.length} done
+                          </span>
+                        </div>
                       </div>
-                      <p className="text-lg font-bold text-slate-800">
-                        {lentLoans.length}
-                      </p>
-                      <p className="text-[10px] text-slate-500 uppercase tracking-wide mt-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                        Loans
-                      </p>
-                      <div className="flex items-center justify-center gap-2 mt-2">
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/70 text-[#00A86B] font-medium">
-                          {activeLoans.length} active
-                        </span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/70 text-slate-500 font-medium">
-                          {completedLoans.length} done
-                        </span>
-                      </div>
-                    </div>
 
-                    {/* Friends Lent To */}
-                    <div className="rounded-xl p-4 text-center" style={{ backgroundColor: '#6EE8B5' }}>
-                      <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center mx-auto mb-2">
-                        <UserIcon className="w-4 h-4 text-[#0A1A10]" />
+                      {/* Friends Lent To */}
+                      <div className="rounded-xl p-4 flex items-center gap-3" style={{ backgroundColor: '#6EE8B5' }}>
+                        <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0">
+                          <UserIcon className="w-4 h-4 text-[#0A1A10]" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                            Friends Lent To
+                          </p>
+                          <p className="text-lg font-bold text-slate-800">
+                            {new Set(lentLoans.map(l => l.borrower_id)).size}
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-lg font-bold text-slate-800">
-                        {new Set(lentLoans.map(l => l.borrower_id)).size}
-                      </p>
-                      <p className="text-[10px] text-slate-500 uppercase tracking-wide mt-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                        Friends Lent To
-                      </p>
                     </div>
                   </div>
-                </div>
 
-                {/* Month Repayment Amount Box */}
-                {(() => {
-                  const monthEnd = endOfMonth(selectedMonth);
-                  let totalReceive = 0;
+                  {/* Right column: Month Repayment Amount + Overview stacked */}
+                  <div className="space-y-4">
+                    {/* Month Repayment Amount Box */}
+                    {(() => {
+                      const monthEnd = endOfMonth(selectedMonth);
+                      let totalReceive = 0;
 
-                  activeLoans.forEach(loan => {
-                    if (!loan.next_payment_date) return;
-                    const paymentDate = new Date(loan.next_payment_date);
-                    const paymentAmount = loan.payment_amount || 0;
+                      activeLoans.forEach(loan => {
+                        if (!loan.next_payment_date) return;
+                        const paymentDate = new Date(loan.next_payment_date);
+                        const paymentAmount = loan.payment_amount || 0;
 
-                    const addAmountIfInMonth = (date) => {
-                      if (isSameMonth(date, selectedMonth)) {
-                        totalReceive += paymentAmount;
-                      }
-                    };
+                        const addAmountIfInMonth = (date) => {
+                          if (isSameMonth(date, selectedMonth)) {
+                            totalReceive += paymentAmount;
+                          }
+                        };
 
-                    addAmountIfInMonth(paymentDate);
+                        addAmountIfInMonth(paymentDate);
 
-                    const frequency = loan.payment_frequency;
-                    if (frequency && frequency !== 'none') {
-                      let currentDate = new Date(loan.next_payment_date);
-                      let iterations = 0;
-                      while (iterations < 10) {
-                        if (frequency === 'weekly') {
-                          currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
-                        } else if (frequency === 'biweekly') {
-                          currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
-                        } else if (frequency === 'monthly') {
-                          currentDate = addMonths(currentDate, 1);
-                        } else if (frequency === 'daily') {
-                          currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
-                        } else {
-                          break;
+                        const frequency = loan.payment_frequency;
+                        if (frequency && frequency !== 'none') {
+                          let currentDate = new Date(loan.next_payment_date);
+                          let iterations = 0;
+                          while (iterations < 10) {
+                            if (frequency === 'weekly') {
+                              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
+                            } else if (frequency === 'biweekly') {
+                              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
+                            } else if (frequency === 'monthly') {
+                              currentDate = addMonths(currentDate, 1);
+                            } else if (frequency === 'daily') {
+                              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+                            } else {
+                              break;
+                            }
+                            if (currentDate > monthEnd) break;
+                            addAmountIfInMonth(currentDate);
+                            iterations++;
+                          }
                         }
-                        if (currentDate > monthEnd) break;
-                        addAmountIfInMonth(currentDate);
-                        iterations++;
-                      }
-                    }
-                  });
+                      });
 
-                  return (
-                    <div className="bg-[#83F384] rounded-xl p-3 flex items-center justify-between">
-                      <p className="text-[11px] text-[#0A1A10] uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                        {format(selectedMonth, 'MMMM')} Repayment Amount
-                      </p>
-                      <p className="text-sm font-bold text-[#0A1A10]">
-                        +${totalReceive.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </p>
-                    </div>
-                  );
-                })()}
+                      return (
+                        <div className="bg-[#83F384] rounded-xl p-3 flex items-center justify-between">
+                          <p className="text-[11px] text-[#0A1A10] uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                            {format(selectedMonth, 'MMMM')} Repayment Amount
+                          </p>
+                          <p className="text-sm font-bold text-[#0A1A10]">
+                            +${totalReceive.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </p>
+                        </div>
+                      );
+                    })()}
 
-                {/* Month Repayment Overview Box */}
-                <div className="bg-[#DBFFEB] rounded-2xl p-5">
+                    {/* Month Repayment Overview Box */}
+                    <div className="bg-[#DBFFEB] rounded-2xl p-5">
                   <div className="flex items-center justify-between mb-4">
                     <div className="relative">
                       <button
@@ -1583,6 +1593,8 @@ export default function Lending() {
                         </div>
                       ));
                     })()}
+                  </div>
+                </div>
                   </div>
                 </div>
               </motion.div>

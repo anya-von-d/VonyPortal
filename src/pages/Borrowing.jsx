@@ -829,7 +829,7 @@ export default function Borrowing() {
                   </div>
                 )}
 
-                {/* Loans Ranked By + Month Payment Amount */}
+                {/* Loans Ranked By + Month Payment Amount & Overview */}
                 {activeLoans.length > 0 && (
                   <div className="grid md:grid-cols-2 gap-4">
                     {/* Loans Ranked By - Left */}
@@ -925,102 +925,63 @@ export default function Borrowing() {
                       </div>
                     </div>
 
-                    {/* Monthly Payment Amount - Right */}
-                    <div className="bg-white rounded-2xl p-5 border-0">
-                      <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                        Monthly Payment Amount
-                      </p>
-                      <div className="space-y-3">
-                        {activeLoans.map((loan, index) => {
-                          const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
-                          const bgColors = ['#D0ED6F', '#83F384', '#6EE8B5'];
-                          return (
-                            <div key={loan.id} className="flex items-center justify-between p-3 rounded-xl" style={{ backgroundColor: bgColors[index % 3] }}>
-                              <div className="flex items-center gap-2">
-                                <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center">
-                                  <span className="text-xs font-medium text-[#00A86B]">
-                                    {lender?.full_name?.charAt(0) || '?'}
-                                  </span>
-                                </div>
-                                <span className="text-sm font-medium text-slate-700">@{lender?.username || 'user'}</span>
-                              </div>
-                              <div className="text-right">
-                                <p className="text-sm font-bold text-slate-800">
-                                  ${(loan.payment_amount || 0).toLocaleString()}
-                                </p>
-                                <p className="text-[10px] text-slate-500">/{loan.payment_frequency === 'weekly' ? 'week' : 'month'}</p>
-                              </div>
-                            </div>
-                          );
-                        })}
-                        {activeLoans.length > 0 && (
-                          <div className="border-t border-slate-100 pt-3 flex items-center justify-between">
-                            <span className="text-sm font-medium text-slate-600">Total</span>
-                            <span className="text-sm font-bold text-slate-800">
-                              ${activeLoans.reduce((sum, l) => sum + (l.payment_amount || 0), 0).toLocaleString()}/mo
-                            </span>
+                    {/* Right column: Month Payment Amount + Overview stacked */}
+                    <div className="space-y-4">
+                      {/* Month Payment Amount Box */}
+                      {(() => {
+                        const monthEnd = endOfMonth(selectedMonth);
+                        let totalSend = 0;
+
+                        activeLoans.forEach(loan => {
+                          if (!loan.next_payment_date) return;
+                          const paymentDate = new Date(loan.next_payment_date);
+                          const paymentAmount = loan.payment_amount || 0;
+
+                          const addAmountIfInMonth = (date) => {
+                            if (isSameMonth(date, selectedMonth)) {
+                              totalSend += paymentAmount;
+                            }
+                          };
+
+                          addAmountIfInMonth(paymentDate);
+
+                          const frequency = loan.payment_frequency;
+                          if (frequency && frequency !== 'none') {
+                            let currentDate = new Date(loan.next_payment_date);
+                            let iterations = 0;
+                            while (iterations < 10) {
+                              if (frequency === 'weekly') {
+                                currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
+                              } else if (frequency === 'biweekly') {
+                                currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
+                              } else if (frequency === 'monthly') {
+                                currentDate = addMonths(currentDate, 1);
+                              } else if (frequency === 'daily') {
+                                currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+                              } else {
+                                break;
+                              }
+                              if (currentDate > monthEnd) break;
+                              addAmountIfInMonth(currentDate);
+                              iterations++;
+                            }
+                          }
+                        });
+
+                        return (
+                          <div className="bg-[#83F384] rounded-xl p-3 flex items-center justify-between">
+                            <p className="text-[11px] text-[#0A1A10] uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                              {format(selectedMonth, 'MMMM')} Payment Amount
+                            </p>
+                            <p className="text-sm font-bold text-[#0A1A10]">
+                              -${totalSend.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </p>
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
+                        );
+                      })()}
 
-                {/* Month Payment Amount Box */}
-                {(() => {
-                  const monthEnd = endOfMonth(selectedMonth);
-                  let totalSend = 0;
-
-                  activeLoans.forEach(loan => {
-                    if (!loan.next_payment_date) return;
-                    const paymentDate = new Date(loan.next_payment_date);
-                    const paymentAmount = loan.payment_amount || 0;
-
-                    const addAmountIfInMonth = (date) => {
-                      if (isSameMonth(date, selectedMonth)) {
-                        totalSend += paymentAmount;
-                      }
-                    };
-
-                    addAmountIfInMonth(paymentDate);
-
-                    const frequency = loan.payment_frequency;
-                    if (frequency && frequency !== 'none') {
-                      let currentDate = new Date(loan.next_payment_date);
-                      let iterations = 0;
-                      while (iterations < 10) {
-                        if (frequency === 'weekly') {
-                          currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
-                        } else if (frequency === 'biweekly') {
-                          currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
-                        } else if (frequency === 'monthly') {
-                          currentDate = addMonths(currentDate, 1);
-                        } else if (frequency === 'daily') {
-                          currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
-                        } else {
-                          break;
-                        }
-                        if (currentDate > monthEnd) break;
-                        addAmountIfInMonth(currentDate);
-                        iterations++;
-                      }
-                    }
-                  });
-
-                  return (
-                    <div className="bg-[#83F384] rounded-xl p-3 flex items-center justify-between">
-                      <p className="text-[11px] text-[#0A1A10] uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                        {format(selectedMonth, 'MMMM')} Payment Amount
-                      </p>
-                      <p className="text-sm font-bold text-[#0A1A10]">
-                        -${totalSend.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </p>
-                    </div>
-                  );
-                })()}
-
-                {/* Month Payment Overview Box */}
-                <div className="bg-[#DBFFEB] rounded-2xl p-5">
+                      {/* Month Payment Overview Box */}
+                      <div className="bg-[#DBFFEB] rounded-2xl p-5">
                   <div className="flex items-center justify-between mb-4">
                     <div className="relative">
                       <button
@@ -1157,6 +1118,9 @@ export default function Borrowing() {
                     })()}
                   </div>
                 </div>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             )}
 
