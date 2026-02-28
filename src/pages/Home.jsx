@@ -240,7 +240,7 @@ export default function Home() {
         <div className="min-h-screen p-6"  style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
            <div className="max-w-4xl mx-auto space-y-7">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="py-5">
-              <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-center">
+              <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-left">
                 {(() => {
                   const hour = new Date().getHours();
                   const greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
@@ -248,7 +248,7 @@ export default function Home() {
                   return <>{greeting}, <span style={{color: '#83F384'}}>{user.full_name?.split(' ')[0] || 'User'}</span> {emoji}</>;
                 })()}
               </h1>
-              <p className="text-lg text-center" style={{ color: '#475569' }}>
+              <p className="text-lg text-left" style={{ color: '#475569' }}>
                 Lending between friends made simple.
               </p>
           </motion.div>
