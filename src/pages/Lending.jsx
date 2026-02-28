@@ -192,9 +192,9 @@ export default function Lending() {
         default:
           paymentAmount = totalAmount / periodInMonths;
       }
-      return { totalAmount, paymentAmount, totalInterest: totalAmount - amount };
+      return { totalAmount, paymentAmount, monthlyPayment: paymentAmount, totalInterest: totalAmount - amount };
     }
-    return { totalAmount: 0, paymentAmount: 0, totalInterest: 0 };
+    return { totalAmount: 0, paymentAmount: 0, monthlyPayment: 0, totalInterest: 0 };
   };
 
   const findUserByUsername = async (username) => {
