@@ -99,8 +99,19 @@ create table if not exists venmo_connections (
   updated_at timestamptz default now()
 );
 
+create table if not exists friendships (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references profiles(id) on delete cascade,
+  friend_id uuid references profiles(id) on delete cascade,
+  status text default 'pending',
+  is_starred boolean default false,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
 -- RLS
 alter table profiles enable row level security;
+alter table friendships enable row level security;
 alter table public_profiles enable row level security;
 alter table loans enable row level security;
 alter table loan_agreements enable row level security;
@@ -203,3 +214,19 @@ create policy "venmo_connections update own"
 create policy "venmo_connections delete own"
   on venmo_connections for delete
   using (auth.uid() = user_id);
+
+create policy "friendships read own"
+  on friendships for select
+  using (auth.uid() = user_id or auth.uid() = friend_id);
+
+create policy "friendships insert own"
+  on friendships for insert
+  with check (auth.uid() = user_id);
+
+create policy "friendships update participants"
+  on friendships for update
+  using (auth.uid() = user_id or auth.uid() = friend_id);
+
+create policy "friendships delete own"
+  on friendships for delete
+  using (auth.uid() = user_id or auth.uid() = friend_id);
