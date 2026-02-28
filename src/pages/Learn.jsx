@@ -60,17 +60,11 @@ export default function Learn() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="py-4 text-center"
+          className="py-5"
         >
-          <div className="w-16 h-16 rounded-full bg-[#35B276]/10 flex items-center justify-center mx-auto mb-4">
-            <BookOpen className="w-8 h-8 text-[#35B276]" />
-          </div>
-          <h1 className="text-3xl md:text-5xl font-bold text-slate-800 mb-3 tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-left">
             Learn
           </h1>
-          <p className="text-base md:text-lg text-slate-600 max-w-xl mx-auto">
-            Master the art of peer-to-peer lending with guides, tips, and best practices
-          </p>
         </motion.div>
 
         {/* Coming Soon Banner */}

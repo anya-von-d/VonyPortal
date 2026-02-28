@@ -296,12 +296,9 @@ export default function RecentActivityPage() {
           animate={{ opacity: 1, y: 0 }}
           className="py-5"
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-left">
             Recent Activity
           </h1>
-          <p className="text-lg text-slate-600 text-center">
-            Track all your loan offers and payments
-          </p>
         </motion.div>
 
         <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm">

@@ -244,13 +244,9 @@ export default function Home() {
                 {(() => {
                   const hour = new Date().getHours();
                   const greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
-                  const emoji = hour < 12 ? "☀️" : hour < 18 ? "✨" : "🌙";
-                  return <>{greeting}, <span style={{color: '#83F384'}}>{user.full_name?.split(' ')[0] || 'User'}</span> {emoji}</>;
+                  return <>{greeting}, <span style={{color: '#83F384'}}>{user.full_name?.split(' ')[0] || 'User'}</span></>;
                 })()}
               </h1>
-              <p className="text-lg text-left" style={{ color: '#475569' }}>
-                Lending between friends made simple.
-              </p>
           </motion.div>
 
           <div className="space-y-7">

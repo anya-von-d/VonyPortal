@@ -1135,9 +1135,6 @@ export default function Lending() {
             <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-left">
               Lending
             </h1>
-            <p className="text-lg text-left" style={{ color: '#475569' }}>
-              Create offers, track your loans, and manage repayments
-            </p>
           </motion.div>
 
           {/* Tab Navigation */}

@@ -230,10 +230,9 @@ export default function Friends() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-left">
             Friends
           </h1>
-          <p className="text-slate-500 mt-1">Manage your connections</p>
         </div>
 
         {/* Tabs */}

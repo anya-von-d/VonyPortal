@@ -225,9 +225,6 @@ export default function Borrowing() {
             <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-left">
               Borrowing
             </h1>
-            <p className="text-lg text-left" style={{ color: '#475569' }}>
-              Track your loans, make payments, and manage offers
-            </p>
           </motion.div>
 
           {/* Tab Navigation */}

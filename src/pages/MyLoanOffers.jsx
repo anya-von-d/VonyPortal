@@ -112,15 +112,12 @@ export default function MyLoanOffersPage() {
           animate={{ opacity: 1, y: 0 }}
           className="py-5"
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-left">
             My Loan Offers
           </h1>
-          <p className="text-lg text-slate-600 text-center">
-            Manage all your pending offers
-          </p>
 
           {/* Toggle Buttons */}
-          <div className="flex justify-center gap-3 mt-6">
+          <div className="flex gap-3 mt-6">
             <Button
               onClick={() => setActiveTab('received')}
               variant={activeTab === 'received' ? 'default' : 'outline'}

@@ -381,18 +381,15 @@ export default function Requests() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="py-4"
+          className="py-5"
         >
-          <h1 className="text-3xl md:text-5xl font-bold text-slate-800 mb-3 tracking-tight text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-left">
             Requests
           </h1>
-          <p className="text-base md:text-lg text-slate-600 text-center">
-            Review and manage pending requests
-          </p>
         </motion.div>
 
         {/* Tabs */}
-        <div className="flex gap-2 overflow-x-auto pb-2 justify-center">
+        <div className="flex gap-2 overflow-x-auto pb-2">
           {tabs.map(tab => (
             <Button
               key={tab.id}

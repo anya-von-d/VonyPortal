@@ -34,9 +34,9 @@ export default function QuickActions() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.2 }}
     >
-      <div className="bg-white rounded-2xl p-5 max-w-[85%] mx-auto lg:max-w-none">
+      <div className="bg-[#DBFFEB] rounded-2xl p-5 max-w-[85%] mx-auto lg:max-w-none">
         {/* Title */}
-        <p className="text-[11px] text-[#0A1A10] uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+        <p className="text-[11px] text-[#7A9A85] uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
           Quick Actions
         </p>
 
@@ -46,6 +46,7 @@ export default function QuickActions() {
             const hoverColor = hoverAccentColors[index % 4];
             const isHovered = hoveredIndex === index;
             const Icon = action.icon;
+            const cardBgColors = ['#D0ED6F', '#83F384', '#6EE8B5'];
 
             return (
               <Link key={action.title} to={createPageUrl(action.url)}>
@@ -55,11 +56,12 @@ export default function QuickActions() {
                   transition={{ duration: 0.3, delay: 0.1 + index * 0.05 }}
                   onMouseEnter={() => setHoveredIndex(index)}
                   onMouseLeave={() => setHoveredIndex(null)}
-                  className="rounded-xl p-3 md:p-4 cursor-pointer transition-all duration-200 flex items-center gap-3 bg-[#6EE8B5]"
+                  className="rounded-xl p-3 md:p-4 cursor-pointer transition-all duration-200 flex items-center gap-3"
+                  style={{ backgroundColor: cardBgColors[index % 3] }}
                 >
                   {/* Circular Icon */}
-                  <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-4 h-4 text-[#00A86B]" />
+                  <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                    <Icon className="w-4 h-4 text-[#0A1A10]" />
                   </div>
 
                   {/* Content - Title only */}

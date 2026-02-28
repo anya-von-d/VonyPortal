@@ -707,8 +707,7 @@ export default function LoanAgreements() {
       <div className="min-h-screen p-4 md:p-6 overflow-x-hidden" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
         <div className="max-w-4xl mx-auto space-y-6 overflow-hidden">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="py-5">
-            <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-center">Document Center</h1>
-            <p className="text-lg text-slate-600 text-center">View all your signed loan agreements</p>
+            <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-left">Document Center</h1>
           </motion.div>
 
           {/* Role Filter Box */}

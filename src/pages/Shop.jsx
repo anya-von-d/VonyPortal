@@ -137,9 +137,6 @@ export default function Shop() {
           <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-left">
             Financial Products
           </h1>
-          <p className="text-lg text-left" style={{ color: '#475569' }}>
-            Credit cards and loans tailored to your needs
-          </p>
         </motion.div>
 
         {/* Coming Soon Banner */}

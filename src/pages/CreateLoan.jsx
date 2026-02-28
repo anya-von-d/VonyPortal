@@ -254,12 +254,9 @@ export default function CreateLoan() {
           animate={{ opacity: 1, y: 0 }}
           className="py-5"
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-left">
             Create Loan Offer
           </h1>
-          <p className="text-lg text-slate-600 text-center">
-            Create and send a loan offer
-          </p>
         </motion.div>
 
         <div className="grid lg:grid-cols-3 gap-8">
