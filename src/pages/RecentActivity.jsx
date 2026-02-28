@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Loan, Payment, User, PublicProfile } from "@/entities/all";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Activity, ArrowUpRight, ArrowDownRight, Send, Check, X, Ban, FileText, DollarSign, Eye } from "lucide-react";
+import { Activity, ArrowUpRight, ArrowDownRight, Send, Check, X, Ban, FileText, DollarSign, Eye, ChevronDown, Users } from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const statusColors = {
   pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
@@ -147,7 +154,21 @@ export default function RecentActivityPage() {
   }
 
   if (filterStatus !== "all") {
-    allActivities = allActivities.filter(a => a.status === filterStatus);
+    if (filterStatus === 'pending_sent') {
+      allActivities = allActivities.filter(a => {
+        if (a.type !== 'loan') return false;
+        const isLender = a.lender_id === user.id;
+        return (a.status === 'pending' || !a.status) && isLender;
+      });
+    } else if (filterStatus === 'pending_received') {
+      allActivities = allActivities.filter(a => {
+        if (a.type !== 'loan') return false;
+        const isLender = a.lender_id === user.id;
+        return (a.status === 'pending' || !a.status) && !isLender;
+      });
+    } else {
+      allActivities = allActivities.filter(a => a.status === filterStatus);
+    }
   }
 
   if (filterPayment !== "all") {
@@ -249,11 +270,30 @@ export default function RecentActivityPage() {
     return { title, description, icon, status };
   };
 
-  const filterButtons = [
-    { key: 'loan', label: 'Loan Agreement', icon: FileText, color: '#D0ED6F' },
-    { key: 'payment', label: 'Payments', icon: DollarSign, color: '#83F384' },
-    { key: 'all', label: 'View Both', icon: Eye, color: '#6EE8B5' },
-  ];
+  // Get display label for the current loan filter
+  const getLoanFilterLabel = () => {
+    const labels = {
+      all: 'Loan Agreements',
+      pending_sent: 'Sent Loan Offer',
+      pending_received: 'Received Loan Offer',
+      active: 'Loan Accepted',
+      declined: 'Loan Declined',
+      cancelled: 'Loan Cancellation',
+      completed: 'Loan Completed',
+      defaulted: 'Loan Defaulted',
+    };
+    return labels[filterStatus] || 'Loan Agreements';
+  };
+
+  // Get display label for the current payment filter
+  const getPaymentFilterLabel = () => {
+    const labels = {
+      all: 'Payments',
+      sent: 'Payment Sent',
+      received: 'Payment Received',
+    };
+    return labels[filterPayment] || 'Payments';
+  };
 
   return (
     <div className="min-h-screen p-3 md:p-6" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
@@ -269,159 +309,198 @@ export default function RecentActivityPage() {
           </h1>
         </motion.div>
 
-        {/* Top Filter Box - Document Center style */}
+        {/* Top Filter Box - "Activity Involving:" */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <div className="bg-[#DBFFEB] rounded-2xl p-5">
-            <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-              Filter Activity
-            </p>
-            <div className="flex flex-col gap-3">
-              {filterButtons.map((btn) => (
-                <button
-                  key={btn.key}
+          <Card className="bg-[#DBFFEB] border-0 rounded-2xl">
+            <CardContent className="p-5">
+              <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                Activity Involving:
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Button
                   onClick={() => {
-                    setFilterType(btn.key);
-                    if (btn.key !== 'loan') setFilterStatus('all');
-                    if (btn.key !== 'payment') setFilterPayment('all');
+                    setFilterType('loan');
+                    setFilterPayment('all');
                   }}
-                  className={`rounded-xl p-3 md:p-4 text-left transition-all duration-200 cursor-pointer group flex items-center gap-3 ${
-                    filterType === btn.key ? 'ring-2 ring-[#00A86B] shadow-md' : 'hover:opacity-90'
+                  variant={filterType === 'loan' ? 'default' : 'outline'}
+                  className={`flex-1 min-w-[100px] ${
+                    filterType === 'loan'
+                      ? 'bg-[#00A86B] hover:bg-[#0D9B76] text-white'
+                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                   }`}
-                  style={{ backgroundColor: btn.color }}
                 >
-                  <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
-                    <btn.icon className="w-4 h-4 text-[#0A1A10]" />
-                  </div>
-                  <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
-                    {btn.label}
-                  </p>
-                </button>
-              ))}
-            </div>
-          </div>
+                  <FileText className="w-4 h-4 mr-2" />
+                  Loan Agreement
+                </Button>
+                <Button
+                  onClick={() => {
+                    setFilterType('payment');
+                    setFilterStatus('all');
+                  }}
+                  variant={filterType === 'payment' ? 'default' : 'outline'}
+                  className={`flex-1 min-w-[100px] ${
+                    filterType === 'payment'
+                      ? 'bg-[#00A86B] hover:bg-[#0D9B76] text-white'
+                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  <DollarSign className="w-4 h-4 mr-2" />
+                  Payments
+                </Button>
+                <Button
+                  onClick={() => {
+                    setFilterType('all');
+                    setFilterStatus('all');
+                    setFilterPayment('all');
+                  }}
+                  variant={filterType === 'all' ? 'default' : 'outline'}
+                  className={`flex-1 min-w-[100px] ${
+                    filterType === 'all'
+                      ? 'bg-[#00A86B] hover:bg-[#0D9B76] text-white'
+                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  <Eye className="w-4 h-4 mr-2" />
+                  View Both
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </motion.div>
 
-        {/* Activity List Box - Document Center style */}
+        {/* Activity List Box */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <div className="bg-[#DBFFEB] rounded-2xl p-5">
-            {/* Header with label and conditional filter dropdown */}
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                {filterType === 'loan' ? 'Loan Activity' : filterType === 'payment' ? 'Payment Activity' : 'All Activity'}
-              </p>
+          <Card className="bg-[#DBFFEB] border-0 rounded-2xl">
+            <CardContent className="p-5">
+              {/* Header with label and conditional dropdown */}
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                  {filterType === 'loan' ? 'Loan Activity' : filterType === 'payment' ? 'Payment Activity' : 'All Activity'}
+                </p>
 
-              {/* Loan Agreement filter - shows when loan type selected */}
-              {filterType === 'loan' && (
-                <Select
-                  value={filterStatus}
-                  onValueChange={setFilterStatus}
-                >
-                  <SelectTrigger className="w-auto h-7 text-xs bg-white border-slate-200 gap-1 px-2">
-                    <SelectValue>
-                      {filterStatus === 'all' && 'All Statuses'}
-                      {filterStatus === 'pending' && 'Pending'}
-                      {filterStatus === 'active' && 'Active'}
-                      {filterStatus === 'completed' && 'Completed'}
-                      {filterStatus === 'cancelled' && 'Cancelled'}
-                      {filterStatus === 'declined' && 'Declined'}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
-                    <SelectItem value="declined">Declined</SelectItem>
-                  </SelectContent>
-                </Select>
+                {/* Loan Agreement dropdown - only shows when loan type selected */}
+                {filterType === 'loan' && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="bg-white border-slate-200 text-slate-600 hover:bg-slate-50 gap-2">
+                        <span>{getLoanFilterLabel()}</span>
+                        <ChevronDown className="w-3.5 h-3.5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48 bg-white">
+                      <DropdownMenuItem onClick={() => setFilterStatus('all')} className={filterStatus === 'all' ? 'bg-slate-100' : ''}>
+                        View All
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setFilterStatus('pending_sent')} className={filterStatus === 'pending_sent' ? 'bg-slate-100' : ''}>
+                        Sent Loan Offer
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setFilterStatus('pending_received')} className={filterStatus === 'pending_received' ? 'bg-slate-100' : ''}>
+                        Received Loan Offer
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setFilterStatus('active')} className={filterStatus === 'active' ? 'bg-slate-100' : ''}>
+                        Loan Accepted
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setFilterStatus('declined')} className={filterStatus === 'declined' ? 'bg-slate-100' : ''}>
+                        Loan Declined
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setFilterStatus('cancelled')} className={filterStatus === 'cancelled' ? 'bg-slate-100' : ''}>
+                        Loan Cancellation
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setFilterStatus('completed')} className={filterStatus === 'completed' ? 'bg-slate-100' : ''}>
+                        Loan Completed
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+
+                {/* Payment dropdown - only shows when payment type selected */}
+                {filterType === 'payment' && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="bg-white border-slate-200 text-slate-600 hover:bg-slate-50 gap-2">
+                        <span>{getPaymentFilterLabel()}</span>
+                        <ChevronDown className="w-3.5 h-3.5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-44 bg-white">
+                      <DropdownMenuItem onClick={() => setFilterPayment('all')} className={filterPayment === 'all' ? 'bg-slate-100' : ''}>
+                        View All
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setFilterPayment('sent')} className={filterPayment === 'sent' ? 'bg-slate-100' : ''}>
+                        Payment Sent
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setFilterPayment('received')} className={filterPayment === 'received' ? 'bg-slate-100' : ''}>
+                        Payment Received
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </div>
+
+              {/* Activity Items */}
+              {allActivities.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-slate-500">
+                  <Activity className="w-10 h-10 opacity-40 mb-2" />
+                  <p className="text-sm">No activity found</p>
+                  <p className="text-xs text-slate-400 mt-1">Try adjusting your filters</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {allActivities.map((activity, index) => {
+                    const { title, description, icon: Icon, status } = getActivityInfo(activity);
+
+                    return (
+                      <motion.div
+                        key={`${activity.type}-${activity.id}-${index}`}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.03 }}
+                        className="rounded-xl p-3 md:p-4 flex items-center gap-3 group hover:opacity-90 transition-all duration-200"
+                        style={{ backgroundColor: bgColors[index % 3] }}
+                      >
+                        {/* Circular Icon */}
+                        <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                          <Icon className="w-4 h-4 text-[#0A1A10]" />
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors truncate">
+                            {title}
+                          </p>
+                          <p className="text-xs text-[#0A1A10]/60 mt-0.5">
+                            {description}
+                          </p>
+                        </div>
+
+                        {/* Status Badge */}
+                        {status && (
+                          <Badge className={`${statusColors[status]} border font-medium capitalize text-[10px] flex-shrink-0`}>
+                            {status}
+                          </Badge>
+                        )}
+                      </motion.div>
+                    );
+                  })}
+                </div>
               )}
 
-              {/* Payment filter - shows when payment type selected */}
-              {filterType === 'payment' && (
-                <Select
-                  value={filterPayment}
-                  onValueChange={setFilterPayment}
-                >
-                  <SelectTrigger className="w-auto h-7 text-xs bg-white border-slate-200 gap-1 px-2">
-                    <SelectValue>
-                      {filterPayment === 'all' && 'All Payments'}
-                      {filterPayment === 'sent' && 'Sent'}
-                      {filterPayment === 'received' && 'Received'}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Payments</SelectItem>
-                    <SelectItem value="sent">Sent</SelectItem>
-                    <SelectItem value="received">Received</SelectItem>
-                  </SelectContent>
-                </Select>
+              {/* Activity Count */}
+              {allActivities.length > 0 && (
+                <div className="text-center text-xs text-slate-500 mt-4">
+                  Showing {allActivities.length} {allActivities.length === 1 ? 'activity' : 'activities'}
+                </div>
               )}
-            </div>
-
-            {/* Activity Items */}
-            {allActivities.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-slate-500">
-                <Activity className="w-10 h-10 opacity-40 mb-2" />
-                <p className="text-sm">No activity found</p>
-                <p className="text-xs text-slate-400 mt-1">Try adjusting your filters</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {allActivities.map((activity, index) => {
-                  const { title, description, icon: Icon, status } = getActivityInfo(activity);
-
-                  return (
-                    <motion.div
-                      key={`${activity.type}-${activity.id}-${index}`}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.03 }}
-                      className="rounded-xl p-3 md:p-4 flex items-center gap-3 group hover:opacity-90 transition-all duration-200"
-                      style={{ backgroundColor: bgColors[index % 3] }}
-                    >
-                      {/* Circular Icon */}
-                      <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
-                        <Icon className="w-4 h-4 text-[#0A1A10]" />
-                      </div>
-
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors truncate">
-                          {title}
-                        </p>
-                        <p className="text-xs text-[#0A1A10]/60 mt-0.5">
-                          {description}
-                        </p>
-                      </div>
-
-                      {/* Status Badge */}
-                      {status && (
-                        <Badge className={`${statusColors[status]} border font-medium capitalize text-[10px] flex-shrink-0`}>
-                          {status}
-                        </Badge>
-                      )}
-                    </motion.div>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Activity Count */}
-            {allActivities.length > 0 && (
-              <div className="text-center text-xs text-slate-500 mt-4">
-                Showing {allActivities.length} {allActivities.length === 1 ? 'activity' : 'activities'}
-              </div>
-            )}
-          </div>
+            </CardContent>
+          </Card>
         </motion.div>
       </div>
     </div>
