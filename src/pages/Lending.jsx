@@ -73,7 +73,10 @@ export default function Lending() {
     payment_frequency: 'monthly',
     purpose: '',
     is_repeating: false,
-    repeating_frequency: 'monthly',
+    repeating_frequency: 'weekly',
+    repeating_day_of_week: 'monday',
+    repeating_day_of_month: '1',
+    repeating_start_date: '',
     repeating_end_date: '',
     first_payment_date: ''
   });
@@ -1404,36 +1407,74 @@ export default function Lending() {
 
                             {/* Repeating Options */}
                             {formData.is_repeating && (
-                              <div className="grid sm:grid-cols-2 gap-4 p-4 bg-[#DBFFEB] rounded-xl">
-                                <div className="space-y-2">
-                                  <Label className="flex items-center gap-2">
-                                    <Calendar className="w-4 h-4 text-[#00A86B]" />
-                                    Payment Frequency
-                                  </Label>
+                              <div className="p-4 bg-[#DBFFEB] rounded-xl space-y-3">
+                                <div className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
+                                  <span>Payments will be due</span>
                                   <Select
                                     value={formData.repeating_frequency}
                                     onValueChange={(value) => handleInputChange('repeating_frequency', value)}
                                   >
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Select frequency" />
+                                    <SelectTrigger className="w-auto h-8 px-3 bg-white">
+                                      <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="weekly">Weekly</SelectItem>
-                                      <SelectItem value="biweekly">Bi-weekly</SelectItem>
-                                      <SelectItem value="monthly">Monthly</SelectItem>
+                                      <SelectItem value="weekly">weekly</SelectItem>
+                                      <SelectItem value="monthly">monthly</SelectItem>
                                     </SelectContent>
                                   </Select>
+                                  <span>on</span>
+                                  {formData.repeating_frequency === 'weekly' ? (
+                                    <Select
+                                      value={formData.repeating_day_of_week}
+                                      onValueChange={(value) => handleInputChange('repeating_day_of_week', value)}
+                                    >
+                                      <SelectTrigger className="w-auto h-8 px-3 bg-white">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="monday">Monday</SelectItem>
+                                        <SelectItem value="tuesday">Tuesday</SelectItem>
+                                        <SelectItem value="wednesday">Wednesday</SelectItem>
+                                        <SelectItem value="thursday">Thursday</SelectItem>
+                                        <SelectItem value="friday">Friday</SelectItem>
+                                        <SelectItem value="saturday">Saturday</SelectItem>
+                                        <SelectItem value="sunday">Sunday</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  ) : (
+                                    <Select
+                                      value={formData.repeating_day_of_month}
+                                      onValueChange={(value) => handleInputChange('repeating_day_of_month', value)}
+                                    >
+                                      <SelectTrigger className="w-auto h-8 px-3 bg-white">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {Array.from({ length: 28 }, (_, i) => i + 1).map((day) => (
+                                          <SelectItem key={day} value={day.toString()}>
+                                            {day}{day === 1 ? 'st' : day === 2 ? 'nd' : day === 3 ? 'rd' : 'th'}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  )}
                                 </div>
-                                <div className="space-y-2">
-                                  <Label className="flex items-center gap-2">
-                                    <Calendar className="w-4 h-4 text-[#00A86B]" />
-                                    End Date
-                                  </Label>
+                                <div className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
+                                  <span>Starting on</span>
+                                  <Input
+                                    type="date"
+                                    value={formData.repeating_start_date}
+                                    onChange={(e) => handleInputChange('repeating_start_date', e.target.value)}
+                                    min={format(new Date(), 'yyyy-MM-dd')}
+                                    className="w-auto h-8 px-3 bg-white"
+                                  />
+                                  <span>and ending on</span>
                                   <Input
                                     type="date"
                                     value={formData.repeating_end_date}
                                     onChange={(e) => handleInputChange('repeating_end_date', e.target.value)}
-                                    min={format(new Date(), 'yyyy-MM-dd')}
+                                    min={formData.repeating_start_date || format(new Date(), 'yyyy-MM-dd')}
+                                    className="w-auto h-8 px-3 bg-white"
                                   />
                                 </div>
                               </div>
@@ -1546,17 +1587,17 @@ export default function Lending() {
                           {isSubmitting ? "Sending..." : (loanType === 'flexible' ? "Send Quick Repayment Request" : "Send Loan Offer")}
                         </Button>
                       </form>
-
-                      {/* Will Your Payment Request Repeat? Info Box - Only show for Quick Payment Request */}
-                      {loanType === 'flexible' && (
-                        <div className="bg-[#83F384] rounded-2xl p-4 mt-5">
-                          <p className="text-sm font-semibold text-slate-800 mb-2">Will Your Payment Request Repeat?</p>
-                          <p className="text-xs text-slate-700 leading-relaxed">
-                            If you are having money sent to you for a monthly bill you split or a regular shared expense like streaming subscriptions, consider creating a repeating request. Fill in the form once and we will help both of you keep track of payments each time the bill comes up for as long as you need.
-                          </p>
-                        </div>
-                      )}
                   </div>
+
+                  {/* Will Your Payment Request Repeat? Info Box - Only show for Quick Payment Request */}
+                  {loanType === 'flexible' && (
+                    <div className="bg-[#83F384] rounded-2xl p-4 mt-4">
+                      <p className="text-sm font-semibold text-slate-800 mb-2">Will Your Payment Request Repeat?</p>
+                      <p className="text-xs text-slate-700 leading-relaxed">
+                        If you are having money sent to you for a monthly bill you split or a regular shared expense like streaming subscriptions, consider creating a repeating request. Fill in the form once and we will help both of you keep track of payments each time the bill comes up for as long as you need.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Summary Sidebar */}
