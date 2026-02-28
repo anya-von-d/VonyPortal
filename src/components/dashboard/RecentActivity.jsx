@@ -39,7 +39,7 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
       >
         <div className="bg-[#DBFFEB] rounded-2xl p-5 max-w-[85%] mx-auto lg:max-w-none">
           <p className="text-[11px] text-[#7A9A85] uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-            Recent Activity
+            Activity
           </p>
           <div className="relative">
             <div className="max-h-[380px] overflow-y-auto space-y-3">
@@ -95,24 +95,25 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
       const otherParty = getUserById(otherPartyId);
       const amount = `$${activity.amount?.toLocaleString() || '0'}`;
       const username = `@${otherParty?.username || 'user'}`;
+      const reason = activity.purpose || 'Reason';
 
       if (activity.status === 'pending' || !activity.status) {
-        title = isLender ? `Sent ${amount} loan offer to ${username}` : `Received ${amount} loan offer from ${username}`;
+        title = isLender ? `Sent ${amount} loan offer to ${username} for ${reason}` : `Received ${amount} loan offer from ${username} for ${reason}`;
         icon = isLender ? Send : ArrowDownRight;
       } else if (activity.status === 'active') {
-        title = isLender ? `${username} accepted your ${amount} loan` : `You accepted ${amount} loan from ${username}`;
+        title = isLender ? `${username} accepted your ${amount} loan for ${reason}` : `You accepted ${amount} loan from ${username} for ${reason}`;
         icon = Check;
       } else if (activity.status === 'declined') {
-        title = isLender ? `${username} declined your ${amount} loan` : `You declined ${amount} loan from ${username}`;
+        title = isLender ? `${username} declined your ${amount} loan for ${reason}` : `You declined ${amount} loan from ${username} for ${reason}`;
         icon = X;
       } else if (activity.status === 'cancelled') {
-        title = isLender ? `You cancelled ${amount} loan offer to ${username}` : `${username} cancelled their ${amount} loan offer`;
+        title = isLender ? `You cancelled ${amount} loan offer to ${username} for ${reason}` : `${username} cancelled their ${amount} loan offer for ${reason}`;
         icon = Ban;
       } else if (activity.status === 'completed') {
-        title = isLender ? `${username} fully repaid your ${amount} loan` : `You fully repaid ${amount} loan to ${username}`;
+        title = isLender ? `${username} fully repaid your ${amount} loan for ${reason}` : `You fully repaid ${amount} loan to ${username} for ${reason}`;
         icon = Check;
       } else {
-        title = isLender ? `${amount} loan to ${username}` : `${amount} loan from ${username}`;
+        title = isLender ? `${amount} loan to ${username} for ${reason}` : `${amount} loan from ${username} for ${reason}`;
         icon = Activity;
       }
 
@@ -147,7 +148,7 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
         {/* Title */}
         <div className="flex items-center justify-between mb-4">
           <p className="text-[11px] text-[#7A9A85] uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-            Recent Activity
+            Activity
           </p>
           <Link to={createPageUrl("RecentActivity")}>
             <Button variant="ghost" size="sm" className="text-[#00A86B] hover:text-[#0D9B76] hover:bg-transparent text-xs">

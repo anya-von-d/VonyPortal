@@ -550,20 +550,13 @@ export default function Requests() {
                             </div>
                             <div className="flex-1">
                               <p className="font-semibold text-slate-800">
-                                @{lender?.username || 'unknown'} wants to lend you ${offer.amount?.toLocaleString()}
+                                @{lender?.username || 'unknown'} wants to lend you ${offer.amount?.toLocaleString()} for {offer.purpose || 'Reason'}
                               </p>
                               <p className="text-xs text-slate-600">
                                 {offer.interest_rate}% APR · {offer.repayment_period} months · ${offer.payment_amount?.toFixed(2)}/{offer.payment_frequency || 'monthly'}
                               </p>
                             </div>
                           </div>
-
-                          {offer.purpose && (
-                            <div className="bg-white/50 rounded-lg p-3">
-                              <p className="text-xs font-medium text-slate-600 mb-1">Purpose:</p>
-                              <p className="text-sm text-slate-800">{offer.purpose}</p>
-                            </div>
-                          )}
 
                           <div className="flex gap-2 justify-end">
                             <Button
@@ -619,7 +612,7 @@ export default function Requests() {
                             </div>
                             <div>
                               <p className="font-semibold text-slate-800">
-                                ${offer.amount?.toLocaleString()} to @{borrower?.username || 'unknown'}
+                                ${offer.amount?.toLocaleString()} to @{borrower?.username || 'unknown'} for {offer.purpose || 'Reason'}
                               </p>
                               <p className="text-xs text-slate-600">
                                 {offer.interest_rate}% APR · Awaiting acceptance

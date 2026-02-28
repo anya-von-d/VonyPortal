@@ -167,60 +167,61 @@ export default function RecentActivityPage() {
       const otherParty = getUserById(otherPartyId);
       const amount = `$${activity.amount?.toLocaleString() || '0'}`;
       const username = `@${otherParty?.username || 'user'}`;
+      const reason = activity.purpose || 'Reason';
 
       // Determine the activity description based on status and role
       if (activity.status === 'pending' || !activity.status) {
         // Loan offer sent or received
         if (isLender) {
-          title = `Sent ${amount} loan offer to ${username}`;
+          title = `Sent ${amount} loan offer to ${username} for ${reason}`;
           icon = <Send className="w-5 h-5 text-green-600" />;
           iconBg = 'bg-green-100';
         } else {
-          title = `Received ${amount} loan offer from ${username}`;
+          title = `Received ${amount} loan offer from ${username} for ${reason}`;
           icon = <ArrowDownRight className="w-5 h-5 text-blue-600" />;
           iconBg = 'bg-blue-100';
         }
       } else if (activity.status === 'active') {
         // Loan accepted
         if (isLender) {
-          title = `${username} accepted your ${amount} loan offer`;
+          title = `${username} accepted your ${amount} loan for ${reason}`;
           icon = <Check className="w-5 h-5 text-green-600" />;
           iconBg = 'bg-green-100';
         } else {
-          title = `You accepted ${amount} loan from ${username}`;
+          title = `You accepted ${amount} loan from ${username} for ${reason}`;
           icon = <Check className="w-5 h-5 text-green-600" />;
           iconBg = 'bg-green-100';
         }
       } else if (activity.status === 'declined') {
         // Loan declined
         if (isLender) {
-          title = `${username} declined your ${amount} loan offer`;
+          title = `${username} declined your ${amount} loan for ${reason}`;
           icon = <X className="w-5 h-5 text-red-600" />;
           iconBg = 'bg-red-100';
         } else {
-          title = `You declined ${amount} loan from ${username}`;
+          title = `You declined ${amount} loan from ${username} for ${reason}`;
           icon = <X className="w-5 h-5 text-red-600" />;
           iconBg = 'bg-red-100';
         }
       } else if (activity.status === 'cancelled') {
         // Loan cancelled by lender
         if (isLender) {
-          title = `You cancelled ${amount} loan offer to ${username}`;
+          title = `You cancelled ${amount} loan offer to ${username} for ${reason}`;
           icon = <Ban className="w-5 h-5 text-gray-600" />;
           iconBg = 'bg-gray-100';
         } else {
-          title = `${username} cancelled their ${amount} loan offer`;
+          title = `${username} cancelled their ${amount} loan offer for ${reason}`;
           icon = <Ban className="w-5 h-5 text-gray-600" />;
           iconBg = 'bg-gray-100';
         }
       } else if (activity.status === 'completed') {
         // Loan fully paid off
         if (isLender) {
-          title = `${username} fully repaid your ${amount} loan`;
+          title = `${username} fully repaid your ${amount} loan for ${reason}`;
           icon = <Check className="w-5 h-5 text-blue-600" />;
           iconBg = 'bg-blue-100';
         } else {
-          title = `You fully repaid ${amount} loan to ${username}`;
+          title = `You fully repaid ${amount} loan to ${username} for ${reason}`;
           icon = <Check className="w-5 h-5 text-blue-600" />;
           iconBg = 'bg-blue-100';
         }
@@ -297,7 +298,7 @@ export default function RecentActivityPage() {
           className="py-5"
         >
           <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-left">
-            Recent Activity
+            Activity
           </h1>
         </motion.div>
 

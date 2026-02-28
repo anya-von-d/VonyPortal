@@ -961,6 +961,11 @@ export default function Lending() {
           <Badge className={`${getStatusColor(loan?.status)} capitalize`}>{loan?.status || 'active'}</Badge>
         </div>
 
+        <div className="bg-[#DBFFEB] rounded-xl p-4 mb-1">
+          <p className="text-xs text-slate-600 mb-1">Purpose</p>
+          <p className="text-sm font-semibold text-slate-800">{loan?.purpose || agreement.purpose || 'Reason'}</p>
+        </div>
+
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-[#DBFFEB] rounded-xl p-4">
             <p className="text-xs text-slate-600 mb-1">Loan Amount</p>
@@ -1309,6 +1314,7 @@ export default function Lending() {
                                     </span>
                                   </div>
                                   <span className="text-sm font-medium text-slate-700">@{borrower?.username || 'user'}</span>
+                                    <span className="text-xs text-slate-400 truncate max-w-[100px]">· {loan.purpose || 'Reason'}</span>
                                 </div>
                                 <span className="text-xs text-slate-500">{percentPaid}%</span>
                               </div>
@@ -2094,12 +2100,10 @@ export default function Lending() {
                       Loan Summary
                     </p>
                     <div className="space-y-3">
-                      {formData.purpose && (
-                        <div className="pb-2 border-b border-[#83F384]">
-                          <span className="text-slate-600 text-sm">For:</span>
-                          <p className="font-medium text-slate-800">{formData.purpose}</p>
-                        </div>
-                      )}
+                      <div className="pb-2 border-b border-[#83F384] flex items-baseline gap-1">
+                        <span className="text-slate-600 text-sm flex-shrink-0">For:</span>
+                        <p className="font-medium text-slate-800 truncate">{formData.purpose || 'Reason'}</p>
+                      </div>
                       {/* For repeating payments, show per payment amount and number of payments */}
                       {loanType === 'flexible' && formData.is_repeating && formData.repeating_num_payments ? (
                         <>
@@ -2209,15 +2213,11 @@ export default function Lending() {
                                     </div>
                                     <span>@{borrower?.username || 'user'}</span>
                                     <span className="text-slate-400">•</span>
+                                    <span className="text-slate-500 truncate max-w-[120px]">{manageLoanSelected.purpose || 'Reason'}</span>
+                                    <span className="text-slate-400">•</span>
                                     <span className="text-[#00A86B] font-medium">${manageLoanSelected.amount?.toLocaleString()}</span>
                                     {manageLoanSelected.status === 'cancelled' && (
                                       <span className="text-red-500 text-xs font-medium">(Cancelled)</span>
-                                    )}
-                                    {manageLoanSelected.purpose && (
-                                      <>
-                                        <span className="text-slate-400">•</span>
-                                        <span className="text-slate-500 truncate">{manageLoanSelected.purpose}</span>
-                                      </>
                                     )}
                                   </div>
                                 );
@@ -2237,15 +2237,11 @@ export default function Lending() {
                                     </div>
                                     <span>@{borrower?.username || 'user'}</span>
                                     <span className="text-slate-400">•</span>
+                                    <span className="text-slate-500 truncate max-w-[120px]">{loan.purpose || 'Reason'}</span>
+                                    <span className="text-slate-400">•</span>
                                     <span className="text-[#00A86B] font-medium">${loan.amount?.toLocaleString()}</span>
                                     {loan.status === 'cancelled' && (
                                       <span className="text-red-500 text-xs font-medium">(Cancelled)</span>
-                                    )}
-                                    {loan.purpose && (
-                                      <>
-                                        <span className="text-slate-400">•</span>
-                                        <span className="text-slate-500">{loan.purpose}</span>
-                                      </>
                                     )}
                                   </div>
                                 </SelectItem>

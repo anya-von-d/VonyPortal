@@ -439,6 +439,11 @@ export default function Borrowing() {
           <Badge className={`${getStatusColor(loan?.status)} capitalize`}>{loan?.status || 'active'}</Badge>
         </div>
 
+        <div className="bg-[#DBFFEB] rounded-xl p-4 mb-1">
+          <p className="text-xs text-slate-600 mb-1">Purpose</p>
+          <p className="text-sm font-semibold text-slate-800">{loan?.purpose || agreement.purpose || 'Reason'}</p>
+        </div>
+
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-[#DBFFEB] rounded-xl p-4">
             <p className="text-xs text-slate-600 mb-1">Loan Amount</p>
@@ -772,6 +777,7 @@ export default function Borrowing() {
                                       </span>
                                     </div>
                                     <span className="text-sm font-medium text-slate-700">@{lender?.username || 'user'}</span>
+                                    <span className="text-xs text-slate-400 truncate max-w-[100px]">· {loan.purpose || 'Reason'}</span>
                                   </div>
                                   <span className="text-xs text-slate-500">{percentPaid}%</span>
                                 </div>
@@ -1170,15 +1176,11 @@ export default function Borrowing() {
                                     </div>
                                     <span>@{lender?.username || 'user'}</span>
                                     <span className="text-slate-400">•</span>
+                                    <span className="text-slate-500 truncate max-w-[120px]">{manageLoanSelected.purpose || 'Reason'}</span>
+                                    <span className="text-slate-400">•</span>
                                     <span className="text-[#00A86B] font-medium">${manageLoanSelected.amount?.toLocaleString()}</span>
                                     {manageLoanSelected.status === 'cancelled' && (
                                       <span className="text-red-500 text-xs font-medium">(Cancelled)</span>
-                                    )}
-                                    {manageLoanSelected.purpose && (
-                                      <>
-                                        <span className="text-slate-400">•</span>
-                                        <span className="text-slate-500 truncate">{manageLoanSelected.purpose}</span>
-                                      </>
                                     )}
                                   </div>
                                 );
@@ -1198,15 +1200,11 @@ export default function Borrowing() {
                                     </div>
                                     <span>@{lender?.username || 'user'}</span>
                                     <span className="text-slate-400">•</span>
+                                    <span className="text-slate-500 truncate max-w-[120px]">{loan.purpose || 'Reason'}</span>
+                                    <span className="text-slate-400">•</span>
                                     <span className="text-[#00A86B] font-medium">${loan.amount?.toLocaleString()}</span>
                                     {loan.status === 'cancelled' && (
                                       <span className="text-red-500 text-xs font-medium">(Cancelled)</span>
-                                    )}
-                                    {loan.purpose && (
-                                      <>
-                                        <span className="text-slate-400">•</span>
-                                        <span className="text-slate-500">{loan.purpose}</span>
-                                      </>
                                     )}
                                   </div>
                                 </SelectItem>
