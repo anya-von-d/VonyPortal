@@ -37,8 +37,8 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.3 }}
       >
-        <div className="bg-[#DBFFEB] rounded-2xl p-6 md:p-8 lg:p-10 max-w-[85%] mx-auto lg:max-w-none">
-          <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#7A9A85] mb-5">
+        <div className="bg-[#DBFFEB] rounded-2xl p-5 max-w-[85%] mx-auto lg:max-w-none">
+          <p className="text-[11px] text-[#7A9A85] uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
             Recent Activity
           </p>
           <div className="relative">
@@ -143,10 +143,10 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.3 }}
     >
-      <div className="bg-[#DBFFEB] rounded-2xl p-6 md:p-8 lg:p-10 max-w-[85%] mx-auto lg:max-w-none">
+      <div className="bg-[#DBFFEB] rounded-2xl p-5 max-w-[85%] mx-auto lg:max-w-none">
         {/* Title */}
-        <div className="flex items-center justify-between mb-5">
-          <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#7A9A85]">
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-[11px] text-[#7A9A85] uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
             Recent Activity
           </p>
           <Link to={createPageUrl("RecentActivity")}>

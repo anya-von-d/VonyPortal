@@ -593,7 +593,7 @@ export default function Home() {
               >
                 <Card className="bg-[#DBFFEB] border-0 rounded-2xl overflow-hidden h-full">
                   <CardContent className="p-5 h-full flex flex-col">
-                    <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                    <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                       Monthly Overview
                     </p>
 

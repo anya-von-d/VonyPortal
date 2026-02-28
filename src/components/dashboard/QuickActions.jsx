@@ -34,14 +34,14 @@ export default function QuickActions() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.2 }}
     >
-      <div className="bg-[#6EE8B5] rounded-2xl p-6 md:p-8 lg:p-10 max-w-[85%] mx-auto lg:max-w-none">
+      <div className="bg-[#6EE8B5] rounded-2xl p-5 max-w-[85%] mx-auto lg:max-w-none">
         {/* Title */}
-        <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#0A1A10] mb-5">
+        <p className="text-[11px] text-[#0A1A10] uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
           Quick Actions
         </p>
 
         {/* Cards */}
-        <div className="space-y-3">
+        <div className="flex flex-col gap-3">
           {actions.map((action, index) => {
             const hoverColor = hoverAccentColors[index % 4];
             const isHovered = hoveredIndex === index;
