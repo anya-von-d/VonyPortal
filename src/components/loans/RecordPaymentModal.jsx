@@ -121,8 +121,8 @@ const generateTransactionId = () => {
 };
 
 export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, isLender = false, currentUserId = null }) {
-  const [amount, setAmount] = useState(loan.payment_amount?.toFixed(2) || "");
-  const [paymentMethod, setPaymentMethod] = useState("");
+  const [amount, setAmount] = useState(loan._prefillAmount || loan.payment_amount?.toFixed(2) || "");
+  const [paymentMethod, setPaymentMethod] = useState(loan._prefillMethod || "");
   const [notes, setNotes] = useState("");
   const [paymentDate, setPaymentDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [isProcessing, setIsProcessing] = useState(false);
