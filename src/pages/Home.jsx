@@ -258,7 +258,7 @@ export default function Home() {
               <PendingLoanOffers offers={pendingOffers} />
             )}
 
-            <div className="bg-[#DBFFEB] rounded-2xl p-6">
+            <div className="bg-[#DBFFEB] rounded-2xl p-5">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Pie Chart Card with Carousel */}
                 <motion.div
@@ -267,130 +267,128 @@ export default function Home() {
                   transition={{ duration: 0.4, ease: "easeOut" }}
                   className="relative"
                 >
-                  {/* Left Arrow */}
-                  <button
-                    onClick={() => setOverviewType(overviewType === 'lending' ? 'borrowing' : 'lending')}
-                    className="absolute left-[-12px] top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors duration-200"
-                    style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00A86B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
-                  </button>
-
-                  {/* Right Arrow */}
-                  <button
-                    onClick={() => setOverviewType(overviewType === 'lending' ? 'borrowing' : 'lending')}
-                    className="absolute right-[-12px] top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors duration-200"
-                    style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00A86B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                  </button>
-
-                  <Card className="bg-white backdrop-blur-sm h-full cursor-default border-0 overflow-hidden">
-                    <CardContent className="p-5 flex flex-col items-center justify-center h-full">
-                      <motion.div
-                        key={overviewType}
-                        initial={{ opacity: 0, x: overviewType === 'lending' ? -20 : 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: overviewType === 'lending' ? 20 : -20 }}
-                        transition={{ duration: 0.3, ease: "easeOut" }}
-                        className="flex flex-col items-center"
+                  {/* Title */}
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                      {overviewType === 'lending' ? 'Lending Overview' : 'Borrowing Overview'}
+                    </p>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => setOverviewType(overviewType === 'lending' ? 'borrowing' : 'lending')}
+                        className="w-7 h-7 rounded-full bg-white/50 hover:bg-white/80 flex items-center justify-center transition-colors duration-200"
                       >
-                        <p className="text-sm font-medium text-slate-600 mb-3">
-                          {overviewType === 'lending' ? 'Lending Overview' : 'Borrowing Overview'}
-                        </p>
-                        {(() => {
-                          if (overviewType === 'lending') {
-                            const lentLoans = myLoans.filter(l => l && l.lender_id === user.id && l.status === 'active');
-                            const totalLentAmount = lentLoans.reduce((sum, loan) => sum + (loan.total_amount || loan.amount || 0), 0);
-                            const totalRepaid = lentLoans.reduce((sum, loan) => sum + (loan.amount_paid || 0), 0);
-                            const percentRepaid = totalLentAmount > 0 ? Math.round((totalRepaid / totalLentAmount) * 100) : 0;
-                            const circumference = 2 * Math.PI * 40;
-                            const strokeDashoffset = circumference - (percentRepaid / 100) * circumference;
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00A86B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => setOverviewType(overviewType === 'lending' ? 'borrowing' : 'lending')}
+                        className="w-7 h-7 rounded-full bg-white/50 hover:bg-white/80 flex items-center justify-center transition-colors duration-200"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00A86B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
 
-                            return (
-                              <>
-                                <div className="relative w-24 h-24">
-                                  <svg className="w-full h-full transform -rotate-90">
-                                    <circle cx="48" cy="48" r="40" fill="none" stroke="#e2e8f0" strokeWidth="8" />
-                                    <circle
-                                      cx="48"
-                                      cy="48"
-                                      r="40"
-                                      fill="none"
-                                      stroke="#00A86B"
-                                      strokeWidth="8"
-                                      strokeLinecap="round"
-                                      strokeDasharray={circumference}
-                                      strokeDashoffset={strokeDashoffset}
-                                      className="transition-all duration-500"
-                                    />
-                                  </svg>
-                                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span className="text-lg font-bold text-slate-800">{percentRepaid}%</span>
-                                    <span className="text-[10px] text-slate-500">Repaid</span>
-                                  </div>
-                                </div>
-                                <div className="mt-3 text-center">
-                                  <p className="text-xs text-slate-500">
-                                    {formatMoney(totalRepaid)} of {formatMoney(totalLentAmount)}
-                                  </p>
-                                  <p className="text-xs text-slate-400 mt-1">
-                                    {lentLoans.length} active loan{lentLoans.length !== 1 ? 's' : ''}
-                                  </p>
-                                </div>
-                              </>
-                            );
-                          } else {
-                            // Borrowing Overview
-                            const borrowedLoans = myLoans.filter(l => l && l.borrower_id === user.id && l.status === 'active');
-                            const totalBorrowedAmount = borrowedLoans.reduce((sum, loan) => sum + (loan.total_amount || loan.amount || 0), 0);
-                            const totalPaidBack = borrowedLoans.reduce((sum, loan) => sum + (loan.amount_paid || 0), 0);
-                            const percentPaid = totalBorrowedAmount > 0 ? Math.round((totalPaidBack / totalBorrowedAmount) * 100) : 0;
-                            const circumference = 2 * Math.PI * 40;
-                            const strokeDashoffset = circumference - (percentPaid / 100) * circumference;
+                  <div className="bg-white rounded-xl p-4 flex flex-col items-center justify-center">
+                    <motion.div
+                      key={overviewType}
+                      initial={{ opacity: 0, x: overviewType === 'lending' ? -20 : 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: overviewType === 'lending' ? 20 : -20 }}
+                      transition={{ duration: 0.3, ease: "easeOut" }}
+                      className="flex flex-col items-center"
+                    >
+                      {(() => {
+                        if (overviewType === 'lending') {
+                          const lentLoans = myLoans.filter(l => l && l.lender_id === user.id && l.status === 'active');
+                          const totalLentAmount = lentLoans.reduce((sum, loan) => sum + (loan.total_amount || loan.amount || 0), 0);
+                          const totalRepaid = lentLoans.reduce((sum, loan) => sum + (loan.amount_paid || 0), 0);
+                          const percentRepaid = totalLentAmount > 0 ? Math.round((totalRepaid / totalLentAmount) * 100) : 0;
+                          const circumference = 2 * Math.PI * 40;
+                          const strokeDashoffset = circumference - (percentRepaid / 100) * circumference;
 
-                            return (
-                              <>
-                                <div className="relative w-24 h-24">
-                                  <svg className="w-full h-full transform -rotate-90">
-                                    <circle cx="48" cy="48" r="40" fill="none" stroke="#e2e8f0" strokeWidth="8" />
-                                    <circle
-                                      cx="48"
-                                      cy="48"
-                                      r="40"
-                                      fill="none"
-                                      stroke="#3B82F6"
-                                      strokeWidth="8"
-                                      strokeLinecap="round"
-                                      strokeDasharray={circumference}
-                                      strokeDashoffset={strokeDashoffset}
-                                      className="transition-all duration-500"
-                                    />
-                                  </svg>
-                                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span className="text-lg font-bold text-slate-800">{percentPaid}%</span>
-                                    <span className="text-[10px] text-slate-500">Paid</span>
-                                  </div>
+                          return (
+                            <>
+                              <div className="relative w-24 h-24">
+                                <svg className="w-full h-full transform -rotate-90">
+                                  <circle cx="48" cy="48" r="40" fill="none" stroke="#e2e8f0" strokeWidth="8" />
+                                  <circle
+                                    cx="48"
+                                    cy="48"
+                                    r="40"
+                                    fill="none"
+                                    stroke="#00A86B"
+                                    strokeWidth="8"
+                                    strokeLinecap="round"
+                                    strokeDasharray={circumference}
+                                    strokeDashoffset={strokeDashoffset}
+                                    className="transition-all duration-500"
+                                  />
+                                </svg>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                  <span className="text-lg font-bold text-slate-800">{percentRepaid}%</span>
+                                  <span className="text-[10px] text-slate-500">Repaid</span>
                                 </div>
-                                <div className="mt-3 text-center">
-                                  <p className="text-xs text-slate-500">
-                                    {formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)}
-                                  </p>
-                                  <p className="text-xs text-slate-400 mt-1">
-                                    {borrowedLoans.length} active loan{borrowedLoans.length !== 1 ? 's' : ''}
-                                  </p>
+                              </div>
+                              <div className="mt-3 text-center">
+                                <p className="text-xs text-slate-500">
+                                  {formatMoney(totalRepaid)} of {formatMoney(totalLentAmount)}
+                                </p>
+                                <p className="text-xs text-slate-400 mt-1">
+                                  {lentLoans.length} active loan{lentLoans.length !== 1 ? 's' : ''}
+                                </p>
+                              </div>
+                            </>
+                          );
+                        } else {
+                          // Borrowing Overview
+                          const borrowedLoans = myLoans.filter(l => l && l.borrower_id === user.id && l.status === 'active');
+                          const totalBorrowedAmount = borrowedLoans.reduce((sum, loan) => sum + (loan.total_amount || loan.amount || 0), 0);
+                          const totalPaidBack = borrowedLoans.reduce((sum, loan) => sum + (loan.amount_paid || 0), 0);
+                          const percentPaid = totalBorrowedAmount > 0 ? Math.round((totalPaidBack / totalBorrowedAmount) * 100) : 0;
+                          const circumference = 2 * Math.PI * 40;
+                          const strokeDashoffset = circumference - (percentPaid / 100) * circumference;
+
+                          return (
+                            <>
+                              <div className="relative w-24 h-24">
+                                <svg className="w-full h-full transform -rotate-90">
+                                  <circle cx="48" cy="48" r="40" fill="none" stroke="#e2e8f0" strokeWidth="8" />
+                                  <circle
+                                    cx="48"
+                                    cy="48"
+                                    r="40"
+                                    fill="none"
+                                    stroke="#3B82F6"
+                                    strokeWidth="8"
+                                    strokeLinecap="round"
+                                    strokeDasharray={circumference}
+                                    strokeDashoffset={strokeDashoffset}
+                                    className="transition-all duration-500"
+                                  />
+                                </svg>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                  <span className="text-lg font-bold text-slate-800">{percentPaid}%</span>
+                                  <span className="text-[10px] text-slate-500">Paid</span>
                                 </div>
-                              </>
-                            );
-                          }
-                        })()}
-                      </motion.div>
-                    </CardContent>
-                  </Card>
+                              </div>
+                              <div className="mt-3 text-center">
+                                <p className="text-xs text-slate-500">
+                                  {formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)}
+                                </p>
+                                <p className="text-xs text-slate-400 mt-1">
+                                  {borrowedLoans.length} active loan{borrowedLoans.length !== 1 ? 's' : ''}
+                                </p>
+                              </div>
+                            </>
+                          );
+                        }
+                      })()}
+                    </motion.div>
+                  </div>
                 </motion.div>
                 <StatsCard title="Next Payment" value={nextPayment ? formatMoney(nextPaymentAmount) : '-'} color="blue" change={nextPayment ? `to @${safeAllProfiles.find(p => p.user_id === nextPayment.lender_id)?.username || 'user'}` : 'N/A'} index={1} />
                 <StatsCard title="Next Payment Due" value={paymentStatus} color="orange" change={nextPayment ? format(nextPayment.date, 'MMM d, yyyy') : 'N/A'} index={2} />
