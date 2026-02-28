@@ -85,7 +85,11 @@ export default function Lending() {
     repeating_start_date: '',
     repeating_num_payments: '',
     first_payment_date: '',
-    lender_send_funds_date: ''
+    lender_send_funds_date: '',
+    loan_day_of_week: 'monday',
+    loan_day_of_month: '1',
+    loan_time: '12:00',
+    loan_timezone: 'EST'
   });
 
   useEffect(() => {
@@ -1765,114 +1769,189 @@ export default function Lending() {
                           </div>
                         )}
 
-                        {/* Scheduled loan fields */}
+                        {/* Scheduled loan fields - Sentence format */}
                         {loanType === 'scheduled' && (
-                          <>
-                            <div className="grid sm:grid-cols-2 gap-4">
-                              <div className="space-y-2">
-                                <Label className="flex items-center gap-2">
-                                  <Percent className="w-4 h-4 text-[#00A86B]" />
-                                  Interest Rate (% per year)
-                                </Label>
-                                <Input
-                                  type="number"
-                                  step="0.1"
-                                  min="0"
-                                  max="8"
-                                  placeholder="Enter rate"
-                                  value={formData.interest_rate}
-                                  onChange={(e) => handleInputChange('interest_rate', e.target.value)}
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <Label className="flex items-center gap-2">
-                                  <Calendar className="w-4 h-4 text-[#00A86B]" />
-                                  Payment Frequency
-                                </Label>
-                                <Select
-                                  value={formData.payment_frequency}
-                                  onValueChange={(value) => handleInputChange('payment_frequency', value)}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select frequency" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="none">None</SelectItem>
-                                    <SelectItem value="daily">Daily</SelectItem>
-                                    <SelectItem value="weekly">Weekly</SelectItem>
-                                    <SelectItem value="biweekly">Bi-weekly</SelectItem>
-                                    <SelectItem value="monthly">Monthly</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                            </div>
-
-                            <div className="grid sm:grid-cols-2 gap-4">
-                              <div className="space-y-2">
-                                <Label className="flex items-center gap-2">
-                                  <Calendar className="w-4 h-4 text-[#00A86B]" />
-                                  First Payment Date
-                                </Label>
-                                <Input
-                                  type="date"
-                                  value={formData.first_payment_date}
-                                  onChange={(e) => handleInputChange('first_payment_date', e.target.value)}
-                                  min={format(new Date(), 'yyyy-MM-dd')}
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <Label className="flex items-center gap-2">
-                                  <Calendar className="w-4 h-4 text-[#00A86B]" />
-                                  Lender Agrees to Send Funds Before
-                                </Label>
-                                <Input
-                                  type="date"
-                                  value={formData.lender_send_funds_date}
-                                  onChange={(e) => handleInputChange('lender_send_funds_date', e.target.value)}
-                                  min={format(new Date(), 'yyyy-MM-dd')}
-                                />
-                              </div>
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-[#00A86B]" />
-                                Repayment Period
-                              </Label>
-                              <div className="grid grid-cols-2 gap-2">
-                                <Select
-                                  value={formData.repayment_unit}
-                                  onValueChange={(value) => handleInputChange('repayment_unit', value)}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Unit" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="days">Days</SelectItem>
-                                    <SelectItem value="weeks">Weeks</SelectItem>
-                                    <SelectItem value="months">Months</SelectItem>
-                                    <SelectItem value="custom">Custom</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                {formData.repayment_unit === 'custom' ? (
-                                  <Input
-                                    type="text"
-                                    placeholder="MM/DD/YYYY"
-                                    value={formData.custom_due_date}
-                                    onChange={(e) => handleInputChange('custom_due_date', e.target.value)}
-                                  />
+                          <div className="p-4 bg-[#DBFFEB] rounded-xl space-y-3">
+                            {/* Line 1: The lender agrees to lend the borrower $X before DATE at an interest rate of X% */}
+                            <div className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
+                              <span>The lender agrees to lend</span>
+                              <span className="font-semibold text-slate-800">
+                                {formData.borrower_username ? (
+                                  <>@{formData.borrower_username}</>
                                 ) : (
-                                  <Input
-                                    type="number"
-                                    min="1"
-                                    placeholder={`# ${formData.repayment_unit}`}
-                                    value={formData.repayment_period}
-                                    onChange={(e) => handleInputChange('repayment_period', e.target.value)}
-                                  />
+                                  'the borrower'
                                 )}
-                              </div>
+                              </span>
+                              <span className="font-bold text-[#00A86B]">
+                                ${parseFloat(formData.amount || 0).toLocaleString()}
+                              </span>
+                              <span>before</span>
+                              <Input
+                                type="date"
+                                value={formData.lender_send_funds_date}
+                                onChange={(e) => handleInputChange('lender_send_funds_date', e.target.value)}
+                                min={format(new Date(), 'yyyy-MM-dd')}
+                                className="w-auto h-8 px-3 bg-white"
+                              />
+                              <span>at an interest rate of</span>
+                              <Input
+                                type="number"
+                                step="0.1"
+                                min="0"
+                                max="8"
+                                placeholder="%"
+                                value={formData.interest_rate}
+                                onChange={(e) => handleInputChange('interest_rate', e.target.value)}
+                                className="w-16 h-8 px-3 bg-white"
+                              />
+                              <span>%</span>
                             </div>
-                          </>
+
+                            {/* Line 2: The loan will be repaid over X weeks/months in weekly/monthly payments of $X */}
+                            <div className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
+                              <span>The loan will be repaid over</span>
+                              <Input
+                                type="number"
+                                min="1"
+                                placeholder="#"
+                                value={formData.repayment_period}
+                                onChange={(e) => handleInputChange('repayment_period', e.target.value)}
+                                className="w-16 h-8 px-3 bg-white"
+                              />
+                              <Select
+                                value={formData.repayment_unit}
+                                onValueChange={(value) => handleInputChange('repayment_unit', value)}
+                              >
+                                <SelectTrigger className="w-auto h-8 px-3 bg-white">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="weeks">weeks</SelectItem>
+                                  <SelectItem value="months">months</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <span>in</span>
+                              <Select
+                                value={formData.payment_frequency}
+                                onValueChange={(value) => handleInputChange('payment_frequency', value)}
+                              >
+                                <SelectTrigger className="w-auto h-8 px-3 bg-white">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="weekly">weekly</SelectItem>
+                                  <SelectItem value="monthly">monthly</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <span>payments of</span>
+                              <span className="font-bold text-[#00A86B]">
+                                ${details.monthlyPayment.toFixed(2)}
+                              </span>
+                            </div>
+
+                            {/* Line 3: Payments will be due weekly/monthly on DAY at TIME for TIMEZONE */}
+                            <div className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
+                              <span>Payments will be due</span>
+                              <span className="font-medium">{formData.payment_frequency}</span>
+                              <span>on</span>
+                              {formData.payment_frequency === 'weekly' ? (
+                                <Select
+                                  value={formData.loan_day_of_week}
+                                  onValueChange={(value) => handleInputChange('loan_day_of_week', value)}
+                                >
+                                  <SelectTrigger className="w-auto h-8 px-3 bg-white">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="monday">Monday</SelectItem>
+                                    <SelectItem value="tuesday">Tuesday</SelectItem>
+                                    <SelectItem value="wednesday">Wednesday</SelectItem>
+                                    <SelectItem value="thursday">Thursday</SelectItem>
+                                    <SelectItem value="friday">Friday</SelectItem>
+                                    <SelectItem value="saturday">Saturday</SelectItem>
+                                    <SelectItem value="sunday">Sunday</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <Select
+                                  value={formData.loan_day_of_month}
+                                  onValueChange={(value) => handleInputChange('loan_day_of_month', value)}
+                                >
+                                  <SelectTrigger className="w-auto h-8 px-3 bg-white">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {Array.from({ length: 28 }, (_, i) => i + 1).map((day) => (
+                                      <SelectItem key={day} value={day.toString()}>
+                                        {day}{day === 1 ? 'st' : day === 2 ? 'nd' : day === 3 ? 'rd' : 'th'}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              )}
+                              <span>at</span>
+                              <Input
+                                type="time"
+                                value={formData.loan_time}
+                                onChange={(e) => handleInputChange('loan_time', e.target.value)}
+                                className="w-auto h-8 px-3 bg-white"
+                              />
+                              <span>for</span>
+                              <Select
+                                value={formData.loan_timezone}
+                                onValueChange={(value) => handleInputChange('loan_timezone', value)}
+                              >
+                                <SelectTrigger className="w-auto h-8 px-3 bg-white">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="EST">EST</SelectItem>
+                                  <SelectItem value="CST">CST</SelectItem>
+                                  <SelectItem value="MST">MST</SelectItem>
+                                  <SelectItem value="PST">PST</SelectItem>
+                                  <SelectItem value="HST">HST</SelectItem>
+                                  <SelectItem value="AKST">AKST</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            {/* Line 4: with the first of the X payments due on DATE and the last payment due on DATE */}
+                            {(() => {
+                              const numPayments = formData.payment_frequency === 'weekly'
+                                ? Math.ceil(parseInt(formData.repayment_period || 0) * (formData.repayment_unit === 'months' ? 4 : 1))
+                                : parseInt(formData.repayment_period || 0);
+
+                              const firstPaymentDate = formData.first_payment_date ? new Date(formData.first_payment_date) : null;
+                              let lastPaymentDate = null;
+
+                              if (firstPaymentDate && numPayments > 0) {
+                                if (formData.payment_frequency === 'weekly') {
+                                  lastPaymentDate = addWeeks(firstPaymentDate, numPayments - 1);
+                                } else {
+                                  lastPaymentDate = addMonths(firstPaymentDate, numPayments - 1);
+                                }
+                              }
+
+                              return (
+                                <div className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
+                                  <span>with the first of the</span>
+                                  <span className="font-bold text-[#00A86B]">{numPayments || '—'}</span>
+                                  <span>payments due on</span>
+                                  <Input
+                                    type="date"
+                                    value={formData.first_payment_date}
+                                    onChange={(e) => handleInputChange('first_payment_date', e.target.value)}
+                                    min={format(new Date(), 'yyyy-MM-dd')}
+                                    className="w-auto h-8 px-3 bg-white"
+                                  />
+                                  <span>and the last payment due on</span>
+                                  <span className="font-bold text-[#00A86B]">
+                                    {lastPaymentDate ? format(lastPaymentDate, 'MMM d, yyyy') : '—'}
+                                  </span>
+                                </div>
+                              );
+                            })()}
+                          </div>
                         )}
 
                         <Button
