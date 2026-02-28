@@ -1629,8 +1629,8 @@ export default function Lending() {
 
                             {/* Repeating Options */}
                             {formData.is_repeating && (
-                              <div className="p-4 bg-[#DBFFEB] rounded-xl">
-                                <p className="text-sm text-slate-700 leading-[2.4] [&_input]:inline-flex [&_input]:align-baseline [&_input]:my-[2px] [&_input[type=number]]:appearance-none [&_input[type=number]]:[-moz-appearance:textfield] [&_input[type=number]::-webkit-outer-spin-button]:appearance-none [&_input[type=number]::-webkit-inner-spin-button]:appearance-none [&_.inline-flex]:my-[2px]">
+                              <div className="p-4 pb-2 bg-[#DBFFEB] rounded-xl">
+                                <p className="text-sm text-slate-700 leading-[2.8] mb-0 [&_input]:inline-flex [&_input]:align-baseline [&_input]:my-[2px] [&_input[type=number]]:appearance-none [&_input[type=number]]:[-moz-appearance:textfield] [&_input[type=number]::-webkit-outer-spin-button]:appearance-none [&_input[type=number]::-webkit-inner-spin-button]:appearance-none [&_.inline-flex]:my-[2px]">
                                   Payments of{' '}
                                   <Input
                                     type="number"
@@ -1749,8 +1749,8 @@ export default function Lending() {
 
                         {/* Scheduled loan fields - Sentence format */}
                         {loanType === 'scheduled' && (
-                          <div className="p-4 bg-[#DBFFEB] rounded-xl">
-                            <p className="text-sm text-slate-700 leading-[2.4] [&_input]:inline-flex [&_input]:align-baseline [&_input]:my-[2px] [&_input[type=number]]:appearance-none [&_input[type=number]]:[-moz-appearance:textfield] [&_input[type=number]::-webkit-outer-spin-button]:appearance-none [&_input[type=number]::-webkit-inner-spin-button]:appearance-none [&_.inline-flex]:my-[2px]">
+                          <div className="p-4 pb-2 bg-[#DBFFEB] rounded-xl">
+                            <p className="text-sm text-slate-700 leading-[2.8] mb-0 [&_input]:inline-flex [&_input]:align-baseline [&_input]:my-[2px] [&_input[type=number]]:appearance-none [&_input[type=number]]:[-moz-appearance:textfield] [&_input[type=number]::-webkit-outer-spin-button]:appearance-none [&_input[type=number]::-webkit-inner-spin-button]:appearance-none [&_.inline-flex]:my-[2px]">
                               The lender agrees to lend{' '}
                               <span className="text-[#00A86B] font-medium">
                                 {formData.borrower_username ? `@${formData.borrower_username}` : 'the borrower'}
@@ -1935,21 +1935,18 @@ export default function Lending() {
                           </div>
                         )}
 
-                        <Card className="border-0 rounded-2xl overflow-hidden mt-4" style={{ backgroundColor: '#83F384' }}>
-                          <CardContent className="p-4">
-                            <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-3" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                              {loanType === 'flexible' ? 'Send Payment Request' : 'Send Loan Offer'}
-                            </p>
-                            <Button
-                              type="submit"
-                              disabled={isSubmitting || !formData.borrower_username || !formData.amount}
-                              className="w-full bg-[#0A1A10] hover:bg-[#1a2a20] text-white py-3 text-base font-semibold rounded-xl"
-                            >
-                              <Send className="w-4 h-4 mr-2" />
-                              {isSubmitting ? "Sending..." : (loanType === 'flexible' ? "Send Quick Payment Request" : "Send Loan Offer")}
-                            </Button>
-                          </CardContent>
-                        </Card>
+                        <Button
+                          type="submit"
+                          disabled={isSubmitting || !formData.borrower_username || !formData.amount}
+                          className={`w-full py-3 text-base font-semibold rounded-xl border-0 mt-4 transition-all duration-200 ${
+                            isSubmitting || !formData.borrower_username || !formData.amount
+                              ? 'bg-[#DBEEE3]/60 text-[#83F384]/40 cursor-not-allowed'
+                              : 'bg-[#DBEEE3] text-[#83F384] hover:bg-[#DBEEE3]/80'
+                          }`}
+                        >
+                          <Send className="w-4 h-4 mr-2" />
+                          {isSubmitting ? "Sending..." : (loanType === 'flexible' ? "Send Quick Payment Request" : "Send Loan Offer")}
+                        </Button>
                       </form>
                   </div>
 
@@ -2002,32 +1999,26 @@ export default function Lending() {
 
                   {/* Borrower Payment Box - Only for Loan type, always visible */}
                   {loanType === 'scheduled' && (
-                    <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0 rounded-xl" style={{ backgroundColor: '#83F384' }}>
-                      <CardContent className="p-5 flex flex-col h-full">
-                        <p className="text-sm font-medium text-slate-600 mb-2 text-left">
-                          {formData.borrower_username ? (
-                            <>
-                              {(() => {
-                                const selectedUser = users.find(u => u.username === formData.borrower_username);
-                                return selectedUser?.full_name || `@${formData.borrower_username}`;
-                              })()} will pay
-                            </>
-                          ) : (
-                            'Borrower will pay'
-                          )}
-                        </p>
-                        <div className="flex-1 flex flex-col items-center justify-center">
-                          <p className="text-lg font-bold text-slate-800">
-                            {formData.amount && details.monthlyPayment > 0 ? `$${details.monthlyPayment.toFixed(2)}` : '$—'}
-                          </p>
-                          <div className="mt-2 px-3 py-1 bg-white rounded-full">
-                            <p className="text-sm font-semibold text-[#00A86B]">
-                              {formData.payment_frequency || '—'} after interest
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <div className="bg-[#83F384] rounded-2xl p-4">
+                      <p className="text-xs text-slate-500 text-center">
+                        {formData.borrower_username ? (
+                          <>
+                            {(() => {
+                              const selectedUser = users.find(u => u.username === formData.borrower_username);
+                              return selectedUser?.full_name || `@${formData.borrower_username}`;
+                            })()} will pay
+                          </>
+                        ) : (
+                          'Borrower will pay'
+                        )}
+                      </p>
+                      <p className="text-2xl font-bold text-slate-800 text-center my-1">
+                        {formData.amount && details.monthlyPayment > 0 ? `$${details.monthlyPayment.toFixed(2)}` : '$—'}
+                      </p>
+                      <p className="text-xs text-slate-500 text-center">
+                        {formData.payment_frequency || '—'} after interest
+                      </p>
+                    </div>
                   )}
 
                   {/* Loan Summary - Always Last */}
