@@ -156,16 +156,10 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
           </Link>
         </div>
 
-        {/* Scrollable area with fade masks */}
+        {/* Scrollable area */}
         <div className="relative">
-          {/* Top fade mask */}
-          <div className="absolute top-0 left-0 right-0 h-10 bg-gradient-to-b from-[#DBFFEB] to-transparent z-10 pointer-events-none" />
-
-          {/* Bottom fade mask */}
-          <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-[#DBFFEB] to-transparent z-10 pointer-events-none" />
-
           {/* Scrollable content */}
-          <div className="max-h-[380px] overflow-y-auto space-y-3 py-2">
+          <div className="max-h-[380px] overflow-y-auto space-y-3">
             {recentActivity.length === 0 ? (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}

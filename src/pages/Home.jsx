@@ -294,7 +294,10 @@ export default function Home() {
                     {overviewType === 'lending' ? 'Lending Overview' : 'Borrowing Overview'}
                   </p>
 
-                  <div className="bg-white rounded-xl p-4 flex flex-col items-center justify-center">
+                  <div
+                    className="rounded-xl p-4 flex flex-col items-center justify-center transition-colors duration-300"
+                    style={{ backgroundColor: overviewType === 'lending' ? '#83F384' : '#6EE8B5' }}
+                  >
                     <motion.div
                       key={overviewType}
                       initial={{ opacity: 0, x: overviewType === 'lending' ? -20 : 20 }}
@@ -392,8 +395,8 @@ export default function Home() {
                     </motion.div>
                   </div>
                 </motion.div>
-                <StatsCard title="Next Payment" value={nextPayment ? formatMoney(nextPaymentAmount) : '-'} color="blue" change={nextPayment ? `to @${safeAllProfiles.find(p => p.user_id === nextPayment.lender_id)?.username || 'user'}` : 'N/A'} index={1} />
-                <StatsCard title="Next Payment Due" value={paymentStatus} color="orange" change={nextPayment ? format(nextPayment.date, 'MMM d, yyyy') : 'N/A'} index={2} />
+                <StatsCard title="Next Payment" value={nextPayment ? formatMoney(nextPaymentAmount) : '-'} color="blue" change={nextPayment ? `to @${safeAllProfiles.find(p => p.user_id === nextPayment.lender_id)?.username || 'user'}` : 'N/A'} index={1} bgColor={overviewType === 'lending' ? '#83F384' : '#6EE8B5'} />
+                <StatsCard title="Next Payment Due" value={paymentStatus} color="orange" change={nextPayment ? format(nextPayment.date, 'MMM d, yyyy') : 'N/A'} index={2} bgColor={overviewType === 'lending' ? '#83F384' : '#6EE8B5'} />
               </div>
             </div>
 

@@ -26,7 +26,7 @@ const colorClasses = {
   }
 };
 
-export default function StatsCard({ title, value, icon: Icon, color, change, isLoading, index = 0 }) {
+export default function StatsCard({ title, value, icon: Icon, color, change, isLoading, index = 0, bgColor }) {
   const colors = colorClasses[color] || colorClasses.green;
 
   if (isLoading) {
@@ -51,7 +51,8 @@ export default function StatsCard({ title, value, icon: Icon, color, change, isL
       whileHover={{ y: -4, transition: { duration: 0.2 } }}
     >
       <Card
-        className="bg-white backdrop-blur-sm hover:shadow-xl transition-all duration-300 group h-full cursor-default border-0"
+        className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 group h-full cursor-default border-0"
+        style={{ backgroundColor: bgColor || 'white' }}
       >
         <CardContent className="p-5 flex flex-col justify-between h-full">
           <div className="mb-2">
