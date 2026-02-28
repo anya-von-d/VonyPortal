@@ -3,8 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Bell, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
-
 export default function PendingLoanOffers({ offers }) {
   const safeOffers = Array.isArray(offers) ? offers : [];
 
@@ -36,7 +34,7 @@ export default function PendingLoanOffers({ offers }) {
               </p>
             </div>
           </div>
-          <Link to={createPageUrl("MyLoanOffers")}>
+          <Link to="/Requests">
             <Button
               className="bg-[#00A86B] hover:bg-[#0D9B76] text-white font-semibold gap-2 text-sm"
             >

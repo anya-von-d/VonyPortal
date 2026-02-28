@@ -18,10 +18,24 @@ import {
   Edit3,
   ArrowUpRight,
   ArrowDownLeft,
-  AlertTriangle
+  AlertTriangle,
+  Send,
+  Percent,
+  Trash2
 } from "lucide-react";
 import { format, addMonths } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
+import BorrowerSignatureModal from "@/components/loans/BorrowerSignatureModal";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const PAYMENT_METHOD_ICONS = {
   venmo: { icon: Smartphone, color: 'text-blue-500', label: 'Venmo' },
@@ -41,13 +55,18 @@ export default function Requests() {
   const [paymentsAwaitingConfirmation, setPaymentsAwaitingConfirmation] = useState([]);
   const [termChangeRequests, setTermChangeRequests] = useState([]);
   const [extensionRequests, setExtensionRequests] = useState([]);
+  const [loanOffersReceived, setLoanOffersReceived] = useState([]);
+  const [loanOffersSent, setLoanOffersSent] = useState([]);
   const [loans, setLoans] = useState([]);
   const [profiles, setProfiles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [processingId, setProcessingId] = useState(null);
   const [confirmingDeny, setConfirmingDeny] = useState(null);
   const [confirmingCancel, setConfirmingCancel] = useState(null);
+  const [confirmingDeleteOffer, setConfirmingDeleteOffer] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
+  const [showSignatureModal, setShowSignatureModal] = useState(false);
+  const [selectedOffer, setSelectedOffer] = useState(null);
 
   useEffect(() => {
     if (user?.id) {
@@ -102,10 +121,22 @@ export default function Requests() {
         return loan.extension_requested && loan.extension_requested_by !== user.id;
       });
 
+      // Loan offers received (user is borrower, status is pending)
+      const offersReceived = allLoans.filter(loan =>
+        loan.borrower_id === user.id && loan.status === 'pending'
+      );
+
+      // Loan offers sent (user is lender, status is pending)
+      const offersSent = allLoans.filter(loan =>
+        loan.lender_id === user.id && loan.status === 'pending'
+      );
+
       setPaymentsToConfirm(toConfirm);
       setPaymentsAwaitingConfirmation(awaitingConfirmation);
       setTermChangeRequests(termChanges);
       setExtensionRequests(extensions);
+      setLoanOffersReceived(offersReceived);
+      setLoanOffersSent(offersSent);
       setLoans(allLoans);
       setProfiles(allProfiles);
     } catch (error) {
@@ -203,6 +234,64 @@ export default function Requests() {
     setProcessingId(null);
   };
 
+  // Loan offer handlers
+  const handleSignOffer = async (signature) => {
+    if (!selectedOffer) return;
+    setProcessingId(selectedOffer.id);
+    try {
+      await Loan.update(selectedOffer.id, { status: 'active' });
+
+      const agreements = await LoanAgreement.list();
+      const agreement = agreements.find(a => a.loan_id === selectedOffer.id);
+
+      if (agreement) {
+        await LoanAgreement.update(agreement.id, {
+          borrower_name: signature,
+          borrower_signed_date: new Date().toISOString(),
+          is_fully_signed: true
+        });
+      }
+
+      setShowSignatureModal(false);
+      setSelectedOffer(null);
+      loadRequests();
+    } catch (error) {
+      console.error("Error signing loan offer:", error);
+    }
+    setProcessingId(null);
+  };
+
+  const handleDeclineOffer = async () => {
+    if (!selectedOffer) return;
+    setProcessingId(selectedOffer.id);
+    try {
+      await Loan.update(selectedOffer.id, { status: 'declined' });
+      setShowSignatureModal(false);
+      setSelectedOffer(null);
+      loadRequests();
+    } catch (error) {
+      console.error("Error declining loan offer:", error);
+    }
+    setProcessingId(null);
+  };
+
+  const handleDeleteOffer = async () => {
+    if (!confirmingDeleteOffer) return;
+    setProcessingId(confirmingDeleteOffer.id);
+    try {
+      await Loan.delete(confirmingDeleteOffer.id);
+      setConfirmingDeleteOffer(null);
+      loadRequests();
+    } catch (error) {
+      console.error("Error deleting loan offer:", error);
+    }
+    setProcessingId(null);
+  };
+
+  const getUserById = (userId) => {
+    return profiles.find(p => p.user_id === userId) || { full_name: 'Unknown', username: 'unknown' };
+  };
+
   const getOtherPartyName = (payment, isRecordedByUser = false) => {
     const loan = loans.find(l => l.id === payment.loan_id);
     if (!loan) return 'Unknown';
@@ -227,10 +316,12 @@ export default function Requests() {
     return PAYMENT_METHOD_ICONS[method] || PAYMENT_METHOD_ICONS.other;
   };
 
-  const totalRequests = paymentsToConfirm.length + paymentsAwaitingConfirmation.length + termChangeRequests.length + extensionRequests.length;
+  const totalLoanOffers = loanOffersReceived.length + loanOffersSent.length;
+  const totalRequests = paymentsToConfirm.length + paymentsAwaitingConfirmation.length + termChangeRequests.length + extensionRequests.length + totalLoanOffers;
 
   const tabs = [
     { id: 'all', label: 'All', count: totalRequests },
+    { id: 'offers', label: 'Loan Offers', count: totalLoanOffers },
     { id: 'payments', label: 'Payments', count: paymentsToConfirm.length + paymentsAwaitingConfirmation.length },
     { id: 'terms', label: 'Term Changes', count: termChangeRequests.length },
     { id: 'extensions', label: 'Extensions', count: extensionRequests.length },
@@ -382,6 +473,138 @@ export default function Requests() {
                 </div>
                 <h3 className="text-xl font-semibold text-slate-800 mb-2">All caught up!</h3>
                 <p className="text-slate-600">You have no pending requests to review.</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* Loan Offers Received (User is Borrower) */}
+        {(activeTab === 'all' || activeTab === 'offers') && loanOffersReceived.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <Card className="bg-[#DBFFEB] border-0 rounded-2xl">
+              <CardContent className="p-5">
+                <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                  Loan Offers For You
+                </p>
+                <div className="space-y-3">
+                  {loanOffersReceived.map((offer, index) => {
+                    const lender = getUserById(offer.lender_id);
+                    return (
+                      <motion.div
+                        key={offer.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="p-4 rounded-xl"
+                        style={{ backgroundColor: colors[index % 3] }}
+                      >
+                        <div className="flex flex-col gap-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                              <Send className="w-5 h-5 text-[#00A86B]" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-semibold text-slate-800">
+                                @{lender?.username || 'unknown'} wants to lend you ${offer.amount?.toLocaleString()}
+                              </p>
+                              <p className="text-xs text-slate-600">
+                                {offer.interest_rate}% APR · {offer.repayment_period} months · ${offer.payment_amount?.toFixed(2)}/{offer.payment_frequency || 'monthly'}
+                              </p>
+                            </div>
+                          </div>
+
+                          {offer.purpose && (
+                            <div className="bg-white/50 rounded-lg p-3">
+                              <p className="text-xs font-medium text-slate-600 mb-1">Purpose:</p>
+                              <p className="text-sm text-slate-800">{offer.purpose}</p>
+                            </div>
+                          )}
+
+                          <div className="flex gap-2 justify-end">
+                            <Button
+                              size="sm"
+                              onClick={() => {
+                                setSelectedOffer(offer);
+                                setShowSignatureModal(true);
+                              }}
+                              disabled={processingId === offer.id}
+                              className="bg-[#00A86B] hover:bg-[#0D9B76] text-white"
+                            >
+                              View Details
+                            </Button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* Loan Offers Sent (User is Lender) */}
+        {(activeTab === 'all' || activeTab === 'offers') && loanOffersSent.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <Card className="bg-[#DBFFEB] border-0 rounded-2xl">
+              <CardContent className="p-5">
+                <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                  Loan Offers You Sent
+                </p>
+                <div className="space-y-3">
+                  {loanOffersSent.map((offer, index) => {
+                    const borrower = getUserById(offer.borrower_id);
+                    return (
+                      <motion.div
+                        key={offer.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="p-4 rounded-xl"
+                        style={{ backgroundColor: colors[index % 3] }}
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                              <ArrowUpRight className="w-5 h-5 text-blue-500" />
+                            </div>
+                            <div>
+                              <p className="font-semibold text-slate-800">
+                                ${offer.amount?.toLocaleString()} to @{borrower?.username || 'unknown'}
+                              </p>
+                              <p className="text-xs text-slate-600">
+                                {offer.interest_rate}% APR · Awaiting acceptance
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge className="bg-amber-100 text-amber-700 border-0">
+                              <Clock className="w-3 h-3 mr-1" />
+                              Pending
+                            </Badge>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setConfirmingDeleteOffer(offer)}
+                              disabled={processingId === offer.id}
+                              className="border-red-300 text-red-600 hover:bg-red-50 bg-white"
+                            >
+                              <Trash2 className="w-4 h-4 mr-1" />
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
               </CardContent>
             </Card>
           </motion.div>
@@ -673,6 +896,46 @@ export default function Requests() {
           </p>
         </motion.div>
       </div>
+
+      {/* Delete Offer Confirmation Dialog */}
+      <AlertDialog open={!!confirmingDeleteOffer} onOpenChange={() => setConfirmingDeleteOffer(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-red-600" />
+              Cancel Loan Offer?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to cancel this loan offer of ${confirmingDeleteOffer?.amount?.toLocaleString()}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep Offer</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteOffer}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Cancel Offer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Borrower Signature Modal */}
+      {showSignatureModal && selectedOffer && (
+        <BorrowerSignatureModal
+          isOpen={showSignatureModal}
+          onClose={() => {
+            setShowSignatureModal(false);
+            setSelectedOffer(null);
+          }}
+          onSign={handleSignOffer}
+          onDecline={handleDeclineOffer}
+          loanDetails={selectedOffer}
+          lenderName={getUserById(selectedOffer.lender_id)?.full_name || 'Lender'}
+          borrowerFullName={user?.full_name || ''}
+        />
+      )}
     </div>
   );
 }
