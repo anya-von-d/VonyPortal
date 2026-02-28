@@ -1326,7 +1326,7 @@ export default function Lending() {
                         )}
                       </div>
                       <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                        {loanType === 'flexible' ? 'Create Quick Repayment Request' : 'Create Loan Offer'}
+                        {loanType === 'flexible' ? 'Create Quick Payment Request' : 'Create Loan Offer'}
                       </p>
                     </div>
                       <form onSubmit={handleSubmit} className="space-y-5">
@@ -1529,40 +1529,14 @@ export default function Lending() {
                               <div className="space-y-2">
                                 <Label className="flex items-center gap-2">
                                   <Calendar className="w-4 h-4 text-[#00A86B]" />
-                                  Repayment Period
+                                  First Payment Date
                                 </Label>
-                                <div className="grid grid-cols-2 gap-2">
-                                  <Select
-                                    value={formData.repayment_unit}
-                                    onValueChange={(value) => handleInputChange('repayment_unit', value)}
-                                  >
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Unit" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="days">Days</SelectItem>
-                                      <SelectItem value="weeks">Weeks</SelectItem>
-                                      <SelectItem value="months">Months</SelectItem>
-                                      <SelectItem value="custom">Custom</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                  {formData.repayment_unit === 'custom' ? (
-                                    <Input
-                                      type="text"
-                                      placeholder="MM/DD/YYYY"
-                                      value={formData.custom_due_date}
-                                      onChange={(e) => handleInputChange('custom_due_date', e.target.value)}
-                                    />
-                                  ) : (
-                                    <Input
-                                      type="number"
-                                      min="1"
-                                      placeholder={`# ${formData.repayment_unit}`}
-                                      value={formData.repayment_period}
-                                      onChange={(e) => handleInputChange('repayment_period', e.target.value)}
-                                    />
-                                  )}
-                                </div>
+                                <Input
+                                  type="date"
+                                  value={formData.first_payment_date}
+                                  onChange={(e) => handleInputChange('first_payment_date', e.target.value)}
+                                  min={format(new Date(), 'yyyy-MM-dd')}
+                                />
                               </div>
                               <div className="space-y-2">
                                 <Label className="flex items-center gap-2">
@@ -1581,14 +1555,40 @@ export default function Lending() {
                             <div className="space-y-2">
                               <Label className="flex items-center gap-2">
                                 <Calendar className="w-4 h-4 text-[#00A86B]" />
-                                First Payment Date
+                                Repayment Period
                               </Label>
-                              <Input
-                                type="date"
-                                value={formData.first_payment_date}
-                                onChange={(e) => handleInputChange('first_payment_date', e.target.value)}
-                                min={format(new Date(), 'yyyy-MM-dd')}
-                              />
+                              <div className="grid grid-cols-2 gap-2">
+                                <Select
+                                  value={formData.repayment_unit}
+                                  onValueChange={(value) => handleInputChange('repayment_unit', value)}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Unit" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="days">Days</SelectItem>
+                                    <SelectItem value="weeks">Weeks</SelectItem>
+                                    <SelectItem value="months">Months</SelectItem>
+                                    <SelectItem value="custom">Custom</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                {formData.repayment_unit === 'custom' ? (
+                                  <Input
+                                    type="text"
+                                    placeholder="MM/DD/YYYY"
+                                    value={formData.custom_due_date}
+                                    onChange={(e) => handleInputChange('custom_due_date', e.target.value)}
+                                  />
+                                ) : (
+                                  <Input
+                                    type="number"
+                                    min="1"
+                                    placeholder={`# ${formData.repayment_unit}`}
+                                    value={formData.repayment_period}
+                                    onChange={(e) => handleInputChange('repayment_period', e.target.value)}
+                                  />
+                                )}
+                              </div>
                             </div>
                           </>
                         )}
@@ -1598,7 +1598,7 @@ export default function Lending() {
                           disabled={isSubmitting || !formData.borrower_username || !formData.amount}
                           className="w-full bg-[#00A86B] hover:bg-[#0D9B76] text-white py-3 text-lg font-semibold"
                         >
-                          {isSubmitting ? "Sending..." : (loanType === 'flexible' ? "Send Quick Repayment Request" : "Send Loan Offer")}
+                          {isSubmitting ? "Sending..." : (loanType === 'flexible' ? "Send Quick Payment Request" : "Send Loan Offer")}
                         </Button>
                       </form>
                   </div>
