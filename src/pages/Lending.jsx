@@ -1618,8 +1618,8 @@ export default function Lending() {
                 {/* Form */}
                 <div className="lg:col-span-2">
                   <div className="bg-[#DBFFEB] rounded-2xl p-5 border-0">
-                    <div className="mb-5">
-                      <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                    <div className="bg-[#36CE8E] rounded-xl p-4 mb-5">
+                      <p className="text-[11px] text-white uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                         {loanType === 'flexible' ? 'Create Quick Payment Request' : 'Create Loan Offer'}
                       </p>
                     </div>

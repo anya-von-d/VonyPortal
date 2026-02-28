@@ -387,43 +387,31 @@ export default function Requests() {
           </h1>
         </motion.div>
 
-        {/* Filter Box */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <Card className="bg-[#DBFFEB] border-0 rounded-2xl">
-            <CardContent className="p-5">
-              <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                Filter by:
-              </p>
-              <div className="flex flex-wrap gap-3">
-                {tabs.map(tab => (
-                  <Button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    variant={activeTab === tab.id ? 'default' : 'outline'}
-                    className={`flex-1 min-w-[100px] ${
-                      activeTab === tab.id
-                        ? 'bg-[#00A86B] hover:bg-[#0D9B76] text-white'
-                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-                    }`}
-                  >
-                    {tab.label}
-                    {tab.count > 0 && (
-                      <span className={`ml-2 px-1.5 py-0.5 rounded-full text-xs ${
-                        activeTab === tab.id ? 'bg-white/20' : 'bg-slate-200'
-                      }`}>
-                        {tab.count}
-                      </span>
-                    )}
-                  </Button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+        {/* Tab Navigation */}
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {tabs.map(tab => (
+            <Button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              variant={activeTab === tab.id ? 'default' : 'outline'}
+              className={`whitespace-nowrap ${
+                activeTab === tab.id
+                  ? 'bg-[#00A86B] hover:bg-[#0D9B76] text-white'
+                  : 'bg-white border-0 text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+              {tab.count > 0 && (
+                <span className={`ml-2 px-1.5 py-0.5 rounded-full text-xs ${
+                  activeTab === tab.id ? 'bg-white/20' : 'bg-slate-200'
+                }`}>
+                  {tab.count}
+                </span>
+              )}
+            </Button>
+          ))}
+        </div>
 
         {/* Warning Dialogs */}
         <AnimatePresence>
