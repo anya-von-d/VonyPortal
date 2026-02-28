@@ -28,6 +28,10 @@ const rightNavItems = [
 
 const moreMenuItems = [
   {
+    title: "Friends",
+    url: createPageUrl("Friends"),
+  },
+  {
     title: "Document Center",
     url: createPageUrl("LoanAgreements"),
   },

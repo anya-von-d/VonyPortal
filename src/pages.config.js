@@ -48,6 +48,7 @@
  * The mainPage value must match a key in the PAGES object exactly.
  */
 import Borrowing from './pages/Borrowing';
+import Friends from './pages/Friends';
 import Home from './pages/Home';
 import Learn from './pages/Learn';
 import Lending from './pages/Lending';
@@ -61,6 +62,7 @@ import __Layout from './Layout.jsx';
 
 export const PAGES = {
     "Borrowing": Borrowing,
+    "Friends": Friends,
     "Home": Home,
     "Learn": Learn,
     "Lending": Lending,

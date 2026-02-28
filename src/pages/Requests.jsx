@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Payment, Loan, PublicProfile, LoanAgreement } from "@/entities/all";
+import { Payment, Loan, PublicProfile, LoanAgreement, Friendship } from "@/entities/all";
 import { useAuth } from "@/lib/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,9 @@ import {
   AlertTriangle,
   Send,
   Percent,
-  Trash2
+  Trash2,
+  UserPlus,
+  Users
 } from "lucide-react";
 import { format, addMonths } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
@@ -57,6 +59,7 @@ export default function Requests() {
   const [extensionRequests, setExtensionRequests] = useState([]);
   const [loanOffersReceived, setLoanOffersReceived] = useState([]);
   const [loanOffersSent, setLoanOffersSent] = useState([]);
+  const [friendRequestsReceived, setFriendRequestsReceived] = useState([]);
   const [loans, setLoans] = useState([]);
   const [profiles, setProfiles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -79,11 +82,12 @@ export default function Requests() {
 
     setIsLoading(true);
     try {
-      const [allPayments, allLoans, allProfiles, allAgreements] = await Promise.all([
+      const [allPayments, allLoans, allProfiles, allAgreements, allFriendships] = await Promise.all([
         Payment.filter({ status: 'pending_confirmation' }).catch(() => []),
         Loan.list().catch(() => []),
         PublicProfile.list().catch(() => []),
-        LoanAgreement.list().catch(() => [])
+        LoanAgreement.list().catch(() => []),
+        Friendship.list().catch(() => [])
       ]);
 
       // Get user's loans
@@ -131,12 +135,18 @@ export default function Requests() {
         loan.lender_id === user.id && loan.status === 'pending'
       );
 
+      // Friend requests received (user is friend_id, status is pending)
+      const friendRequests = allFriendships.filter(f =>
+        f.friend_id === user.id && f.status === 'pending'
+      );
+
       setPaymentsToConfirm(toConfirm);
       setPaymentsAwaitingConfirmation(awaitingConfirmation);
       setTermChangeRequests(termChanges);
       setExtensionRequests(extensions);
       setLoanOffersReceived(offersReceived);
       setLoanOffersSent(offersSent);
+      setFriendRequestsReceived(friendRequests);
       setLoans(allLoans);
       setProfiles(allProfiles);
     } catch (error) {
@@ -316,11 +326,34 @@ export default function Requests() {
     return PAYMENT_METHOD_ICONS[method] || PAYMENT_METHOD_ICONS.other;
   };
 
+  const handleAcceptFriendRequest = async (friendship) => {
+    setProcessingId(friendship.id);
+    try {
+      await Friendship.update(friendship.id, { status: 'accepted' });
+      await loadRequests();
+    } catch (error) {
+      console.error("Error accepting friend request:", error);
+    }
+    setProcessingId(null);
+  };
+
+  const handleDeclineFriendRequest = async (friendship) => {
+    setProcessingId(friendship.id);
+    try {
+      await Friendship.delete(friendship.id);
+      await loadRequests();
+    } catch (error) {
+      console.error("Error declining friend request:", error);
+    }
+    setProcessingId(null);
+  };
+
   const totalLoanOffers = loanOffersReceived.length + loanOffersSent.length;
-  const totalRequests = paymentsToConfirm.length + paymentsAwaitingConfirmation.length + termChangeRequests.length + extensionRequests.length + totalLoanOffers;
+  const totalRequests = paymentsToConfirm.length + paymentsAwaitingConfirmation.length + termChangeRequests.length + extensionRequests.length + totalLoanOffers + friendRequestsReceived.length;
 
   const tabs = [
     { id: 'all', label: 'All', count: totalRequests },
+    { id: 'friends', label: 'Friend Requests', count: friendRequestsReceived.length },
     { id: 'offers', label: 'Loan Offers', count: totalLoanOffers },
     { id: 'payments', label: 'Payments', count: paymentsToConfirm.length + paymentsAwaitingConfirmation.length },
     { id: 'terms', label: 'Term Changes', count: termChangeRequests.length },
@@ -598,6 +631,88 @@ export default function Requests() {
                             >
                               <Trash2 className="w-4 h-4 mr-1" />
                               Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* Friend Requests */}
+        {(activeTab === 'all' || activeTab === 'friends') && friendRequestsReceived.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <Card className="bg-[#DBFFEB] border-0 rounded-2xl">
+              <CardContent className="p-5">
+                <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                  Friend Requests
+                </p>
+                <div className="space-y-3">
+                  {friendRequestsReceived.map((request, index) => {
+                    const senderProfile = profiles.find(p => p.user_id === request.user_id);
+                    return (
+                      <motion.div
+                        key={request.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="p-4 rounded-xl"
+                        style={{ backgroundColor: colors[index % 3] }}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-full bg-[#83F384] flex items-center justify-center flex-shrink-0">
+                            {senderProfile?.avatar_url ? (
+                              <img
+                                src={senderProfile.avatar_url}
+                                alt={senderProfile.full_name}
+                                className="w-full h-full rounded-full object-cover"
+                              />
+                            ) : (
+                              <span className="text-lg font-semibold text-[#0A1A10]">
+                                {(senderProfile?.full_name || senderProfile?.username || '?').charAt(0).toUpperCase()}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-slate-800 truncate">
+                              {senderProfile?.full_name || senderProfile?.username}
+                            </p>
+                            <p className="text-sm text-slate-600 truncate">
+                              @{senderProfile?.username} wants to be your friend
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => handleAcceptFriendRequest(request)}
+                              disabled={processingId === request.id}
+                              className="bg-[#00A86B] hover:bg-[#0D9B76] text-white"
+                            >
+                              {processingId === request.id ? (
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                              ) : (
+                                <>
+                                  <CheckCircle className="w-4 h-4 mr-1" />
+                                  Accept
+                                </>
+                              )}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleDeclineFriendRequest(request)}
+                              disabled={processingId === request.id}
+                              className="border-red-300 text-red-600 hover:bg-red-50 bg-white"
+                            >
+                              <XCircle className="w-4 h-4 mr-1" />
+                              Decline
                             </Button>
                           </div>
                         </div>

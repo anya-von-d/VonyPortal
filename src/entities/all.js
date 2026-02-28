@@ -164,3 +164,4 @@ export const LoanAgreement = createTableApi('loan_agreements');
 export const Payment = createTableApi('payments');
 export const PayPalConnection = createTableApi('paypal_connections');
 export const VenmoConnection = createTableApi('venmo_connections');
+export const Friendship = createTableApi('friendships');

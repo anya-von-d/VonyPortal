@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Loan, LoanAgreement, User, PublicProfile } from "@/entities/all";
+import { Loan, LoanAgreement, User, PublicProfile, Friendship } from "@/entities/all";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,7 +28,7 @@ import {
   DollarSign, Calendar, Percent, FileText, User as UserIcon,
   AlertCircle, Zap, ClipboardList, Send, Clock,
   TrendingUp, Pencil, X, Save, History, PlusCircle, Settings, BarChart3,
-  Download, CheckCircle, FolderOpen, Info
+  Download, CheckCircle, FolderOpen, Info, UserPlus
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { addMonths, addWeeks, addDays, format } from "date-fns";
@@ -62,6 +62,8 @@ export default function Lending() {
   const [activeDocPopup, setActiveDocPopup] = useState(null); // 'promissory', 'amortization', 'summary'
   const [docPopupAgreement, setDocPopupAgreement] = useState(null);
   const [activeInfoTooltip, setActiveInfoTooltip] = useState(null); // 'promissory' or 'amortization'
+  const [friendships, setFriendships] = useState([]);
+  const [friends, setFriends] = useState([]);
 
   const [formData, setFormData] = useState({
     borrower_username: '',
@@ -93,20 +95,47 @@ export default function Lending() {
       const user = await User.me();
       setCurrentUser(user);
 
-      const [allLoans, profiles, agreements] = await Promise.all([
+      const [allLoans, profiles, agreements, allFriendships] = await Promise.all([
         Loan.list('-created_at').catch(() => []),
         PublicProfile.list().catch(() => []),
-        LoanAgreement.list().catch(() => [])
+        LoanAgreement.list().catch(() => []),
+        Friendship.list().catch(() => [])
       ]);
 
       setLoans(allLoans || []);
       setPublicProfiles(profiles || []);
       setLoanAgreements(agreements || []);
+      setFriendships(allFriendships || []);
 
-      // Filter out current user for borrower selection
-      const otherUsers = (profiles || []).filter(p => p && p.user_id !== user.id && !p.user_id?.startsWith('sample-user-'));
-      const uniqueUsers = Array.from(new Map(otherUsers.map(u => [u.user_id, u])).values());
-      setUsers(uniqueUsers);
+      // Get accepted friendships where user is either user_id or friend_id
+      const acceptedFriendships = (allFriendships || []).filter(f =>
+        f.status === 'accepted' &&
+        (f.user_id === user.id || f.friend_id === user.id)
+      );
+
+      // Get friend user IDs
+      const friendUserIds = acceptedFriendships.map(f =>
+        f.user_id === user.id ? f.friend_id : f.user_id
+      );
+
+      // Filter profiles to only show friends, sorted with starred first
+      const friendProfiles = (profiles || []).filter(p =>
+        p && friendUserIds.includes(p.user_id)
+      ).map(p => {
+        const friendship = acceptedFriendships.find(f =>
+          f.user_id === p.user_id || f.friend_id === p.user_id
+        );
+        return { ...p, is_starred: friendship?.is_starred || false };
+      }).sort((a, b) => {
+        // Starred friends first
+        if (a.is_starred && !b.is_starred) return -1;
+        if (!a.is_starred && b.is_starred) return 1;
+        // Then alphabetically
+        return (a.full_name || a.username || '').localeCompare(b.full_name || b.username || '');
+      });
+
+      setFriends(friendProfiles);
+      setUsers(friendProfiles);
     } catch (error) {
       console.error("Error loading data:", error);
     }
@@ -1343,7 +1372,9 @@ export default function Lending() {
                               users={users}
                               value={formData.borrower_username}
                               onSelect={(username) => handleInputChange('borrower_username', username)}
-                              placeholder="Choose a user..."
+                              placeholder="Choose a friend..."
+                              showAddFriends={true}
+                              onAddFriends={() => navigate(createPageUrl('Friends') + '?tab=add')}
                             />
                           )}
                         </div>
