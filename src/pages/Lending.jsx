@@ -2014,8 +2014,8 @@ export default function Lending() {
                           disabled={isSubmitting || !formData.borrower_username || !formData.amount}
                           className={`w-full py-3 text-base font-semibold rounded-xl border-0 mt-4 transition-all duration-200 ${
                             isSubmitting || !formData.borrower_username || !formData.amount
-                              ? 'bg-[#83F384]/40 text-[#DBEEE3]/70 cursor-not-allowed grayscale-[30%]'
-                              : 'bg-[#83F384] text-[#DBEEE3] hover:bg-[#83F384]/90 opacity-100'
+                              ? 'bg-[#83F384] text-[#DBEEE3] cursor-not-allowed saturate-[0.7] brightness-[0.92]'
+                              : 'bg-[#83F384] text-[#DBEEE3] hover:bg-[#83F384]/90'
                           }`}
                         >
                           <Send className="w-4 h-4 mr-2" />
