@@ -4,6 +4,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Users,
   UserPlus,
@@ -14,7 +15,9 @@ import {
   Clock,
   Pencil,
   Check,
-  Trash2
+  Trash2,
+  CheckCircle,
+  XCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -226,42 +229,50 @@ export default function Friends() {
   });
 
   const tabs = [
-    { id: 'friends', label: 'Your Friends', icon: Users },
-    { id: 'add', label: 'Add Friends', icon: UserPlus },
+    { id: 'friends', label: 'Your Friends' },
+    { id: 'add', label: 'Add Friends' },
   ];
 
+  const colors = ['#D0ED6F', '#83F384', '#6EE8B5'];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 p-4 md:p-6">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen p-6" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
+      <div className="max-w-4xl mx-auto space-y-7">
         {/* Header */}
-        <div className="mb-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="py-5"
+        >
           <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-left">
             Friends
           </h1>
-        </div>
+        </motion.div>
 
-        {/* Tabs */}
-        <div className="flex gap-2 mb-6">
-          {tabs.map((tab) => (
-            <button
+        {/* Tab Navigation */}
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {tabs.map(tab => (
+            <Button
               key={tab.id}
               onClick={() => {
                 setActiveTab(tab.id);
                 setEditMode(false);
                 setSearchQuery('');
               }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              variant={activeTab === tab.id ? 'default' : 'outline'}
+              className={`whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'bg-[#00A86B] text-white'
-                  : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+                  ? 'bg-[#00A86B] hover:bg-[#0D9B76] text-white'
+                  : 'bg-white border-0 text-slate-600 hover:bg-slate-50'
               }`}
             >
-              <tab.icon className="w-4 h-4" />
-              {tab.label}
-            </button>
+              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+            </Button>
           ))}
         </div>
 
+        {/* Content Sections */}
         <AnimatePresence mode="wait">
           {/* Your Friends Tab */}
           {activeTab === 'friends' && (
@@ -271,110 +282,120 @@ export default function Friends() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
             >
-              <div className="bg-[#DBFFEB] rounded-2xl p-5">
-                <div className="flex items-center justify-between mb-4">
-                  <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                    Friends
-                  </p>
-                  <button
-                    onClick={() => setEditMode(!editMode)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                      editMode
-                        ? 'bg-[#00A86B] text-white'
-                        : 'bg-white text-slate-600 hover:bg-slate-50'
-                    }`}
-                  >
-                    {editMode ? 'Done' : 'Edit'}
-                  </button>
-                </div>
-
-                {isLoading ? (
-                  <div className="text-center py-8">
-                    <div className="w-8 h-8 border-2 border-[#00A86B] border-t-transparent rounded-full animate-spin mx-auto" />
+              <Card className="bg-[#DBFFEB] border-0 rounded-2xl">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                      Your Friends
+                    </p>
+                    {sortedFriends.length > 0 && (
+                      <button
+                        onClick={() => setEditMode(!editMode)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                          editMode
+                            ? 'bg-[#00A86B] text-white'
+                            : 'bg-white text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        {editMode ? 'Done' : 'Edit'}
+                      </button>
+                    )}
                   </div>
-                ) : sortedFriends.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Users className="w-12 h-12 mx-auto mb-3 text-slate-300" />
-                    <p className="text-slate-500">No friends yet</p>
-                    <button
-                      onClick={() => setActiveTab('add')}
-                      className="mt-3 text-[#00A86B] font-medium text-sm hover:underline"
-                    >
-                      Add your first friend
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {sortedFriends.map((friendship) => {
-                      const friendProfile = getFriendProfile(friendship);
-                      if (!friendProfile) return null;
 
-                      return (
-                        <div
-                          key={friendship.id}
-                          className="bg-white rounded-xl p-4 flex items-center gap-4"
-                        >
-                          {/* Profile Photo */}
-                          <div className="w-12 h-12 rounded-full bg-[#83F384] flex items-center justify-center flex-shrink-0">
-                            {friendProfile.avatar_url ? (
-                              <img
-                                src={friendProfile.avatar_url}
-                                alt={friendProfile.full_name}
-                                className="w-full h-full rounded-full object-cover"
-                              />
-                            ) : (
-                              <span className="text-lg font-semibold text-[#0A1A10]">
-                                {(friendProfile.full_name || friendProfile.username || '?').charAt(0).toUpperCase()}
-                              </span>
-                            )}
-                          </div>
+                  {isLoading ? (
+                    <div className="text-center py-8">
+                      <div className="w-8 h-8 border-2 border-[#00A86B] border-t-transparent rounded-full animate-spin mx-auto" />
+                    </div>
+                  ) : sortedFriends.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Users className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+                      <p className="text-slate-500">No friends yet</p>
+                      <button
+                        onClick={() => setActiveTab('add')}
+                        className="mt-3 text-[#00A86B] font-medium text-sm hover:underline"
+                      >
+                        Add your first friend
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {sortedFriends.map((friendship, index) => {
+                        const friendProfile = getFriendProfile(friendship);
+                        if (!friendProfile) return null;
 
-                          {/* Name and Username */}
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-slate-800 truncate">
-                              {friendProfile.full_name || friendProfile.username}
-                            </p>
-                            <p className="text-sm text-slate-500 truncate">
-                              @{friendProfile.username}
-                            </p>
-                          </div>
-
-                          {/* Star Button */}
-                          <button
-                            onClick={() => handleToggleStar(friendship)}
-                            disabled={processingId === friendship.id}
-                            className={`p-2 rounded-lg transition-all ${
-                              friendship.is_starred
-                                ? 'text-yellow-500'
-                                : 'text-slate-300 hover:text-yellow-400'
-                            }`}
+                        return (
+                          <motion.div
+                            key={friendship.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            className="p-4 rounded-xl"
+                            style={{ backgroundColor: colors[index % 3] }}
                           >
-                            <Star
-                              className="w-5 h-5"
-                              fill={friendship.is_starred ? 'currentColor' : 'none'}
-                            />
-                          </button>
+                            <div className="flex items-center gap-4">
+                              {/* Profile Photo */}
+                              <div className="w-12 h-12 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                                {friendProfile.avatar_url ? (
+                                  <img
+                                    src={friendProfile.avatar_url}
+                                    alt={friendProfile.full_name}
+                                    className="w-full h-full rounded-full object-cover"
+                                  />
+                                ) : (
+                                  <span className="text-lg font-semibold text-[#0A1A10]">
+                                    {(friendProfile.full_name || friendProfile.username || '?').charAt(0).toUpperCase()}
+                                  </span>
+                                )}
+                              </div>
 
-                          {/* Remove Button (Edit Mode) */}
-                          {editMode && (
-                            <button
-                              onClick={() => handleRemoveFriend(friendship.id)}
-                              disabled={processingId === friendship.id}
-                              className="p-2 rounded-lg text-red-400 hover:text-red-500 hover:bg-red-50 transition-all"
-                            >
-                              {processingId === friendship.id ? (
-                                <div className="w-5 h-5 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
-                              ) : (
-                                <Trash2 className="w-5 h-5" />
+                              {/* Name and Username */}
+                              <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-slate-800 truncate">
+                                  {friendProfile.full_name || friendProfile.username}
+                                </p>
+                                <p className="text-sm text-slate-600 truncate">
+                                  @{friendProfile.username}
+                                </p>
+                              </div>
+
+                              {/* Star Button */}
+                              <button
+                                onClick={() => handleToggleStar(friendship)}
+                                disabled={processingId === friendship.id}
+                                className={`p-2 rounded-lg transition-all ${
+                                  friendship.is_starred
+                                    ? 'text-yellow-500'
+                                    : 'text-slate-400 hover:text-yellow-400'
+                                }`}
+                              >
+                                <Star
+                                  className="w-5 h-5"
+                                  fill={friendship.is_starred ? 'currentColor' : 'none'}
+                                />
+                              </button>
+
+                              {/* Remove Button (Edit Mode) */}
+                              {editMode && (
+                                <button
+                                  onClick={() => handleRemoveFriend(friendship.id)}
+                                  disabled={processingId === friendship.id}
+                                  className="p-2 rounded-lg text-red-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                                >
+                                  {processingId === friendship.id ? (
+                                    <div className="w-5 h-5 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
+                                  ) : (
+                                    <Trash2 className="w-5 h-5" />
+                                  )}
+                                </button>
                               )}
-                            </button>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </motion.div>
           )}
 
@@ -388,185 +409,217 @@ export default function Friends() {
               className="space-y-4"
             >
               {/* Search Box */}
-              <div className="bg-[#DBFFEB] rounded-2xl p-5">
-                <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                  Search for Friends
-                </p>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <Input
-                    type="text"
-                    placeholder="Search by username..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 bg-white"
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery('')}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-              </div>
+              <Card className="bg-[#DBFFEB] border-0 rounded-2xl">
+                <CardContent className="p-5">
+                  <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                    Search for Friends
+                  </p>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                    <Input
+                      type="text"
+                      placeholder="Search by username..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10 bg-white"
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery('')}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
 
               {/* Search Results */}
               {searchQuery.trim() && (
-                <div className="bg-[#DBFFEB] rounded-2xl p-5">
-                  <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                    Select Your Friends
-                  </p>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <Card className="bg-[#DBFFEB] border-0 rounded-2xl">
+                    <CardContent className="p-5">
+                      <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                        Results
+                      </p>
 
-                  {searchResults.length === 0 ? (
-                    <div className="text-center py-6">
-                      <p className="text-slate-500">No users found matching "{searchQuery}"</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {searchResults.map((profile) => {
-                        const receivedRequest = getReceivedRequestFrom(profile.user_id);
+                      {searchResults.length === 0 ? (
+                        <div className="text-center py-6">
+                          <p className="text-slate-500">No users found matching "{searchQuery}"</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {searchResults.map((profile, index) => {
+                            const receivedRequest = getReceivedRequestFrom(profile.user_id);
 
-                        return (
-                          <div
-                            key={profile.user_id}
-                            className="bg-white rounded-xl p-4 flex items-center gap-4"
-                          >
-                            {/* Profile Photo */}
-                            <div className="w-12 h-12 rounded-full bg-[#83F384] flex items-center justify-center flex-shrink-0">
-                              {profile.avatar_url ? (
-                                <img
-                                  src={profile.avatar_url}
-                                  alt={profile.full_name}
-                                  className="w-full h-full rounded-full object-cover"
-                                />
-                              ) : (
-                                <span className="text-lg font-semibold text-[#0A1A10]">
-                                  {(profile.full_name || profile.username || '?').charAt(0).toUpperCase()}
-                                </span>
-                              )}
-                            </div>
-
-                            {/* Name and Username */}
-                            <div className="flex-1 min-w-0">
-                              <p className="font-semibold text-slate-800 truncate">
-                                {profile.full_name || profile.username}
-                              </p>
-                              <p className="text-sm text-slate-500 truncate">
-                                @{profile.username}
-                              </p>
-                            </div>
-
-                            {/* Accept or Send Request Button */}
-                            {receivedRequest ? (
-                              <Button
-                                onClick={() => handleAcceptRequestFromSearch(receivedRequest.id)}
-                                disabled={processingId === receivedRequest.id}
-                                className="bg-[#00A86B] hover:bg-[#0D9B76] text-white text-sm"
+                            return (
+                              <motion.div
+                                key={profile.user_id}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.05 }}
+                                className="p-4 rounded-xl"
+                                style={{ backgroundColor: colors[index % 3] }}
                               >
-                                {processingId === receivedRequest.id ? (
-                                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                ) : (
-                                  <>
-                                    <Check className="w-4 h-4 mr-2" />
-                                    Accept Friend Request
-                                  </>
-                                )}
-                              </Button>
-                            ) : (
-                              <Button
-                                onClick={() => handleSendRequest(profile.user_id)}
-                                disabled={processingId === profile.user_id}
-                                className="bg-[#00A86B] hover:bg-[#0D9B76] text-white text-sm"
-                              >
-                                {processingId === profile.user_id ? (
-                                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                ) : (
-                                  <>
-                                    <Send className="w-4 h-4 mr-2" />
-                                    Send Friend Request
-                                  </>
-                                )}
-                              </Button>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
+                                <div className="flex items-center gap-4">
+                                  {/* Profile Photo */}
+                                  <div className="w-12 h-12 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                                    {profile.avatar_url ? (
+                                      <img
+                                        src={profile.avatar_url}
+                                        alt={profile.full_name}
+                                        className="w-full h-full rounded-full object-cover"
+                                      />
+                                    ) : (
+                                      <span className="text-lg font-semibold text-[#0A1A10]">
+                                        {(profile.full_name || profile.username || '?').charAt(0).toUpperCase()}
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  {/* Name and Username */}
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-semibold text-slate-800 truncate">
+                                      {profile.full_name || profile.username}
+                                    </p>
+                                    <p className="text-sm text-slate-600 truncate">
+                                      @{profile.username}
+                                    </p>
+                                  </div>
+
+                                  {/* Accept or Send Request Button */}
+                                  {receivedRequest ? (
+                                    <Button
+                                      size="sm"
+                                      onClick={() => handleAcceptRequestFromSearch(receivedRequest.id)}
+                                      disabled={processingId === receivedRequest.id}
+                                      className="bg-[#00A86B] hover:bg-[#0D9B76] text-white"
+                                    >
+                                      {processingId === receivedRequest.id ? (
+                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                      ) : (
+                                        <>
+                                          <CheckCircle className="w-4 h-4 mr-1" />
+                                          Accept
+                                        </>
+                                      )}
+                                    </Button>
+                                  ) : (
+                                    <Button
+                                      size="sm"
+                                      onClick={() => handleSendRequest(profile.user_id)}
+                                      disabled={processingId === profile.user_id}
+                                      className="bg-[#00A86B] hover:bg-[#0D9B76] text-white"
+                                    >
+                                      {processingId === profile.user_id ? (
+                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                      ) : (
+                                        <>
+                                          <Send className="w-4 h-4 mr-1" />
+                                          Send Request
+                                        </>
+                                      )}
+                                    </Button>
+                                  )}
+                                </div>
+                              </motion.div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.div>
               )}
 
               {/* Sent Friend Requests */}
-              <div ref={sentRequestsRef} className="bg-[#DBFFEB] rounded-2xl p-5">
-                <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                  Sent Friend Requests
-                </p>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+              >
+                <Card ref={sentRequestsRef} className="bg-[#DBFFEB] border-0 rounded-2xl">
+                  <CardContent className="p-5">
+                    <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                      Sent Friend Requests
+                    </p>
 
-                {sentRequests.length === 0 ? (
-                  <div className="text-center py-6">
-                    <Clock className="w-10 h-10 mx-auto mb-2 text-slate-300" />
-                    <p className="text-slate-500">No pending requests</p>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {sentRequests.map((request) => {
-                      const profile = getProfileById(request.friend_id);
-                      if (!profile) return null;
+                    {sentRequests.length === 0 ? (
+                      <div className="text-center py-6">
+                        <Clock className="w-10 h-10 mx-auto mb-2 text-slate-300" />
+                        <p className="text-slate-500">No pending requests</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {sentRequests.map((request, index) => {
+                          const profile = getProfileById(request.friend_id);
+                          if (!profile) return null;
 
-                      return (
-                        <div
-                          key={request.id}
-                          className="bg-white rounded-xl p-4 flex items-center gap-4"
-                        >
-                          {/* Profile Photo */}
-                          <div className="w-12 h-12 rounded-full bg-[#83F384] flex items-center justify-center flex-shrink-0">
-                            {profile.avatar_url ? (
-                              <img
-                                src={profile.avatar_url}
-                                alt={profile.full_name}
-                                className="w-full h-full rounded-full object-cover"
-                              />
-                            ) : (
-                              <span className="text-lg font-semibold text-[#0A1A10]">
-                                {(profile.full_name || profile.username || '?').charAt(0).toUpperCase()}
-                              </span>
-                            )}
-                          </div>
+                          return (
+                            <motion.div
+                              key={request.id}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: index * 0.05 }}
+                              className="p-4 rounded-xl"
+                              style={{ backgroundColor: colors[index % 3] }}
+                            >
+                              <div className="flex items-center gap-4">
+                                {/* Profile Photo */}
+                                <div className="w-12 h-12 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                                  {profile.avatar_url ? (
+                                    <img
+                                      src={profile.avatar_url}
+                                      alt={profile.full_name}
+                                      className="w-full h-full rounded-full object-cover"
+                                    />
+                                  ) : (
+                                    <span className="text-lg font-semibold text-[#0A1A10]">
+                                      {(profile.full_name || profile.username || '?').charAt(0).toUpperCase()}
+                                    </span>
+                                  )}
+                                </div>
 
-                          {/* Name and Username */}
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-slate-800 truncate">
-                              {profile.full_name || profile.username}
-                            </p>
-                            <p className="text-sm text-slate-500 truncate">
-                              @{profile.username}
-                            </p>
-                          </div>
+                                {/* Name and Username */}
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-semibold text-slate-800 truncate">
+                                    {profile.full_name || profile.username}
+                                  </p>
+                                  <p className="text-sm text-slate-600 truncate">
+                                    @{profile.username}
+                                  </p>
+                                </div>
 
-                          {/* Cancel Request Button */}
-                          <Button
-                            onClick={() => handleCancelRequest(request.id)}
-                            disabled={processingId === request.id}
-                            variant="outline"
-                            className="text-red-500 border-red-200 hover:bg-red-50 text-sm"
-                          >
-                            {processingId === request.id ? (
-                              <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                              <>
-                                <X className="w-4 h-4 mr-2" />
-                                Cancel Request
-                              </>
-                            )}
-                          </Button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+                                {/* Cancel Request Button */}
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleCancelRequest(request.id)}
+                                  disabled={processingId === request.id}
+                                  variant="outline"
+                                  className="border-red-300 text-red-600 hover:bg-red-50 bg-white"
+                                >
+                                  {processingId === request.id ? (
+                                    <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
+                                  ) : (
+                                    <>
+                                      <Trash2 className="w-4 h-4 mr-1" />
+                                      Cancel
+                                    </>
+                                  )}
+                                </Button>
+                              </div>
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
