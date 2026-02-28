@@ -1561,9 +1561,8 @@ export default function Lending() {
                       <form onSubmit={handleSubmit} className="space-y-5">
                         {/* Borrower Selection */}
                         <div className="space-y-2">
-                          <Label htmlFor="borrower_username" className="flex items-center gap-2">
-                            <UserIcon className="w-4 h-4 text-[#00A86B]" />
-                            Select Borrower
+                          <Label htmlFor="borrower_username">
+                            Select one of your friends
                           </Label>
                           {isLoadingUsers ? (
                             <div className="h-10 bg-slate-100 rounded-md animate-pulse" />
@@ -1579,14 +1578,12 @@ export default function Lending() {
                           )}
                         </div>
 
-                        {/* Amount and Purpose */}
-                        {/* Show amount and purpose fields only if NOT repeating (for flexible) or always for scheduled */}
-                        {(loanType === 'scheduled' || (loanType === 'flexible' && !formData.is_repeating)) && (
+                        {/* Amount and Purpose - Only for Quick Payment Request (non-repeating) */}
+                        {loanType === 'flexible' && !formData.is_repeating && (
                           <div className="grid sm:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                              <Label htmlFor="amount" className="flex items-center gap-2">
-                                <DollarSign className="w-4 h-4 text-[#00A86B]" />
-                                Loan Amount
+                              <Label htmlFor="amount">
+                                Payment Amount
                               </Label>
                               <Input
                                 id="amount"
@@ -1601,8 +1598,7 @@ export default function Lending() {
                               />
                             </div>
                             <div className="space-y-2">
-                              <Label htmlFor="purpose" className="flex items-center gap-2">
-                                <FileText className="w-4 h-4 text-[#00A86B]" />
+                              <Label htmlFor="purpose">
                                 What's this for?
                               </Label>
                               <Input
@@ -1782,9 +1778,16 @@ export default function Lending() {
                                   'the borrower'
                                 )}
                               </span>
-                              <span className="font-bold text-[#00A86B]">
-                                ${parseFloat(formData.amount || 0).toLocaleString()}
-                              </span>
+                              <Input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                max="5000"
+                                placeholder="$0.00"
+                                value={formData.amount}
+                                onChange={(e) => handleInputChange('amount', e.target.value)}
+                                className="w-24 h-8 px-3 bg-white"
+                              />
                               <span>before</span>
                               <Input
                                 type="date"
@@ -1951,6 +1954,19 @@ export default function Lending() {
                                 </div>
                               );
                             })()}
+
+                            {/* Line 5: This loan is for */}
+                            <div className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
+                              <span>This loan is for</span>
+                              <Input
+                                type="text"
+                                placeholder="e.g., concert tickets, rent, tuition..."
+                                value={formData.purpose}
+                                onChange={(e) => handleInputChange('purpose', e.target.value)}
+                                className="flex-1 h-8 px-3 bg-white min-w-[200px]"
+                                maxLength={100}
+                              />
+                            </div>
                           </div>
                         )}
 
@@ -1977,19 +1993,65 @@ export default function Lending() {
 
                 {/* Summary Sidebar */}
                 <div className="space-y-4">
-                  {/* Borrower Payment Box - Only for Loan type */}
-                  {loanType === 'scheduled' && formData.amount && (
+                  {/* Loan Type Toggle - Always First */}
+                  <div className="bg-white rounded-2xl p-4 border-0">
+                    <div className="flex items-center justify-center gap-3">
+                      <span className={`text-xs font-medium ${loanType === 'scheduled' ? 'text-[#00A86B]' : 'text-slate-400'}`}>
+                        Loan
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setLoanType(loanType === 'flexible' ? 'scheduled' : 'flexible')}
+                        className={`relative w-14 h-7 rounded-full transition-all flex-shrink-0 ${
+                          loanType === 'flexible' ? 'bg-[#00A86B]' : 'bg-slate-300'
+                        }`}
+                      >
+                        <div className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow transition-all ${
+                          loanType === 'flexible' ? 'translate-x-7' : 'translate-x-0'
+                        }`}>
+                          {loanType === 'scheduled' ? (
+                            <ClipboardList className="w-3 h-3 text-slate-500 m-1" />
+                          ) : (
+                            <Zap className="w-3 h-3 text-[#00A86B] m-1" />
+                          )}
+                        </div>
+                      </button>
+                      <span className={`text-xs font-medium text-center ${loanType === 'flexible' ? 'text-[#00A86B]' : 'text-slate-400'}`}>
+                        Quick Payment Request
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 text-center mt-3">
+                      {loanType === 'flexible'
+                        ? "Get paid back in one payment - perfect for splitting dinner with roommates or one-time expenses"
+                        : "Offer money that will be paid back gradually with a structured payment plan"}
+                    </p>
+                  </div>
+
+                  {/* Borrower Payment Box - Only for Loan type, always visible */}
+                  {loanType === 'scheduled' && (
                     <div className="bg-[#DBFFEB] rounded-2xl p-4">
-                      <p className="text-xs text-slate-500 text-center">Borrower will pay</p>
+                      <p className="text-xs text-slate-500 text-center">
+                        {formData.borrower_username ? (
+                          <>
+                            {(() => {
+                              const selectedUser = users.find(u => u.username === formData.borrower_username);
+                              return selectedUser?.full_name || `@${formData.borrower_username}`;
+                            })()} will pay
+                          </>
+                        ) : (
+                          'Borrower will pay'
+                        )}
+                      </p>
                       <p className="text-2xl font-bold text-slate-800 text-center my-1">
-                        ${details.monthlyPayment.toFixed(2)}
+                        {formData.amount && details.monthlyPayment > 0 ? `$${details.monthlyPayment.toFixed(2)}` : '$—'}
                       </p>
                       <p className="text-xs text-slate-500 text-center">
-                        every {formData.payment_frequency || 'month'} before interest
+                        every {formData.payment_frequency || '—'} after interest
                       </p>
                     </div>
                   )}
 
+                  {/* Loan Summary - Always Last */}
                   <div className="bg-[#DBFFEB] rounded-2xl p-5 sticky top-6">
                     <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                       Loan Summary
@@ -2048,39 +2110,11 @@ export default function Lending() {
                     </div>
                   </div>
 
-                  {/* Loan Type Toggle */}
-                  <div className="bg-white rounded-2xl p-4 border-0">
-                    <div className="flex items-center justify-center gap-3">
-                      <span className={`text-xs font-medium ${loanType === 'scheduled' ? 'text-[#00A86B]' : 'text-slate-400'}`}>
-                        Loan
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setLoanType(loanType === 'flexible' ? 'scheduled' : 'flexible')}
-                        className={`relative w-14 h-7 rounded-full transition-all flex-shrink-0 ${
-                          loanType === 'flexible' ? 'bg-[#00A86B]' : 'bg-slate-300'
-                        }`}
-                      >
-                        <div className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow transition-all ${
-                          loanType === 'flexible' ? 'translate-x-7' : 'translate-x-0'
-                        }`}>
-                          {loanType === 'scheduled' ? (
-                            <ClipboardList className="w-3 h-3 text-slate-500 m-1" />
-                          ) : (
-                            <Zap className="w-3 h-3 text-[#00A86B] m-1" />
-                          )}
-                        </div>
-                      </button>
-                      <span className={`text-xs font-medium text-center ${loanType === 'flexible' ? 'text-[#00A86B]' : 'text-slate-400'}`}>
-                        Quick Payment Request
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-500 text-center mt-3">
-                      {loanType === 'flexible'
-                        ? "Get paid back in one payment - perfect for splitting dinner with roommates or one-time expenses"
-                        : "Offer money that will be paid back gradually with a structured payment plan"}
-                    </p>
-                  </div>
+                  {/* Friends-only message */}
+                  <p className="text-xs text-slate-500 flex items-center justify-center gap-1.5">
+                    <AlertCircle className="w-4 h-4" />
+                    You can only send offers to people in your friends list
+                  </p>
                 </div>
               </motion.div>
             )}
