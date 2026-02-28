@@ -1315,10 +1315,14 @@ export default function Lending() {
                   <div className="bg-white rounded-2xl p-5 border-0">
                     <div className="flex items-center gap-2 mb-5">
                       <div className="w-8 h-8 rounded-full bg-[#83F384] flex items-center justify-center">
-                        <PlusCircle className="w-4 h-4 text-[#0A1A10]" />
+                        {loanType === 'flexible' ? (
+                          <Zap className="w-4 h-4 text-[#0A1A10]" />
+                        ) : (
+                          <PlusCircle className="w-4 h-4 text-[#0A1A10]" />
+                        )}
                       </div>
                       <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                        Create Loan Offer
+                        {loanType === 'flexible' ? 'Create Quick Repayment Request' : 'Create Loan Offer'}
                       </p>
                     </div>
                       <form onSubmit={handleSubmit} className="space-y-5">
@@ -1539,9 +1543,19 @@ export default function Lending() {
                           disabled={isSubmitting || !formData.borrower_username || !formData.amount}
                           className="w-full bg-[#00A86B] hover:bg-[#0D9B76] text-white py-3 text-lg font-semibold"
                         >
-                          {isSubmitting ? "Sending..." : "Send Loan Offer"}
+                          {isSubmitting ? "Sending..." : (loanType === 'flexible' ? "Send Quick Repayment Request" : "Send Loan Offer")}
                         </Button>
                       </form>
+
+                      {/* Will Your Payment Request Repeat? Info Box - Only show for Quick Payment Request */}
+                      {loanType === 'flexible' && (
+                        <div className="bg-[#83F384] rounded-2xl p-4 mt-5">
+                          <p className="text-sm font-semibold text-slate-800 mb-2">Will Your Payment Request Repeat?</p>
+                          <p className="text-xs text-slate-700 leading-relaxed">
+                            If you are having money sent to you for a monthly bill you split or a regular shared expense like streaming subscriptions, consider creating a repeating request. Fill in the form once and we will help both of you keep track of payments each time the bill comes up for as long as you need.
+                          </p>
+                        </div>
+                      )}
                   </div>
                 </div>
 
@@ -1614,16 +1628,6 @@ export default function Lending() {
                         : "Offer money that will be paid back gradually with a structured payment plan"}
                     </p>
                   </div>
-
-                  {/* Will Your Payment Request Repeat? Info Box - Only show for Quick Payment Request */}
-                  {loanType === 'flexible' && (
-                    <div className="bg-[#83F384] rounded-2xl p-4">
-                      <p className="text-sm font-semibold text-slate-800 mb-2">Will Your Payment Request Repeat?</p>
-                      <p className="text-xs text-slate-700 leading-relaxed">
-                        If you are having money sent to you for a monthly bill you split or a regular shared expense like streaming subscriptions, consider creating a repeating request. Fill in the form once and we will help both of you keep track of payments each time the bill comes up for as long as you need.
-                      </p>
-                    </div>
-                  )}
                 </div>
               </motion.div>
             )}
