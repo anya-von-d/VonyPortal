@@ -262,7 +262,7 @@ export default function CreateLoan() {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Form */}
           <div className="lg:col-span-2">
-            <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
+            <Card className="bg-[#DBFFEB] backdrop-blur-sm border-0">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-slate-800">
                   <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
@@ -506,7 +506,7 @@ export default function CreateLoan() {
             </Card>
 
             {/* Flexible/Scheduled Switch */}
-            <div className="bg-white/70 backdrop-blur-sm border border-slate-200/60 rounded-lg p-4">
+            <div className="bg-[#DBFFEB] backdrop-blur-sm border-0 rounded-lg p-4">
               <div className="flex items-center justify-center gap-4">
                 <span className={`text-sm font-medium ${loanType === 'flexible' ? 'text-[#35B276]' : 'text-slate-400'}`}>Flexible</span>
                 <button

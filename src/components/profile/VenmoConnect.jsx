@@ -89,7 +89,7 @@ export default function VenmoConnect() {
 
   if (isLoading) {
     return (
-      <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
+      <Card className="bg-[#DBFFEB] backdrop-blur-sm border-0">
         <CardContent className="p-6 flex items-center justify-center">
           <Loader className="w-6 h-6 animate-spin text-green-600" />
         </CardContent>
@@ -102,7 +102,7 @@ export default function VenmoConnect() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
     >
-      <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
+      <Card className="bg-[#DBFFEB] backdrop-blur-sm border-0">
         <CardHeader className="border-b border-slate-200/40">
           <CardTitle className="flex items-center gap-2 text-slate-800">
             <svg

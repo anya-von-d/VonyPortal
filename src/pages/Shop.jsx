@@ -209,19 +209,19 @@ export default function Shop() {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                  <div className="bg-white rounded-xl p-3">
+                  <div className="bg-[#DBFFEB] rounded-xl p-3">
                     <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>APR</p>
                     <p className="font-semibold text-slate-800 text-sm">{card.apr}</p>
                   </div>
-                  <div className="bg-white rounded-xl p-3">
+                  <div className="bg-[#DBFFEB] rounded-xl p-3">
                     <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Annual Fee</p>
                     <p className="font-semibold text-slate-800 text-sm">{card.annualFee}</p>
                   </div>
-                  <div className="bg-white rounded-xl p-3">
+                  <div className="bg-[#DBFFEB] rounded-xl p-3">
                     <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Credit Limit</p>
                     <p className="font-semibold text-slate-800 text-sm">{card.creditLimit}</p>
                   </div>
-                  <div className="bg-white rounded-xl p-3">
+                  <div className="bg-[#DBFFEB] rounded-xl p-3">
                     <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Rewards</p>
                     <p className="font-semibold text-slate-800 text-sm">{card.rewards}</p>
                   </div>
@@ -278,15 +278,15 @@ export default function Shop() {
                 <p className="text-sm text-slate-600 mb-4">{loan.description}</p>
 
                 <div className="grid grid-cols-3 gap-2 mb-4">
-                  <div className="bg-white rounded-xl p-2 text-center">
+                  <div className="bg-[#DBFFEB] rounded-xl p-2 text-center">
                     <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>APR</p>
                     <p className="font-semibold text-slate-800 text-xs">{loan.apr}</p>
                   </div>
-                  <div className="bg-white rounded-xl p-2 text-center">
+                  <div className="bg-[#DBFFEB] rounded-xl p-2 text-center">
                     <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Amount</p>
                     <p className="font-semibold text-slate-800 text-xs">{loan.amount}</p>
                   </div>
-                  <div className="bg-white rounded-xl p-2 text-center">
+                  <div className="bg-[#DBFFEB] rounded-xl p-2 text-center">
                     <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Term</p>
                     <p className="font-semibold text-slate-800 text-xs">{loan.term}</p>
                   </div>

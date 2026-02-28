@@ -1180,7 +1180,7 @@ export default function Lending() {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Pie Chart */}
-                    <div className="rounded-xl p-4 flex flex-col items-center justify-center" style={{ backgroundColor: '#83F384' }}>
+                    <div className="rounded-xl p-4 flex flex-col items-center justify-center" style={{ backgroundColor: '#6EE8B5' }}>
                       <p className="text-sm font-medium text-slate-600 mb-3">Repayment Progress</p>
                       {(() => {
                         const totalOwed = activeLoans.reduce((sum, loan) => sum + (loan.total_amount || loan.amount || 0), 0);
@@ -1230,7 +1230,7 @@ export default function Lending() {
                     </div>
 
                     {/* Stats Card - Total Lent */}
-                    <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0 rounded-xl" style={{ backgroundColor: '#D0ED6F' }}>
+                    <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0 rounded-xl" style={{ backgroundColor: '#6EE8B5' }}>
                       <CardContent className="p-5 flex flex-col items-center justify-center h-full text-center">
                         <p className="text-sm font-medium text-slate-600 mb-2">Total Lent</p>
                         <p className="text-lg font-bold text-slate-800">${totalLent.toLocaleString()}</p>
@@ -1239,7 +1239,7 @@ export default function Lending() {
                     </Card>
 
                     {/* Stats Card - Expected Back */}
-                    <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0 rounded-xl" style={{ backgroundColor: '#83F384' }}>
+                    <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0 rounded-xl" style={{ backgroundColor: '#6EE8B5' }}>
                       <CardContent className="p-5 flex flex-col items-center justify-center h-full text-center">
                         <p className="text-sm font-medium text-slate-600 mb-2">Expected Back</p>
                         <p className="text-lg font-bold text-slate-800">${totalExpectedBack.toLocaleString()}</p>
@@ -1252,7 +1252,7 @@ export default function Lending() {
                 {/* Upcoming Payments + Individual Loan Progress */}
                 <div className="grid md:grid-cols-2 gap-4">
                   {/* Upcoming Payments - Left */}
-                  <div className="bg-white rounded-2xl p-5 border-0">
+                  <div className="bg-[#DBFFEB] rounded-2xl p-5 border-0">
                     <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                       Upcoming Payments
                     </p>
@@ -1290,7 +1290,7 @@ export default function Lending() {
                   </div>
 
                   {/* Individual Loan Progress - Right */}
-                  <div className="bg-white rounded-2xl p-5 border-0">
+                  <div className="bg-[#DBFFEB] rounded-2xl p-5 border-0">
                     <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                       Individual Loan Progress
                     </p>
@@ -1543,13 +1543,13 @@ export default function Lending() {
                   </div>
 
                   {/* Loan History - Right */}
-                  <div className="bg-white rounded-2xl p-5 border-0">
+                  <div className="bg-[#DBFFEB] rounded-2xl p-5 border-0">
                     <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                       Loan History
                     </p>
                     <div className="space-y-3">
                       {/* Total Amount Lent */}
-                      <div className="rounded-xl p-4 flex items-center gap-3" style={{ backgroundColor: '#D0ED6F' }}>
+                      <div className="rounded-xl p-4 flex items-center gap-3" style={{ backgroundColor: '#6EE8B5' }}>
                         <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0">
                           <DollarSign className="w-4 h-4 text-[#0A1A10]" />
                         </div>
@@ -1617,7 +1617,7 @@ export default function Lending() {
               >
                 {/* Form */}
                 <div className="lg:col-span-2">
-                  <div className="bg-white rounded-2xl p-5 border-0">
+                  <div className="bg-[#DBFFEB] rounded-2xl p-5 border-0">
                     <div className="mb-5">
                       <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                         {loanType === 'flexible' ? 'Create Quick Payment Request' : 'Create Loan Offer'}
@@ -2038,7 +2038,7 @@ export default function Lending() {
                 {/* Summary Sidebar */}
                 <div className="space-y-4">
                   {/* Loan Type Toggle - Always First */}
-                  <div className="bg-white rounded-2xl p-4 border-0">
+                  <div className="bg-[#DBFFEB] rounded-2xl p-4 border-0">
                     <div className="flex items-center justify-center gap-3">
                       <span className={`text-xs font-medium ${loanType === 'scheduled' ? 'text-[#00A86B]' : 'text-slate-400'}`}>
                         Loan
@@ -2173,7 +2173,7 @@ export default function Lending() {
                     <div className="w-8 h-8 border-2 border-green-600 border-t-transparent rounded-full animate-spin mx-auto" />
                   </div>
                 ) : manageableLoans.length === 0 ? (
-                  <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
+                  <Card className="bg-[#DBFFEB] backdrop-blur-sm border-0">
                     <CardContent className="py-12">
                       <div className="text-center text-slate-500">
                         <Settings className="w-12 h-12 mx-auto mb-3 opacity-30" />
@@ -2190,7 +2190,7 @@ export default function Lending() {
                 ) : (
                   <div className="space-y-4">
                     {/* Loan Selector Dropdown */}
-                    <div className="bg-white rounded-2xl p-5 border-0">
+                    <div className="bg-[#DBFFEB] rounded-2xl p-5 border-0">
                       <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                         Your Loans
                       </p>
@@ -2254,7 +2254,7 @@ export default function Lending() {
 
                     {/* Loan Details - Below Dropdown */}
                     {!manageLoanSelected ? (
-                      <div className="bg-white rounded-2xl p-5 border-0 flex items-center justify-center py-16">
+                      <div className="bg-[#DBFFEB] rounded-2xl p-5 border-0 flex items-center justify-center py-16">
                         <div className="text-center text-[#4A6B55]">
                           <BarChart3 className="w-12 h-12 mx-auto mb-3 opacity-50" />
                           <p>Select a loan above to view details</p>

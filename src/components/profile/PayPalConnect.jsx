@@ -77,7 +77,7 @@ export default function PayPalConnect({ userId }) {
 
   if (isLoading) {
     return (
-      <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
+      <Card className="bg-[#DBFFEB] backdrop-blur-sm border-0">
         <CardContent className="p-6">
           <div className="h-20 bg-slate-100 rounded animate-pulse"></div>
         </CardContent>
@@ -86,7 +86,7 @@ export default function PayPalConnect({ userId }) {
   }
 
   return (
-    <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
+    <Card className="bg-[#DBFFEB] backdrop-blur-sm border-0">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-lg">
           <img 

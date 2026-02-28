@@ -31,7 +31,7 @@ export default function StatsCard({ title, value, icon: Icon, color, change, isL
 
   if (isLoading) {
     return (
-      <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
+      <Card className="bg-[#DBFFEB] backdrop-blur-sm border-0">
         <CardContent className="p-6">
           <div className="mb-2">
             <SkeletonShimmer className="h-4 w-24" />

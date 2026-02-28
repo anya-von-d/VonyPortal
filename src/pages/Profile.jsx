@@ -234,9 +234,8 @@ export default function Profile() {
     setSaving(true);
     setError(null);
     try {
-      // Only include fields that exist in the database schema
+      // Only include fields that exist in the database schema (full_name is not editable)
       const updateData = {
-        full_name: formData.full_name,
         username: formData.username,
         phone: formData.phone,
         location: formData.location,
@@ -248,6 +247,8 @@ export default function Profile() {
       // Sync public profile with all latest data including updatedUser and updateData
       await syncPublicProfile({ ...user, ...updatedUser, ...updateData });
       await loadUserData();
+      // Notify other components (Layout/AuthContext) that the profile was updated
+      window.dispatchEvent(new Event('profileUpdated'));
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -270,7 +271,7 @@ export default function Profile() {
   if (isLoading) {
     return (
       <div className="min-h-screen p-6 flex items-center justify-center" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
-        <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60 p-8">
+        <Card className="bg-[#DBFFEB] backdrop-blur-sm border-0 p-8">
           <div className="text-center">
             <div className="w-8 h-8 border-2 border-green-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-slate-600">Loading profile...</p>
@@ -284,7 +285,7 @@ export default function Profile() {
   if (error && !user) {
     return (
       <div className="min-h-screen p-6 flex items-center justify-center" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
-        <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60 p-8 max-w-md">
+        <Card className="bg-[#DBFFEB] backdrop-blur-sm border-0 p-8 max-w-md">
           <div className="text-center">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <XCircle className="w-8 h-8 text-red-600" />
@@ -434,7 +435,7 @@ export default function Profile() {
           {/* Profile Info */}
           <div className="lg:col-span-2 space-y-4 md:space-y-6 min-w-0 w-full">
             {/* Personal Information - First */}
-            <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60 overflow-hidden w-full">
+            <Card className="bg-[#DBFFEB] backdrop-blur-sm border-0 overflow-hidden w-full">
               <CardHeader className="pb-3 px-3 md:px-6">
                 <CardTitle className="flex items-center gap-2 text-base md:text-xl">
                   <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
@@ -449,16 +450,15 @@ export default function Profile() {
                   <div className="grid md:grid-cols-2 gap-3 md:gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="full_name" className="flex items-center gap-2">
-                        <UserIcon className={`w-4 h-4 ${isEditing ? 'text-green-600' : 'text-slate-500'}`} />
+                        <UserIcon className="w-4 h-4 text-slate-500" />
                         Full Name
                       </Label>
                       <Input
                         id="full_name"
                         value={formData.full_name}
-                        onChange={(e) => handleInputChange('full_name', e.target.value)}
-                        disabled={!isEditing || isSaving}
+                        disabled
                         placeholder="Enter your full name"
-                        className={!isEditing ? 'bg-slate-50' : ''}
+                        className="bg-slate-50"
                       />
                     </div>
 
@@ -554,7 +554,7 @@ export default function Profile() {
           {/* Stats & Verification */}
           <div className="space-y-4 md:space-y-6 min-w-0 w-full">
             {/* Bank Account Connection */}
-            <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60 overflow-hidden w-full">
+            <Card className="bg-[#DBFFEB] backdrop-blur-sm border-0 overflow-hidden w-full">
               <CardHeader className="px-3 md:px-6">
                 <CardTitle className="flex items-center gap-2 text-base md:text-lg">
                   <Landmark className="w-5 h-5 text-green-600" />
@@ -579,7 +579,7 @@ export default function Profile() {
             </Card>
 
             {/* Verification Status */}
-            <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60 overflow-hidden w-full">
+            <Card className="bg-[#DBFFEB] backdrop-blur-sm border-0 overflow-hidden w-full">
               <CardHeader className="px-3 md:px-6">
                 <CardTitle className="flex items-center gap-2 text-base md:text-lg">
                   <Shield className="w-5 h-5 text-green-600" />
@@ -624,7 +624,7 @@ export default function Profile() {
             </Card>
 
             {/* Theme Preference */}
-            <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60 overflow-hidden w-full">
+            <Card className="bg-[#DBFFEB] backdrop-blur-sm border-0 overflow-hidden w-full">
               <CardHeader className="px-3 md:px-6">
                 <CardTitle className="flex items-center gap-2 text-base md:text-lg">
                   <Palette className="w-5 h-5 text-purple-600" />

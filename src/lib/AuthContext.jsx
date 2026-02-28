@@ -119,6 +119,19 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
+  // Listen for profile updates from Profile page
+  useEffect(() => {
+    const handleProfileUpdated = () => {
+      if (user?.id) {
+        fetchUserProfile(user.id);
+      }
+    };
+    window.addEventListener('profileUpdated', handleProfileUpdated);
+    return () => {
+      window.removeEventListener('profileUpdated', handleProfileUpdated);
+    };
+  }, [user?.id]);
+
   const refreshProfile = async () => {
     if (user?.id) {
       await fetchUserProfile(user.id);

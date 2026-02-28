@@ -9,14 +9,16 @@ export default function Layout({ children }) {
   const { userProfile, isLoadingAuth, refreshProfile } = useAuth();
 
   useEffect(() => {
-    // Listen for theme changes from Profile page
-    const handleThemeChange = () => {
+    // Listen for theme changes and profile updates from Profile page
+    const handleProfileRefresh = () => {
       refreshProfile();
     };
-    window.addEventListener('themeChanged', handleThemeChange);
+    window.addEventListener('themeChanged', handleProfileRefresh);
+    window.addEventListener('profileUpdated', handleProfileRefresh);
 
     return () => {
-      window.removeEventListener('themeChanged', handleThemeChange);
+      window.removeEventListener('themeChanged', handleProfileRefresh);
+      window.removeEventListener('profileUpdated', handleProfileRefresh);
     };
   }, []);
 

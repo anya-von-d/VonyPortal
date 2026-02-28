@@ -46,7 +46,7 @@ export default function QuickActions() {
             const hoverColor = hoverAccentColors[index % 4];
             const isHovered = hoveredIndex === index;
             const Icon = action.icon;
-            const cardBgColors = ['#D0ED6F', '#83F384', '#6EE8B5'];
+            const cardBgColors = ['#36CE8E', '#36CE8E', '#36CE8E'];
 
             return (
               <Link key={action.title} to={createPageUrl(action.url)}>

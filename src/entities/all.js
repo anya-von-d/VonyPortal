@@ -106,12 +106,13 @@ const getCurrentUserProfile = async () => {
       ...createdProfile
     };
   }
+  // Prioritize profiles table data, only fall back to metadata if profile fields are empty
   return {
     id: user.id,
     email: user.email,
-    full_name: metadata.full_name,
-    username: metadata.username,
-    ...profile
+    ...profile,
+    full_name: profile.full_name || metadata.full_name || '',
+    username: profile.username || metadata.username || '',
   };
 };
 
@@ -120,12 +121,24 @@ const updateCurrentUserProfile = async (payload) => {
   if (authError) throw authError;
   if (!authData?.user) throw new Error('Not authenticated');
   const userId = authData.user.id;
+
+  // Update the profiles table
   const { data, error } = await supabase
     .from('profiles')
-    .upsert({ id: userId, email: authData.user.email, ...payload })
+    .update(payload)
+    .eq('id', userId)
     .select('*')
     .single();
   if (error) throw error;
+
+  // Also update auth user_metadata so it stays in sync
+  const metadataUpdate = {};
+  if (payload.full_name !== undefined) metadataUpdate.full_name = payload.full_name;
+  if (payload.username !== undefined) metadataUpdate.username = payload.username;
+  if (Object.keys(metadataUpdate).length > 0) {
+    await supabase.auth.updateUser({ data: metadataUpdate });
+  }
+
   return data;
 };
 

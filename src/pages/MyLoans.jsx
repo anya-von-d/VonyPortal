@@ -325,7 +325,7 @@ export default function MyLoans() {
               <CardContent className="p-6 pt-3 space-y-6">
                 {isLoading ? (
                   Array(3).fill(0).map((_, i) => (
-                    <Card key={i} className="bg-white/70 backdrop-blur-sm border-slate-200/60 animate-pulse p-6">
+                    <Card key={i} className="bg-[#DBFFEB] backdrop-blur-sm border-0 animate-pulse p-6">
                       <div className="flex justify-between items-center mb-4">
                         <div className="h-6 bg-slate-200 rounded w-1/3"></div>
                         <div className="h-6 bg-slate-200 rounded w-1/4"></div>
@@ -395,7 +395,7 @@ export default function MyLoans() {
               <CardContent className="p-6 pt-3 space-y-6">
                 {isLoading ? (
                   Array(3).fill(0).map((_, i) => (
-                    <Card key={i} className="bg-white/70 backdrop-blur-sm border-slate-200/60 animate-pulse p-6">
+                    <Card key={i} className="bg-[#DBFFEB] backdrop-blur-sm border-0 animate-pulse p-6">
                       <div className="flex justify-between items-center mb-4">
                         <div className="h-6 bg-slate-200 rounded w-1/3"></div>
                         <div className="h-6 bg-slate-200 rounded w-1/4"></div>

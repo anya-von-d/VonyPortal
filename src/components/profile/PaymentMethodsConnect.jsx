@@ -218,7 +218,7 @@ export default function PaymentMethodsConnect() {
 
   if (isLoading) {
     return (
-      <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
+      <Card className="bg-[#DBFFEB] backdrop-blur-sm border-0">
         <CardContent className="p-6 flex items-center justify-center">
           <Loader className="w-6 h-6 animate-spin text-green-600" />
         </CardContent>
@@ -231,7 +231,7 @@ export default function PaymentMethodsConnect() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
     >
-      <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60 overflow-hidden w-full">
+      <Card className="bg-[#DBFFEB] backdrop-blur-sm border-0 overflow-hidden w-full">
         <CardHeader className="pb-3 px-3 md:px-6">
           <CardTitle className="flex items-center gap-2 text-slate-800 text-base md:text-xl">
             <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">

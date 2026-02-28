@@ -81,7 +81,7 @@ export default function MyLoanOffersPage() {
       <div className="min-h-screen p-6" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-center min-h-96">
-            <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60 p-8">
+            <Card className="bg-[#DBFFEB] backdrop-blur-sm border-0 p-8">
               <div className="text-center">
                 <div className="w-8 h-8 border-2 border-green-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                 <p className="text-slate-600">Loading your loan offers...</p>

@@ -818,7 +818,7 @@ export default function LoanAgreements() {
 
                   if (filteredAgreements.length === 0) {
                     return (
-                      <div className="bg-white rounded-xl p-8 text-center">
+                      <div className="bg-[#DBFFEB] rounded-xl p-8 text-center">
                         <div className="w-16 h-16 rounded-full bg-[#DBFFEB] flex items-center justify-center mx-auto mb-4">
                           <FileText className="w-8 h-8 text-[#00A86B]" />
                         </div>
