@@ -195,27 +195,25 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
                     transition={{ duration: 0.3, delay: 0.1 + index * 0.05 }}
                     onMouseEnter={() => setHoveredIndex(index)}
                     onMouseLeave={() => setHoveredIndex(null)}
-                    className="rounded-xl p-4 md:p-5 cursor-pointer transition-all duration-200 flex items-start gap-4"
+                    className="rounded-xl p-3 md:p-4 cursor-pointer transition-all duration-200 flex items-center gap-3"
                     style={{ backgroundColor: bgColor }}
                   >
                     {/* Circular Icon */}
-                    <div className="w-10 h-10 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-5 h-5 text-[#0A1A10]" />
+                    <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-4 h-4 text-[#0A1A10]" />
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 flex flex-col md:flex-row md:items-center md:justify-between gap-1 md:gap-4">
                       <p
-                        className="font-sans text-[15px] font-semibold transition-colors duration-200"
+                        className="font-sans text-[14px] font-semibold transition-colors duration-200 truncate"
                         style={{ color: isHovered ? hoverColor : '#0A1A10' }}
                       >
                         {title}
                       </p>
-                      <div className="flex justify-end mt-2">
-                        <p className="font-sans text-xs text-[#4A6B55]">
-                          {date}
-                        </p>
-                      </div>
+                      <p className="font-sans text-xs text-[#4A6B55] flex-shrink-0">
+                        {date}
+                      </p>
                     </div>
                   </motion.div>
                 );
