@@ -102,21 +102,37 @@ export default function Friends() {
       );
       if (isFriend) return false;
 
-      // Check if request already sent by current user
+      // Check if request already sent by current user (exclude from results - they're in sent requests)
       const requestSent = sentRequests.some(r => r.friend_id === profile.user_id);
       if (requestSent) return false;
 
-      // Check if request already received from this user
-      const requestReceived = receivedRequests.some(r => r.user_id === profile.user_id);
-      if (requestReceived) return false;
-
       // Match username or full name containing search query
+      // Note: Users who have sent requests TO current user ARE included (so user can accept)
       const usernameMatch = profile.username?.toLowerCase().includes(query);
       const nameMatch = profile.full_name?.toLowerCase().includes(query);
       return usernameMatch || nameMatch;
     });
 
     setSearchResults(results);
+  };
+
+  // Check if a user has sent a request to current user
+  const getReceivedRequestFrom = (userId) => {
+    return receivedRequests.find(r => r.user_id === userId);
+  };
+
+  const handleAcceptRequestFromSearch = async (friendshipId) => {
+    if (processingId) return;
+    setProcessingId(friendshipId);
+
+    try {
+      await Friendship.update(friendshipId, { status: 'accepted' });
+      await loadFriendsData();
+      setSearchQuery('');
+    } catch (error) {
+      console.error("Error accepting friend request:", error);
+    }
+    setProcessingId(null);
   };
 
   const getFriendProfile = (friendship) => {
@@ -405,53 +421,74 @@ export default function Friends() {
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      {searchResults.map((profile) => (
-                        <div
-                          key={profile.user_id}
-                          className="bg-white rounded-xl p-4 flex items-center gap-4"
-                        >
-                          {/* Profile Photo */}
-                          <div className="w-12 h-12 rounded-full bg-[#83F384] flex items-center justify-center flex-shrink-0">
-                            {profile.avatar_url ? (
-                              <img
-                                src={profile.avatar_url}
-                                alt={profile.full_name}
-                                className="w-full h-full rounded-full object-cover"
-                              />
-                            ) : (
-                              <span className="text-lg font-semibold text-[#0A1A10]">
-                                {(profile.full_name || profile.username || '?').charAt(0).toUpperCase()}
-                              </span>
-                            )}
-                          </div>
+                      {searchResults.map((profile) => {
+                        const receivedRequest = getReceivedRequestFrom(profile.user_id);
 
-                          {/* Name and Username */}
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-slate-800 truncate">
-                              {profile.full_name || profile.username}
-                            </p>
-                            <p className="text-sm text-slate-500 truncate">
-                              @{profile.username}
-                            </p>
-                          </div>
-
-                          {/* Send Request Button */}
-                          <Button
-                            onClick={() => handleSendRequest(profile.user_id)}
-                            disabled={processingId === profile.user_id}
-                            className="bg-[#00A86B] hover:bg-[#0D9B76] text-white text-sm"
+                        return (
+                          <div
+                            key={profile.user_id}
+                            className="bg-white rounded-xl p-4 flex items-center gap-4"
                           >
-                            {processingId === profile.user_id ? (
-                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            {/* Profile Photo */}
+                            <div className="w-12 h-12 rounded-full bg-[#83F384] flex items-center justify-center flex-shrink-0">
+                              {profile.avatar_url ? (
+                                <img
+                                  src={profile.avatar_url}
+                                  alt={profile.full_name}
+                                  className="w-full h-full rounded-full object-cover"
+                                />
+                              ) : (
+                                <span className="text-lg font-semibold text-[#0A1A10]">
+                                  {(profile.full_name || profile.username || '?').charAt(0).toUpperCase()}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Name and Username */}
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-slate-800 truncate">
+                                {profile.full_name || profile.username}
+                              </p>
+                              <p className="text-sm text-slate-500 truncate">
+                                @{profile.username}
+                              </p>
+                            </div>
+
+                            {/* Accept or Send Request Button */}
+                            {receivedRequest ? (
+                              <Button
+                                onClick={() => handleAcceptRequestFromSearch(receivedRequest.id)}
+                                disabled={processingId === receivedRequest.id}
+                                className="bg-[#00A86B] hover:bg-[#0D9B76] text-white text-sm"
+                              >
+                                {processingId === receivedRequest.id ? (
+                                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                ) : (
+                                  <>
+                                    <Check className="w-4 h-4 mr-2" />
+                                    Accept Friend Request
+                                  </>
+                                )}
+                              </Button>
                             ) : (
-                              <>
-                                <Send className="w-4 h-4 mr-2" />
-                                Send Friend Request
-                              </>
+                              <Button
+                                onClick={() => handleSendRequest(profile.user_id)}
+                                disabled={processingId === profile.user_id}
+                                className="bg-[#00A86B] hover:bg-[#0D9B76] text-white text-sm"
+                              >
+                                {processingId === profile.user_id ? (
+                                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                ) : (
+                                  <>
+                                    <Send className="w-4 h-4 mr-2" />
+                                    Send Friend Request
+                                  </>
+                                )}
+                              </Button>
                             )}
-                          </Button>
-                        </div>
-                      ))}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
