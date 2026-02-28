@@ -16,7 +16,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
-  Clock, Calendar, DollarSign, AlertCircle, FileText
+  Clock, Calendar, DollarSign, AlertCircle, FileText, ChevronDown
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
@@ -42,6 +42,7 @@ export default function Borrowing() {
   const [showSignModal, setShowSignModal] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [manageLoanSelected, setManageLoanSelected] = useState(null);
+  const [rankingFilter, setRankingFilter] = useState('highest_interest'); // 'highest_interest', 'highest_payment', 'soonest_deadline'
 
   useEffect(() => {
     loadData();
@@ -467,6 +468,111 @@ export default function Borrowing() {
                         >
                           View Offers
                         </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Loans Ranked By */}
+                {activeLoans.length > 0 && (
+                  <Card className="bg-[#DBFFEB] border-0 rounded-2xl">
+                    <CardContent className="p-5">
+                      {/* Header with dropdown */}
+                      <div className="flex items-center gap-2 mb-4">
+                        <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                          Loans Ranked By
+                        </p>
+                        <Select value={rankingFilter} onValueChange={setRankingFilter}>
+                          <SelectTrigger className="w-auto h-7 text-xs bg-white border-slate-200 gap-1 px-2">
+                            <SelectValue>
+                              {rankingFilter === 'highest_interest' && 'Highest Interest'}
+                              {rankingFilter === 'highest_payment' && 'Highest Payment'}
+                              {rankingFilter === 'soonest_deadline' && 'Soonest Payment Deadline'}
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="highest_interest">Highest Interest</SelectItem>
+                            <SelectItem value="highest_payment">Highest Payment</SelectItem>
+                            <SelectItem value="soonest_deadline">Soonest Payment Deadline</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Ranked Loans */}
+                      <div className="space-y-3">
+                        {(() => {
+                          let sortedLoans = [...activeLoans];
+
+                          if (rankingFilter === 'highest_interest') {
+                            sortedLoans.sort((a, b) => (b.interest_rate || 0) - (a.interest_rate || 0));
+                          } else if (rankingFilter === 'highest_payment') {
+                            sortedLoans.sort((a, b) => (b.payment_amount || 0) - (a.payment_amount || 0));
+                          } else if (rankingFilter === 'soonest_deadline') {
+                            sortedLoans.sort((a, b) => {
+                              const dateA = a.next_payment_date ? new Date(a.next_payment_date) : new Date('2999-12-31');
+                              const dateB = b.next_payment_date ? new Date(b.next_payment_date) : new Date('2999-12-31');
+                              return dateA - dateB;
+                            });
+                          }
+
+                          return sortedLoans.map((loan, index) => {
+                            const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
+                            const bgColors = ['#D0ED6F', '#83F384', '#6EE8B5'];
+
+                            return (
+                              <motion.div
+                                key={loan.id}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.05 }}
+                                className="rounded-xl p-4 flex items-center gap-3"
+                                style={{ backgroundColor: bgColors[index % 3] }}
+                              >
+                                {/* Rank Number */}
+                                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0">
+                                  <span className="text-sm font-bold text-slate-800">{index + 1}</span>
+                                </div>
+
+                                {/* Loan Info */}
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <p className="font-semibold text-slate-800 text-sm">
+                                      @{lender?.username || 'user'}
+                                    </p>
+                                    <span className="text-slate-500 text-xs">•</span>
+                                    <p className="text-sm text-slate-700">
+                                      ${(loan.amount || 0).toLocaleString()}
+                                    </p>
+                                  </div>
+                                  <div className="flex items-center gap-3 mt-1 text-xs text-slate-600">
+                                    {rankingFilter === 'highest_interest' && (
+                                      <span className="font-medium text-slate-700">{loan.interest_rate || 0}% interest</span>
+                                    )}
+                                    {rankingFilter === 'highest_payment' && (
+                                      <span className="font-medium text-slate-700">${(loan.payment_amount || 0).toLocaleString()} / {loan.payment_frequency || 'month'}</span>
+                                    )}
+                                    {rankingFilter === 'soonest_deadline' && loan.next_payment_date && (
+                                      <span className="font-medium text-slate-700">
+                                        Due {format(new Date(loan.next_payment_date), 'MMM d, yyyy')}
+                                      </span>
+                                    )}
+                                    {rankingFilter === 'soonest_deadline' && !loan.next_payment_date && (
+                                      <span className="font-medium text-slate-500">No payment date set</span>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* Amount remaining */}
+                                <div className="text-right flex-shrink-0">
+                                  <p className="text-xs text-slate-500">Remaining</p>
+                                  <p className="font-semibold text-slate-800 text-sm">
+                                    ${((loan.total_amount || loan.amount || 0) - (loan.amount_paid || 0)).toLocaleString()}
+                                  </p>
+                                </div>
+                              </motion.div>
+                            );
+                          });
+                        })()}
                       </div>
                     </CardContent>
                   </Card>
