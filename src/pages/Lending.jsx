@@ -28,10 +28,10 @@ import {
   DollarSign, Calendar, Percent, FileText, User as UserIcon,
   AlertCircle, Zap, ClipboardList, Send, Clock,
   TrendingUp, Pencil, X, Save, History, PlusCircle, Settings, BarChart3,
-  Download, CheckCircle, FolderOpen, Info, UserPlus
+  Download, CheckCircle, FolderOpen, Info, UserPlus, ChevronDown
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { addMonths, addWeeks, addDays, format } from "date-fns";
+import { addMonths, addWeeks, addDays, format, startOfMonth, endOfMonth, isSameMonth } from "date-fns";
 import { jsPDF } from "jspdf";
 import { formatMoney } from "@/components/utils/formatMoney";
 
@@ -64,6 +64,8 @@ export default function Lending() {
   const [activeInfoTooltip, setActiveInfoTooltip] = useState(null); // 'promissory' or 'amortization'
   const [friendships, setFriendships] = useState([]);
   const [friends, setFriends] = useState([]);
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [showMonthDropdown, setShowMonthDropdown] = useState(false);
 
   const [formData, setFormData] = useState({
     borrower_username: '',
@@ -1330,6 +1332,198 @@ export default function Lending() {
                         )}
                       </div>
                     )}
+                  </div>
+                </div>
+
+                {/* Month Repayment Amount Box */}
+                {(() => {
+                  const monthEnd = endOfMonth(selectedMonth);
+                  let totalReceive = 0;
+
+                  activeLoans.forEach(loan => {
+                    if (!loan.next_payment_date) return;
+                    const paymentDate = new Date(loan.next_payment_date);
+                    const paymentAmount = loan.payment_amount || 0;
+
+                    const addAmountIfInMonth = (date) => {
+                      if (isSameMonth(date, selectedMonth)) {
+                        totalReceive += paymentAmount;
+                      }
+                    };
+
+                    addAmountIfInMonth(paymentDate);
+
+                    const frequency = loan.payment_frequency;
+                    if (frequency && frequency !== 'none') {
+                      let currentDate = new Date(loan.next_payment_date);
+                      let iterations = 0;
+                      while (iterations < 10) {
+                        if (frequency === 'weekly') {
+                          currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
+                        } else if (frequency === 'biweekly') {
+                          currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
+                        } else if (frequency === 'monthly') {
+                          currentDate = addMonths(currentDate, 1);
+                        } else if (frequency === 'daily') {
+                          currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+                        } else {
+                          break;
+                        }
+                        if (currentDate > monthEnd) break;
+                        addAmountIfInMonth(currentDate);
+                        iterations++;
+                      }
+                    }
+                  });
+
+                  return (
+                    <div className="bg-[#83F384] rounded-xl p-3 flex items-center justify-between">
+                      <p className="text-[11px] text-[#0A1A10] uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                        {format(selectedMonth, 'MMMM')} Repayment Amount
+                      </p>
+                      <p className="text-sm font-bold text-[#0A1A10]">
+                        +${totalReceive.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </p>
+                    </div>
+                  );
+                })()}
+
+                {/* Month Repayment Overview Box */}
+                <div className="bg-[#DBFFEB] rounded-2xl p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="relative">
+                      <button
+                        onClick={() => setShowMonthDropdown(!showMonthDropdown)}
+                        className="flex items-center gap-2 text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium hover:text-slate-800 transition-colors"
+                        style={{ fontFamily: 'IBM Plex Mono, monospace' }}
+                      >
+                        {format(selectedMonth, 'MMMM')} Repayment Overview
+                        <ChevronDown className={`w-4 h-4 transition-transform ${showMonthDropdown ? 'rotate-180' : ''}`} />
+                      </button>
+
+                      {showMonthDropdown && (
+                        <>
+                          <div className="fixed inset-0 z-10" onClick={() => setShowMonthDropdown(false)} />
+                          <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-lg border z-20 py-2 min-w-[160px]">
+                            {Array.from({ length: 12 }, (_, i) => {
+                              const monthDate = new Date(new Date().getFullYear(), i, 1);
+                              return (
+                                <button
+                                  key={i}
+                                  onClick={() => {
+                                    setSelectedMonth(monthDate);
+                                    setShowMonthDropdown(false);
+                                  }}
+                                  className={`w-full px-4 py-2 text-left text-sm hover:bg-[#DBFFEB] transition-colors ${
+                                    isSameMonth(monthDate, selectedMonth) ? 'bg-[#DBFFEB] font-medium text-[#00A86B]' : 'text-slate-700'
+                                  }`}
+                                >
+                                  {format(monthDate, 'MMMM')}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1" style={{
+                    maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
+                    WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)'
+                  }}>
+                    {(() => {
+                      const monthEnd = endOfMonth(selectedMonth);
+                      const events = [];
+
+                      activeLoans.forEach(loan => {
+                        if (!loan.next_payment_date) return;
+
+                        const paymentDate = new Date(loan.next_payment_date);
+                        const borrower = publicProfiles.find(p => p.user_id === loan.borrower_id);
+
+                        const addEventIfInMonth = (date) => {
+                          if (isSameMonth(date, selectedMonth)) {
+                            events.push({
+                              date: new Date(date),
+                              amount: loan.payment_amount || 0,
+                              username: borrower?.username || 'user'
+                            });
+                          }
+                        };
+
+                        addEventIfInMonth(paymentDate);
+
+                        const frequency = loan.payment_frequency;
+                        if (frequency && frequency !== 'none') {
+                          let currentDate = new Date(loan.next_payment_date);
+                          let iterations = 0;
+                          while (iterations < 10) {
+                            if (frequency === 'weekly') {
+                              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
+                            } else if (frequency === 'biweekly') {
+                              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
+                            } else if (frequency === 'monthly') {
+                              currentDate = addMonths(currentDate, 1);
+                            } else if (frequency === 'daily') {
+                              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+                            } else {
+                              break;
+                            }
+                            if (currentDate > monthEnd) break;
+                            addEventIfInMonth(currentDate);
+                            iterations++;
+                          }
+                        }
+                      });
+
+                      events.sort((a, b) => a.date - b.date);
+
+                      if (events.length === 0) {
+                        return (
+                          <div className="flex flex-col items-center justify-center py-8 text-slate-500">
+                            <Calendar className="w-10 h-10 opacity-40 mb-2" />
+                            <p className="text-sm">No repayments expected this month</p>
+                          </div>
+                        );
+                      }
+
+                      const colors = ['#D0ED6F', '#83F384', '#6EE8B5'];
+
+                      return events.map((event, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center gap-3 p-3 rounded-xl"
+                          style={{ backgroundColor: colors[index % 3] }}
+                        >
+                          <div className="bg-[#DBFFEB] rounded-lg px-3 py-2 flex-shrink-0 text-center min-w-[50px]">
+                            <p className="text-xs text-slate-500 uppercase" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                              {format(event.date, 'MMM')}
+                            </p>
+                            <p className="text-lg font-bold text-slate-800">
+                              {format(event.date, 'd')}
+                            </p>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-slate-800">
+                              <span className="text-[#00A86B]">Receive</span>
+                              {' '}
+                              <span className="font-bold">${event.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                              {' '}
+                              <span className="text-slate-600">from</span>
+                              {' '}
+                              <span className="font-medium">@{event.username}</span>
+                            </p>
+                          </div>
+                          <div className="flex-shrink-0">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00A86B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <line x1="12" y1="19" x2="12" y2="5"></line>
+                              <polyline points="5 12 12 5 19 12"></polyline>
+                            </svg>
+                          </div>
+                        </div>
+                      ));
+                    })()}
                   </div>
                 </div>
               </motion.div>
