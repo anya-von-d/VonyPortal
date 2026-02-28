@@ -3,12 +3,6 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 const leftNavItems = [
   {
@@ -203,31 +197,6 @@ export default function TopNav({ location }) {
                 {item.title}
               </Link>
             ))}
-
-            {/* More Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="font-sans text-sm font-medium text-[#4A6B55] hover:text-[#0A1A10] transition-colors duration-200">
-                  More
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 bg-white border border-gray-100 shadow-lg">
-                {moreMenuItems.map((item) => (
-                  <DropdownMenuItem key={item.title} asChild>
-                    <Link
-                      to={item.url}
-                      className={`cursor-pointer ${
-                        location.pathname === item.url
-                          ? "text-[#0A1A10]"
-                          : "text-[#4A6B55] hover:text-[#0A1A10]"
-                      }`}
-                    >
-                      {item.title}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
 
           {/* My Profile Button (Right) */}
@@ -248,7 +217,7 @@ export default function TopNav({ location }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 bg-[#DBEEE3] flex flex-col"
+            className="fixed inset-0 z-40 bg-[#83F384] flex flex-col"
             style={{ top: '56px' }}
           >
             {/* Navigation Links */}
@@ -264,10 +233,10 @@ export default function TopNav({ location }) {
                   <Link
                     to={item.url}
                     onClick={() => handleNavClick(item.url)}
-                    className={`block py-3 md:py-4 font-display italic text-5xl md:text-6xl lg:text-7xl tracking-wide transition-colors duration-200 ${
+                    className={`block py-2 text-2xl md:text-3xl font-bold tracking-tight transition-colors duration-200 ${
                       location.pathname === item.url
                         ? "text-[#0A1A10]"
-                        : "text-[#4A6B55] hover:text-[#0A1A10]"
+                        : "text-[#0A1A10]/70 hover:text-[#0A1A10]"
                     }`}
                   >
                     {item.title}
@@ -282,9 +251,9 @@ export default function TopNav({ location }) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ delay: 0.4, duration: 0.3 }}
-              className="py-8 text-center"
+              className="py-6 text-center"
             >
-              <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-[#4A6B55]">
+              <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#0A1A10]/60">
                 Vony · Lending Made Simple
               </p>
             </motion.div>

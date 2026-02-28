@@ -71,7 +71,10 @@ export default function Lending() {
     repayment_unit: 'months',
     custom_due_date: '',
     payment_frequency: 'monthly',
-    purpose: ''
+    purpose: '',
+    is_repeating: false,
+    repeating_frequency: 'monthly',
+    repeating_end_date: ''
   });
 
   useEffect(() => {
@@ -1371,6 +1374,68 @@ export default function Lending() {
                           </div>
                         </div>
 
+                        {/* Repeating Request Toggle - Only for Quick Payment Request */}
+                        {loanType === 'flexible' && (
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                              <div>
+                                <Label className="flex items-center gap-2 text-sm font-medium">
+                                  Repeating Request
+                                </Label>
+                                <p className="text-xs text-slate-500 mt-0.5">Will this payment repeat regularly?</p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleInputChange('is_repeating', !formData.is_repeating)}
+                                className={`relative w-12 h-6 rounded-full transition-all ${
+                                  formData.is_repeating ? 'bg-[#00A86B]' : 'bg-slate-300'
+                                }`}
+                              >
+                                <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow transition-all ${
+                                  formData.is_repeating ? 'translate-x-6' : 'translate-x-0'
+                                }`} />
+                              </button>
+                            </div>
+
+                            {/* Repeating Options */}
+                            {formData.is_repeating && (
+                              <div className="grid sm:grid-cols-2 gap-4 p-4 bg-[#DBFFEB] rounded-xl">
+                                <div className="space-y-2">
+                                  <Label className="flex items-center gap-2">
+                                    <Calendar className="w-4 h-4 text-[#00A86B]" />
+                                    Payment Frequency
+                                  </Label>
+                                  <Select
+                                    value={formData.repeating_frequency}
+                                    onValueChange={(value) => handleInputChange('repeating_frequency', value)}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select frequency" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="weekly">Weekly</SelectItem>
+                                      <SelectItem value="biweekly">Bi-weekly</SelectItem>
+                                      <SelectItem value="monthly">Monthly</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="space-y-2">
+                                  <Label className="flex items-center gap-2">
+                                    <Calendar className="w-4 h-4 text-[#00A86B]" />
+                                    End Date
+                                  </Label>
+                                  <Input
+                                    type="date"
+                                    value={formData.repeating_end_date}
+                                    onChange={(e) => handleInputChange('repeating_end_date', e.target.value)}
+                                    min={format(new Date(), 'yyyy-MM-dd')}
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
                         {/* Scheduled loan fields */}
                         {loanType === 'scheduled' && (
                           <>
@@ -1503,14 +1568,14 @@ export default function Lending() {
 
                   {/* Loan Type Toggle */}
                   <div className="bg-white rounded-2xl p-4 border-0">
-                    <div className="flex items-center justify-center gap-4">
-                      <span className={`text-sm font-medium ${loanType === 'flexible' ? 'text-[#00A86B]' : 'text-slate-400'}`}>
-                        Flexible
+                    <div className="flex items-center justify-center gap-3">
+                      <span className={`text-xs font-medium text-center ${loanType === 'flexible' ? 'text-[#00A86B]' : 'text-slate-400'}`}>
+                        Quick Payment Request
                       </span>
                       <button
                         type="button"
                         onClick={() => setLoanType(loanType === 'flexible' ? 'scheduled' : 'flexible')}
-                        className={`relative w-14 h-7 rounded-full transition-all ${
+                        className={`relative w-14 h-7 rounded-full transition-all flex-shrink-0 ${
                           loanType === 'scheduled' ? 'bg-[#00A86B]' : 'bg-slate-300'
                         }`}
                       >
@@ -1524,16 +1589,26 @@ export default function Lending() {
                           )}
                         </div>
                       </button>
-                      <span className={`text-sm font-medium ${loanType === 'scheduled' ? 'text-[#00A86B]' : 'text-slate-400'}`}>
-                        Scheduled
+                      <span className={`text-xs font-medium ${loanType === 'scheduled' ? 'text-[#00A86B]' : 'text-slate-400'}`}>
+                        Scheduled Loan
                       </span>
                     </div>
-                    <p className="text-xs text-slate-500 text-center mt-2">
+                    <p className="text-xs text-slate-500 text-center mt-3">
                       {loanType === 'flexible'
-                        ? "Casual loans, no interest or schedule"
-                        : "Formal loans with interest and payments"}
+                        ? "Get paid back in one payment - perfect for splitting dinner with roommates or one-time expenses"
+                        : "Formal loans with interest and scheduled payment plans"}
                     </p>
                   </div>
+
+                  {/* Will Your Payment Request Repeat? Info Box */}
+                  {loanType === 'flexible' && (
+                    <div className="bg-[#83F384] rounded-2xl p-4">
+                      <p className="text-sm font-semibold text-slate-800 mb-2">Will Your Payment Request Repeat?</p>
+                      <p className="text-xs text-slate-700 leading-relaxed">
+                        If you are having money sent to you for a monthly bill you split or a regular shared expense like streaming subscriptions, consider creating a repeating request. Fill in the form once and we will help both of you keep track of payments each time the bill comes up for as long as you need.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}
