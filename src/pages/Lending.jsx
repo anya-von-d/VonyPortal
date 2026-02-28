@@ -465,7 +465,6 @@ export default function Lending() {
     { id: 'lending', label: 'All' },
     { id: 'create', label: 'Create Offer' },
     { id: 'active', label: 'Manage Loans' },
-    { id: 'offers', label: 'Pending Offers' },
     { id: 'history', label: 'History' },
   ];
 
@@ -1429,43 +1428,6 @@ export default function Lending() {
                       )}
                   </div>
                 )}
-              </motion.div>
-            )}
-
-            {activeSection === 'offers' && (
-              <motion.div
-                key="offers"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-              >
-                <Card className="bg-white/70 backdrop-blur-sm border-slate-200/60">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                        <Send className="w-4 h-4 text-blue-600" />
-                      </div>
-                      Pending Offers Sent
-                    </CardTitle>
-                    <p className="text-sm text-slate-500">Loan offers waiting for acceptance</p>
-                  </CardHeader>
-                  <CardContent>
-                    {pendingOffers.length === 0 ? (
-                      <div className="text-center py-8 text-slate-500">
-                        <Send className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                        <p>No pending offers</p>
-                      </div>
-                    ) : (
-                      <MyLoanOffers
-                        offers={pendingOffers}
-                        users={publicProfiles}
-                        currentUser={currentUser}
-                        onDelete={handleDeleteOffer}
-                        hideHeader={true}
-                      />
-                    )}
-                  </CardContent>
-                </Card>
               </motion.div>
             )}
 

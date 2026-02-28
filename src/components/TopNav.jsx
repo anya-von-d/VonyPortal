@@ -30,6 +30,10 @@ const rightNavItems = [
 
 const moreMenuItems = [
   {
+    title: "Requests",
+    url: createPageUrl("Requests"),
+  },
+  {
     title: "Agreements",
     url: createPageUrl("LoanAgreements"),
   },
@@ -200,11 +204,11 @@ export default function TopNav({ location }) {
               </Link>
             ))}
 
-            {/* Agreements Dropdown */}
+            {/* Requests Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="font-sans text-sm font-medium text-[#4A6B55] hover:text-[#0A1A10] transition-colors duration-200">
-                  Agreements
+                  Requests
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 bg-white border border-gray-100 shadow-lg">
