@@ -1345,70 +1345,9 @@ export default function Lending() {
                   </div>
                 </div>
 
-                {/* Loan History + Month Repayment */}
+                {/* Month Repayment + Loan History */}
                 <div className="grid md:grid-cols-2 gap-4">
-                  {/* Loan History - Left */}
-                  <div className="bg-white rounded-2xl p-5 border-0">
-                    <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                      Loan History
-                    </p>
-                    <div className="space-y-3">
-                      {/* Total Amount Lent */}
-                      <div className="rounded-xl p-4 flex items-center gap-3" style={{ backgroundColor: '#D0ED6F' }}>
-                        <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0">
-                          <DollarSign className="w-4 h-4 text-[#0A1A10]" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                            Total Lent
-                          </p>
-                          <p className="text-lg font-bold text-slate-800">
-                            ${lentLoans.reduce((sum, l) => sum + (l.amount || 0), 0).toLocaleString()}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Number of Loans */}
-                      <div className="rounded-xl p-4 flex items-center gap-3" style={{ backgroundColor: '#83F384' }}>
-                        <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0">
-                          <FileText className="w-4 h-4 text-[#0A1A10]" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                            Loans
-                          </p>
-                          <p className="text-lg font-bold text-slate-800">
-                            {lentLoans.length}
-                          </p>
-                        </div>
-                        <div className="flex flex-col gap-1 flex-shrink-0">
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/70 text-[#00A86B] font-medium">
-                            {activeLoans.length} active
-                          </span>
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/70 text-slate-500 font-medium">
-                            {completedLoans.length} done
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Friends Lent To */}
-                      <div className="rounded-xl p-4 flex items-center gap-3" style={{ backgroundColor: '#6EE8B5' }}>
-                        <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0">
-                          <UserIcon className="w-4 h-4 text-[#0A1A10]" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                            Friends Lent To
-                          </p>
-                          <p className="text-lg font-bold text-slate-800">
-                            {new Set(lentLoans.map(l => l.borrower_id)).size}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Right column: Month Repayment Amount + Overview stacked */}
+                  {/* Left column: Month Repayment Amount + Overview stacked */}
                   <div className="space-y-4">
                     {/* Month Repayment Amount Box */}
                     {(() => {
@@ -1602,6 +1541,68 @@ export default function Lending() {
                   </div>
                 </div>
                   </div>
+
+                  {/* Loan History - Right */}
+                  <div className="bg-white rounded-2xl p-5 border-0">
+                    <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                      Loan History
+                    </p>
+                    <div className="space-y-3">
+                      {/* Total Amount Lent */}
+                      <div className="rounded-xl p-4 flex items-center gap-3" style={{ backgroundColor: '#D0ED6F' }}>
+                        <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0">
+                          <DollarSign className="w-4 h-4 text-[#0A1A10]" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                            Total Lent
+                          </p>
+                          <p className="text-lg font-bold text-slate-800">
+                            ${lentLoans.reduce((sum, l) => sum + (l.amount || 0), 0).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Number of Loans */}
+                      <div className="rounded-xl p-4 flex items-center gap-3" style={{ backgroundColor: '#83F384' }}>
+                        <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0">
+                          <FileText className="w-4 h-4 text-[#0A1A10]" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                            Loans
+                          </p>
+                          <p className="text-lg font-bold text-slate-800">
+                            {lentLoans.length}
+                          </p>
+                        </div>
+                        <div className="flex flex-col gap-1 flex-shrink-0">
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/70 text-[#00A86B] font-medium">
+                            {activeLoans.length} active
+                          </span>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/70 text-slate-500 font-medium">
+                            {completedLoans.length} done
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Friends Lent To */}
+                      <div className="rounded-xl p-4 flex items-center gap-3" style={{ backgroundColor: '#6EE8B5' }}>
+                        <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0">
+                          <UserIcon className="w-4 h-4 text-[#0A1A10]" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                            Friends Lent To
+                          </p>
+                          <p className="text-lg font-bold text-slate-800">
+                            {new Set(lentLoans.map(l => l.borrower_id)).size}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
               </motion.div>
             )}
@@ -2333,12 +2334,9 @@ export default function Lending() {
                                           <span className="text-xs text-slate-500">Paid</span>
                                         </div>
                                       </div>
-                                      <div className="mt-3 text-center space-y-1">
+                                      <div className="mt-3 text-center">
                                         <p className="text-xs text-slate-600">
-                                          <span className="text-[#00A86B] font-semibold">${amountPaid.toLocaleString()}</span> paid
-                                        </p>
-                                        <p className="text-xs text-slate-600">
-                                          <span className="text-slate-800 font-semibold">${remaining.toLocaleString()}</span> remaining
+                                          <span className="text-slate-800 font-semibold">${remaining.toLocaleString()}</span> remaining{manageLoanSelected.next_payment_date ? ` due ${format(new Date(manageLoanSelected.next_payment_date), 'MMM d')}` : ''}
                                         </p>
                                       </div>
                                     </>
@@ -2391,7 +2389,7 @@ export default function Lending() {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Interest Box + Loan Amounts - Left */}
                             <div className="space-y-4">
-                              <div className="bg-[#DBFFEB] rounded-2xl p-5">
+                              <div className="bg-[#6EE8B5] rounded-2xl p-5">
                                 <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                                   Interest
                                 </p>
@@ -2422,25 +2420,28 @@ export default function Lending() {
                                 </div>
                               </div>
                               {/* Loan Progress Box */}
-                              <div className="bg-[#DBFFEB] rounded-2xl p-5">
+                              <div className="bg-[#83F384] rounded-2xl p-5">
                                 <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                                   Loan Progress
                                 </p>
                                 <div className="grid grid-cols-2 gap-3">
                                   <div className="bg-[#D0ED6F] rounded-xl p-4">
-                                    <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Total Remaining</p>
-                                    <p className="text-xl font-bold text-slate-800">
-                                      ${(() => {
-                                        const total = manageLoanSelected.total_amount || manageLoanSelected.amount || 0;
-                                        const paid = manageLoanSelected.amount_paid || 0;
-                                        return (total - paid).toLocaleString();
-                                      })()}
-                                    </p>
-                                  </div>
-                                  <div className="bg-[#83F384] rounded-xl p-4">
                                     <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Amount Paid</p>
                                     <p className="text-xl font-bold text-[#00A86B]">
                                       ${(manageLoanSelected.amount_paid || 0).toLocaleString()}
+                                    </p>
+                                  </div>
+                                  <div className="bg-[#D0ED6F] rounded-xl p-4">
+                                    <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Completed Payments</p>
+                                    <p className="text-xl font-bold text-slate-800">
+                                      {(() => {
+                                        const paymentAmt = manageLoanSelected.payment_amount || 0;
+                                        const totalAmt = manageLoanSelected.total_amount || manageLoanSelected.amount || 0;
+                                        const amtPaid = manageLoanSelected.amount_paid || 0;
+                                        const completed = paymentAmt > 0 ? Math.floor(amtPaid / paymentAmt) : 0;
+                                        const totalPayments = paymentAmt > 0 ? Math.ceil(totalAmt / paymentAmt) : 0;
+                                        return `${completed}/${totalPayments}`;
+                                      })()}
                                     </p>
                                   </div>
                                 </div>

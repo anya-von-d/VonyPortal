@@ -835,103 +835,10 @@ export default function Borrowing() {
                   </div>
                 )}
 
-                {/* Loans Ranked By + Month Payment Amount & Overview */}
+                {/* Month Payment + Loans Ranked By */}
                 {activeLoans.length > 0 && (
                   <div className="grid md:grid-cols-2 gap-4">
-                    {/* Loans Ranked By - Left */}
-                    <div className="bg-white rounded-2xl p-5 border-0">
-                      {/* Header with dropdown */}
-                      <div className="flex items-center gap-2 mb-4">
-                        <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                          Loans Ranked By
-                        </p>
-                        <Select value={rankingFilter} onValueChange={setRankingFilter}>
-                          <SelectTrigger className="w-auto h-7 text-xs bg-white border-slate-200 gap-1 px-2">
-                            <SelectValue>
-                              {rankingFilter === 'highest_interest' && 'Highest Interest'}
-                              {rankingFilter === 'highest_payment' && 'Highest Payment'}
-                              {rankingFilter === 'soonest_deadline' && 'Soonest Deadline'}
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="highest_interest">Highest Interest</SelectItem>
-                            <SelectItem value="highest_payment">Highest Payment</SelectItem>
-                            <SelectItem value="soonest_deadline">Soonest Deadline</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      {/* Ranked Loans */}
-                      <div className="space-y-3">
-                        {(() => {
-                          let sortedLoans = [...activeLoans];
-
-                          if (rankingFilter === 'highest_interest') {
-                            sortedLoans.sort((a, b) => (b.interest_rate || 0) - (a.interest_rate || 0));
-                          } else if (rankingFilter === 'highest_payment') {
-                            sortedLoans.sort((a, b) => (b.payment_amount || 0) - (a.payment_amount || 0));
-                          } else if (rankingFilter === 'soonest_deadline') {
-                            sortedLoans.sort((a, b) => {
-                              const dateA = a.next_payment_date ? new Date(a.next_payment_date) : new Date('2999-12-31');
-                              const dateB = b.next_payment_date ? new Date(b.next_payment_date) : new Date('2999-12-31');
-                              return dateA - dateB;
-                            });
-                          }
-
-                          return sortedLoans.slice(0, 5).map((loan, index) => {
-                            const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
-                            const bgColors = ['#D0ED6F', '#83F384', '#6EE8B5'];
-
-                            return (
-                              <motion.div
-                                key={loan.id}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.05 }}
-                                className="rounded-xl p-3 flex items-center gap-3"
-                                style={{ backgroundColor: bgColors[index % 3] }}
-                              >
-                                {/* Rank Number */}
-                                <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center flex-shrink-0">
-                                  <span className="text-xs font-bold text-slate-800">{index + 1}</span>
-                                </div>
-
-                                {/* Loan Info */}
-                                <div className="flex-1 min-w-0">
-                                  <p className="font-semibold text-slate-800 text-sm truncate">
-                                    @{lender?.username || 'user'}
-                                  </p>
-                                  <div className="text-xs text-slate-600 mt-0.5">
-                                    {rankingFilter === 'highest_interest' && (
-                                      <span>{loan.interest_rate || 0}% interest</span>
-                                    )}
-                                    {rankingFilter === 'highest_payment' && (
-                                      <span>${(loan.payment_amount || 0).toLocaleString()}/{loan.payment_frequency === 'weekly' ? 'wk' : 'mo'}</span>
-                                    )}
-                                    {rankingFilter === 'soonest_deadline' && loan.next_payment_date && (
-                                      <span>Due {format(new Date(loan.next_payment_date), 'MMM d')}</span>
-                                    )}
-                                    {rankingFilter === 'soonest_deadline' && !loan.next_payment_date && (
-                                      <span className="text-slate-400">No date</span>
-                                    )}
-                                  </div>
-                                </div>
-
-                                {/* Amount remaining */}
-                                <div className="text-right flex-shrink-0">
-                                  <p className="font-semibold text-slate-800 text-sm">
-                                    ${((loan.total_amount || loan.amount || 0) - (loan.amount_paid || 0)).toLocaleString()}
-                                  </p>
-                                  <p className="text-[10px] text-slate-500">left</p>
-                                </div>
-                              </motion.div>
-                            );
-                          });
-                        })()}
-                      </div>
-                    </div>
-
-                    {/* Right column: Month Payment Amount + Overview stacked */}
+                    {/* Left column: Month Payment Amount + Overview stacked */}
                     <div className="space-y-4">
                       {/* Month Payment Amount Box */}
                       {(() => {
@@ -1125,6 +1032,88 @@ export default function Borrowing() {
                   </div>
                 </div>
                     </div>
+
+                    {/* Loans Ranked By - Right */}
+                    <div className="bg-white rounded-2xl p-5 border-0">
+                      {/* Header with dropdown */}
+                      <div className="flex items-center gap-2 mb-4">
+                        <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                          Loans Ranked By
+                        </p>
+                        <Select value={rankingFilter} onValueChange={setRankingFilter}>
+                          <SelectTrigger className="w-auto h-7 text-xs bg-white border-slate-200 gap-1 px-2">
+                            <SelectValue>
+                              {rankingFilter === 'highest_interest' && 'Highest Interest'}
+                              {rankingFilter === 'highest_payment' && 'Highest Payment'}
+                              {rankingFilter === 'soonest_deadline' && 'Soonest Deadline'}
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="highest_interest">Highest Interest</SelectItem>
+                            <SelectItem value="highest_payment">Highest Payment</SelectItem>
+                            <SelectItem value="soonest_deadline">Soonest Deadline</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Ranked Loans */}
+                      <div className="space-y-3">
+                        {(() => {
+                          let sortedLoans = [...activeLoans];
+
+                          if (rankingFilter === 'highest_interest') {
+                            sortedLoans.sort((a, b) => (b.interest_rate || 0) - (a.interest_rate || 0));
+                          } else if (rankingFilter === 'highest_payment') {
+                            sortedLoans.sort((a, b) => (b.payment_amount || 0) - (a.payment_amount || 0));
+                          } else if (rankingFilter === 'soonest_deadline') {
+                            sortedLoans.sort((a, b) => {
+                              const dateA = a.next_payment_date ? new Date(a.next_payment_date) : new Date('2999-12-31');
+                              const dateB = b.next_payment_date ? new Date(b.next_payment_date) : new Date('2999-12-31');
+                              return dateA - dateB;
+                            });
+                          }
+
+                          return sortedLoans.slice(0, 5).map((loan, index) => {
+                            const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
+                            const bgColors = ['#D0ED6F', '#83F384', '#6EE8B5'];
+
+                            return (
+                              <motion.div
+                                key={loan.id}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.05 }}
+                                className="rounded-xl p-3 flex items-center gap-3"
+                                style={{ backgroundColor: bgColors[index % 3] }}
+                              >
+                                {/* Rank Number */}
+                                <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center flex-shrink-0">
+                                  <span className="text-xs font-bold text-slate-800">{index + 1}</span>
+                                </div>
+
+                                {/* Loan Info */}
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-semibold text-slate-800 text-sm truncate">
+                                    @{lender?.username || 'user'}
+                                  </p>
+                                  <p className="text-xs text-slate-600 mt-0.5 truncate">
+                                    For {loan.purpose || 'Reason'}{loan.next_payment_date ? ` due ${format(new Date(loan.next_payment_date), 'MMM d')}` : ''}
+                                  </p>
+                                </div>
+
+                                {/* Amount */}
+                                <div className="text-center flex-shrink-0">
+                                  <p className="font-semibold text-slate-800 text-sm">
+                                    ${((loan.total_amount || loan.amount || 0) - (loan.amount_paid || 0)).toLocaleString()}
+                                  </p>
+                                </div>
+                              </motion.div>
+                            );
+                          });
+                        })()}
+                      </div>
+                    </div>
+
                   </div>
                 )}
               </motion.div>
@@ -1296,12 +1285,9 @@ export default function Borrowing() {
                                         <span className="text-xs text-slate-500">Paid</span>
                                       </div>
                                     </div>
-                                    <div className="mt-3 text-center space-y-1">
+                                    <div className="mt-3 text-center">
                                       <p className="text-xs text-slate-600">
-                                        <span className="text-[#00A86B] font-semibold">${amountPaid.toLocaleString()}</span> paid
-                                      </p>
-                                      <p className="text-xs text-slate-600">
-                                        <span className="text-slate-800 font-semibold">${remaining.toLocaleString()}</span> remaining
+                                        <span className="text-slate-800 font-semibold">${remaining.toLocaleString()}</span> remaining{manageLoanSelected.next_payment_date ? ` due ${format(new Date(manageLoanSelected.next_payment_date), 'MMM d')}` : ''}
                                       </p>
                                     </div>
                                   </>
@@ -1354,7 +1340,7 @@ export default function Borrowing() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {/* Interest Box + Loan Progress - Left */}
                           <div className="space-y-4">
-                            <div className="bg-[#DBFFEB] rounded-2xl p-5">
+                            <div className="bg-[#6EE8B5] rounded-2xl p-5">
                               <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                                 Interest
                               </p>
@@ -1385,25 +1371,28 @@ export default function Borrowing() {
                               </div>
                             </div>
                             {/* Loan Progress Box */}
-                            <div className="bg-[#DBFFEB] rounded-2xl p-5">
+                            <div className="bg-[#83F384] rounded-2xl p-5">
                               <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                                 Loan Progress
                               </p>
                               <div className="grid grid-cols-2 gap-3">
                                 <div className="bg-[#D0ED6F] rounded-xl p-4">
-                                  <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Total Remaining</p>
-                                  <p className="text-xl font-bold text-slate-800">
-                                    ${(() => {
-                                      const total = manageLoanSelected.total_amount || manageLoanSelected.amount || 0;
-                                      const paid = manageLoanSelected.amount_paid || 0;
-                                      return (total - paid).toLocaleString();
-                                    })()}
-                                  </p>
-                                </div>
-                                <div className="bg-[#83F384] rounded-xl p-4">
                                   <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Amount Paid</p>
                                   <p className="text-xl font-bold text-[#00A86B]">
                                     ${(manageLoanSelected.amount_paid || 0).toLocaleString()}
+                                  </p>
+                                </div>
+                                <div className="bg-[#D0ED6F] rounded-xl p-4">
+                                  <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Completed Payments</p>
+                                  <p className="text-xl font-bold text-slate-800">
+                                    {(() => {
+                                      const paymentAmt = manageLoanSelected.payment_amount || 0;
+                                      const totalAmt = manageLoanSelected.total_amount || manageLoanSelected.amount || 0;
+                                      const amtPaid = manageLoanSelected.amount_paid || 0;
+                                      const completed = paymentAmt > 0 ? Math.floor(amtPaid / paymentAmt) : 0;
+                                      const totalPayments = paymentAmt > 0 ? Math.ceil(totalAmt / paymentAmt) : 0;
+                                      return `${completed}/${totalPayments}`;
+                                    })()}
                                   </p>
                                 </div>
                               </div>
