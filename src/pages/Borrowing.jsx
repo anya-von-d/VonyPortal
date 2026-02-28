@@ -1340,12 +1340,12 @@ export default function Borrowing() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {/* Interest Box + Loan Progress - Left */}
                           <div className="space-y-4">
-                            <div className="bg-[#6EE8B5] rounded-2xl p-5">
+                            <div className="bg-[#DBFFEB] rounded-2xl p-5">
                               <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                                 Interest
                               </p>
                               <div className="grid grid-cols-2 gap-3">
-                                <div className="bg-[#D0ED6F] rounded-xl p-4">
+                                <div className="bg-[#6EE8B5] rounded-xl p-4">
                                   <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Interest Accrued</p>
                                   <p className="text-xl font-bold text-slate-800">
                                     ${(() => {
@@ -1355,7 +1355,7 @@ export default function Borrowing() {
                                     })()}
                                   </p>
                                 </div>
-                                <div className="bg-[#83F384] rounded-xl p-4">
+                                <div className="bg-[#6EE8B5] rounded-xl p-4">
                                   <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Predicted Interest</p>
                                   <p className="text-xl font-bold text-slate-800">
                                     ${(() => {
@@ -1371,18 +1371,18 @@ export default function Borrowing() {
                               </div>
                             </div>
                             {/* Loan Progress Box */}
-                            <div className="bg-[#83F384] rounded-2xl p-5">
+                            <div className="bg-[#DBFFEB] rounded-2xl p-5">
                               <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                                 Loan Progress
                               </p>
                               <div className="grid grid-cols-2 gap-3">
-                                <div className="bg-[#D0ED6F] rounded-xl p-4">
+                                <div className="bg-[#83F384] rounded-xl p-4">
                                   <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Amount Paid</p>
                                   <p className="text-xl font-bold text-[#00A86B]">
                                     ${(manageLoanSelected.amount_paid || 0).toLocaleString()}
                                   </p>
                                 </div>
-                                <div className="bg-[#D0ED6F] rounded-xl p-4">
+                                <div className="bg-[#83F384] rounded-xl p-4">
                                   <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Completed Payments</p>
                                   <p className="text-xl font-bold text-slate-800">
                                     {(() => {
