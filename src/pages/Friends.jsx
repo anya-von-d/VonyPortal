@@ -48,7 +48,7 @@ export default function Friends() {
     } else {
       setSearchResults([]);
     }
-  }, [searchQuery]);
+  }, [searchQuery, sentRequests, friends]);
 
   const loadFriendsData = async () => {
     if (!user?.id) return;
@@ -144,6 +144,8 @@ export default function Friends() {
     return profiles.find(p => p.user_id === userId);
   };
 
+  const sentRequestsRef = React.useRef(null);
+
   const handleSendRequest = async (friendUserId) => {
     if (!user?.id || processingId) return;
     setProcessingId(friendUserId);
@@ -156,7 +158,10 @@ export default function Friends() {
         is_starred: false
       });
       await loadFriendsData();
-      setSearchQuery('');
+      // Scroll to sent requests section so user sees the profile moved there
+      setTimeout(() => {
+        sentRequestsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
     } catch (error) {
       console.error("Error sending friend request:", error);
     }
@@ -494,7 +499,7 @@ export default function Friends() {
               )}
 
               {/* Sent Friend Requests */}
-              <div className="bg-[#DBFFEB] rounded-2xl p-5">
+              <div ref={sentRequestsRef} className="bg-[#DBFFEB] rounded-2xl p-5">
                 <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                   Sent Friend Requests
                 </p>
