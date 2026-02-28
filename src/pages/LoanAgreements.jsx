@@ -874,8 +874,8 @@ export default function LoanAgreements() {
                                       <span className="text-[10px] font-bold text-slate-800">i</span>
                                     </div>
                                     {activeInfoTooltip === `promissory-${agreement.id}` && (
-                                      <div className="absolute right-0 top-6 z-50 w-56 bg-slate-800 text-white text-xs rounded-lg p-3 shadow-lg">
-                                        A promissory note is a legal document where the borrower promises to repay the loan amount plus any interest by a specific date.
+                                      <div className="absolute left-6 top-0 z-50 w-56 bg-slate-800 text-white text-xs rounded-lg p-3 shadow-lg">
+                                        A promissory note is a legal document where the borrower promises to repay the loan amount plus any interest by a specific date. It serves as written proof of the debt.
                                       </div>
                                     )}
                                   </div>
@@ -897,7 +897,7 @@ export default function LoanAgreements() {
                                       <span className="text-[10px] font-bold text-slate-800">i</span>
                                     </div>
                                     {activeInfoTooltip === `amortization-${agreement.id}` && (
-                                      <div className="absolute right-0 top-6 z-50 w-56 bg-slate-800 text-white text-xs rounded-lg p-3 shadow-lg">
+                                      <div className="absolute left-6 top-0 z-50 w-56 bg-slate-800 text-white text-xs rounded-lg p-3 shadow-lg">
                                         An amortization schedule shows the breakdown of each payment over the life of the loan, including how much goes toward principal vs. interest.
                                       </div>
                                     )}
@@ -949,8 +949,8 @@ export default function LoanAgreements() {
                                       <span className="text-[10px] font-bold text-slate-800">i</span>
                                     </div>
                                     {activeInfoTooltip === `promissory-mobile-${agreement.id}` && (
-                                      <div className="absolute right-0 bottom-6 z-50 w-48 bg-slate-800 text-white text-xs rounded-lg p-3 shadow-lg">
-                                        A promissory note is a legal document where the borrower promises to repay the loan.
+                                      <div className="absolute left-6 top-0 z-50 w-56 bg-slate-800 text-white text-xs rounded-lg p-3 shadow-lg">
+                                        A promissory note is a legal document where the borrower promises to repay the loan amount plus any interest by a specific date. It serves as written proof of the debt.
                                       </div>
                                     )}
                                   </div>
@@ -972,8 +972,8 @@ export default function LoanAgreements() {
                                       <span className="text-[10px] font-bold text-slate-800">i</span>
                                     </div>
                                     {activeInfoTooltip === `amortization-mobile-${agreement.id}` && (
-                                      <div className="absolute right-0 bottom-6 z-50 w-48 bg-slate-800 text-white text-xs rounded-lg p-3 shadow-lg">
-                                        Shows the breakdown of each payment over the loan's life.
+                                      <div className="absolute left-6 top-0 z-50 w-56 bg-slate-800 text-white text-xs rounded-lg p-3 shadow-lg">
+                                        An amortization schedule shows the breakdown of each payment over the life of the loan, including how much goes toward principal vs. interest.
                                       </div>
                                     )}
                                   </div>
