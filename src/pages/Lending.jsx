@@ -43,7 +43,7 @@ export default function Lending() {
   const [currentUser, setCurrentUser] = useState(null);
   const [showSignatureModal, setShowSignatureModal] = useState(false);
   const [pendingLoanData, setPendingLoanData] = useState(null);
-  const [loanType, setLoanType] = useState('flexible');
+  const [loanType, setLoanType] = useState('scheduled');
   const [loans, setLoans] = useState([]);
   const [publicProfiles, setPublicProfiles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -1590,17 +1590,17 @@ export default function Lending() {
                         </div>
                       </button>
                       <span className={`text-xs font-medium ${loanType === 'scheduled' ? 'text-[#00A86B]' : 'text-slate-400'}`}>
-                        Scheduled Loan
+                        Loan
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 text-center mt-3">
                       {loanType === 'flexible'
                         ? "Get paid back in one payment - perfect for splitting dinner with roommates or one-time expenses"
-                        : "Formal loans with interest and scheduled payment plans"}
+                        : "Offer money that will be paid back gradually with a structured payment plan"}
                     </p>
                   </div>
 
-                  {/* Will Your Payment Request Repeat? Info Box */}
+                  {/* Will Your Payment Request Repeat? Info Box - Only show for Quick Payment Request */}
                   {loanType === 'flexible' && (
                     <div className="bg-[#83F384] rounded-2xl p-4">
                       <p className="text-sm font-semibold text-slate-800 mb-2">Will Your Payment Request Repeat?</p>
