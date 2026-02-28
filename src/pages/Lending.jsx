@@ -1684,8 +1684,8 @@ export default function Lending() {
 
                             {/* Repeating Options */}
                             {formData.is_repeating && (
-                              <div className="p-4 pb-2 bg-[#DBFFEB] rounded-xl">
-                                <p className="text-sm text-slate-700 leading-[2.8] mb-0 [&_input]:inline-flex [&_input]:align-baseline [&_input]:my-[2px] [&_input[type=number]]:appearance-none [&_input[type=number]]:[-moz-appearance:textfield] [&_input[type=number]::-webkit-outer-spin-button]:appearance-none [&_input[type=number]::-webkit-inner-spin-button]:appearance-none [&_.inline-flex]:my-[2px]">
+                              <div className="p-4 bg-[#DBFFEB] rounded-xl">
+                                <p className="text-sm text-slate-700 leading-[3.2] [&_input]:inline-flex [&_input]:align-baseline [&_input]:my-[2px] [&_input[type=number]]:appearance-none [&_input[type=number]]:[-moz-appearance:textfield] [&_input[type=number]::-webkit-outer-spin-button]:appearance-none [&_input[type=number]::-webkit-inner-spin-button]:appearance-none [&_.inline-flex]:my-[2px]" style={{ marginBottom: '-0.8em' }}>
                                   Payments of{' '}
                                   <Input
                                     type="number"
@@ -1804,8 +1804,8 @@ export default function Lending() {
 
                         {/* Scheduled loan fields - Sentence format */}
                         {loanType === 'scheduled' && (
-                          <div className="p-4 pb-2 bg-[#DBFFEB] rounded-xl">
-                            <p className="text-sm text-slate-700 leading-[2.8] mb-0 [&_input]:inline-flex [&_input]:align-baseline [&_input]:my-[2px] [&_input[type=number]]:appearance-none [&_input[type=number]]:[-moz-appearance:textfield] [&_input[type=number]::-webkit-outer-spin-button]:appearance-none [&_input[type=number]::-webkit-inner-spin-button]:appearance-none [&_.inline-flex]:my-[2px]">
+                          <div className="p-4 bg-[#DBFFEB] rounded-xl">
+                            <p className="text-sm text-slate-700 leading-[3.2] [&_input]:inline-flex [&_input]:align-baseline [&_input]:my-[2px] [&_input[type=number]]:appearance-none [&_input[type=number]]:[-moz-appearance:textfield] [&_input[type=number]::-webkit-outer-spin-button]:appearance-none [&_input[type=number]::-webkit-inner-spin-button]:appearance-none [&_.inline-flex]:my-[2px] [&:last-child]:mb-0" style={{ marginBottom: '-0.8em' }}>
                               The lender agrees to lend{' '}
                               <span className="text-[#00A86B] font-medium">
                                 {formData.borrower_username ? `@${formData.borrower_username}` : 'the borrower'}
@@ -1995,8 +1995,8 @@ export default function Lending() {
                           disabled={isSubmitting || !formData.borrower_username || !formData.amount}
                           className={`w-full py-3 text-base font-semibold rounded-xl border-0 mt-4 transition-all duration-200 ${
                             isSubmitting || !formData.borrower_username || !formData.amount
-                              ? 'bg-[#DBEEE3]/60 text-[#83F384]/40 cursor-not-allowed'
-                              : 'bg-[#DBEEE3] text-[#83F384] hover:bg-[#DBEEE3]/80'
+                              ? 'bg-[#DBEEE3] text-[#83F384]/60 cursor-not-allowed opacity-70'
+                              : 'bg-[#DBEEE3] text-[#83F384] hover:bg-[#DBEEE3]/80 opacity-100'
                           }`}
                         >
                           <Send className="w-4 h-4 mr-2" />
