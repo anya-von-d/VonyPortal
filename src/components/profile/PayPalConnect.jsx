@@ -86,7 +86,7 @@ export default function PayPalConnect({ userId }) {
   }
 
   return (
-    <Card className="bg-[#DBFFEB] backdrop-blur-sm border-0">
+    <Card className="bg-[#30FFA8] backdrop-blur-sm border-0">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-lg">
           <img 

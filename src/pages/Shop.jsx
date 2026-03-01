@@ -125,6 +125,11 @@ export default function Shop() {
     }
   ];
 
+  const cardColors = ['#96FFD0', '#AAFFA3', '#74FF71', '#30FFA8', '#6EE8A2'];
+  const subBoxColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#6EE8A2'];
+  const loanCardColors = ['#30FFA8', '#6EE8A2', '#AAFFA3'];
+  const loanSubBoxColors = ['#6EE8A2', '#96FFD0', '#74FF71'];
+
   return (
     <div className="min-h-screen p-6" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
       <div className="max-w-4xl mx-auto space-y-7">
@@ -191,7 +196,8 @@ export default function Shop() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 + index * 0.1 }}
-                className="bg-[#DBFFEB] rounded-2xl p-5"
+                className="rounded-2xl p-5"
+                style={{ backgroundColor: '#DBFFEB' }}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
@@ -209,22 +215,17 @@ export default function Shop() {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                  <div className="bg-[#DBFFEB] rounded-xl p-3">
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>APR</p>
-                    <p className="font-semibold text-slate-800 text-sm">{card.apr}</p>
-                  </div>
-                  <div className="bg-[#DBFFEB] rounded-xl p-3">
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Annual Fee</p>
-                    <p className="font-semibold text-slate-800 text-sm">{card.annualFee}</p>
-                  </div>
-                  <div className="bg-[#DBFFEB] rounded-xl p-3">
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Credit Limit</p>
-                    <p className="font-semibold text-slate-800 text-sm">{card.creditLimit}</p>
-                  </div>
-                  <div className="bg-[#DBFFEB] rounded-xl p-3">
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Rewards</p>
-                    <p className="font-semibold text-slate-800 text-sm">{card.rewards}</p>
-                  </div>
+                  {[
+                    { label: 'APR', value: card.apr },
+                    { label: 'Annual Fee', value: card.annualFee },
+                    { label: 'Credit Limit', value: card.creditLimit },
+                    { label: 'Rewards', value: card.rewards }
+                  ].map((stat, statIdx) => (
+                    <div key={stat.label} className="rounded-xl p-3" style={{ backgroundColor: subBoxColors[(index + statIdx + 1) % 5] }}>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>{stat.label}</p>
+                      <p className="font-semibold text-slate-800 text-sm">{stat.value}</p>
+                    </div>
+                  ))}
                 </div>
 
                 <div className="flex flex-wrap gap-2 mb-4">
@@ -258,7 +259,8 @@ export default function Shop() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 + index * 0.1 }}
-                className="bg-[#DBFFEB] rounded-2xl p-5"
+                className="rounded-2xl p-5"
+                style={{ backgroundColor: '#DBFFEB' }}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
@@ -278,18 +280,16 @@ export default function Shop() {
                 <p className="text-sm text-slate-600 mb-4">{loan.description}</p>
 
                 <div className="grid grid-cols-3 gap-2 mb-4">
-                  <div className="bg-[#DBFFEB] rounded-xl p-2 text-center">
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>APR</p>
-                    <p className="font-semibold text-slate-800 text-xs">{loan.apr}</p>
-                  </div>
-                  <div className="bg-[#DBFFEB] rounded-xl p-2 text-center">
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Amount</p>
-                    <p className="font-semibold text-slate-800 text-xs">{loan.amount}</p>
-                  </div>
-                  <div className="bg-[#DBFFEB] rounded-xl p-2 text-center">
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Term</p>
-                    <p className="font-semibold text-slate-800 text-xs">{loan.term}</p>
-                  </div>
+                  {[
+                    { label: 'APR', value: loan.apr },
+                    { label: 'Amount', value: loan.amount },
+                    { label: 'Term', value: loan.term }
+                  ].map((stat, statIdx) => (
+                    <div key={stat.label} className="rounded-xl p-2 text-center" style={{ backgroundColor: loanSubBoxColors[(index + statIdx + 1) % 3] }}>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>{stat.label}</p>
+                      <p className="font-semibold text-slate-800 text-xs">{stat.value}</p>
+                    </div>
+                  ))}
                 </div>
 
                 <div className="space-y-1.5 mb-4">

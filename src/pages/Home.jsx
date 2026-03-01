@@ -291,7 +291,7 @@ export default function Home() {
 
                   <div
                     className="rounded-xl p-4 flex flex-col items-center justify-center transition-colors duration-300"
-                    style={{ backgroundColor: overviewType === 'lending' ? '#83F384' : '#6EE8B5' }}
+                    style={{ backgroundColor: overviewType === 'lending' ? '#83F384' : '#74FF71' }}
                   >
                     <motion.div
                       key={overviewType}
@@ -488,7 +488,7 @@ export default function Home() {
                             color="blue"
                             change={nextBorrowerPayment ? `to @${nextBorrowerPayment.username}` : 'N/A'}
                             index={1}
-                            bgColor="#6EE8B5"
+                            bgColor="#96FFD0"
                           />
                         </div>
                         <motion.div
@@ -498,7 +498,7 @@ export default function Home() {
                           whileHover={{ y: -4, transition: { duration: 0.2 } }}
                           className="mt-[28px]"
                         >
-                          <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0" style={{ backgroundColor: '#6EE8B5' }}>
+                          <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0" style={{ backgroundColor: '#6EE8A2' }}>
                             <CardContent className="p-5 flex flex-col h-full">
                               <p className="text-sm font-medium text-slate-600 mb-2 text-left">Next Payment Date</p>
                               {nextBorrowerPayment ? (
@@ -871,13 +871,13 @@ export default function Home() {
                           );
                         }
 
-                        const colors = ['#D0ED6F', '#83F384', '#6EE8B5'];
+                        const colors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
 
                         return events.map((event, index) => (
                           <div
                             key={index}
                             className="flex items-center gap-3 p-3 rounded-xl"
-                            style={{ backgroundColor: colors[index % 3] }}
+                            style={{ backgroundColor: colors[index % 6] }}
                           >
                             {/* Date Box */}
                             <div className="bg-[#DBFFEB] rounded-lg px-3 py-2 flex-shrink-0 text-center min-w-[50px]">

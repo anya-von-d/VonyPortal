@@ -497,7 +497,7 @@ export default function Requests() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <Card className="bg-[#96FFD0] border-0 rounded-2xl">
+            <Card className="bg-[#DBFFEB] border-0 rounded-2xl">
               <CardContent className="py-16 text-center">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white flex items-center justify-center">
                   <CheckCircle className="w-8 h-8 text-[#00A86B]" />
@@ -515,7 +515,7 @@ export default function Requests() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <Card className="bg-[#AAFFA3] border-0 rounded-2xl">
+            <Card className="bg-[#DBFFEB] border-0 rounded-2xl">
               <CardContent className="p-5">
                 <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                   Loan Offers For You
@@ -569,7 +569,7 @@ export default function Requests() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <Card className="bg-[#74FF71] border-0 rounded-2xl">
+            <Card className="bg-[#DBFFEB] border-0 rounded-2xl">
               <CardContent className="p-5">
                 <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                   Loan Offers You Sent
@@ -635,7 +635,7 @@ export default function Requests() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <Card className="bg-[#30FFA8] border-0 rounded-2xl">
+            <Card className="bg-[#DBFFEB] border-0 rounded-2xl">
               <CardContent className="p-5">
                 <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                   Friend Requests
@@ -717,7 +717,7 @@ export default function Requests() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <Card className="bg-[#96FFD0] border-0 rounded-2xl">
+            <Card className="bg-[#DBFFEB] border-0 rounded-2xl">
               <CardContent className="p-5">
                 <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                   Payments Awaiting Your Confirmation
@@ -780,7 +780,7 @@ export default function Requests() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <Card className="bg-[#6EE8A2] border-0 rounded-2xl">
+            <Card className="bg-[#DBFFEB] border-0 rounded-2xl">
               <CardContent className="p-5">
                 <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                   Your Payments Awaiting Confirmation
@@ -846,7 +846,7 @@ export default function Requests() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className="bg-[#AAFFA3] border-0 rounded-2xl">
+            <Card className="bg-[#DBFFEB] border-0 rounded-2xl">
               <CardContent className="p-5">
                 <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                   Term Change Requests

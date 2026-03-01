@@ -46,7 +46,7 @@ export default function Learn() {
     }
   ];
 
-  const bgColors = ['#D0ED6F', '#83F384', '#6EE8B5'];
+  const bgColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
 
   return (
     <div className="min-h-screen p-3 md:p-6" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
@@ -96,7 +96,7 @@ export default function Learn() {
                 >
                   <div
                     className="rounded-xl p-4 hover:shadow-md transition-all duration-200 cursor-pointer group"
-                    style={{ backgroundColor: bgColors[index % 3] }}
+                    style={{ backgroundColor: bgColors[index % 6] }}
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0">

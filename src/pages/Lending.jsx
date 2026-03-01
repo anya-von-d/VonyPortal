@@ -1097,7 +1097,7 @@ export default function Lending() {
             >
               <div className="sticky top-0 bg-white border-b border-slate-100 p-4 flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-[#DBFFEB] flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-[#96FFD0] flex items-center justify-center">
                     <FileText className="w-4 h-4 text-[#00A86B]" />
                   </div>
                   <span className="font-medium text-slate-800">
@@ -1176,7 +1176,7 @@ export default function Lending() {
                 className="space-y-7"
               >
                 {/* Lending Overview Section */}
-                <div className="bg-[#96FFD0] rounded-2xl p-5">
+                <div className="bg-[#DBFFEB] rounded-2xl p-5">
                   <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                     Lending Overview
                   </p>
@@ -1254,7 +1254,7 @@ export default function Lending() {
 
                 {/* Quick Record Payment */}
                 {activeLoans.length > 0 && (
-                  <div className="bg-[#74FF71] rounded-2xl p-5 border-0">
+                  <div className="bg-[#DBFFEB] rounded-2xl p-5 border-0">
                     <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                       Record Payment
                     </p>
@@ -1338,7 +1338,7 @@ export default function Lending() {
                 {/* Upcoming Payments + Individual Loan Progress */}
                 <div className="grid md:grid-cols-2 gap-4">
                   {/* Upcoming Payments - Left */}
-                  <div className="bg-[#AAFFA3] rounded-2xl p-5 border-0">
+                  <div className="bg-[#DBFFEB] rounded-2xl p-5 border-0">
                     <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                       Upcoming Payments
                     </p>
@@ -1352,9 +1352,9 @@ export default function Lending() {
                           .slice(0, 3)
                           .map((loan, index) => {
                             const borrower = publicProfiles.find(p => p.user_id === loan.borrower_id);
-                            const bgColors = ['#D0ED6F', '#83F384', '#6EE8B5'];
+                            const bgColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
                             return (
-                              <div key={loan.id} className="flex items-center justify-between p-3 rounded-xl" style={{ backgroundColor: bgColors[index % 3] }}>
+                              <div key={loan.id} className="flex items-center justify-between p-3 rounded-xl" style={{ backgroundColor: bgColors[index % 6] }}>
                                 <div>
                                   <p className="font-medium text-sm text-slate-800">
                                     ${loan.payment_amount?.toLocaleString() || 0} from @{borrower?.username || 'user'}
@@ -1376,7 +1376,7 @@ export default function Lending() {
                   </div>
 
                   {/* Individual Loan Progress - Right */}
-                  <div className="bg-[#6EE8A2] rounded-2xl p-5 border-0">
+                  <div className="bg-[#DBFFEB] rounded-2xl p-5 border-0">
                     <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                       Individual Loan Progress
                     </p>
@@ -1489,7 +1489,7 @@ export default function Lending() {
                     })()}
 
                     {/* Month Repayment Overview Box */}
-                    <div className="bg-[#96FFD0] rounded-2xl p-5">
+                    <div className="bg-[#DBFFEB] rounded-2xl p-5">
                   <div className="flex items-center justify-between mb-4">
                     <div className="relative">
                       <button
@@ -1514,8 +1514,8 @@ export default function Lending() {
                                     setSelectedMonth(monthDate);
                                     setShowMonthDropdown(false);
                                   }}
-                                  className={`w-full px-4 py-2 text-left text-sm hover:bg-[#DBFFEB] transition-colors ${
-                                    isSameMonth(monthDate, selectedMonth) ? 'bg-[#DBFFEB] font-medium text-[#00A86B]' : 'text-slate-700'
+                                  className={`w-full px-4 py-2 text-left text-sm hover:bg-[#96FFD0] transition-colors ${
+                                    isSameMonth(monthDate, selectedMonth) ? 'bg-[#96FFD0] font-medium text-[#00A86B]' : 'text-slate-700'
                                   }`}
                                 >
                                   {format(monthDate, 'MMMM')}
@@ -1588,15 +1588,15 @@ export default function Lending() {
                         );
                       }
 
-                      const colors = ['#D0ED6F', '#83F384', '#6EE8B5'];
+                      const colors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
 
                       return events.map((event, index) => (
                         <div
                           key={index}
                           className="flex items-center gap-3 p-3 rounded-xl"
-                          style={{ backgroundColor: colors[index % 3] }}
+                          style={{ backgroundColor: colors[index % 6] }}
                         >
-                          <div className="bg-[#DBFFEB] rounded-lg px-3 py-2 flex-shrink-0 text-center min-w-[50px]">
+                          <div className="bg-[#AAFFA3] rounded-lg px-3 py-2 flex-shrink-0 text-center min-w-[50px]">
                             <p className="text-xs text-slate-500 uppercase" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                               {format(event.date, 'MMM')}
                             </p>
@@ -1629,7 +1629,7 @@ export default function Lending() {
                   </div>
 
                   {/* Loan History - Right */}
-                  <div className="bg-[#74FF71] rounded-2xl p-5 border-0">
+                  <div className="bg-[#DBFFEB] rounded-2xl p-5 border-0">
                     <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                       Loan History
                     </p>
@@ -2116,7 +2116,7 @@ export default function Lending() {
                 {/* Summary Sidebar */}
                 <div className="space-y-4">
                   {/* Loan Type Toggle - Always First */}
-                  <div className="bg-[#6EE8A2] rounded-2xl p-4 border-0">
+                  <div className="bg-[#DBFFEB] rounded-2xl p-4 border-0">
                     <div className="flex items-center justify-center gap-3">
                       <span className={`text-xs font-medium ${loanType === 'scheduled' ? 'text-[#00A86B]' : 'text-slate-400'}`}>
                         Loan
@@ -2174,7 +2174,7 @@ export default function Lending() {
                   )}
 
                   {/* Loan Summary - Always Last */}
-                  <div className="bg-[#AAFFA3] rounded-2xl p-5 sticky top-6">
+                  <div className="bg-[#DBFFEB] rounded-2xl p-5 sticky top-6">
                     <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                       Loan Summary
                     </p>
@@ -2346,7 +2346,7 @@ export default function Lending() {
                               Loan Information
                             </p>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                              <div className="bg-[#D0ED6F] rounded-xl p-4">
+                              <div className="bg-[#AAFFA3] rounded-xl p-4">
                                 <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Amount</p>
                                 <p className="text-xl font-bold text-slate-800">
                                   ${(manageLoanSelected.amount || 0).toLocaleString()}
@@ -2358,7 +2358,7 @@ export default function Lending() {
                                   {manageLoanSelected.interest_rate || 0}%
                                 </p>
                               </div>
-                              <div className="bg-[#6EE8B5] rounded-xl p-4">
+                              <div className="bg-[#6EE8A2] rounded-xl p-4">
                                 <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Term</p>
                                 <p className="text-xl font-bold text-slate-800">
                                   {manageLoanSelected.repayment_period || 0} {manageLoanSelected.repayment_unit || 'months'}
@@ -2424,7 +2424,7 @@ export default function Lending() {
                             </div>
 
                             {/* Next Payment Date - Middle */}
-                            <div className="bg-[#83F384] rounded-2xl p-5 flex flex-col">
+                            <div className="bg-[#DBFFEB] rounded-2xl p-5 flex flex-col">
                               <p className="text-[10px] text-slate-700 uppercase tracking-[0.12em] font-medium mb-2" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                                 Next Payment Date
                               </p>
@@ -2448,7 +2448,7 @@ export default function Lending() {
                             </div>
 
                             {/* Payment Amount - Right */}
-                            <div className="bg-[#6EE8B5] rounded-2xl p-5 flex flex-col">
+                            <div className="bg-[#DBFFEB] rounded-2xl p-5 flex flex-col">
                               <p className="text-[10px] text-slate-700 uppercase tracking-[0.12em] font-medium mb-2" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                                 Payment Amount
                               </p>
@@ -2472,7 +2472,7 @@ export default function Lending() {
                                   Interest
                                 </p>
                                 <div className="grid grid-cols-2 gap-3">
-                                  <div className="bg-[#6EE8B5] rounded-xl p-4">
+                                  <div className="bg-[#AAFFA3] rounded-xl p-4">
                                     <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Interest Accrued</p>
                                     <p className="text-xl font-bold text-slate-800">
                                       ${(() => {
@@ -2482,7 +2482,7 @@ export default function Lending() {
                                       })()}
                                     </p>
                                   </div>
-                                  <div className="bg-[#6EE8B5] rounded-xl p-4">
+                                  <div className="bg-[#74FF71] rounded-xl p-4">
                                     <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Predicted Interest</p>
                                     <p className="text-xl font-bold text-slate-800">
                                       ${(() => {
@@ -2547,9 +2547,9 @@ export default function Lending() {
                                     {/* Loan Summary */}
                                     <button
                                       onClick={() => openDocPopup('summary', agreement)}
-                                      className="bg-[#D0ED6F] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3"
+                                      className="bg-[#AAFFA3] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3"
                                     >
-                                      <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                                      <div className="w-9 h-9 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
                                         <FileText className="w-4 h-4 text-[#0A1A10]" />
                                       </div>
                                       <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
@@ -2562,7 +2562,7 @@ export default function Lending() {
                                       onClick={() => openDocPopup('promissory', agreement)}
                                       className="bg-[#83F384] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3"
                                     >
-                                      <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                                      <div className="w-9 h-9 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
                                         <ClipboardList className="w-4 h-4 text-[#0A1A10]" />
                                       </div>
                                       <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
@@ -2589,9 +2589,9 @@ export default function Lending() {
                                     {/* Amortization Schedule */}
                                     <button
                                       onClick={() => openDocPopup('amortization', agreement)}
-                                      className="bg-[#6EE8B5] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3"
+                                      className="bg-[#6EE8A2] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3"
                                     >
-                                      <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                                      <div className="w-9 h-9 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
                                         <BarChart3 className="w-4 h-4 text-[#0A1A10]" />
                                       </div>
                                       <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
@@ -2629,9 +2629,9 @@ export default function Lending() {
                             <div className="flex flex-col sm:flex-row gap-3">
                               <button
                                 onClick={() => handleMakePayment(manageLoanSelected)}
-                                className="bg-[#D0ED6F] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
+                                className="bg-[#AAFFA3] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
                               >
-                                <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                                <div className="w-9 h-9 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
                                   <DollarSign className="w-4 h-4 text-[#0A1A10]" />
                                 </div>
                                 <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
@@ -2642,7 +2642,7 @@ export default function Lending() {
                                 onClick={() => handleEditLoan(manageLoanSelected)}
                                 className="bg-[#83F384] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
                               >
-                                <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                                <div className="w-9 h-9 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
                                   <Pencil className="w-4 h-4 text-[#0A1A10]" />
                                 </div>
                                 <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
@@ -2651,9 +2651,9 @@ export default function Lending() {
                               </button>
                               <button
                                 onClick={() => handleCancelLoan(manageLoanSelected)}
-                                className="bg-[#6EE8B5] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
+                                className="bg-[#6EE8A2] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
                               >
-                                <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                                <div className="w-9 h-9 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
                                   <X className="w-4 h-4 text-[#0A1A10]" />
                                 </div>
                                 <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
@@ -2719,7 +2719,7 @@ export default function Lending() {
             <AlertDialogCancel className="flex-1 rounded-xl border-0 font-semibold text-[#0A1A10] text-[14px] h-12 hover:opacity-90 transition-all" style={{ backgroundColor: '#83F384' }}>
               Keep Loan
             </AlertDialogCancel>
-            <AlertDialogAction onClick={confirmCancelLoan} className="flex-1 rounded-xl border-0 font-semibold text-[#0A1A10] text-[14px] h-12 hover:opacity-90 transition-all" style={{ backgroundColor: '#D0ED6F' }}>
+            <AlertDialogAction onClick={confirmCancelLoan} className="flex-1 rounded-xl border-0 font-semibold text-[#0A1A10] text-[14px] h-12 hover:opacity-90 transition-all" style={{ backgroundColor: '#30FFA8' }}>
               Request Loan Cancellation
             </AlertDialogAction>
           </div>

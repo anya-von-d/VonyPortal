@@ -88,13 +88,13 @@ export function UserSelector({ users = [], value, onSelect, placeholder = "Choos
                 {filteredUsers.map((user, index) => {
                   if (!user || !user.username) return null;
                   const isSelected = value === user.username;
-                  const bgColors = ['#D0ED6F', '#83F384', '#6EE8B5'];
+                  const bgColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
 
                   return (
                     <div
                       key={user.username}
                       className="flex items-center gap-3 px-3 py-2.5 mx-2 my-1 rounded-xl cursor-pointer hover:opacity-90 transition-all duration-200"
-                      style={{ backgroundColor: isSelected ? bgColors[index % 3] : bgColors[index % 3] }}
+                      style={{ backgroundColor: isSelected ? bgColors[index % 6] : bgColors[index % 6] }}
                       onClick={() => handleSelect(user.username)}
                     >
                       {/* Profile Picture */}
@@ -137,7 +137,7 @@ export function UserSelector({ users = [], value, onSelect, placeholder = "Choos
                 {/* Add Friends Option */}
                 {showAddFriends && (
                   <div
-                    className="flex items-center gap-3 px-3 py-2.5 mx-2 my-1 rounded-xl cursor-pointer hover:opacity-90 transition-all duration-200 bg-[#DBFFEB]"
+                    className="flex items-center gap-3 px-3 py-2.5 mx-2 my-1 rounded-xl cursor-pointer hover:opacity-90 transition-all duration-200 bg-[#AAFFA3]"
                     onClick={handleAddFriends}
                   >
                     <div className="w-9 h-9 rounded-full bg-[#00A86B] flex items-center justify-center flex-shrink-0">
@@ -158,7 +158,7 @@ export function UserSelector({ users = [], value, onSelect, placeholder = "Choos
                   {searchTerm ? 'No friends found' : 'No friends yet'}
                 </div>
                 <div
-                  className="flex items-center gap-3 px-3 py-2.5 mx-2 my-1 rounded-xl cursor-pointer hover:opacity-90 transition-all duration-200 bg-[#DBFFEB]"
+                  className="flex items-center gap-3 px-3 py-2.5 mx-2 my-1 rounded-xl cursor-pointer hover:opacity-90 transition-all duration-200 bg-[#AAFFA3]"
                   onClick={handleAddFriends}
                 >
                   <div className="w-9 h-9 rounded-full bg-[#00A86B] flex items-center justify-center flex-shrink-0">

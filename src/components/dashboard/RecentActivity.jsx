@@ -9,7 +9,7 @@ import { format } from "date-fns";
 import { SkeletonShimmer } from "@/components/ui/animations";
 
 // Background colors that cycle through cards
-const cardBgColors = ['#D0ED6F', '#83F384', '#6EE8B5'];
+const cardBgColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
 // Hover accent colors that cycle through cards
 const hoverAccentColors = ['#00A86B', '#50C878', '#0D9B76', '#00BF7A'];
 
@@ -47,7 +47,7 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
                 <div
                   key={i}
                   className="rounded-xl p-4 md:p-5"
-                  style={{ backgroundColor: cardBgColors[i % 3] }}
+                  style={{ backgroundColor: cardBgColors[i % 6] }}
                 >
                   <SkeletonShimmer className="h-4 w-48 mb-2" />
                   <SkeletonShimmer className="h-3 w-32" />
@@ -178,7 +178,7 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
             ) : (
               recentActivity.map((activity, index) => {
                 const { title, date, icon: Icon } = getActivityInfo(activity);
-                const bgColor = cardBgColors[index % 3];
+                const bgColor = cardBgColors[index % 6];
                 const hoverColor = hoverAccentColors[index % 4];
                 const isHovered = hoveredIndex === index;
 
@@ -194,7 +194,7 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
                     style={{ backgroundColor: bgColor }}
                   >
                     {/* Circular Icon */}
-                    <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                    <div className="w-9 h-9 rounded-full bg-[#6EE8A2] flex items-center justify-center flex-shrink-0">
                       <Icon className="w-4 h-4 text-[#0A1A10]" />
                     </div>
 

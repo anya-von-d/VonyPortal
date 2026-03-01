@@ -46,7 +46,7 @@ export default function QuickActions() {
             const hoverColor = hoverAccentColors[index % 4];
             const isHovered = hoveredIndex === index;
             const Icon = action.icon;
-            const cardBgColors = ['#36CE8E', '#36CE8E', '#36CE8E'];
+            const cardBgColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
 
             return (
               <Link key={action.title} to={createPageUrl(action.url)}>
@@ -57,10 +57,10 @@ export default function QuickActions() {
                   onMouseEnter={() => setHoveredIndex(index)}
                   onMouseLeave={() => setHoveredIndex(null)}
                   className="rounded-xl p-3 md:p-4 cursor-pointer transition-all duration-200 flex items-center gap-3"
-                  style={{ backgroundColor: cardBgColors[index % 3] }}
+                  style={{ backgroundColor: cardBgColors[index % 6] }}
                 >
                   {/* Circular Icon */}
-                  <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
                     <Icon className="w-4 h-4 text-[#0A1A10]" />
                   </div>
 

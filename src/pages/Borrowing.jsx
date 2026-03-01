@@ -307,7 +307,7 @@ export default function Borrowing() {
           <p className="text-sm text-slate-500 mt-1">Document ID: {agreement.id}</p>
         </div>
 
-        <div className="bg-[#DBFFEB] rounded-xl p-4">
+        <div className="bg-[#96FFD0] rounded-xl p-4">
           <p className="text-sm text-slate-600 mb-1">Principal Amount</p>
           <p className="text-3xl font-bold text-slate-800">{formatMoney(agreement.amount)}</p>
         </div>
@@ -365,15 +365,15 @@ export default function Borrowing() {
         </div>
 
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-[#DBFFEB] rounded-xl p-3 text-center">
+          <div className="bg-[#AAFFA3] rounded-xl p-3 text-center">
             <p className="text-xs text-slate-600">Principal</p>
             <p className="text-lg font-bold text-slate-800">{formatMoney(agreement.amount)}</p>
           </div>
-          <div className="bg-[#DBFFEB] rounded-xl p-3 text-center">
+          <div className="bg-[#30FFA8] rounded-xl p-3 text-center">
             <p className="text-xs text-slate-600">Interest</p>
             <p className="text-lg font-bold text-slate-800">{formatMoney((agreement.total_amount || 0) - (agreement.amount || 0))}</p>
           </div>
-          <div className="bg-[#DBFFEB] rounded-xl p-3 text-center">
+          <div className="bg-[#96FFD0] rounded-xl p-3 text-center">
             <p className="text-xs text-slate-600">Total</p>
             <p className="text-lg font-bold text-slate-800">{formatMoney(agreement.total_amount)}</p>
           </div>
@@ -443,17 +443,17 @@ export default function Borrowing() {
           <Badge className={`${getStatusColor(loan?.status)} capitalize`}>{loan?.status || 'active'}</Badge>
         </div>
 
-        <div className="bg-[#DBFFEB] rounded-xl p-4 mb-1">
+        <div className="bg-[#AAFFA3] rounded-xl p-4 mb-1">
           <p className="text-xs text-slate-600 mb-1">Purpose</p>
           <p className="text-sm font-semibold text-slate-800">{loan?.purpose || agreement.purpose || 'Reason'}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-[#DBFFEB] rounded-xl p-4">
+          <div className="bg-[#30FFA8] rounded-xl p-4">
             <p className="text-xs text-slate-600 mb-1">Loan Amount</p>
             <p className="text-2xl font-bold text-slate-800">{formatMoney(agreement.amount)}</p>
           </div>
-          <div className="bg-[#DBFFEB] rounded-xl p-4">
+          <div className="bg-[#6EE8A2] rounded-xl p-4">
             <p className="text-xs text-slate-600 mb-1">Total Due</p>
             <p className="text-2xl font-bold text-[#00A86B]">{formatMoney(agreement.total_amount)}</p>
           </div>
@@ -575,7 +575,7 @@ export default function Borrowing() {
             >
               <div className="sticky top-0 bg-white border-b border-slate-100 p-4 flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-[#DBFFEB] flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-[#96FFD0] flex items-center justify-center">
                     <FileText className="w-4 h-4 text-[#00A86B]" />
                   </div>
                   <span className="font-medium text-slate-800">
@@ -649,7 +649,7 @@ export default function Borrowing() {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Pie Chart */}
-                    <div className="rounded-xl p-4 flex flex-col items-center justify-center" style={{ backgroundColor: '#6EE8B5' }}>
+                    <div className="rounded-xl p-4 flex flex-col items-center justify-center" style={{ backgroundColor: '#AAFFA3' }}>
                       <p className="text-sm font-medium text-slate-600 mb-3">Repayment Progress</p>
                       {(() => {
                         const percentPaid = totalOwed > 0 ? Math.round((totalPaid / totalOwed) * 100) : 0;
@@ -697,7 +697,7 @@ export default function Borrowing() {
                     </div>
 
                     {/* Stats Card - Total Borrowed */}
-                    <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0 rounded-xl" style={{ backgroundColor: '#83F384' }}>
+                    <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0 rounded-xl" style={{ backgroundColor: '#30FFA8' }}>
                       <CardContent className="p-5 flex flex-col items-center justify-center h-full text-center">
                         <p className="text-sm font-medium text-slate-600 mb-2">Total Borrowed</p>
                         <p className="text-lg font-bold text-slate-800">${totalBorrowed.toLocaleString()}</p>
@@ -706,7 +706,7 @@ export default function Borrowing() {
                     </Card>
 
                     {/* Stats Card - Remaining */}
-                    <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0 rounded-xl" style={{ backgroundColor: '#6EE8B5' }}>
+                    <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0 rounded-xl" style={{ backgroundColor: '#6EE8A2' }}>
                       <CardContent className="p-5 flex flex-col items-center justify-center h-full text-center">
                         <p className="text-sm font-medium text-slate-600 mb-2">Remaining Balance</p>
                         <p className="text-lg font-bold text-slate-800">${remainingBalance.toLocaleString()}</p>
@@ -816,9 +816,9 @@ export default function Borrowing() {
                           .slice(0, 3)
                           .map((loan, index) => {
                             const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
-                            const bgColors = ['#D0ED6F', '#83F384', '#6EE8B5'];
+                            const bgColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
                             return (
-                              <div key={loan.id} className="flex items-center justify-between p-3 rounded-xl" style={{ backgroundColor: bgColors[index % 3] }}>
+                              <div key={loan.id} className="flex items-center justify-between p-3 rounded-xl" style={{ backgroundColor: bgColors[index % 6] }}>
                                 <div>
                                   <p className="font-medium text-sm text-slate-800">
                                     ${loan.payment_amount?.toLocaleString() || 0} to @{lender?.username || 'user'}
@@ -969,7 +969,7 @@ export default function Borrowing() {
                         });
 
                         return (
-                          <div className="bg-[#83F384] rounded-xl p-3 flex items-center justify-between">
+                          <div className="bg-[#30FFA8] rounded-xl p-3 flex items-center justify-between">
                             <p className="text-[11px] text-[#0A1A10] uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                               {format(selectedMonth, 'MMMM')} Payment Amount
                             </p>
@@ -1006,8 +1006,8 @@ export default function Borrowing() {
                                     setSelectedMonth(monthDate);
                                     setShowMonthDropdown(false);
                                   }}
-                                  className={`w-full px-4 py-2 text-left text-sm hover:bg-[#DBFFEB] transition-colors ${
-                                    isSameMonth(monthDate, selectedMonth) ? 'bg-[#DBFFEB] font-medium text-[#00A86B]' : 'text-slate-700'
+                                  className={`w-full px-4 py-2 text-left text-sm hover:bg-[#AAFFA3] transition-colors ${
+                                    isSameMonth(monthDate, selectedMonth) ? 'bg-[#30FFA8] font-medium text-[#00A86B]' : 'text-slate-700'
                                   }`}
                                 >
                                   {format(monthDate, 'MMMM')}
@@ -1080,15 +1080,15 @@ export default function Borrowing() {
                         );
                       }
 
-                      const colors = ['#D0ED6F', '#83F384', '#6EE8B5'];
+                      const colors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
 
                       return events.map((event, index) => (
                         <div
                           key={index}
                           className="flex items-center gap-3 p-3 rounded-xl"
-                          style={{ backgroundColor: colors[index % 3] }}
+                          style={{ backgroundColor: colors[index % 6] }}
                         >
-                          <div className="bg-[#DBFFEB] rounded-lg px-3 py-2 flex-shrink-0 text-center min-w-[50px]">
+                          <div className="bg-[#96FFD0] rounded-lg px-3 py-2 flex-shrink-0 text-center min-w-[50px]">
                             <p className="text-xs text-slate-500 uppercase" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                               {format(event.date, 'MMM')}
                             </p>
@@ -1162,7 +1162,7 @@ export default function Borrowing() {
 
                           return sortedLoans.slice(0, 5).map((loan, index) => {
                             const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
-                            const bgColors = ['#D0ED6F', '#83F384', '#6EE8B5'];
+                            const bgColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
 
                             return (
                               <motion.div
@@ -1171,7 +1171,7 @@ export default function Borrowing() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.05 }}
                                 className="rounded-xl p-3 flex items-center gap-3"
-                                style={{ backgroundColor: bgColors[index % 3] }}
+                                style={{ backgroundColor: bgColors[index % 6] }}
                               >
                                 {/* Rank Number */}
                                 <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center flex-shrink-0">
@@ -1306,7 +1306,7 @@ export default function Borrowing() {
                             Loan Information
                           </p>
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <div className="bg-[#D0ED6F] rounded-xl p-4">
+                            <div className="bg-[#AAFFA3] rounded-xl p-4">
                               <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Amount</p>
                               <p className="text-xl font-bold text-slate-800">
                                 ${(manageLoanSelected.amount || 0).toLocaleString()}
@@ -1318,7 +1318,7 @@ export default function Borrowing() {
                                 {manageLoanSelected.interest_rate || 0}%
                               </p>
                             </div>
-                            <div className="bg-[#6EE8B5] rounded-xl p-4">
+                            <div className="bg-[#30FFA8] rounded-xl p-4">
                               <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Term</p>
                               <p className="text-xl font-bold text-slate-800">
                                 {manageLoanSelected.repayment_period || 0} {manageLoanSelected.repayment_unit || 'months'}
@@ -1408,7 +1408,7 @@ export default function Borrowing() {
                           </div>
 
                           {/* Payment Amount - Right */}
-                          <div className="bg-[#6EE8B5] rounded-2xl p-5 flex flex-col">
+                          <div className="bg-[#DBFFEB] rounded-2xl p-5 flex flex-col">
                             <p className="text-[10px] text-slate-700 uppercase tracking-[0.12em] font-medium mb-2" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                               Payment Amount
                             </p>
@@ -1432,7 +1432,7 @@ export default function Borrowing() {
                                 Interest
                               </p>
                               <div className="grid grid-cols-2 gap-3">
-                                <div className="bg-[#6EE8B5] rounded-xl p-4">
+                                <div className="bg-[#74FF71] rounded-xl p-4">
                                   <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Interest Accrued</p>
                                   <p className="text-xl font-bold text-slate-800">
                                     ${(() => {
@@ -1442,7 +1442,7 @@ export default function Borrowing() {
                                     })()}
                                   </p>
                                 </div>
-                                <div className="bg-[#6EE8B5] rounded-xl p-4">
+                                <div className="bg-[#6EE8A2] rounded-xl p-4">
                                   <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Predicted Interest</p>
                                   <p className="text-xl font-bold text-slate-800">
                                     ${(() => {
@@ -1507,9 +1507,9 @@ export default function Borrowing() {
                                   {/* Loan Summary */}
                                   <button
                                     onClick={() => openDocPopup('summary', agreement)}
-                                    className="bg-[#D0ED6F] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3"
+                                    className="bg-[#AAFFA3] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3"
                                   >
-                                    <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                                    <div className="w-9 h-9 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
                                       <FileText className="w-4 h-4 text-[#0A1A10]" />
                                     </div>
                                     <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
@@ -1522,7 +1522,7 @@ export default function Borrowing() {
                                     onClick={() => openDocPopup('promissory', agreement)}
                                     className="bg-[#83F384] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3"
                                   >
-                                    <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                                    <div className="w-9 h-9 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
                                       <ClipboardList className="w-4 h-4 text-[#0A1A10]" />
                                     </div>
                                     <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
@@ -1549,9 +1549,9 @@ export default function Borrowing() {
                                   {/* Amortization Schedule */}
                                   <button
                                     onClick={() => openDocPopup('amortization', agreement)}
-                                    className="bg-[#6EE8B5] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3"
+                                    className="bg-[#6EE8A2] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3"
                                   >
-                                    <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                                    <div className="w-9 h-9 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
                                       <BarChart3 className="w-4 h-4 text-[#0A1A10]" />
                                     </div>
                                     <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
@@ -1589,9 +1589,9 @@ export default function Borrowing() {
                           <div className="flex flex-col sm:flex-row gap-3">
                             <button
                               onClick={() => handleMakePayment(manageLoanSelected)}
-                              className="bg-[#D0ED6F] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
+                              className="bg-[#30FFA8] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
                             >
-                              <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                              <div className="w-9 h-9 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
                                 <DollarSign className="w-4 h-4 text-[#0A1A10]" />
                               </div>
                               <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
@@ -1602,7 +1602,7 @@ export default function Borrowing() {
                               onClick={() => handleEditLoan(manageLoanSelected)}
                               className="bg-[#83F384] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
                             >
-                              <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                              <div className="w-9 h-9 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
                                 <Pencil className="w-4 h-4 text-[#0A1A10]" />
                               </div>
                               <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
@@ -1611,9 +1611,9 @@ export default function Borrowing() {
                             </button>
                             <button
                               onClick={() => handleCancelLoan(manageLoanSelected)}
-                              className="bg-[#6EE8B5] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
+                              className="bg-[#96FFD0] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
                             >
-                              <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                              <div className="w-9 h-9 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
                                 <X className="w-4 h-4 text-[#0A1A10]" />
                               </div>
                               <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
@@ -1693,7 +1693,7 @@ export default function Borrowing() {
             <AlertDialogCancel className="flex-1 rounded-xl border-0 font-semibold text-[#0A1A10] text-[14px] h-12 hover:opacity-90 transition-all" style={{ backgroundColor: '#83F384' }}>
               Keep Loan
             </AlertDialogCancel>
-            <AlertDialogAction onClick={confirmCancelLoan} className="flex-1 rounded-xl border-0 font-semibold text-[#0A1A10] text-[14px] h-12 hover:opacity-90 transition-all" style={{ backgroundColor: '#D0ED6F' }}>
+            <AlertDialogAction onClick={confirmCancelLoan} className="flex-1 rounded-xl border-0 font-semibold text-[#0A1A10] text-[14px] h-12 hover:opacity-90 transition-all" style={{ backgroundColor: '#AAFFA3' }}>
               Request Loan Cancellation
             </AlertDialogAction>
           </div>

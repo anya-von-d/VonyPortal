@@ -417,7 +417,7 @@ export default function LoanAgreements() {
           <p className="text-sm text-slate-500 mt-1">Document ID: {agreement.id}</p>
         </div>
 
-        <div className="bg-[#DBFFEB] rounded-xl p-4">
+        <div className="bg-[#96FFD0] rounded-xl p-4">
           <p className="text-sm text-slate-600 mb-1">Principal Amount</p>
           <p className="text-3xl font-bold text-slate-800">{formatMoney(agreement.amount)}</p>
         </div>
@@ -479,15 +479,15 @@ export default function LoanAgreements() {
         </div>
 
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-[#DBFFEB] rounded-xl p-3 text-center">
+          <div className="bg-[#AAFFA3] rounded-xl p-3 text-center">
             <p className="text-xs text-slate-600">Principal</p>
             <p className="text-lg font-bold text-slate-800">{formatMoney(agreement.amount)}</p>
           </div>
-          <div className="bg-[#DBFFEB] rounded-xl p-3 text-center">
+          <div className="bg-[#30FFA8] rounded-xl p-3 text-center">
             <p className="text-xs text-slate-600">Interest</p>
             <p className="text-lg font-bold text-slate-800">{formatMoney((agreement.total_amount || 0) - (agreement.amount || 0))}</p>
           </div>
-          <div className="bg-[#DBFFEB] rounded-xl p-3 text-center">
+          <div className="bg-[#96FFD0] rounded-xl p-3 text-center">
             <p className="text-xs text-slate-600">Total</p>
             <p className="text-lg font-bold text-slate-800">{formatMoney(agreement.total_amount)}</p>
           </div>
@@ -559,11 +559,11 @@ export default function LoanAgreements() {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-[#DBFFEB] rounded-xl p-4">
+          <div className="bg-[#74FF71] rounded-xl p-4">
             <p className="text-xs text-slate-600 mb-1">Loan Amount</p>
             <p className="text-2xl font-bold text-slate-800">{formatMoney(agreement.amount)}</p>
           </div>
-          <div className="bg-[#DBFFEB] rounded-xl p-4">
+          <div className="bg-[#30FFA8] rounded-xl p-4">
             <p className="text-xs text-slate-600 mb-1">Total Due</p>
             <p className="text-2xl font-bold text-[#00A86B]">{formatMoney(agreement.total_amount)}</p>
           </div>
@@ -680,7 +680,7 @@ export default function LoanAgreements() {
             >
               <div className="sticky top-0 bg-white border-b border-slate-100 p-4 flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-[#DBFFEB] flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-[#6EE8A2] flex items-center justify-center">
                     <FileText className="w-4 h-4 text-[#00A86B]" />
                   </div>
                   <span className="font-medium text-slate-800">
@@ -819,7 +819,7 @@ export default function LoanAgreements() {
                   if (filteredAgreements.length === 0) {
                     return (
                       <div className="bg-[#DBFFEB] rounded-xl p-8 text-center">
-                        <div className="w-16 h-16 rounded-full bg-[#DBFFEB] flex items-center justify-center mx-auto mb-4">
+                        <div className="w-16 h-16 rounded-full bg-[#96FFD0] flex items-center justify-center mx-auto mb-4">
                           <FileText className="w-8 h-8 text-[#00A86B]" />
                         </div>
                         <h3 className="text-lg font-semibold text-slate-800 mb-2">No Agreements Found</h3>
@@ -832,7 +832,7 @@ export default function LoanAgreements() {
                     );
                   }
 
-                  const colors = ['#D0ED6F', '#83F384', '#6EE8B5'];
+                  const colors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
 
                   return (
                     <div className="space-y-3">
@@ -849,7 +849,7 @@ export default function LoanAgreements() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.05 }}
                             className="p-4 rounded-xl"
-                            style={{ backgroundColor: colors[index % 3] }}
+                            style={{ backgroundColor: colors[index % 6] }}
                           >
                             {/* Desktop Layout */}
                             <div className="hidden md:flex items-center gap-4">
@@ -888,7 +888,7 @@ export default function LoanAgreements() {
                                     onMouseLeave={() => setActiveInfoTooltip(null)}
                                     onClick={(e) => e.stopPropagation()}
                                   >
-                                    <div className="w-4 h-4 rounded-full bg-[#6EE8B5] flex items-center justify-center cursor-help">
+                                    <div className="w-4 h-4 rounded-full bg-[#6EE8A2] flex items-center justify-center cursor-help">
                                       <span className="text-[10px] font-bold text-slate-800">i</span>
                                     </div>
                                     {activeInfoTooltip === `promissory-${agreement.id}` && (
@@ -911,7 +911,7 @@ export default function LoanAgreements() {
                                     onMouseLeave={() => setActiveInfoTooltip(null)}
                                     onClick={(e) => e.stopPropagation()}
                                   >
-                                    <div className="w-4 h-4 rounded-full bg-[#6EE8B5] flex items-center justify-center cursor-help">
+                                    <div className="w-4 h-4 rounded-full bg-[#6EE8A2] flex items-center justify-center cursor-help">
                                       <span className="text-[10px] font-bold text-slate-800">i</span>
                                     </div>
                                     {activeInfoTooltip === `amortization-${agreement.id}` && (
@@ -963,7 +963,7 @@ export default function LoanAgreements() {
                                     onMouseLeave={() => setActiveInfoTooltip(null)}
                                     onClick={(e) => e.stopPropagation()}
                                   >
-                                    <div className="w-4 h-4 rounded-full bg-[#6EE8B5] flex items-center justify-center cursor-help">
+                                    <div className="w-4 h-4 rounded-full bg-[#6EE8A2] flex items-center justify-center cursor-help">
                                       <span className="text-[10px] font-bold text-slate-800">i</span>
                                     </div>
                                     {activeInfoTooltip === `promissory-mobile-${agreement.id}` && (
@@ -986,7 +986,7 @@ export default function LoanAgreements() {
                                     onMouseLeave={() => setActiveInfoTooltip(null)}
                                     onClick={(e) => e.stopPropagation()}
                                   >
-                                    <div className="w-4 h-4 rounded-full bg-[#6EE8B5] flex items-center justify-center cursor-help">
+                                    <div className="w-4 h-4 rounded-full bg-[#6EE8A2] flex items-center justify-center cursor-help">
                                       <span className="text-[10px] font-bold text-slate-800">i</span>
                                     </div>
                                     {activeInfoTooltip === `amortization-mobile-${agreement.id}` && (

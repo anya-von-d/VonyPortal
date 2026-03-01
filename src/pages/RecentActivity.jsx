@@ -467,7 +467,7 @@ export default function RecentActivityPage() {
                         style={{ backgroundColor: bgColors[index % 6] }}
                       >
                         {/* Circular Icon */}
-                        <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                        <div className="w-9 h-9 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
                           <Icon className="w-4 h-4 text-[#0A1A10]" />
                         </div>
 
