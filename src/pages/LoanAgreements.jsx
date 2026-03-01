@@ -559,7 +559,7 @@ export default function LoanAgreements() {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-[#74FF71] rounded-xl p-4">
+          <div className="bg-[#6EE8B5] rounded-xl p-4">
             <p className="text-xs text-slate-600 mb-1">Loan Amount</p>
             <p className="text-2xl font-bold text-slate-800">{formatMoney(agreement.amount)}</p>
           </div>
@@ -832,7 +832,7 @@ export default function LoanAgreements() {
                     );
                   }
 
-                  const colors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
+                  const colors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#6EE8B5', '#83F384', '#6EE8A2'];
 
                   return (
                     <div className="space-y-3">

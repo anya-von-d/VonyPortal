@@ -22,7 +22,7 @@ const statusConfig = {
   declined: { bg: 'bg-white', icon: XCircle, iconColor: 'text-red-500', textColor: 'text-red-500' }
 };
 
-const bgColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
+const bgColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#6EE8B5', '#83F384', '#6EE8A2'];
 
 export default function RecentActivityPage() {
   const [loans, setLoans] = useState([]);

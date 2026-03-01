@@ -9,7 +9,7 @@ import { format } from "date-fns";
 import { SkeletonShimmer } from "@/components/ui/animations";
 
 // Background colors that cycle through cards
-const cardBgColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
+const cardBgColors = ['#AAFFA3', '#96FFD0', '#6EE8B5'];
 // Hover accent colors that cycle through cards
 const hoverAccentColors = ['#00A86B', '#50C878', '#0D9B76', '#00BF7A'];
 

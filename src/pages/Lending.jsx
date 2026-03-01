@@ -890,7 +890,7 @@ export default function Lending() {
               <p className="font-bold text-slate-800">{formatMoney(agreement.payment_amount)}</p>
               <p className="text-xs text-slate-500 capitalize">{agreement.payment_frequency}</p>
             </div>
-            <div className="bg-[#74FF71] rounded-xl p-3">
+            <div className="bg-[#6EE8B5] rounded-xl p-3">
               <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-0.5">Term</p>
               <p className="font-bold text-slate-800">{agreement.repayment_period} {agreement.repayment_unit || 'months'}</p>
             </div>
@@ -1027,7 +1027,7 @@ export default function Lending() {
           <Badge className={`${getStatusColor(loan?.status)} capitalize`}>{loan?.status || 'active'}</Badge>
         </div>
 
-        <div className="bg-[#74FF71] rounded-xl p-4 mb-1">
+        <div className="bg-[#6EE8B5] rounded-xl p-4 mb-1">
           <p className="text-xs text-slate-600 mb-1">Purpose</p>
           <p className="text-sm font-semibold text-slate-800">{loan?.purpose || agreement.purpose || '—'}</p>
         </div>
@@ -1239,7 +1239,7 @@ export default function Lending() {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Pie Chart */}
-                    <div className="rounded-xl p-4 flex flex-col items-center justify-center" style={{ backgroundColor: '#AAFFA3' }}>
+                    <div className="rounded-xl p-4 flex flex-col items-center justify-center" style={{ backgroundColor: '#6EE8B5' }}>
                       <p className="text-sm font-medium text-slate-600 mb-3">Repayment Progress</p>
                       {(() => {
                         const totalOwed = activeLoans.reduce((sum, loan) => sum + (loan.total_amount || loan.amount || 0), 0);
@@ -1310,7 +1310,7 @@ export default function Lending() {
 
                 {/* Quick Record Payment */}
                 {activeLoans.length > 0 && (
-                  <div className="bg-[#DBFFEB] rounded-2xl p-5 border-0">
+                  <div className="bg-[#AAFFA3] rounded-2xl p-5 border-0">
                     <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                       Record Payment
                     </p>
@@ -1381,8 +1381,8 @@ export default function Lending() {
                         disabled={!quickPayLoanId || !quickPayAmount}
                         className={`h-8 px-4 rounded-lg text-sm font-medium border-0 transition-all ${
                           !quickPayLoanId || !quickPayAmount
-                            ? 'bg-[#83F384] text-[#DBEEE3] saturate-[0.7] brightness-[0.92] cursor-not-allowed'
-                            : 'bg-[#83F384] text-[#DBEEE3] hover:bg-[#83F384]/90'
+                            ? 'bg-[#00A86B]/30 text-[#00A86B]/50 cursor-not-allowed'
+                            : 'bg-[#00A86B] text-white hover:bg-[#0D9B76]'
                         }`}
                       >
                         Submit
@@ -1408,7 +1408,7 @@ export default function Lending() {
                           .slice(0, 3)
                           .map((loan, index) => {
                             const borrower = publicProfiles.find(p => p.user_id === loan.borrower_id);
-                            const bgColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
+                            const bgColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#6EE8B5', '#83F384', '#6EE8A2'];
                             return (
                               <div key={loan.id} className="flex items-center justify-between p-3 rounded-xl" style={{ backgroundColor: bgColors[index % 6] }}>
                                 <div>
@@ -1644,7 +1644,7 @@ export default function Lending() {
                         );
                       }
 
-                      const colors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
+                      const colors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#6EE8B5', '#83F384', '#6EE8A2'];
 
                       return events.map((event, index) => (
                         <div
@@ -2207,7 +2207,7 @@ export default function Lending() {
 
                   {/* Borrower Payment Box - Only for Loan type, always visible */}
                   {loanType === 'scheduled' && (
-                    <div className="bg-[#30FFA8] rounded-2xl p-4">
+                    <div className="bg-[#83F384] rounded-2xl p-4">
                       <p className="text-xs text-slate-500 text-center">
                         {formData.borrower_username ? (
                           <>
@@ -2237,23 +2237,23 @@ export default function Lending() {
                     <div className="space-y-3">
                       <div className="pb-2 border-b border-[#83F384] flex items-baseline gap-1">
                         <span className="text-slate-600 text-sm flex-shrink-0">For:</span>
-                        <p className={`font-medium truncate ${formData.purpose ? 'text-slate-800' : 'text-slate-400'}`}>{formData.purpose || '—'}</p>
+                        <p className={`font-medium truncate ${formData.purpose ? 'text-black' : 'text-slate-400'}`}>{formData.purpose || '—'}</p>
                       </div>
                       {/* For repeating payments, show per payment amount and number of payments */}
                       {loanType === 'flexible' && formData.is_repeating && formData.repeating_num_payments ? (
                         <>
                           <div className="flex justify-between">
                             <span className="text-slate-600">Per Payment:</span>
-                            <span className={`font-bold ${formData.amount ? 'text-slate-800' : 'text-slate-400'}`}>{formData.amount ? `$${parseFloat(formData.amount).toLocaleString()}` : '$0.00'}</span>
+                            <span className={`font-bold ${formData.amount ? 'text-black' : 'text-slate-400'}`}>{formData.amount ? `$${parseFloat(formData.amount).toLocaleString()}` : '$0.00'}</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-slate-600">Payments:</span>
-                            <span className="font-bold text-slate-800">{formData.repeating_num_payments}</span>
+                            <span className="font-bold text-black">{formData.repeating_num_payments}</span>
                           </div>
                           <div className="border-t border-[#83F384] pt-2">
                             <div className="flex justify-between text-lg">
                               <span className="text-slate-600">Total:</span>
-                              <span className={`font-bold ${formData.amount && formData.repeating_num_payments ? 'text-slate-800' : 'text-slate-400'}`}>
+                              <span className={`font-bold ${formData.amount && formData.repeating_num_payments ? 'text-black' : 'text-slate-400'}`}>
                                 {formData.amount && formData.repeating_num_payments ? `$${(parseFloat(formData.amount) * parseInt(formData.repeating_num_payments)).toFixed(2)}` : '$0.00'}
                               </span>
                             </div>
@@ -2263,18 +2263,18 @@ export default function Lending() {
                         <>
                           <div className="flex justify-between">
                             <span className="text-slate-600">Amount:</span>
-                            <span className={`font-bold ${formData.amount ? 'text-slate-800' : 'text-slate-400'}`}>{formData.amount ? `$${parseFloat(formData.amount).toLocaleString()}` : '$0.00'}</span>
+                            <span className={`font-bold ${formData.amount ? 'text-black' : 'text-slate-400'}`}>{formData.amount ? `$${parseFloat(formData.amount).toLocaleString()}` : '$0.00'}</span>
                           </div>
                           {loanType === 'scheduled' && (
                             <div className="flex justify-between">
                               <span className="text-slate-600">Interest:</span>
-                              <span className={`font-bold ${formData.amount && formData.interest_rate ? 'text-slate-800' : 'text-slate-400'}`}>{formData.amount && formData.interest_rate ? `$${details.totalInterest.toFixed(2)}` : '$0.00'}</span>
+                              <span className={`font-bold ${formData.amount && formData.interest_rate ? 'text-black' : 'text-slate-400'}`}>{formData.amount && formData.interest_rate ? `$${details.totalInterest.toFixed(2)}` : '$0.00'}</span>
                             </div>
                           )}
                           <div className="border-t border-[#83F384] pt-2">
                             <div className="flex justify-between text-lg">
                               <span className="text-slate-600">Total:</span>
-                              <span className={`font-bold ${formData.amount ? 'text-slate-800' : 'text-slate-400'}`}>
+                              <span className={`font-bold ${formData.amount ? 'text-black' : 'text-slate-400'}`}>
                                 {formData.amount
                                   ? `$${loanType === 'flexible'
                                       ? parseFloat(formData.amount).toFixed(2)
@@ -2437,7 +2437,7 @@ export default function Lending() {
                           {/* Progress Pie Chart + Next Payment + Payment Amount */}
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {/* Pie Chart - Left */}
-                            <div className="bg-[#DBFFEB] rounded-2xl p-5">
+                            <div className="bg-[#6EE8B5] rounded-2xl p-5">
                               <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                                 Payment Progress
                               </p>
@@ -2485,7 +2485,7 @@ export default function Lending() {
                             </div>
 
                             {/* Next Payment Date - Middle */}
-                            <div className="bg-[#DBFFEB] rounded-2xl p-5 flex flex-col">
+                            <div className="bg-[#6EE8B5] rounded-2xl p-5 flex flex-col">
                               <p className="text-[10px] text-slate-700 uppercase tracking-[0.12em] font-medium mb-2" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                                 Next Payment Date
                               </p>
@@ -2509,7 +2509,7 @@ export default function Lending() {
                             </div>
 
                             {/* Payment Amount - Right */}
-                            <div className="bg-[#DBFFEB] rounded-2xl p-5 flex flex-col">
+                            <div className="bg-[#6EE8B5] rounded-2xl p-5 flex flex-col">
                               <p className="text-[10px] text-slate-700 uppercase tracking-[0.12em] font-medium mb-2" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                                 Payment Amount
                               </p>
@@ -2533,7 +2533,7 @@ export default function Lending() {
                                   Interest
                                 </p>
                                 <div className="grid grid-cols-2 gap-3">
-                                  <div className="bg-[#AAFFA3] rounded-xl p-4">
+                                  <div className="bg-[#6EE8B5] rounded-xl p-4">
                                     <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Interest Accrued</p>
                                     <p className="text-xl font-bold text-slate-800">
                                       ${(() => {
@@ -2543,7 +2543,7 @@ export default function Lending() {
                                       })()}
                                     </p>
                                   </div>
-                                  <div className="bg-[#74FF71] rounded-xl p-4">
+                                  <div className="bg-[#6EE8B5] rounded-xl p-4">
                                     <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Predicted Interest</p>
                                     <p className="text-xl font-bold text-slate-800">
                                       ${(() => {
@@ -2566,7 +2566,7 @@ export default function Lending() {
                                 <div className="grid grid-cols-2 gap-3">
                                   <div className="bg-[#83F384] rounded-xl p-4">
                                     <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Amount Paid</p>
-                                    <p className="text-xl font-bold text-[#00A86B]">
+                                    <p className="text-xl font-bold text-black">
                                       ${(manageLoanSelected.amount_paid || 0).toLocaleString()}
                                     </p>
                                   </div>

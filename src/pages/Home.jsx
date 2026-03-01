@@ -291,7 +291,7 @@ export default function Home() {
 
                   <div
                     className="rounded-xl p-4 flex flex-col items-center justify-center transition-colors duration-300"
-                    style={{ backgroundColor: overviewType === 'lending' ? '#83F384' : '#74FF71' }}
+                    style={{ backgroundColor: overviewType === 'lending' ? '#83F384' : '#6EE8B5' }}
                   >
                     <motion.div
                       key={overviewType}
@@ -488,7 +488,7 @@ export default function Home() {
                             color="blue"
                             change={nextBorrowerPayment ? `to @${nextBorrowerPayment.username}` : 'N/A'}
                             index={1}
-                            bgColor="#96FFD0"
+                            bgColor="#6EE8B5"
                           />
                         </div>
                         <motion.div
@@ -498,7 +498,7 @@ export default function Home() {
                           whileHover={{ y: -4, transition: { duration: 0.2 } }}
                           className="mt-[28px]"
                         >
-                          <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0" style={{ backgroundColor: '#6EE8A2' }}>
+                          <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0" style={{ backgroundColor: '#6EE8B5' }}>
                             <CardContent className="p-5 flex flex-col h-full">
                               <p className="text-sm font-medium text-slate-600 mb-2 text-left">Next Payment Date</p>
                               {nextBorrowerPayment ? (
@@ -683,16 +683,14 @@ export default function Home() {
                                 {/* Payment Indicators */}
                                 <div className="flex gap-0.5 absolute bottom-0.5">
                                   {hasSend && (
-                                    <div className="w-2 h-2 rounded-full bg-[#EF4444]" />
+                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#96FFD0' }} />
                                   )}
                                   {hasReceive && (
-                                    <div className="w-2 h-2 rounded-full bg-[#00A86B]" />
+                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#AAFFA3' }} />
                                   )}
                                 </div>
                                 {(hasSend || hasReceive) && (
-                                  <div className={`absolute inset-0 rounded-lg ${
-                                    hasSend && hasReceive ? 'bg-amber-50' : hasSend ? 'bg-red-50' : 'bg-[#DBFFEB]'
-                                  }`} style={{ zIndex: -1 }} />
+                                  <div className="absolute inset-0 rounded-lg" style={{ backgroundColor: hasSend && hasReceive ? '#6EE8A2' : hasSend ? '#96FFD0' : '#AAFFA3', opacity: 0.3, zIndex: -1 }} />
                                 )}
                               </div>
                             );
@@ -704,15 +702,15 @@ export default function Home() {
                     {/* Legend */}
                     <div className="flex items-center justify-center gap-6 mt-4 pt-3 border-t border-white/50">
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-[#EF4444]" />
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#96FFD0' }} />
                         <span className="text-sm font-medium text-slate-700">Send</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-[#00A86B]" />
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#AAFFA3' }} />
                         <span className="text-sm font-medium text-slate-700">Receive</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-amber-200 border border-amber-300" />
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#6EE8A2' }} />
                         <span className="text-sm font-medium text-slate-700">Both</span>
                       </div>
                     </div>
@@ -872,7 +870,7 @@ export default function Home() {
                           );
                         }
 
-                        const colors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
+                        const colors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#6EE8B5', '#83F384', '#6EE8A2'];
 
                         return events.map((event, index) => (
                           <div

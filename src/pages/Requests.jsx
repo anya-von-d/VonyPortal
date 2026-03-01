@@ -360,7 +360,7 @@ export default function Requests() {
     { id: 'terms', label: 'Loan Changes', count: termChangeRequests.length },
   ];
 
-  const colors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
+  const colors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#6EE8B5', '#83F384', '#6EE8A2'];
 
   if (isLoading) {
     return (

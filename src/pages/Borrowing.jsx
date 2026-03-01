@@ -720,7 +720,7 @@ export default function Borrowing() {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Pie Chart */}
-                    <div className="rounded-xl p-4 flex flex-col items-center justify-center" style={{ backgroundColor: '#AAFFA3' }}>
+                    <div className="rounded-xl p-4 flex flex-col items-center justify-center" style={{ backgroundColor: '#6EE8A2' }}>
                       <p className="text-sm font-medium text-slate-600 mb-3">Repayment Progress</p>
                       {(() => {
                         const percentPaid = totalOwed > 0 ? Math.round((totalPaid / totalOwed) * 100) : 0;
@@ -768,7 +768,7 @@ export default function Borrowing() {
                     </div>
 
                     {/* Stats Card - Total Borrowed */}
-                    <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0 rounded-xl" style={{ backgroundColor: '#30FFA8' }}>
+                    <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0 rounded-xl" style={{ backgroundColor: '#83F384' }}>
                       <CardContent className="p-5 flex flex-col items-center justify-center h-full text-center">
                         <p className="text-sm font-medium text-slate-600 mb-2">Total Borrowed</p>
                         <p className="text-lg font-bold text-slate-800">${totalBorrowed.toLocaleString()}</p>
@@ -789,7 +789,7 @@ export default function Borrowing() {
 
                 {/* Quick Record Payment */}
                 {activeLoans.length > 0 && (
-                  <div className="bg-[#DBFFEB] rounded-2xl p-5 border-0">
+                  <div className="bg-[#AAFFA3] rounded-2xl p-5 border-0">
                     <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                       Record Payment
                     </p>
@@ -858,8 +858,8 @@ export default function Borrowing() {
                         disabled={!quickPayLoanId || !quickPayAmount || !quickPayMethod}
                         className={`h-8 px-4 rounded-lg text-sm font-medium border-0 transition-all ${
                           !quickPayLoanId || !quickPayAmount || !quickPayMethod
-                            ? 'bg-[#83F384] text-[#DBEEE3] saturate-[0.7] brightness-[0.92] cursor-not-allowed'
-                            : 'bg-[#83F384] text-[#DBEEE3] hover:bg-[#83F384]/90'
+                            ? 'bg-[#00A86B]/30 text-[#00A86B]/50 cursor-not-allowed'
+                            : 'bg-[#00A86B] text-white hover:bg-[#0D9B76]'
                         }`}
                       >
                         Submit
@@ -885,7 +885,7 @@ export default function Borrowing() {
                           .slice(0, 3)
                           .map((loan, index) => {
                             const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
-                            const bgColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
+                            const bgColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#6EE8B5', '#83F384', '#6EE8A2'];
                             return (
                               <div key={loan.id} className="flex items-center justify-between p-3 rounded-xl" style={{ backgroundColor: bgColors[index % 6] }}>
                                 <div>
@@ -1149,7 +1149,7 @@ export default function Borrowing() {
                         );
                       }
 
-                      const colors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
+                      const colors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#6EE8B5', '#83F384', '#6EE8A2'];
 
                       return events.map((event, index) => (
                         <div
@@ -1231,7 +1231,7 @@ export default function Borrowing() {
 
                           return sortedLoans.slice(0, 5).map((loan, index) => {
                             const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
-                            const bgColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
+                            const bgColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#6EE8B5', '#83F384', '#6EE8A2'];
 
                             return (
                               <motion.div
@@ -1408,7 +1408,7 @@ export default function Borrowing() {
                         {/* Progress Pie Chart + Next Payment + Payment Amount */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           {/* Pie Chart - Left */}
-                          <div className="bg-[#DBFFEB] rounded-2xl p-5">
+                          <div className="bg-[#6EE8B5] rounded-2xl p-5">
                             <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                               Payment Progress
                             </p>
@@ -1480,7 +1480,7 @@ export default function Borrowing() {
                           </div>
 
                           {/* Payment Amount - Right */}
-                          <div className="bg-[#DBFFEB] rounded-2xl p-5 flex flex-col">
+                          <div className="bg-[#6EE8B5] rounded-2xl p-5 flex flex-col">
                             <p className="text-[10px] text-slate-700 uppercase tracking-[0.12em] font-medium mb-2" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                               Payment Amount
                             </p>
@@ -1504,7 +1504,7 @@ export default function Borrowing() {
                                 Interest
                               </p>
                               <div className="grid grid-cols-2 gap-3">
-                                <div className="bg-[#74FF71] rounded-xl p-4">
+                                <div className="bg-[#6EE8B5] rounded-xl p-4">
                                   <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Interest Accrued</p>
                                   <p className="text-xl font-bold text-slate-800">
                                     ${(() => {
@@ -1514,7 +1514,7 @@ export default function Borrowing() {
                                     })()}
                                   </p>
                                 </div>
-                                <div className="bg-[#6EE8A2] rounded-xl p-4">
+                                <div className="bg-[#6EE8B5] rounded-xl p-4">
                                   <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Predicted Interest</p>
                                   <p className="text-xl font-bold text-slate-800">
                                     ${(() => {
@@ -1537,7 +1537,7 @@ export default function Borrowing() {
                               <div className="grid grid-cols-2 gap-3">
                                 <div className="bg-[#83F384] rounded-xl p-4">
                                   <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Amount Paid</p>
-                                  <p className="text-xl font-bold text-[#00A86B]">
+                                  <p className="text-xl font-bold text-black">
                                     ${(manageLoanSelected.amount_paid || 0).toLocaleString()}
                                   </p>
                                 </div>

@@ -125,10 +125,10 @@ export default function Shop() {
     }
   ];
 
-  const cardColors = ['#96FFD0', '#AAFFA3', '#74FF71', '#30FFA8', '#6EE8A2'];
-  const subBoxColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#6EE8A2'];
+  const cardColors = ['#96FFD0', '#AAFFA3', '#6EE8B5', '#30FFA8', '#6EE8A2'];
+  const subBoxColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#6EE8B5', '#6EE8A2'];
   const loanCardColors = ['#30FFA8', '#6EE8A2', '#AAFFA3'];
-  const loanSubBoxColors = ['#6EE8A2', '#96FFD0', '#74FF71'];
+  const loanSubBoxColors = ['#6EE8A2', '#96FFD0', '#6EE8B5'];
 
   return (
     <div className="min-h-screen p-3 md:p-6" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
