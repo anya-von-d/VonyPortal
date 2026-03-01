@@ -777,7 +777,7 @@ export default function Borrowing() {
                     </Card>
 
                     {/* Stats Card - Remaining */}
-                    <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0 rounded-xl" style={{ backgroundColor: '#6EE8A2' }}>
+                    <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0 rounded-xl" style={{ backgroundColor: '#6EE8B5' }}>
                       <CardContent className="p-5 flex flex-col items-center justify-center h-full text-center">
                         <p className="text-sm font-medium text-slate-600 mb-2">Remaining Balance</p>
                         <p className="text-lg font-bold text-slate-800">${remainingBalance.toLocaleString()}</p>

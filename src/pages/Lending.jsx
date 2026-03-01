@@ -1310,7 +1310,7 @@ export default function Lending() {
 
                 {/* Quick Record Payment */}
                 {activeLoans.length > 0 && (
-                  <div className="bg-[#AAFFA3] rounded-2xl p-5 border-0">
+                  <div className="bg-[#96FFD0] rounded-2xl p-5 border-0">
                     <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                       Record Payment
                     </p>
@@ -1326,7 +1326,7 @@ export default function Lending() {
                         className="w-24 h-8 px-3 bg-white inline-flex"
                         style={{ MozAppearance: 'textfield' }}
                       />
-                      <span>to</span>
+                      <span>from</span>
                       <span className="text-[#00A86B] font-medium">
                         {quickPayLoanId
                           ? `@${getUserById(activeLoans.find(l => l.id === quickPayLoanId)?.borrower_id)?.username || 'user'}`
@@ -1784,17 +1784,21 @@ export default function Lending() {
                               <Label htmlFor="amount">
                                 Payment Amount
                               </Label>
-                              <Input
-                                id="amount"
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                max="5000"
-                                placeholder="Enter amount"
-                                value={formData.amount}
-                                onChange={(e) => handleInputChange('amount', e.target.value)}
-                                required
-                              />
+                              <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-medium">$</span>
+                                <Input
+                                  id="amount"
+                                  type="number"
+                                  step="0.01"
+                                  min="0"
+                                  max="5000"
+                                  placeholder="Enter amount"
+                                  value={formData.amount}
+                                  onChange={(e) => handleInputChange('amount', e.target.value)}
+                                  required
+                                  className="pl-7"
+                                />
+                              </div>
                             </div>
                             <div className="space-y-2">
                               <Label htmlFor="purpose">
@@ -1839,7 +1843,7 @@ export default function Lending() {
                             {formData.is_repeating && (
                               <div className="px-5 pt-5 pb-1 bg-[#DBFFEB] rounded-xl overflow-hidden">
                                 <p className="text-sm text-slate-700 leading-[4.2] [&_input]:inline-flex [&_input]:align-baseline [&_input]:my-[2px] [&_input[type=number]]:appearance-none [&_input[type=number]]:[-moz-appearance:textfield] [&_input[type=number]::-webkit-outer-spin-button]:appearance-none [&_input[type=number]::-webkit-inner-spin-button]:appearance-none [&_.inline-flex]:my-[2px]">
-                                  Payments of{' '}
+                                  Payments of $
                                   <Input
                                     type="number"
                                     step="0.01"
@@ -1963,7 +1967,7 @@ export default function Lending() {
                               <span className="text-[#00A86B] font-medium">
                                 {formData.borrower_username ? `@${formData.borrower_username}` : 'the borrower'}
                               </span>{' '}
-                              <Input
+                              $<Input
                                 type="number"
                                 step="0.01"
                                 min="0"
