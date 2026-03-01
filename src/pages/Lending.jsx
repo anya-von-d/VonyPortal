@@ -1843,7 +1843,7 @@ export default function Lending() {
                             {formData.is_repeating && (
                               <div className="px-5 pt-5 pb-1 bg-[#DBFFEB] rounded-xl overflow-hidden">
                                 <p className="text-sm text-slate-700 leading-[4.2] [&_input]:inline-flex [&_input]:align-baseline [&_input]:my-[2px] [&_input[type=number]]:appearance-none [&_input[type=number]]:[-moz-appearance:textfield] [&_input[type=number]::-webkit-outer-spin-button]:appearance-none [&_input[type=number]::-webkit-inner-spin-button]:appearance-none [&_.inline-flex]:my-[2px]">
-                                  Payments of $
+                                  Payments of ${' '}
                                   <Input
                                     type="number"
                                     step="0.01"
@@ -1967,7 +1967,8 @@ export default function Lending() {
                               <span className="text-[#00A86B] font-medium">
                                 {formData.borrower_username ? `@${formData.borrower_username}` : 'the borrower'}
                               </span>{' '}
-                              $<Input
+                              ${' '}
+                              <Input
                                 type="number"
                                 step="0.01"
                                 min="0"
@@ -2224,7 +2225,7 @@ export default function Lending() {
                           'Borrower will pay'
                         )}
                       </p>
-                      <p className="text-2xl font-bold text-slate-800 text-center my-1">
+                      <p className="text-2xl font-bold text-black text-center my-1">
                         {formData.amount && details.monthlyPayment > 0 ? `$${details.monthlyPayment.toFixed(2)}` : '$0.00'}
                       </p>
                       <p className="text-xs text-slate-500 text-center">
@@ -2241,14 +2242,14 @@ export default function Lending() {
                     <div className="space-y-3">
                       <div className="pb-2 border-b border-[#83F384] flex items-baseline gap-1">
                         <span className="text-slate-600 text-sm flex-shrink-0">For:</span>
-                        <p className={`font-medium truncate ${formData.purpose ? 'text-black' : 'text-slate-400'}`}>{formData.purpose || '—'}</p>
+                        <p className="font-medium truncate text-black">{formData.purpose || '—'}</p>
                       </div>
                       {/* For repeating payments, show per payment amount and number of payments */}
                       {loanType === 'flexible' && formData.is_repeating && formData.repeating_num_payments ? (
                         <>
                           <div className="flex justify-between">
                             <span className="text-slate-600">Per Payment:</span>
-                            <span className={`font-bold ${formData.amount ? 'text-black' : 'text-slate-400'}`}>{formData.amount ? `$${parseFloat(formData.amount).toLocaleString()}` : '$0.00'}</span>
+                            <span className="font-bold text-black">{formData.amount ? `$${parseFloat(formData.amount).toLocaleString()}` : '$0.00'}</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-slate-600">Payments:</span>
@@ -2257,7 +2258,7 @@ export default function Lending() {
                           <div className="border-t border-[#83F384] pt-2">
                             <div className="flex justify-between text-lg">
                               <span className="text-slate-600">Total:</span>
-                              <span className={`font-bold ${formData.amount && formData.repeating_num_payments ? 'text-black' : 'text-slate-400'}`}>
+                              <span className="font-bold text-black">
                                 {formData.amount && formData.repeating_num_payments ? `$${(parseFloat(formData.amount) * parseInt(formData.repeating_num_payments)).toFixed(2)}` : '$0.00'}
                               </span>
                             </div>
@@ -2267,18 +2268,18 @@ export default function Lending() {
                         <>
                           <div className="flex justify-between">
                             <span className="text-slate-600">Amount:</span>
-                            <span className={`font-bold ${formData.amount ? 'text-black' : 'text-slate-400'}`}>{formData.amount ? `$${parseFloat(formData.amount).toLocaleString()}` : '$0.00'}</span>
+                            <span className="font-bold text-black">{formData.amount ? `$${parseFloat(formData.amount).toLocaleString()}` : '$0.00'}</span>
                           </div>
                           {loanType === 'scheduled' && (
                             <div className="flex justify-between">
                               <span className="text-slate-600">Interest:</span>
-                              <span className={`font-bold ${formData.amount && formData.interest_rate ? 'text-black' : 'text-slate-400'}`}>{formData.amount && formData.interest_rate ? `$${details.totalInterest.toFixed(2)}` : '$0.00'}</span>
+                              <span className="font-bold text-black">{formData.amount && formData.interest_rate ? `$${details.totalInterest.toFixed(2)}` : '$0.00'}</span>
                             </div>
                           )}
                           <div className="border-t border-[#83F384] pt-2">
                             <div className="flex justify-between text-lg">
                               <span className="text-slate-600">Total:</span>
-                              <span className={`font-bold ${formData.amount ? 'text-black' : 'text-slate-400'}`}>
+                              <span className="font-bold text-black">
                                 {formData.amount
                                   ? `$${loanType === 'flexible'
                                       ? parseFloat(formData.amount).toFixed(2)

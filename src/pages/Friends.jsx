@@ -444,7 +444,7 @@ export default function Friends() {
                   <Card className="bg-[#DBFFEB] border-0 rounded-2xl">
                     <CardContent className="p-5">
                       <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                        Results
+                        Users
                       </p>
 
                       {searchResults.length === 0 ? (
@@ -509,21 +509,20 @@ export default function Friends() {
                                       )}
                                     </Button>
                                   ) : (
-                                    <Button
-                                      size="sm"
+                                    <button
                                       onClick={() => handleSendRequest(profile.user_id)}
                                       disabled={processingId === profile.user_id}
-                                      className="bg-[#00A86B] hover:bg-[#0D9B76] text-white"
+                                      className="bg-[#DBFFEB] rounded-xl px-4 py-2 flex items-center gap-1.5 hover:bg-[#AAFFA3] transition-colors disabled:opacity-50"
                                     >
                                       {processingId === profile.user_id ? (
-                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                        <div className="w-4 h-4 border-2 border-[#00A86B] border-t-transparent rounded-full animate-spin" />
                                       ) : (
                                         <>
-                                          <Send className="w-4 h-4 mr-1" />
-                                          Send Request
+                                          <Send className="w-3.5 h-3.5 text-[#00A86B]" />
+                                          <span className="text-sm font-medium text-[#00A86B]">Send Friend Request</span>
                                         </>
                                       )}
-                                    </Button>
+                                    </button>
                                   )}
                                 </div>
                               </motion.div>

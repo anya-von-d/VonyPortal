@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Loan, Payment, User, PublicProfile } from "@/entities/all";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Activity, ArrowUpRight, ArrowDownRight, Send, Check, X, Ban, FileText, DollarSign, Eye, ChevronDown, Users, Clock, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { Activity, ArrowUpRight, ArrowDownRight, Send, Check, X, Ban, ChevronDown, Clock, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import {
@@ -309,68 +307,32 @@ export default function RecentActivityPage() {
           </h1>
         </motion.div>
 
-        {/* Top Filter Box - "Activity Involving:" */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <Card className="bg-[#DBFFEB] border-0 rounded-2xl">
-            <CardContent className="p-5">
-              <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                Activity Involving:
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Button
-                  onClick={() => {
-                    setFilterType('loan');
-                    setFilterPayment('all');
-                  }}
-                  variant={filterType === 'loan' ? 'default' : 'outline'}
-                  className={`flex-1 min-w-[100px] ${
-                    filterType === 'loan'
-                      ? 'bg-[#00A86B] hover:bg-[#0D9B76] text-white'
-                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-                  }`}
-                >
-                  <FileText className="w-4 h-4 mr-2" />
-                  Loan Agreement
-                </Button>
-                <Button
-                  onClick={() => {
-                    setFilterType('payment');
-                    setFilterStatus('all');
-                  }}
-                  variant={filterType === 'payment' ? 'default' : 'outline'}
-                  className={`flex-1 min-w-[100px] ${
-                    filterType === 'payment'
-                      ? 'bg-[#00A86B] hover:bg-[#0D9B76] text-white'
-                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-                  }`}
-                >
-                  <DollarSign className="w-4 h-4 mr-2" />
-                  Payments
-                </Button>
-                <Button
-                  onClick={() => {
-                    setFilterType('all');
-                    setFilterStatus('all');
-                    setFilterPayment('all');
-                  }}
-                  variant={filterType === 'all' ? 'default' : 'outline'}
-                  className={`flex-1 min-w-[100px] ${
-                    filterType === 'all'
-                      ? 'bg-[#00A86B] hover:bg-[#0D9B76] text-white'
-                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-                  }`}
-                >
-                  <Eye className="w-4 h-4 mr-2" />
-                  View Both
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+        {/* Tab Navigation */}
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {[
+            { id: 'all', label: 'All' },
+            { id: 'loan', label: 'Loan Actions' },
+            { id: 'payment', label: 'Payment Actions' },
+          ].map(tab => (
+            <Button
+              key={tab.id}
+              onClick={() => {
+                setFilterType(tab.id);
+                if (tab.id !== 'loan') setFilterStatus('all');
+                if (tab.id !== 'payment') setFilterPayment('all');
+              }}
+              variant={filterType === tab.id ? 'default' : 'outline'}
+              className={`whitespace-nowrap ${
+                filterType === tab.id
+                  ? 'bg-[#00A86B] hover:bg-[#0D9B76] text-white'
+                  : 'bg-white border-0 text-slate-600 hover:bg-[#DBFFEB]'
+              }`}
+            >
+              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+            </Button>
+          ))}
+        </div>
 
         {/* Activity List Box */}
         <motion.div
@@ -378,8 +340,7 @@ export default function RecentActivityPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card className="bg-[#DBFFEB] border-0 rounded-2xl">
-            <CardContent className="p-5">
+          <div className="bg-[#DBFFEB] rounded-2xl p-5">
               {/* Header with label and conditional dropdown */}
               <div className="flex items-center justify-between mb-4">
                 <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
@@ -504,8 +465,7 @@ export default function RecentActivityPage() {
                   Showing {allActivities.length} {allActivities.length === 1 ? 'activity' : 'activities'}
                 </div>
               )}
-            </CardContent>
-          </Card>
+          </div>
         </motion.div>
       </div>
     </div>

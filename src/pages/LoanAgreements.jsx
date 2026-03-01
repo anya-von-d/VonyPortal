@@ -860,11 +860,19 @@ export default function LoanAgreements() {
 
                               {/* Center: User Info */}
                               <div className="flex items-center gap-3 flex-1 min-w-0">
-                                <img
-                                  src={otherParty.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((otherParty.full_name || 'User').charAt(0))}&background=22c55e&color=fff&size=128`}
-                                  alt={otherParty.full_name}
-                                  className="w-10 h-10 rounded-full object-cover border-2 border-white flex-shrink-0"
-                                />
+                                <div className="w-10 h-10 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
+                                  {otherParty.profile_picture_url ? (
+                                    <img
+                                      src={otherParty.profile_picture_url}
+                                      alt={otherParty.full_name}
+                                      className="w-full h-full rounded-full object-cover"
+                                    />
+                                  ) : (
+                                    <span className="text-lg font-semibold text-[#0A1A10]">
+                                      {(otherParty.full_name || otherParty.username || '?').charAt(0).toUpperCase()}
+                                    </span>
+                                  )}
+                                </div>
                                 <div className="min-w-0">
                                   <p className="font-semibold text-slate-800 truncate">{otherParty.full_name}</p>
                                   <p className="text-xs text-slate-600 truncate">
