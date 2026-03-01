@@ -312,17 +312,17 @@ export default function Home() {
                             <>
                               <div className="relative w-32 h-32">
                                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                                  <circle cx="60" cy="60" r="50" fill="none" stroke="#e2e8f0" strokeWidth="12" />
+                                  <circle cx="60" cy="60" r="52" fill="none" stroke="#DBFFEB" strokeWidth="7" />
                                   <circle
                                     cx="60"
                                     cy="60"
-                                    r="50"
+                                    r="52"
                                     fill="none"
                                     stroke="#00A86B"
-                                    strokeWidth="12"
+                                    strokeWidth="7"
                                     strokeLinecap="round"
-                                    strokeDasharray={2 * Math.PI * 50}
-                                    strokeDashoffset={2 * Math.PI * 50 - (percentRepaid / 100) * 2 * Math.PI * 50}
+                                    strokeDasharray={2 * Math.PI * 52}
+                                    strokeDashoffset={2 * Math.PI * 52 - (percentRepaid / 100) * 2 * Math.PI * 52}
                                     className="transition-all duration-500"
                                   />
                                 </svg>
@@ -349,17 +349,17 @@ export default function Home() {
                             <>
                               <div className="relative w-32 h-32">
                                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                                  <circle cx="60" cy="60" r="50" fill="none" stroke="#e2e8f0" strokeWidth="12" />
+                                  <circle cx="60" cy="60" r="52" fill="none" stroke="#DBFFEB" strokeWidth="7" />
                                   <circle
                                     cx="60"
                                     cy="60"
-                                    r="50"
+                                    r="52"
                                     fill="none"
                                     stroke="#00A86B"
-                                    strokeWidth="12"
+                                    strokeWidth="7"
                                     strokeLinecap="round"
-                                    strokeDasharray={2 * Math.PI * 50}
-                                    strokeDashoffset={2 * Math.PI * 50 - (percentPaid / 100) * 2 * Math.PI * 50}
+                                    strokeDasharray={2 * Math.PI * 52}
+                                    strokeDashoffset={2 * Math.PI * 52 - (percentPaid / 100) * 2 * Math.PI * 52}
                                     className="transition-all duration-500"
                                   />
                                 </svg>

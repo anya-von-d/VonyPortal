@@ -795,6 +795,7 @@ export default function Borrowing() {
                     </p>
                     <div className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
                       <span>Record payment of</span>
+                      <span className="font-medium">$</span>
                       <Input
                         type="number"
                         step="0.01"
