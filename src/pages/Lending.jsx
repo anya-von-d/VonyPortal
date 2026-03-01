@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Loan, LoanAgreement, User, PublicProfile, Friendship } from "@/entities/all";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -69,6 +69,54 @@ export default function Lending() {
   const [quickPayAmount, setQuickPayAmount] = useState('');
   const [quickPayMethod, setQuickPayMethod] = useState('');
   const [quickPayLoanId, setQuickPayLoanId] = useState('');
+
+  // Typing animation for purpose placeholder
+  const [purposePlaceholder, setPurposePlaceholder] = useState('');
+  const purposeAnimRef = useRef({ termIndex: 0, charIndex: 0, isDeleting: false, timeoutId: null });
+  const PURPOSE_TERMS = ['medical bills', 'car repairs', 'help with rent', 'travel expenses', 'bills'];
+
+  useEffect(() => {
+    const animate = () => {
+      const ref = purposeAnimRef.current;
+      const currentTerm = PURPOSE_TERMS[ref.termIndex];
+
+      if (!ref.isDeleting) {
+        // Typing forward
+        ref.charIndex++;
+        setPurposePlaceholder(`e.g., ${currentTerm.slice(0, ref.charIndex)}...`);
+
+        if (ref.charIndex >= currentTerm.length) {
+          // Pause at full word, then start deleting
+          ref.timeoutId = setTimeout(() => {
+            ref.isDeleting = true;
+            ref.timeoutId = setTimeout(animate, 60);
+          }, 2000);
+          return;
+        }
+        ref.timeoutId = setTimeout(animate, 80);
+      } else {
+        // Deleting
+        ref.charIndex--;
+        if (ref.charIndex <= 0) {
+          ref.isDeleting = false;
+          ref.charIndex = 0;
+          ref.termIndex = (ref.termIndex + 1) % PURPOSE_TERMS.length;
+          ref.timeoutId = setTimeout(animate, 400);
+          return;
+        }
+        setPurposePlaceholder(`e.g., ${currentTerm.slice(0, ref.charIndex)}...`);
+        ref.timeoutId = setTimeout(animate, 40);
+      }
+    };
+
+    animate();
+
+    return () => {
+      if (purposeAnimRef.current.timeoutId) {
+        clearTimeout(purposeAnimRef.current.timeoutId);
+      }
+    };
+  }, []);
 
   const [formData, setFormData] = useState({
     borrower_username: '',
@@ -805,19 +853,20 @@ export default function Lending() {
     const borrowerInfo = getUserById(agreement.borrower_id);
 
     return (
-      <div className="space-y-6">
-        <div className="text-center border-b border-slate-200 pb-4">
-          <h2 className="text-2xl font-bold text-slate-800">PROMISSORY NOTE</h2>
-          <p className="text-sm text-slate-500 mt-1">Document ID: {agreement.id}</p>
+      <div className="space-y-5">
+        <div className="text-center pb-3">
+          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-400 mb-1">Document</p>
+          <h2 className="text-2xl font-bold text-slate-800">Promissory Note</h2>
+          <p className="text-xs text-slate-400 mt-1">ID: {agreement.id}</p>
         </div>
 
-        <div className="bg-[#96FFD0] rounded-xl p-4">
-          <p className="text-sm text-slate-600 mb-1">Principal Amount</p>
+        <div className="bg-[#96FFD0] rounded-2xl p-5 text-center">
+          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-1">Principal Amount</p>
           <p className="text-3xl font-bold text-slate-800">{formatMoney(agreement.amount)}</p>
         </div>
 
-        <div className="space-y-3 text-sm">
-          <p className="leading-relaxed">
+        <div className="bg-[#DBFFEB] rounded-2xl p-4">
+          <p className="text-sm text-slate-700 leading-relaxed">
             FOR VALUE RECEIVED, the undersigned Borrower, <span className="font-semibold">{borrowerInfo.full_name}</span> (@{borrowerInfo.username}),
             promises to pay to the order of <span className="font-semibold">{lenderInfo.full_name}</span> (@{lenderInfo.username}),
             the principal sum of <span className="font-semibold">{formatMoney(agreement.amount)}</span>,
@@ -825,36 +874,49 @@ export default function Lending() {
           </p>
         </div>
 
-        <div className="bg-slate-50 rounded-xl p-4 space-y-2">
-          <h3 className="font-semibold text-slate-800 mb-3">Terms of Repayment</h3>
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div><span className="text-slate-500">Total Amount Due:</span> <span className="font-medium">{formatMoney(agreement.total_amount)}</span></div>
-            <div><span className="text-slate-500">Interest Rate:</span> <span className="font-medium">{agreement.interest_rate}%</span></div>
-            <div><span className="text-slate-500">Payment:</span> <span className="font-medium">{formatMoney(agreement.payment_amount)} {agreement.payment_frequency}</span></div>
-            <div><span className="text-slate-500">Term:</span> <span className="font-medium">{agreement.repayment_period} {agreement.repayment_unit || 'months'}</span></div>
+        <div className="bg-[#DBFFEB] rounded-2xl p-4 space-y-3">
+          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500">Terms of Repayment</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-[#AAFFA3] rounded-xl p-3">
+              <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-0.5">Total Due</p>
+              <p className="font-bold text-slate-800">{formatMoney(agreement.total_amount)}</p>
+            </div>
+            <div className="bg-[#30FFA8] rounded-xl p-3">
+              <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-0.5">Interest</p>
+              <p className="font-bold text-slate-800">{agreement.interest_rate}%</p>
+            </div>
+            <div className="bg-[#6EE8A2] rounded-xl p-3">
+              <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-0.5">Payment</p>
+              <p className="font-bold text-slate-800">{formatMoney(agreement.payment_amount)}</p>
+              <p className="text-xs text-slate-500 capitalize">{agreement.payment_frequency}</p>
+            </div>
+            <div className="bg-[#74FF71] rounded-xl p-3">
+              <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-0.5">Term</p>
+              <p className="font-bold text-slate-800">{agreement.repayment_period} {agreement.repayment_unit || 'months'}</p>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-slate-50 rounded-lg p-4">
-            <p className="text-xs text-slate-500 mb-1">Borrower</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-[#DBFFEB] rounded-2xl p-4">
+            <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-400 mb-1">Borrower</p>
             <p className="text-lg font-serif italic text-slate-800">{agreement.borrower_name || borrowerInfo.full_name}</p>
             {agreement.borrower_signed_date && (
-              <p className="text-xs text-slate-500 mt-1">Signed {format(new Date(agreement.borrower_signed_date), 'MMM d, yyyy')}</p>
+              <p className="text-xs text-slate-400 mt-1">Signed {format(new Date(agreement.borrower_signed_date), 'MMM d, yyyy')}</p>
             )}
           </div>
-          <div className="bg-slate-50 rounded-lg p-4">
-            <p className="text-xs text-slate-500 mb-1">Lender</p>
+          <div className="bg-[#DBFFEB] rounded-2xl p-4">
+            <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-400 mb-1">Lender</p>
             <p className="text-lg font-serif italic text-slate-800">{agreement.lender_name || lenderInfo.full_name}</p>
             {agreement.lender_signed_date && (
-              <p className="text-xs text-slate-500 mt-1">Signed {format(new Date(agreement.lender_signed_date), 'MMM d, yyyy')}</p>
+              <p className="text-xs text-slate-400 mt-1">Signed {format(new Date(agreement.lender_signed_date), 'MMM d, yyyy')}</p>
             )}
           </div>
         </div>
 
         <Button
           onClick={() => downloadPromissoryNote(agreement)}
-          className="w-full bg-[#00A86B] hover:bg-[#0D9B76] text-white"
+          className="w-full bg-[#00A86B] hover:bg-[#0D9B76] text-white rounded-xl py-3"
         >
           <Download className="w-4 h-4 mr-2" />
           Download PDF
@@ -870,49 +932,50 @@ export default function Lending() {
     const paidPayments = loan?.amount_paid ? Math.floor(loan.amount_paid / agreement.payment_amount) : 0;
 
     return (
-      <div className="space-y-6">
-        <div className="text-center border-b border-slate-200 pb-4">
-          <h2 className="text-2xl font-bold text-slate-800">AMORTIZATION SCHEDULE</h2>
-          <p className="text-sm text-slate-500 mt-1">{schedule.length} payments · {agreement.payment_frequency}</p>
+      <div className="space-y-5">
+        <div className="text-center pb-3">
+          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-400 mb-1">Schedule</p>
+          <h2 className="text-2xl font-bold text-slate-800">Amortization Schedule</h2>
+          <p className="text-xs text-slate-400 mt-1">{schedule.length} payments · {agreement.payment_frequency}</p>
         </div>
 
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-[#AAFFA3] rounded-xl p-3 text-center">
-            <p className="text-xs text-slate-600">Principal</p>
+          <div className="bg-[#AAFFA3] rounded-2xl p-3 text-center">
+            <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-0.5">Principal</p>
             <p className="text-lg font-bold text-slate-800">{formatMoney(agreement.amount)}</p>
           </div>
-          <div className="bg-[#30FFA8] rounded-xl p-3 text-center">
-            <p className="text-xs text-slate-600">Interest</p>
+          <div className="bg-[#30FFA8] rounded-2xl p-3 text-center">
+            <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-0.5">Interest</p>
             <p className="text-lg font-bold text-slate-800">{formatMoney((agreement.total_amount || 0) - (agreement.amount || 0))}</p>
           </div>
-          <div className="bg-[#96FFD0] rounded-xl p-3 text-center">
-            <p className="text-xs text-slate-600">Total</p>
+          <div className="bg-[#96FFD0] rounded-2xl p-3 text-center">
+            <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-0.5">Total</p>
             <p className="text-lg font-bold text-slate-800">{formatMoney(agreement.total_amount)}</p>
           </div>
         </div>
 
-        <div className="max-h-[300px] overflow-x-auto overflow-y-auto rounded-xl border border-slate-200">
+        <div className="max-h-[300px] overflow-x-auto overflow-y-auto rounded-2xl bg-[#DBFFEB]">
           <table className="w-full text-xs min-w-[700px]">
-            <thead className="bg-slate-50 sticky top-0">
+            <thead className="bg-[#DBFFEB] sticky top-0">
               <tr>
-                <th className="px-2 py-2 text-left font-medium text-slate-600">Payment</th>
-                <th className="px-2 py-2 text-left font-medium text-slate-600">Payment Date</th>
-                <th className="px-2 py-2 text-right font-medium text-slate-600">Starting Balance</th>
-                <th className="px-2 py-2 text-right font-medium text-slate-600">Principal Payment</th>
-                <th className="px-2 py-2 text-right font-medium text-slate-600">Interest Payment</th>
-                <th className="px-2 py-2 text-right font-medium text-slate-600">Principal to Date</th>
-                <th className="px-2 py-2 text-right font-medium text-slate-600">Interest to Date</th>
-                <th className="px-2 py-2 text-right font-medium text-slate-600">Ending Balance</th>
+                <th className="px-2 py-2.5 text-left text-[10px] font-mono uppercase tracking-wider text-slate-500">Payment</th>
+                <th className="px-2 py-2.5 text-left text-[10px] font-mono uppercase tracking-wider text-slate-500">Date</th>
+                <th className="px-2 py-2.5 text-right text-[10px] font-mono uppercase tracking-wider text-slate-500">Start Bal.</th>
+                <th className="px-2 py-2.5 text-right text-[10px] font-mono uppercase tracking-wider text-slate-500">Principal</th>
+                <th className="px-2 py-2.5 text-right text-[10px] font-mono uppercase tracking-wider text-slate-500">Interest</th>
+                <th className="px-2 py-2.5 text-right text-[10px] font-mono uppercase tracking-wider text-slate-500">Princ. TD</th>
+                <th className="px-2 py-2.5 text-right text-[10px] font-mono uppercase tracking-wider text-slate-500">Int. TD</th>
+                <th className="px-2 py-2.5 text-right text-[10px] font-mono uppercase tracking-wider text-slate-500">End Bal.</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody>
               {schedule.map((row, index) => (
                 <tr
                   key={row.number}
-                  className={index < paidPayments ? 'bg-green-50' : ''}
+                  className={index < paidPayments ? 'bg-[#AAFFA3]/40' : index % 2 === 0 ? 'bg-white/40' : ''}
                 >
                   <td className="px-2 py-2 text-slate-600">
-                    {index < paidPayments && <CheckCircle className="w-3 h-3 text-green-500 inline mr-1" />}
+                    {index < paidPayments && <CheckCircle className="w-3 h-3 text-[#00A86B] inline mr-1" />}
                     {row.number}
                   </td>
                   <td className="px-2 py-2 text-slate-800">{format(row.date, 'MMM d, yyyy')}</td>
@@ -930,7 +993,7 @@ export default function Lending() {
 
         <Button
           onClick={() => downloadAmortizationSchedule(agreement)}
-          className="w-full bg-[#00A86B] hover:bg-[#0D9B76] text-white"
+          className="w-full bg-[#00A86B] hover:bg-[#0D9B76] text-white rounded-xl py-3"
         >
           <Download className="w-4 h-4 mr-2" />
           Download PDF
@@ -966,7 +1029,7 @@ export default function Lending() {
 
         <div className="bg-[#74FF71] rounded-xl p-4 mb-1">
           <p className="text-xs text-slate-600 mb-1">Purpose</p>
-          <p className="text-sm font-semibold text-slate-800">{loan?.purpose || agreement.purpose || 'Reason'}</p>
+          <p className="text-sm font-semibold text-slate-800">{loan?.purpose || agreement.purpose || '_____'}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -1059,13 +1122,6 @@ export default function Lending() {
             </div>
           </div>
         </div>
-
-        {agreement.purpose && (
-          <div className="bg-slate-50 rounded-xl p-4">
-            <p className="text-xs text-slate-500 mb-1">Purpose</p>
-            <p className="text-slate-800">{agreement.purpose}</p>
-          </div>
-        )}
       </div>
     );
   };
@@ -1095,7 +1151,7 @@ export default function Lending() {
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl"
             >
-              <div className="sticky top-0 bg-white border-b border-slate-100 p-4 flex justify-between items-center">
+              <div className="sticky top-0 bg-white border-b border-slate-100 p-4 flex justify-between items-center rounded-t-2xl z-10">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-[#DBFFEB] flex items-center justify-center">
                     <FileText className="w-4 h-4 text-[#00A86B]" />
@@ -1887,7 +1943,7 @@ export default function Lending() {
                                   payments. These payments will be for{' '}
                                   <Input
                                     type="text"
-                                    placeholder="e.g., Netflix subscription, rent split..."
+                                    placeholder={purposePlaceholder}
                                     value={formData.purpose}
                                     onChange={(e) => handleInputChange('purpose', e.target.value)}
                                     className="flex-1 h-8 px-3 bg-white min-w-[200px] inline-flex"
@@ -2076,7 +2132,7 @@ export default function Lending() {
                               {' '}This loan is for{' '}
                               <Input
                                 type="text"
-                                placeholder="e.g., concert tickets, rent, tuition..."
+                                placeholder={purposePlaceholder}
                                 value={formData.purpose}
                                 onChange={(e) => handleInputChange('purpose', e.target.value)}
                                 className="flex-1 h-8 px-3 bg-white min-w-[200px] inline-flex"
@@ -2089,9 +2145,9 @@ export default function Lending() {
 
                         <Button
                           type="submit"
-                          disabled={isSubmitting || !formData.borrower_username || !formData.amount}
+                          disabled={isSubmitting || !formData.borrower_username || !formData.amount || !formData.purpose || (loanType === 'scheduled' && (!formData.interest_rate || !formData.repayment_period || !formData.lender_send_funds_date || !formData.first_payment_date)) || (loanType === 'flexible' && formData.is_repeating && (!formData.repeating_start_date || !formData.repeating_num_payments))}
                           className={`w-full py-3 text-base font-semibold rounded-xl border-0 mt-4 transition-all duration-200 ${
-                            isSubmitting || !formData.borrower_username || !formData.amount
+                            isSubmitting || !formData.borrower_username || !formData.amount || !formData.purpose || (loanType === 'scheduled' && (!formData.interest_rate || !formData.repayment_period || !formData.lender_send_funds_date || !formData.first_payment_date)) || (loanType === 'flexible' && formData.is_repeating && (!formData.repeating_start_date || !formData.repeating_num_payments))
                               ? 'bg-[#83F384] text-[#DBEEE3] cursor-not-allowed saturate-[0.7] brightness-[0.92]'
                               : 'bg-[#83F384] text-[#DBEEE3] hover:bg-[#83F384]/90'
                           }`}
@@ -2105,8 +2161,8 @@ export default function Lending() {
                   {/* Will Your Payment Request Repeat? Info Box - Only show for Quick Payment Request */}
                   {loanType === 'flexible' && (
                     <div className="bg-[#83F384] rounded-2xl p-4 mt-4">
-                      <p className="text-sm font-semibold text-slate-800 mb-2">Will Your Payment Request Repeat?</p>
-                      <p className="text-xs text-slate-700 leading-relaxed">
+                      <p className="text-base font-semibold text-slate-800 mb-2">Will Your Payment Request Repeat?</p>
+                      <p className="text-sm text-slate-700 leading-relaxed">
                         If you're requesting money for a recurring bill (like rent, utilities, or streaming subscriptions) set up a repeating request. Enter the details once, and we'll automatically send reminders and help you both stay on track for as long as you need.
                       </p>
                     </div>
@@ -2144,7 +2200,7 @@ export default function Lending() {
                     </div>
                     <p className="text-xs text-slate-500 text-center mt-3">
                       {loanType === 'flexible'
-                        ? "Get paid back in one payment - perfect for splitting dinner with roommates or one-time expenses"
+                        ? "Get paid back in one payment: perfect for splitting dinner with roommates or one-time expenses"
                         : "Offer money that will be paid back gradually with a structured payment plan"}
                     </p>
                   </div>

@@ -338,8 +338,8 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
   if (step === 3 && isSuccess) {
     return (
       <Dialog open={true} onOpenChange={() => {}}>
-        <DialogContent className="sm:max-w-md">
-          <div className="relative">
+        <DialogContent className="sm:max-w-md p-0 border-0 bg-[#DBEEE3] rounded-2xl overflow-hidden">
+          <div className="relative p-6">
             <SuccessAnimation
               show={true}
               title="Payment Recorded!"
@@ -379,107 +379,109 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
 
     return (
       <Dialog open={true} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Shield className="w-5 h-5 text-[#35B276]" />
-              Confirm Payment
-            </DialogTitle>
-            <DialogDescription>
-              Please review and confirm the payment details
-            </DialogDescription>
-          </DialogHeader>
-
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-4"
-          >
-            {/* Payment Summary Card */}
-            <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-5 border border-slate-200 space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-600">Amount</span>
-                <span className="text-2xl font-bold text-slate-800">${parseFloat(amount).toFixed(2)}</span>
+        <DialogContent className="sm:max-w-md p-0 border-0 bg-[#DBEEE3] rounded-2xl overflow-hidden">
+          <div className="p-5 space-y-4">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-8 h-8 rounded-full bg-[#DBFFEB] flex items-center justify-center">
+                <Shield className="w-4 h-4 text-[#00A86B]" />
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-600">Method</span>
-                <div className="flex items-center gap-2">
-                  <MethodIcon className={`w-4 h-4 ${methodInfo?.color}`} />
-                  <span className="font-medium text-slate-800">{methodInfo?.label}</span>
-                </div>
+              <div>
+                <h3 className="font-semibold text-slate-800">Confirm Payment</h3>
+                <p className="text-xs text-slate-500">Review and confirm the details</p>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-600">Date</span>
-                <span className="font-medium text-slate-800">
-                  {format(new Date(paymentDate), 'MMM d, yyyy')}
-                </span>
-              </div>
-              {recipientInfo && (
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600">To</span>
-                  <span className="font-medium text-slate-800">{recipientInfo.full_name}</span>
-                </div>
-              )}
-              {notes && (
-                <div className="pt-3 border-t border-slate-200">
-                  <span className="text-sm text-slate-600">Notes</span>
-                  <p className="text-sm text-slate-800 mt-1">{notes}</p>
-                </div>
-              )}
             </div>
 
-            {/* Warning Notice */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-4"
             >
-              <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-amber-700">
-                {isLender ? 'The Borrower' : 'The Lender'} will need to confirm this payment. Make sure the details are correct.
-              </p>
-            </motion.div>
-
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-red-700">{error}</p>
+              {/* Payment Summary Card */}
+              <div className="bg-[#DBFFEB] rounded-2xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500">Amount</span>
+                  <span className="text-2xl font-bold text-slate-800">${parseFloat(amount).toFixed(2)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500">Method</span>
+                  <div className="flex items-center gap-2">
+                    <MethodIcon className={`w-4 h-4 ${methodInfo?.color}`} />
+                    <span className="font-medium text-slate-800">{methodInfo?.label}</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500">Date</span>
+                  <span className="font-medium text-slate-800">
+                    {format(new Date(paymentDate), 'MMM d, yyyy')}
+                  </span>
+                </div>
+                {recipientInfo && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500">To</span>
+                    <span className="font-medium text-slate-800">{recipientInfo.full_name}</span>
+                  </div>
+                )}
+                {notes && (
+                  <div className="pt-3 border-t border-white/40">
+                    <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500">Notes</span>
+                    <p className="text-sm text-slate-800 mt-1">{notes}</p>
+                  </div>
+                )}
               </div>
-            )}
 
-            {/* Action Buttons */}
-            <div className="flex gap-3 pt-2">
-              <Button
-                variant="outline"
-                onClick={() => setStep(1)}
-                className="flex-1"
-                disabled={isProcessing}
+              {/* Warning Notice */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="bg-[#DBFFEB] rounded-xl p-3 flex items-start gap-2"
               >
-                <ArrowLeft className="w-4 h-4 mr-1" />
-                Back
-              </Button>
-              <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  onClick={handleRecordPayment}
-                  disabled={isProcessing}
-                  className="w-full bg-[#35B276] hover:bg-[#2d9a65] shadow-lg shadow-green-600/25"
-                >
-                  {isProcessing ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                      Recording...
-                    </>
-                  ) : (
-                    <>
-                      <Check className="w-4 h-4 mr-1" />
-                      Confirm Payment
-                    </>
-                  )}
-                </Button>
+                <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-slate-600">
+                  {isLender ? 'The Borrower' : 'The Lender'} will need to confirm this payment. Make sure the details are correct.
+                </p>
               </motion.div>
-            </div>
-          </motion.div>
+
+              {error && (
+                <div className="bg-red-50 rounded-xl p-3 flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-red-700">{error}</p>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-1">
+                <Button
+                  variant="outline"
+                  onClick={() => setStep(1)}
+                  className="flex-1 rounded-xl border-0 bg-white hover:bg-white/80"
+                  disabled={isProcessing}
+                >
+                  <ArrowLeft className="w-4 h-4 mr-1" />
+                  Back
+                </Button>
+                <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    onClick={handleRecordPayment}
+                    disabled={isProcessing}
+                    className="w-full bg-[#00A86B] hover:bg-[#0D9B76] text-white rounded-xl"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                        Recording...
+                      </>
+                    ) : (
+                      <>
+                        <Check className="w-4 h-4 mr-1" />
+                        Confirm Payment
+                      </>
+                    )}
+                  </Button>
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
         </DialogContent>
       </Dialog>
     );
@@ -488,325 +490,312 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
   // Step 1: Enter Details
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <DollarSign className="w-5 h-5 text-green-600" />
-            Record Payment
-          </DialogTitle>
-          <DialogDescription>
-            {isLender
-              ? "Record a payment received from the borrower"
-              : "Record a payment you made to the lender"
-            }
-          </DialogDescription>
-        </DialogHeader>
-
-        {/* Step Indicator */}
-        <div className="flex items-center justify-center gap-2 py-2">
-          <div className="flex items-center gap-1">
-            <div className="w-8 h-8 rounded-full bg-[#35B276] text-white flex items-center justify-center text-sm font-medium">1</div>
-            <span className="text-xs text-slate-600 hidden sm:inline">Details</span>
-          </div>
-          <div className="w-8 h-0.5 bg-slate-200" />
-          <div className="flex items-center gap-1">
-            <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-sm font-medium">2</div>
-            <span className="text-xs text-slate-400 hidden sm:inline">Confirm</span>
-          </div>
-          <div className="w-8 h-0.5 bg-slate-200" />
-          <div className="flex items-center gap-1">
-            <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-sm font-medium">3</div>
-            <span className="text-xs text-slate-400 hidden sm:inline">Done</span>
-          </div>
-        </div>
-
-        {/* Info banner about confirmation */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-start gap-2"
-        >
-          <Clock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-blue-700">
-            {isLender ? 'The Borrower' : 'The Lender'} will need to confirm this payment before it updates the loan balance.
-          </p>
-        </motion.div>
-
-        <form onSubmit={(e) => { e.preventDefault(); handleProceedToConfirm(); }} className="space-y-5">
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2"
-            >
-              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-red-700">{error}</p>
-            </motion.div>
-          )}
-
-          {/* Loan Summary */}
-          <div className="bg-slate-50 rounded-lg p-4 space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-600">Total Loan Amount:</span>
-              <span className="font-medium">${(loan.total_amount || 0).toFixed(2)}</span>
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto p-0 border-0 bg-[#DBEEE3] rounded-2xl">
+        <div className="p-5 space-y-4">
+          {/* Header */}
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-8 h-8 rounded-full bg-[#DBFFEB] flex items-center justify-center">
+              <DollarSign className="w-4 h-4 text-[#00A86B]" />
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-600">Already Paid:</span>
-              <span className="font-medium text-green-600">${(loan.amount_paid || 0).toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-sm border-t border-slate-200 pt-2">
-              <span className="text-slate-800 font-medium">Remaining Balance:</span>
-              <span className="font-bold text-slate-800">${remainingBalance.toFixed(2)}</span>
+            <div>
+              <h3 className="font-semibold text-slate-800">Record Payment</h3>
+              <p className="text-xs text-slate-500">
+                {isLender ? "Record a payment received from the borrower" : "Record a payment you made to the lender"}
+              </p>
             </div>
           </div>
 
-          {/* Payment Method */}
-          <div className="space-y-2">
-            <Label className={methodError ? 'text-red-600' : ''}>Payment Method</Label>
-            <div className="grid grid-cols-3 gap-2">
-              {PAYMENT_METHODS.map((method) => {
-                const Icon = method.icon;
-                const hasHandle = !!recipientPaymentHandles[method.id];
-                return (
-                  <motion.button
-                    key={method.id}
-                    type="button"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => {
-                      setPaymentMethod(method.id);
-                      setMethodError("");
-                      setShowDeepLinkOption(false);
-                    }}
-                    className={`flex flex-col items-center gap-1 p-3 rounded-lg border-2 transition-all relative ${
-                      paymentMethod === method.id
-                        ? 'border-green-500 bg-green-50 shadow-md'
-                        : methodError
-                        ? 'border-red-200 hover:border-red-300 bg-white'
-                        : 'border-slate-200 hover:border-slate-300 bg-white hover:shadow-sm'
-                    }`}
-                  >
-                    <Icon className={`w-5 h-5 ${method.color}`} />
-                    <span className="text-xs font-medium text-slate-700">{method.label}</span>
-                    {hasHandle && (
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
-                    )}
-                  </motion.button>
-                );
-              })}
+          {/* Step Indicator */}
+          <div className="flex items-center justify-center gap-2 py-1">
+            <div className="flex items-center gap-1">
+              <div className="w-7 h-7 rounded-full bg-[#00A86B] text-white flex items-center justify-center text-xs font-medium">1</div>
+              <span className="text-xs text-slate-600 hidden sm:inline">Details</span>
             </div>
-            {methodError && (
-              <motion.p
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-xs text-red-600 flex items-center gap-1"
-              >
-                <AlertCircle className="w-3 h-3" />
-                {methodError}
-              </motion.p>
-            )}
-            <p className="text-xs text-slate-500">
-              <span className="inline-flex items-center gap-1">
-                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                indicates recipient has connected this payment method
-              </span>
+            <div className="w-8 h-0.5 bg-white/60" />
+            <div className="flex items-center gap-1">
+              <div className="w-7 h-7 rounded-full bg-white/60 text-slate-400 flex items-center justify-center text-xs font-medium">2</div>
+              <span className="text-xs text-slate-400 hidden sm:inline">Confirm</span>
+            </div>
+            <div className="w-8 h-0.5 bg-white/60" />
+            <div className="flex items-center gap-1">
+              <div className="w-7 h-7 rounded-full bg-white/60 text-slate-400 flex items-center justify-center text-xs font-medium">3</div>
+              <span className="text-xs text-slate-400 hidden sm:inline">Done</span>
+            </div>
+          </div>
+
+          {/* Info banner */}
+          <div className="bg-[#DBFFEB] rounded-xl p-3 flex items-start gap-2">
+            <Clock className="w-4 h-4 text-[#00A86B] flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-slate-600">
+              {isLender ? 'The Borrower' : 'The Lender'} will need to confirm this payment before it updates the loan balance.
             </p>
           </div>
 
-          {/* Deep Link Section - Show when a method with deep link capability is selected */}
-          {paymentMethod && ['venmo', 'cashapp', 'paypal', 'zelle'].includes(paymentMethod) && !isLender && (
-            <div className="bg-gradient-to-r from-slate-50 to-slate-100 rounded-lg p-4 space-y-3 border border-slate-200">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-slate-700">
-                  Quick Pay with {PAYMENT_METHODS.find(m => m.id === paymentMethod)?.label}
-                </p>
-                {currentHandle && (
-                  <span className="text-xs text-green-600 font-medium flex items-center gap-1">
-                    <Check className="w-3 h-3" />
-                    Connected
-                  </span>
+          <form onSubmit={(e) => { e.preventDefault(); handleProceedToConfirm(); }} className="space-y-4">
+            {error && (
+              <div className="bg-red-50 rounded-xl p-3 flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-red-700">{error}</p>
+              </div>
+            )}
+
+            {/* Loan Summary */}
+            <div className="bg-[#DBFFEB] rounded-2xl p-4 space-y-2">
+              <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-2">Loan Balance</p>
+              <div className="flex justify-between text-sm">
+                <span className="text-slate-600">Total Loan Amount</span>
+                <span className="font-medium">${(loan.total_amount || 0).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-slate-600">Already Paid</span>
+                <span className="font-medium text-[#00A86B]">${(loan.amount_paid || 0).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm pt-2 border-t border-white/50">
+                <span className="text-slate-800 font-medium">Remaining Balance</span>
+                <span className="font-bold text-slate-800">${remainingBalance.toFixed(2)}</span>
+              </div>
+            </div>
+
+            {/* Payment Method */}
+            <div className="space-y-2">
+              <p className={`text-[10px] font-mono uppercase tracking-[0.2em] ${methodError ? 'text-red-600' : 'text-slate-500'}`}>Payment Method</p>
+              <div className="grid grid-cols-3 gap-2">
+                {PAYMENT_METHODS.map((method) => {
+                  const Icon = method.icon;
+                  const hasHandle = !!recipientPaymentHandles[method.id];
+                  return (
+                    <motion.button
+                      key={method.id}
+                      type="button"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        setPaymentMethod(method.id);
+                        setMethodError("");
+                        setShowDeepLinkOption(false);
+                      }}
+                      className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all relative ${
+                        paymentMethod === method.id
+                          ? 'bg-[#AAFFA3] shadow-sm'
+                          : methodError
+                          ? 'bg-red-50 hover:bg-red-100'
+                          : 'bg-white hover:bg-[#DBFFEB]'
+                      }`}
+                    >
+                      <Icon className={`w-5 h-5 ${method.color}`} />
+                      <span className="text-xs font-medium text-slate-700">{method.label}</span>
+                      {hasHandle && (
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#00A86B] rounded-full border-2 border-[#DBEEE3]" />
+                      )}
+                    </motion.button>
+                  );
+                })}
+              </div>
+              {methodError && (
+                <motion.p
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-xs text-red-600 flex items-center gap-1"
+                >
+                  <AlertCircle className="w-3 h-3" />
+                  {methodError}
+                </motion.p>
+              )}
+              <p className="text-xs text-slate-500">
+                <span className="inline-flex items-center gap-1">
+                  <span className="w-2 h-2 bg-[#00A86B] rounded-full"></span>
+                  indicates recipient has connected this method
+                </span>
+              </p>
+            </div>
+
+            {/* Deep Link Section */}
+            {paymentMethod && ['venmo', 'cashapp', 'paypal', 'zelle'].includes(paymentMethod) && !isLender && (
+              <div className="bg-[#DBFFEB] rounded-xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-slate-700">
+                    Quick Pay with {PAYMENT_METHODS.find(m => m.id === paymentMethod)?.label}
+                  </p>
+                  {currentHandle && (
+                    <span className="text-xs text-[#00A86B] font-medium flex items-center gap-1">
+                      <Check className="w-3 h-3" />
+                      Connected
+                    </span>
+                  )}
+                </div>
+
+                {currentHandle ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 bg-white rounded-xl p-2">
+                      <span className="text-sm text-slate-600 flex-1 font-mono">
+                        {currentHandle}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleCopyHandle}
+                        className="h-8 px-2"
+                      >
+                        {copiedHandle ? (
+                          <Check className="w-4 h-4 text-[#00A86B]" />
+                        ) : (
+                          <Copy className="w-4 h-4 text-slate-500" />
+                        )}
+                      </Button>
+                    </div>
+
+                    {currentLinks?.canDeepLink && (
+                      <Button
+                        type="button"
+                        onClick={handleOpenPaymentApp}
+                        className={`w-full ${PAYMENT_METHODS.find(m => m.id === paymentMethod)?.bgColor} hover:opacity-90 text-white rounded-xl`}
+                      >
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Open {PAYMENT_METHODS.find(m => m.id === paymentMethod)?.label} to Pay ${parseFloat(amount) || suggestedPayment}
+                      </Button>
+                    )}
+
+                    {paymentMethod === 'zelle' && (
+                      <p className="text-xs text-slate-500">
+                        Open your bank app and send to the phone/email above via Zelle.
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-sm text-slate-500">
+                    <p>
+                      {recipientInfo?.full_name || 'The recipient'} hasn't connected their {PAYMENT_METHODS.find(m => m.id === paymentMethod)?.label} account yet.
+                    </p>
+                    {currentLinks?.web && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(currentLinks.web, '_blank')}
+                        className="mt-2 rounded-xl border-0 bg-white"
+                      >
+                        <ExternalLink className="w-3 h-3 mr-1" />
+                        Open {PAYMENT_METHODS.find(m => m.id === paymentMethod)?.label}
+                      </Button>
+                    )}
+                  </div>
                 )}
               </div>
-
-              {currentHandle ? (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 bg-white rounded-md p-2 border border-slate-200">
-                    <span className="text-sm text-slate-600 flex-1 font-mono">
-                      {currentHandle}
-                    </span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleCopyHandle}
-                      className="h-8 px-2"
-                    >
-                      {copiedHandle ? (
-                        <Check className="w-4 h-4 text-green-600" />
-                      ) : (
-                        <Copy className="w-4 h-4 text-slate-500" />
-                      )}
-                    </Button>
-                  </div>
-
-                  {currentLinks?.canDeepLink && (
-                    <Button
-                      type="button"
-                      onClick={handleOpenPaymentApp}
-                      className={`w-full ${PAYMENT_METHODS.find(m => m.id === paymentMethod)?.bgColor} hover:opacity-90 text-white`}
-                    >
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      Open {PAYMENT_METHODS.find(m => m.id === paymentMethod)?.label} to Pay ${parseFloat(amount) || suggestedPayment}
-                    </Button>
-                  )}
-
-                  {paymentMethod === 'zelle' && (
-                    <p className="text-xs text-slate-500">
-                      Open your bank app and send to the phone/email above via Zelle.
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <div className="text-sm text-slate-500">
-                  <p>
-                    {recipientInfo?.full_name || 'The recipient'} hasn't connected their {PAYMENT_METHODS.find(m => m.id === paymentMethod)?.label} account yet.
-                  </p>
-                  {currentLinks?.web && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => window.open(currentLinks.web, '_blank')}
-                      className="mt-2"
-                    >
-                      <ExternalLink className="w-3 h-3 mr-1" />
-                      Open {PAYMENT_METHODS.find(m => m.id === paymentMethod)?.label}
-                    </Button>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Amount Input */}
-          <div className="space-y-2">
-            <Label htmlFor="amount" className={`flex items-center gap-2 ${amountError ? 'text-red-600' : ''}`}>
-              <DollarSign className={`w-4 h-4 ${amountError ? 'text-red-600' : 'text-green-600'}`} />
-              Payment Amount
-            </Label>
-            <div className="relative">
-              <Input
-                id="amount"
-                type="number"
-                step="0.01"
-                min="0.01"
-                max={remainingBalance}
-                placeholder={suggestedPayment.toFixed(2)}
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                required
-                className={`text-lg transition-all ${
-                  amountError
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-                    : amount && !amountError
-                    ? 'border-green-300 focus:border-green-500'
-                    : ''
-                }`}
-              />
-              {amount && !amountError && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2"
-                >
-                  <Check className="w-5 h-5 text-green-500" />
-                </motion.div>
-              )}
-            </div>
-            {amountError && (
-              <motion.p
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-xs text-red-600 flex items-center gap-1"
-              >
-                <AlertCircle className="w-3 h-3" />
-                {amountError}
-              </motion.p>
             )}
-            <div className="flex gap-2">
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+
+            {/* Amount Input */}
+            <div className="space-y-2">
+              <p className={`text-[10px] font-mono uppercase tracking-[0.2em] ${amountError ? 'text-red-600' : 'text-slate-500'}`}>Payment Amount</p>
+              <div className="relative">
+                <Input
+                  id="amount"
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  max={remainingBalance}
+                  placeholder={suggestedPayment.toFixed(2)}
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  required
+                  className={`text-lg rounded-xl bg-white border-0 transition-all ${
+                    amountError
+                      ? 'ring-1 ring-red-300'
+                      : amount && !amountError
+                      ? 'ring-1 ring-[#00A86B]/30'
+                      : ''
+                  }`}
+                />
+                {amount && !amountError && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2"
+                  >
+                    <Check className="w-5 h-5 text-[#00A86B]" />
+                  </motion.div>
+                )}
+              </div>
+              {amountError && (
+                <motion.p
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-xs text-red-600 flex items-center gap-1"
+                >
+                  <AlertCircle className="w-3 h-3" />
+                  {amountError}
+                </motion.p>
+              )}
+              <div className="flex gap-2">
                 <Button
                   type="button"
-                  variant="outline"
                   size="sm"
                   onClick={() => setAmount(suggestedPayment.toFixed(2))}
-                  className="text-xs hover:border-green-300 hover:bg-green-50"
+                  className="text-xs bg-white hover:bg-[#DBFFEB] text-slate-700 border-0 rounded-lg"
                 >
                   Suggested: ${suggestedPayment.toFixed(2)}
                 </Button>
-              </motion.div>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
                   type="button"
-                  variant="outline"
                   size="sm"
                   onClick={() => setAmount(remainingBalance.toFixed(2))}
-                  className="text-xs hover:border-green-300 hover:bg-green-50"
+                  className="text-xs bg-white hover:bg-[#DBFFEB] text-slate-700 border-0 rounded-lg"
                 >
                   Pay Full: ${remainingBalance.toFixed(2)}
                 </Button>
+              </div>
+            </div>
+
+            {/* Payment Date */}
+            <div className="space-y-2">
+              <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500">Payment Date</p>
+              <Input
+                id="paymentDate"
+                type="date"
+                value={paymentDate}
+                onChange={(e) => setPaymentDate(e.target.value)}
+                max={format(new Date(), 'yyyy-MM-dd')}
+                required
+                className="rounded-xl bg-white border-0"
+              />
+            </div>
+
+            {/* Notes */}
+            <div className="space-y-2">
+              <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500">Notes (Optional)</p>
+              <Textarea
+                id="notes"
+                placeholder="Add any details about this payment..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={2}
+                className="rounded-xl bg-white border-0"
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-1">
+              <Button
+                type="button"
+                onClick={onClose}
+                className="flex-1 bg-white hover:bg-white/80 text-slate-700 border-0 rounded-xl"
+                disabled={isProcessing}
+              >
+                Cancel
+              </Button>
+              <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  type="submit"
+                  disabled={isProcessing || !amount || !paymentMethod || !!amountError}
+                  className="w-full bg-[#00A86B] hover:bg-[#0D9B76] text-white rounded-xl transition-all"
+                >
+                  Continue
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </Button>
               </motion.div>
             </div>
-          </div>
-
-          {/* Payment Date */}
-          <div className="space-y-2">
-            <Label htmlFor="paymentDate">Payment Date</Label>
-            <Input
-              id="paymentDate"
-              type="date"
-              value={paymentDate}
-              onChange={(e) => setPaymentDate(e.target.value)}
-              max={format(new Date(), 'yyyy-MM-dd')}
-              required
-            />
-          </div>
-
-          {/* Notes */}
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notes (Optional)</Label>
-            <Textarea
-              id="notes"
-              placeholder="Add any details about this payment..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              rows={2}
-            />
-          </div>
-
-          {/* Actions */}
-          <div className="flex gap-3 pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="flex-1 hover:bg-slate-50 transition-colors"
-              disabled={isProcessing}
-            >
-              Cancel
-            </Button>
-            <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button
-                type="submit"
-                disabled={isProcessing || !amount || !paymentMethod || !!amountError}
-                className="w-full bg-[#35B276] hover:bg-[#2d9a65] shadow-lg shadow-green-600/25 transition-all"
-              >
-                Continue
-                <ArrowRight className="w-4 h-4 ml-1" />
-              </Button>
-            </motion.div>
-          </div>
-        </form>
+          </form>
+        </div>
       </DialogContent>
     </Dialog>
   );
