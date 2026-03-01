@@ -232,21 +232,24 @@ export default function TopNav({ location }) {
               animate="visible"
               exit="exit"
             >
-              {allNavItems.map((item) => (
-                <motion.div key={item.title} variants={itemVariants}>
-                  <Link
-                    to={item.url}
-                    onClick={() => handleNavClick(item.url)}
-                    className={`block py-2 text-2xl md:text-3xl font-bold tracking-tight transition-colors duration-200 ${
-                      location.pathname === item.url
-                        ? "text-[#0A1A10]"
-                        : "text-[#0A1A10]/70 hover:text-[#0A1A10]"
-                    }`}
-                  >
-                    {item.title}
-                  </Link>
-                </motion.div>
-              ))}
+              <div className="flex flex-col items-start">
+                {allNavItems.map((item) => (
+                  <motion.div key={item.title} variants={itemVariants}>
+                    <Link
+                      to={item.url}
+                      onClick={() => handleNavClick(item.url)}
+                      className={`flex items-center gap-3 py-2 text-2xl md:text-3xl font-bold tracking-tight transition-colors duration-200 ${
+                        location.pathname === item.url
+                          ? "text-[#0A1A10]"
+                          : "text-[#0A1A10]/70 hover:text-[#0A1A10]"
+                      }`}
+                    >
+                      <span className="text-base">•</span>
+                      {item.title}
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
             </motion.nav>
 
             {/* Footer */}

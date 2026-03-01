@@ -315,7 +315,7 @@ export default function Shop() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="text-center text-xs text-slate-400 px-4"
+          className="text-center text-xs text-[#DBEEE3] px-4"
         >
           <p>
             All rates and terms are subject to credit approval. APRs shown are estimates and may vary based on creditworthiness.
