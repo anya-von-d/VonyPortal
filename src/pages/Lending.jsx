@@ -1781,8 +1781,8 @@ export default function Lending() {
 
                             {/* Repeating Options */}
                             {formData.is_repeating && (
-                              <div className="p-5 bg-[#DBFFEB] rounded-xl">
-                                <p className="text-sm text-slate-700 leading-[3.8] [&_input]:inline-flex [&_input]:align-baseline [&_input]:my-[2px] [&_input[type=number]]:appearance-none [&_input[type=number]]:[-moz-appearance:textfield] [&_input[type=number]::-webkit-outer-spin-button]:appearance-none [&_input[type=number]::-webkit-inner-spin-button]:appearance-none [&_.inline-flex]:my-[2px]">
+                              <div className="px-5 pt-5 pb-3 bg-[#DBFFEB] rounded-xl">
+                                <p className="text-sm text-slate-700 leading-[4.2] [&_input]:inline-flex [&_input]:align-baseline [&_input]:my-[2px] [&_input[type=number]]:appearance-none [&_input[type=number]]:[-moz-appearance:textfield] [&_input[type=number]::-webkit-outer-spin-button]:appearance-none [&_input[type=number]::-webkit-inner-spin-button]:appearance-none [&_.inline-flex]:my-[2px]">
                                   Payments of{' '}
                                   <Input
                                     type="number"
@@ -1901,8 +1901,8 @@ export default function Lending() {
 
                         {/* Scheduled loan fields - Sentence format */}
                         {loanType === 'scheduled' && (
-                          <div className="p-5 bg-[#DBFFEB] rounded-xl">
-                            <p className="text-sm text-slate-700 leading-[3.8] [&_input]:inline-flex [&_input]:align-baseline [&_input]:my-[2px] [&_input[type=number]]:appearance-none [&_input[type=number]]:[-moz-appearance:textfield] [&_input[type=number]::-webkit-outer-spin-button]:appearance-none [&_input[type=number]::-webkit-inner-spin-button]:appearance-none [&_.inline-flex]:my-[2px] [&:last-child]:mb-0">
+                          <div className="px-5 pt-5 pb-3 bg-[#DBFFEB] rounded-xl">
+                            <p className="text-sm text-slate-700 leading-[4.2] [&_input]:inline-flex [&_input]:align-baseline [&_input]:my-[2px] [&_input[type=number]]:appearance-none [&_input[type=number]]:[-moz-appearance:textfield] [&_input[type=number]::-webkit-outer-spin-button]:appearance-none [&_input[type=number]::-webkit-inner-spin-button]:appearance-none [&_.inline-flex]:my-[2px] [&:last-child]:mb-0">
                               The lender agrees to lend{' '}
                               <span className="text-[#00A86B] font-medium">
                                 {formData.borrower_username ? `@${formData.borrower_username}` : 'the borrower'}
@@ -1938,7 +1938,7 @@ export default function Lending() {
                                 className="w-16 h-8 px-3 bg-white inline-flex"
                                 style={{ MozAppearance: 'textfield' }}
                               />
-                              %. The loan will be repaid over{' '}
+                              . The loan will be repaid over{' '}
                               <Input
                                 type="number"
                                 min="1"
@@ -2165,10 +2165,10 @@ export default function Lending() {
                         )}
                       </p>
                       <p className="text-2xl font-bold text-slate-800 text-center my-1">
-                        {formData.amount && details.monthlyPayment > 0 ? `$${details.monthlyPayment.toFixed(2)}` : '$—'}
+                        {formData.amount && details.monthlyPayment > 0 ? `$${details.monthlyPayment.toFixed(2)}` : '$_____'}
                       </p>
                       <p className="text-xs text-slate-500 text-center">
-                        {formData.payment_frequency || '—'} after interest
+                        {formData.payment_frequency || '_____'} after interest
                       </p>
                     </div>
                   )}
@@ -2188,17 +2188,17 @@ export default function Lending() {
                         <>
                           <div className="flex justify-between">
                             <span className="text-slate-600">Per Payment:</span>
-                            <span className="font-bold text-slate-800">${parseFloat(formData.amount || 0).toLocaleString()}</span>
+                            <span className={`font-bold ${formData.amount ? 'text-slate-800' : 'text-slate-400'}`}>{formData.amount ? `$${parseFloat(formData.amount).toLocaleString()}` : '_____'}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-slate-600"># of Payments:</span>
+                            <span className="text-slate-600">Payments:</span>
                             <span className="font-bold text-slate-800">{formData.repeating_num_payments}</span>
                           </div>
                           <div className="border-t border-[#83F384] pt-2">
                             <div className="flex justify-between text-lg">
                               <span className="text-slate-600">Total:</span>
-                              <span className="font-bold text-slate-800">
-                                ${(parseFloat(formData.amount || 0) * parseInt(formData.repeating_num_payments || 0)).toFixed(2)}
+                              <span className={`font-bold ${formData.amount && formData.repeating_num_payments ? 'text-slate-800' : 'text-slate-400'}`}>
+                                {formData.amount && formData.repeating_num_payments ? `$${(parseFloat(formData.amount) * parseInt(formData.repeating_num_payments)).toFixed(2)}` : '_____'}
                               </span>
                             </div>
                           </div>
@@ -2207,21 +2207,23 @@ export default function Lending() {
                         <>
                           <div className="flex justify-between">
                             <span className="text-slate-600">Amount:</span>
-                            <span className="font-bold text-slate-800">${parseFloat(formData.amount || 0).toLocaleString()}</span>
+                            <span className={`font-bold ${formData.amount ? 'text-slate-800' : 'text-slate-400'}`}>{formData.amount ? `$${parseFloat(formData.amount).toLocaleString()}` : '_____'}</span>
                           </div>
                           {loanType === 'scheduled' && (
                             <div className="flex justify-between">
                               <span className="text-slate-600">Interest:</span>
-                              <span className="font-bold text-slate-800">${details.totalInterest.toFixed(2)}</span>
+                              <span className={`font-bold ${formData.amount && formData.interest_rate ? 'text-slate-800' : 'text-slate-400'}`}>{formData.amount && formData.interest_rate ? `$${details.totalInterest.toFixed(2)}` : '_____'}</span>
                             </div>
                           )}
                           <div className="border-t border-[#83F384] pt-2">
                             <div className="flex justify-between text-lg">
                               <span className="text-slate-600">Total:</span>
-                              <span className="font-bold text-slate-800">
-                                ${loanType === 'flexible'
-                                  ? parseFloat(formData.amount || 0).toFixed(2)
-                                  : details.totalAmount.toFixed(2)}
+                              <span className={`font-bold ${formData.amount ? 'text-slate-800' : 'text-slate-400'}`}>
+                                {formData.amount
+                                  ? `$${loanType === 'flexible'
+                                      ? parseFloat(formData.amount).toFixed(2)
+                                      : details.totalAmount.toFixed(2)}`
+                                  : '_____'}
                               </span>
                             </div>
                           </div>

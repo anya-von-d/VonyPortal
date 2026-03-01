@@ -232,9 +232,9 @@ export default function TopNav({ location }) {
               animate="visible"
               exit="exit"
             >
-              <div className="flex flex-col items-start">
+              <div className="flex flex-col items-start w-full max-w-xs mx-auto pl-6">
                 {allNavItems.map((item) => (
-                  <motion.div key={item.title} variants={itemVariants}>
+                  <motion.div key={item.title} variants={itemVariants} className="w-full">
                     <Link
                       to={item.url}
                       onClick={() => handleNavClick(item.url)}
