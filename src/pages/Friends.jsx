@@ -334,7 +334,7 @@ export default function Friends() {
                           >
                             <div className="flex items-center gap-4">
                               {/* Profile Photo */}
-                              <div className="w-12 h-12 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
+                              <div className="w-12 h-12 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
                                 {friendProfile.avatar_url ? (
                                   <img
                                     src={friendProfile.avatar_url}
@@ -467,7 +467,7 @@ export default function Friends() {
                               >
                                 <div className="flex items-center gap-4">
                                   {/* Profile Photo */}
-                                  <div className="w-12 h-12 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
+                                  <div className="w-12 h-12 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
                                     {profile.avatar_url ? (
                                       <img
                                         src={profile.avatar_url}
@@ -570,7 +570,7 @@ export default function Friends() {
                             >
                               <div className="flex items-center gap-4">
                                 {/* Profile Photo */}
-                                <div className="w-12 h-12 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
+                                <div className="w-12 h-12 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
                                   {profile.avatar_url ? (
                                     <img
                                       src={profile.avatar_url}

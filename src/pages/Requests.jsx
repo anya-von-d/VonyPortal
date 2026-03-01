@@ -653,7 +653,7 @@ export default function Requests() {
                         style={{ backgroundColor: colors[index % 6] }}
                       >
                         <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-full bg-[#83F384] flex items-center justify-center flex-shrink-0">
+                          <div className="w-12 h-12 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
                             {senderProfile?.avatar_url ? (
                               <img
                                 src={senderProfile.avatar_url}
@@ -863,7 +863,7 @@ export default function Requests() {
                     >
                       <div className="flex flex-col gap-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
                             <Edit3 className="w-5 h-5 text-amber-600" />
                           </div>
                           <div className="flex-1">

@@ -234,7 +234,7 @@ export default function PaymentMethodsConnect() {
       <Card className="bg-[#96FFD0] backdrop-blur-sm border-0 overflow-hidden w-full">
         <CardHeader className="pb-3 px-3 md:px-6">
           <CardTitle className="flex items-center gap-2 text-slate-800 text-base md:text-xl">
-            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
               <CreditCard className="w-4 h-4 text-green-600" />
             </div>
             Payment Methods

@@ -1097,7 +1097,7 @@ export default function Lending() {
             >
               <div className="sticky top-0 bg-white border-b border-slate-100 p-4 flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-[#96FFD0] flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-[#DBFFEB] flex items-center justify-center">
                     <FileText className="w-4 h-4 text-[#00A86B]" />
                   </div>
                   <span className="font-medium text-slate-800">
@@ -2549,7 +2549,7 @@ export default function Lending() {
                                       onClick={() => openDocPopup('summary', agreement)}
                                       className="bg-[#AAFFA3] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3"
                                     >
-                                      <div className="w-9 h-9 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
+                                      <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
                                         <FileText className="w-4 h-4 text-[#0A1A10]" />
                                       </div>
                                       <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
@@ -2562,7 +2562,7 @@ export default function Lending() {
                                       onClick={() => openDocPopup('promissory', agreement)}
                                       className="bg-[#83F384] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3"
                                     >
-                                      <div className="w-9 h-9 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
+                                      <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
                                         <ClipboardList className="w-4 h-4 text-[#0A1A10]" />
                                       </div>
                                       <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
@@ -2591,7 +2591,7 @@ export default function Lending() {
                                       onClick={() => openDocPopup('amortization', agreement)}
                                       className="bg-[#6EE8A2] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3"
                                     >
-                                      <div className="w-9 h-9 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
+                                      <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
                                         <BarChart3 className="w-4 h-4 text-[#0A1A10]" />
                                       </div>
                                       <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
@@ -2631,7 +2631,7 @@ export default function Lending() {
                                 onClick={() => handleMakePayment(manageLoanSelected)}
                                 className="bg-[#AAFFA3] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
                               >
-                                <div className="w-9 h-9 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
+                                <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
                                   <DollarSign className="w-4 h-4 text-[#0A1A10]" />
                                 </div>
                                 <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
@@ -2642,7 +2642,7 @@ export default function Lending() {
                                 onClick={() => handleEditLoan(manageLoanSelected)}
                                 className="bg-[#83F384] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
                               >
-                                <div className="w-9 h-9 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
+                                <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
                                   <Pencil className="w-4 h-4 text-[#0A1A10]" />
                                 </div>
                                 <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
@@ -2653,7 +2653,7 @@ export default function Lending() {
                                 onClick={() => handleCancelLoan(manageLoanSelected)}
                                 className="bg-[#6EE8A2] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
                               >
-                                <div className="w-9 h-9 rounded-full bg-[#96FFD0] flex items-center justify-center flex-shrink-0">
+                                <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
                                   <X className="w-4 h-4 text-[#0A1A10]" />
                                 </div>
                                 <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">

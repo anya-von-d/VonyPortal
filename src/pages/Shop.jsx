@@ -201,7 +201,7 @@ export default function Shop() {
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#83F384] flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-[#DBFFEB] flex items-center justify-center">
                       <CreditCard className="w-5 h-5 text-[#0A1A10]" />
                     </div>
                     <div>
@@ -264,7 +264,7 @@ export default function Shop() {
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#83F384] flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-[#DBFFEB] flex items-center justify-center">
                       <loan.icon className="w-5 h-5 text-[#0A1A10]" />
                     </div>
                     <div>

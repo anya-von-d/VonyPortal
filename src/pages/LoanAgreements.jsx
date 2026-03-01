@@ -680,7 +680,7 @@ export default function LoanAgreements() {
             >
               <div className="sticky top-0 bg-white border-b border-slate-100 p-4 flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-[#6EE8A2] flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-[#DBFFEB] flex items-center justify-center">
                     <FileText className="w-4 h-4 text-[#00A86B]" />
                   </div>
                   <span className="font-medium text-slate-800">
@@ -819,7 +819,7 @@ export default function LoanAgreements() {
                   if (filteredAgreements.length === 0) {
                     return (
                       <div className="bg-[#DBFFEB] rounded-xl p-8 text-center">
-                        <div className="w-16 h-16 rounded-full bg-[#96FFD0] flex items-center justify-center mx-auto mb-4">
+                        <div className="w-16 h-16 rounded-full bg-[#DBFFEB] flex items-center justify-center mx-auto mb-4">
                           <FileText className="w-8 h-8 text-[#00A86B]" />
                         </div>
                         <h3 className="text-lg font-semibold text-slate-800 mb-2">No Agreements Found</h3>

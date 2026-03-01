@@ -194,7 +194,7 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
                     style={{ backgroundColor: bgColor }}
                   >
                     {/* Circular Icon */}
-                    <div className="w-9 h-9 rounded-full bg-[#6EE8A2] flex items-center justify-center flex-shrink-0">
+                    <div className="w-9 h-9 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
                       <Icon className="w-4 h-4 text-[#0A1A10]" />
                     </div>
 
