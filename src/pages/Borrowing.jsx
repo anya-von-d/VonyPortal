@@ -761,7 +761,7 @@ export default function Borrowing() {
                     <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0 rounded-xl" style={{ backgroundColor: '#83F384' }}>
                       <CardContent className="p-4 flex flex-col h-full">
                         <p className="text-sm font-medium text-slate-600 mb-2 text-left">Total Borrowed</p>
-                        <p className="text-lg font-bold text-slate-800 text-center flex-1 flex items-center justify-center">${totalBorrowed.toLocaleString()}</p>
+                        <p className="text-2xl font-bold text-slate-800 text-center flex-1 flex items-center justify-center">${totalBorrowed.toLocaleString()}</p>
                         <p className="text-xs text-slate-500 text-right">{activeLoans.length} active loans</p>
                       </CardContent>
                     </Card>
@@ -770,7 +770,7 @@ export default function Borrowing() {
                     <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0 rounded-xl" style={{ backgroundColor: '#6EE8B5' }}>
                       <CardContent className="p-4 flex flex-col h-full">
                         <p className="text-sm font-medium text-slate-600 mb-2 text-left">Remaining Balance</p>
-                        <p className="text-lg font-bold text-slate-800 text-center flex-1 flex items-center justify-center">${remainingBalance.toLocaleString()}</p>
+                        <p className="text-2xl font-bold text-slate-800 text-center flex-1 flex items-center justify-center">${remainingBalance.toLocaleString()}</p>
                         <p className="text-xs text-slate-500 text-right">${totalPaid.toLocaleString()} paid</p>
                       </CardContent>
                     </Card>

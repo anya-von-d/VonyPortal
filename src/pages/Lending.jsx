@@ -1282,7 +1282,7 @@ export default function Lending() {
                     <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0 rounded-xl" style={{ backgroundColor: '#30FFA8' }}>
                       <CardContent className="p-4 flex flex-col h-full">
                         <p className="text-sm font-medium text-slate-600 mb-2 text-left">Total Lent</p>
-                        <p className="text-lg font-bold text-slate-800 text-center flex-1 flex items-center justify-center">${totalLent.toLocaleString()}</p>
+                        <p className="text-2xl font-bold text-slate-800 text-center flex-1 flex items-center justify-center">${totalLent.toLocaleString()}</p>
                         <p className="text-xs text-slate-500 mt-1 text-right">{activeLoans.length} active loans</p>
                       </CardContent>
                     </Card>
@@ -1291,7 +1291,7 @@ export default function Lending() {
                     <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0 rounded-xl" style={{ backgroundColor: '#6EE8A2' }}>
                       <CardContent className="p-4 flex flex-col h-full">
                         <p className="text-sm font-medium text-slate-600 mb-2 text-left">Expected Back</p>
-                        <p className="text-lg font-bold text-slate-800 text-center flex-1 flex items-center justify-center">${totalExpectedBack.toLocaleString()}</p>
+                        <p className="text-2xl font-bold text-slate-800 text-center flex-1 flex items-center justify-center">${totalExpectedBack.toLocaleString()}</p>
                         <p className="text-xs text-slate-500 mt-1 text-right">Including interest</p>
                       </CardContent>
                     </Card>
