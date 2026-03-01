@@ -2107,7 +2107,7 @@ export default function Lending() {
                     <div className="bg-[#83F384] rounded-2xl p-4 mt-4">
                       <p className="text-sm font-semibold text-slate-800 mb-2">Will Your Payment Request Repeat?</p>
                       <p className="text-xs text-slate-700 leading-relaxed">
-                        If you are having money sent to you for a monthly bill you split or a regular shared expense like streaming subscriptions, consider creating a repeating request. Fill in the form once and we will help both of you keep track of payments each time the bill comes up for as long as you need.
+                        If you're requesting money for a recurring bill (like rent, utilities, or streaming subscriptions) set up a repeating request. Enter the details once, and we'll automatically send reminders and help you both stay on track for as long as you need.
                       </p>
                     </div>
                   )}
@@ -2181,7 +2181,7 @@ export default function Lending() {
                     <div className="space-y-3">
                       <div className="pb-2 border-b border-[#83F384] flex items-baseline gap-1">
                         <span className="text-slate-600 text-sm flex-shrink-0">For:</span>
-                        <p className="font-medium text-slate-800 truncate">{formData.purpose || 'Reason'}</p>
+                        <p className={`font-medium truncate ${formData.purpose ? 'text-slate-800' : 'text-slate-400'}`}>{formData.purpose || '_____'}</p>
                       </div>
                       {/* For repeating payments, show per payment amount and number of payments */}
                       {loanType === 'flexible' && formData.is_repeating && formData.repeating_num_payments ? (

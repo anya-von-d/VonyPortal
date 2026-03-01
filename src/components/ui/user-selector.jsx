@@ -88,13 +88,13 @@ export function UserSelector({ users = [], value, onSelect, placeholder = "Choos
                 {filteredUsers.map((user, index) => {
                   if (!user || !user.username) return null;
                   const isSelected = value === user.username;
-                  const bgColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#74FF71', '#83F384', '#6EE8A2'];
 
                   return (
                     <div
                       key={user.username}
-                      className="flex items-center gap-3 px-3 py-2.5 mx-2 my-1 rounded-xl cursor-pointer hover:opacity-90 transition-all duration-200"
-                      style={{ backgroundColor: isSelected ? bgColors[index % 6] : bgColors[index % 6] }}
+                      className={`flex items-center gap-3 px-3 py-2.5 mx-2 my-1 rounded-xl cursor-pointer transition-all duration-200 ${
+                        isSelected ? 'bg-[#DBFFEB]' : 'bg-white hover:bg-[#DBFFEB]/50'
+                      }`}
                       onClick={() => handleSelect(user.username)}
                     >
                       {/* Profile Picture */}
