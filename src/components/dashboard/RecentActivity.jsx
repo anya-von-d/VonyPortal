@@ -37,16 +37,16 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.3 }}
       >
-        <div className="bg-white rounded-xl p-5 max-w-[85%] mx-auto lg:max-w-none">
+        <div className="bg-white rounded-lg p-5 max-w-[85%] mx-auto lg:max-w-none">
           <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight font-serif">
             Activity
           </p>
           <div className="relative">
-            <div className="max-h-[380px] overflow-y-auto space-y-3">
+            <div className="max-h-[380px] overflow-y-auto space-y-1.5">
               {Array(3).fill(0).map((_, i) => (
                 <div
                   key={i}
-                  className="rounded-lg p-2.5 md:p-3"
+                  className="rounded-md p-2.5 md:p-3"
                   style={{ backgroundColor: cardBgColors[i % 6] }}
                 >
                   <SkeletonShimmer className="h-4 w-48 mb-2" />
@@ -144,7 +144,7 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.3 }}
     >
-      <div className="bg-white rounded-xl p-5 max-w-[85%] mx-auto lg:max-w-none">
+      <div className="bg-white rounded-lg p-5 max-w-[85%] mx-auto lg:max-w-none">
         {/* Title */}
         <div className="flex items-center justify-between mb-4">
           <p className="text-xl font-bold text-slate-800 tracking-tight font-serif">
@@ -160,7 +160,7 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
         {/* Scrollable area */}
         <div className="relative">
           {/* Scrollable content - shows 3 items, scroll for more */}
-          <div className="max-h-[220px] overflow-y-auto space-y-3">
+          <div className="max-h-[220px] overflow-y-auto space-y-1.5">
             {recentActivity.length === 0 ? (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -190,7 +190,7 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
                     transition={{ duration: 0.3, delay: 0.1 + index * 0.05 }}
                     onMouseEnter={() => setHoveredIndex(index)}
                     onMouseLeave={() => setHoveredIndex(null)}
-                    className="rounded-lg p-2 md:p-2.5 cursor-pointer transition-all duration-200 flex items-center gap-2.5"
+                    className="rounded-md p-2 md:p-2.5 cursor-pointer transition-all duration-200 flex items-center gap-2.5"
                     style={{ backgroundColor: bgColor }}
                   >
                     {/* Circular Icon */}

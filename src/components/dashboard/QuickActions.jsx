@@ -34,14 +34,14 @@ export default function QuickActions() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.2 }}
     >
-      <div className="bg-white rounded-xl p-5 max-w-[85%] mx-auto lg:max-w-none">
+      <div className="bg-white rounded-lg p-5 max-w-[85%] mx-auto lg:max-w-none">
         {/* Title */}
         <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight font-serif">
           Quick Actions
         </p>
 
         {/* Cards */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1.5">
           {actions.map((action, index) => {
             const hoverColor = hoverAccentColors[index % 4];
             const isHovered = hoveredIndex === index;
@@ -56,7 +56,7 @@ export default function QuickActions() {
                   transition={{ duration: 0.3, delay: 0.1 + index * 0.05 }}
                   onMouseEnter={() => setHoveredIndex(index)}
                   onMouseLeave={() => setHoveredIndex(null)}
-                  className="rounded-lg p-2 md:p-2.5 cursor-pointer transition-all duration-200 flex items-center gap-2.5"
+                  className="rounded-md p-2 md:p-2.5 cursor-pointer transition-all duration-200 flex items-center gap-2.5"
                   style={{ backgroundColor: cardBgColors[index % 6] }}
                 >
                   {/* Circular Icon */}

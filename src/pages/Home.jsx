@@ -285,7 +285,7 @@ export default function Home() {
 
               return (
                 <div
-                  className="lg:col-span-2 rounded-xl p-7 relative transition-all duration-300"
+                  className="lg:col-span-2 rounded-lg p-7 relative transition-all duration-300"
                   style={{
                     background: '#052e16'
                   }}
@@ -486,7 +486,7 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.2 }}
               >
-                <Card className="bg-white border-0 rounded-xl overflow-hidden">
+                <Card className="bg-white border-0 rounded-lg overflow-hidden">
                   <CardContent className="p-5">
                     {/* Calendar Header with Navigation */}
                     <div className="flex items-center justify-between mb-4">
@@ -661,15 +661,15 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.3 }}
-                className="flex flex-col gap-3"
+                className="flex flex-col gap-1.5"
               >
-                <Card className="bg-white border-0 rounded-xl overflow-hidden h-full">
+                <Card className="bg-white border-0 rounded-lg overflow-hidden h-full">
                   <CardContent className="p-5 h-full flex flex-col">
                     <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight font-serif">
                       {format(calendarMonth, 'MMMM')} Overview
                     </p>
 
-                    <div className="flex-1 space-y-3 overflow-y-auto max-h-[320px] pr-1" style={{
+                    <div className="flex-1 space-y-1.5 overflow-y-auto max-h-[320px] pr-1" style={{
                       maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
                       WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)'
                     }}>
@@ -750,7 +750,7 @@ export default function Home() {
                         return events.map((event, index) => (
                           <div
                             key={index}
-                            className="flex items-center gap-2.5 p-2 md:p-2.5 rounded-lg"
+                            className="flex items-center gap-2.5 p-2 md:p-2.5 rounded-md"
                             style={{ backgroundColor: colors[index % 6] }}
                           >
                             {/* Date Box */}
@@ -853,7 +853,7 @@ export default function Home() {
                   const isPositive = netBalance >= 0;
 
                   return (
-                    <div className="bg-[#36CE8E] rounded-lg p-2.5 flex items-center justify-between">
+                    <div className="bg-[#36CE8E] rounded-md p-2.5 flex items-center justify-between">
                       <p className="text-sm font-semibold text-[#0A1A10]">
                         {format(calendarMonth, 'MMMM')} Balance
                       </p>
