@@ -238,7 +238,7 @@ export default function Home() {
 
     return (
         <div className="min-h-screen p-6"  style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
-           <div className="max-w-4xl mx-auto space-y-7">
+           <div className="max-w-6xl mx-auto space-y-7">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="py-5">
               <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-left">
                 {(() => {
@@ -254,7 +254,8 @@ export default function Home() {
               <PendingLoanOffers offers={pendingOffers} />
             )}
 
-            <div className="bg-[#DBFFEB] rounded-2xl p-4 relative">
+            <div className="grid lg:grid-cols-3 gap-6 items-start">
+            <div className="lg:col-span-2 bg-[#DBFFEB] rounded-2xl p-4 relative">
               {/* Left Arrow - on outer box */}
               <button
                 onClick={() => setOverviewType(overviewType === 'lending' ? 'borrowing' : 'lending')}
@@ -526,193 +527,13 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-1">
-                <QuickActions />
-              </div>
-              <div className="lg:col-span-2">
-                <RecentActivity loans={myLoans} payments={payments} user={user} allUsers={safeAllProfiles} /* Pass profiles */ />
-              </div>
+            <div className="lg:col-span-1">
+              <QuickActions />
+            </div>
             </div>
 
-            {/* Calendar and Monthly Overview Section */}
+            {/* Monthly Overview and Activity Section */}
             <div className="grid lg:grid-cols-2 gap-6">
-              {/* Calendar */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.2 }}
-              >
-                <Card className="bg-[#DBFFEB] border-0 rounded-2xl overflow-hidden">
-                  <CardContent className="p-5">
-                    {/* Calendar Header with Navigation */}
-                    <div className="flex items-center justify-between mb-4">
-                      <button
-                        onClick={() => setCalendarMonth(subMonths(calendarMonth, 1))}
-                        className="w-9 h-9 rounded-full bg-white/50 hover:bg-white/80 flex items-center justify-center transition-colors duration-200"
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00A86B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="15 18 9 12 15 6"></polyline>
-                        </svg>
-                      </button>
-                      <h3 className="text-lg font-bold text-slate-800">
-                        {format(calendarMonth, 'MMMM yyyy')}
-                      </h3>
-                      <button
-                        onClick={() => setCalendarMonth(addMonths(calendarMonth, 1))}
-                        className="w-9 h-9 rounded-full bg-white/50 hover:bg-white/80 flex items-center justify-center transition-colors duration-200"
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00A86B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                      </button>
-                    </div>
-
-                    {/* Day Labels */}
-                    <div className="grid grid-cols-7 gap-1 mb-2">
-                      {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                        <div key={day} className="text-center text-xs font-medium text-slate-500 py-1">
-                          {day}
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Calendar Grid */}
-                    {(() => {
-                      const monthStart = startOfMonth(calendarMonth);
-                      const monthEnd = endOfMonth(calendarMonth);
-                      const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
-                      const startDayOfWeek = getDay(monthStart);
-
-                      // Get all payment events for this month
-                      const getPaymentEvents = () => {
-                        const events = [];
-                        const activeLoans = myLoans.filter(l => l && l.status === 'active');
-
-                        activeLoans.forEach(loan => {
-                          if (!loan.next_payment_date) return;
-
-                          const paymentDate = new Date(loan.next_payment_date);
-                          const isLender = loan.lender_id === user.id;
-                          const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
-                          const otherUser = safeAllProfiles.find(p => p.user_id === otherUserId);
-
-                          // Check if this payment falls in the current calendar month
-                          if (isSameMonth(paymentDate, calendarMonth)) {
-                            events.push({
-                              date: paymentDate,
-                              type: isLender ? 'receive' : 'send',
-                              amount: loan.payment_amount || 0,
-                              username: otherUser?.username || 'user'
-                            });
-                          }
-
-                          // Also check for recurring payments within the month
-                          const frequency = loan.payment_frequency;
-                          if (frequency && frequency !== 'none') {
-                            let currentDate = new Date(loan.next_payment_date);
-                            const maxIterations = 10;
-                            let iterations = 0;
-
-                            while (iterations < maxIterations) {
-                              // Move to next payment date based on frequency
-                              if (frequency === 'weekly') {
-                                currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
-                              } else if (frequency === 'biweekly') {
-                                currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
-                              } else if (frequency === 'monthly') {
-                                currentDate = addMonths(currentDate, 1);
-                              } else if (frequency === 'daily') {
-                                currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
-                              } else {
-                                break;
-                              }
-
-                              // Stop if we've gone past the calendar month
-                              if (currentDate > monthEnd) break;
-
-                              // Add if this payment is in the calendar month
-                              if (isSameMonth(currentDate, calendarMonth)) {
-                                events.push({
-                                  date: new Date(currentDate),
-                                  type: isLender ? 'receive' : 'send',
-                                  amount: loan.payment_amount || 0,
-                                  username: otherUser?.username || 'user'
-                                });
-                              }
-
-                              iterations++;
-                            }
-                          }
-                        });
-
-                        return events;
-                      };
-
-                      const paymentEvents = getPaymentEvents();
-
-                      // Create empty cells for days before the first day of the month
-                      const emptyCells = Array(startDayOfWeek).fill(null);
-
-                      return (
-                        <div className="grid grid-cols-7 gap-1">
-                          {emptyCells.map((_, index) => (
-                            <div key={`empty-${index}`} className="h-10" />
-                          ))}
-                          {daysInMonth.map(day => {
-                            const dayEvents = paymentEvents.filter(e => isSameDay(e.date, day));
-                            const hasSend = dayEvents.some(e => e.type === 'send');
-                            const hasReceive = dayEvents.some(e => e.type === 'receive');
-                            const isToday = isSameDay(day, new Date());
-
-                            return (
-                              <div
-                                key={day.toISOString()}
-                                className={`h-10 flex flex-col items-center justify-center rounded-lg relative ${
-                                  isToday ? 'bg-white ring-2 ring-[#00A86B]' : ''
-                                }`}
-                              >
-                                <span className={`text-sm ${isToday ? 'font-bold text-[#00A86B]' : 'text-slate-700'}`}>
-                                  {format(day, 'd')}
-                                </span>
-                                {/* Payment Indicators */}
-                                <div className="flex gap-0.5 absolute bottom-0.5">
-                                  {hasSend && (
-                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#35B276' }} />
-                                  )}
-                                  {hasReceive && (
-                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#74FF71' }} />
-                                  )}
-                                </div>
-                                {(hasSend || hasReceive) && (
-                                  <div className="absolute inset-0 rounded-lg" style={{ backgroundColor: hasSend && hasReceive ? '#6EE8A2' : hasSend ? '#35B276' : '#74FF71', opacity: 0.3, zIndex: -1 }} />
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      );
-                    })()}
-
-                    {/* Legend */}
-                    <div className="flex items-center justify-center gap-6 mt-4 pt-3 border-t border-white/50">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#35B276' }} />
-                        <span className="text-sm font-medium text-slate-700">Send</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#74FF71' }} />
-                        <span className="text-sm font-medium text-slate-700">Receive</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#6EE8A2' }} />
-                        <span className="text-sm font-medium text-slate-700">Both</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-
               {/* Monthly Overview */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -917,6 +738,189 @@ export default function Home() {
                           </div>
                         ));
                       })()}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* Activity */}
+              <div className="flex flex-col">
+                <RecentActivity loans={myLoans} payments={payments} user={user} allUsers={safeAllProfiles} />
+              </div>
+            </div>
+
+            {/* Calendar Section */}
+            <div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.2 }}
+              >
+                <Card className="bg-[#DBFFEB] border-0 rounded-2xl overflow-hidden">
+                  <CardContent className="p-5">
+                    {/* Calendar Header with Navigation */}
+                    <div className="flex items-center justify-between mb-4">
+                      <button
+                        onClick={() => setCalendarMonth(subMonths(calendarMonth, 1))}
+                        className="w-9 h-9 rounded-full bg-white/50 hover:bg-white/80 flex items-center justify-center transition-colors duration-200"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00A86B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                      </button>
+                      <h3 className="text-lg font-bold text-slate-800">
+                        {format(calendarMonth, 'MMMM yyyy')}
+                      </h3>
+                      <button
+                        onClick={() => setCalendarMonth(addMonths(calendarMonth, 1))}
+                        className="w-9 h-9 rounded-full bg-white/50 hover:bg-white/80 flex items-center justify-center transition-colors duration-200"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00A86B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Day Labels */}
+                    <div className="grid grid-cols-7 gap-1 mb-2">
+                      {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                        <div key={day} className="text-center text-xs font-medium text-slate-500 py-1">
+                          {day}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Calendar Grid */}
+                    {(() => {
+                      const monthStart = startOfMonth(calendarMonth);
+                      const monthEnd = endOfMonth(calendarMonth);
+                      const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+                      const startDayOfWeek = getDay(monthStart);
+
+                      // Get all payment events for this month
+                      const getPaymentEvents = () => {
+                        const events = [];
+                        const activeLoans = myLoans.filter(l => l && l.status === 'active');
+
+                        activeLoans.forEach(loan => {
+                          if (!loan.next_payment_date) return;
+
+                          const paymentDate = new Date(loan.next_payment_date);
+                          const isLender = loan.lender_id === user.id;
+                          const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
+                          const otherUser = safeAllProfiles.find(p => p.user_id === otherUserId);
+
+                          // Check if this payment falls in the current calendar month
+                          if (isSameMonth(paymentDate, calendarMonth)) {
+                            events.push({
+                              date: paymentDate,
+                              type: isLender ? 'receive' : 'send',
+                              amount: loan.payment_amount || 0,
+                              username: otherUser?.username || 'user'
+                            });
+                          }
+
+                          // Also check for recurring payments within the month
+                          const frequency = loan.payment_frequency;
+                          if (frequency && frequency !== 'none') {
+                            let currentDate = new Date(loan.next_payment_date);
+                            const maxIterations = 10;
+                            let iterations = 0;
+
+                            while (iterations < maxIterations) {
+                              // Move to next payment date based on frequency
+                              if (frequency === 'weekly') {
+                                currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
+                              } else if (frequency === 'biweekly') {
+                                currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
+                              } else if (frequency === 'monthly') {
+                                currentDate = addMonths(currentDate, 1);
+                              } else if (frequency === 'daily') {
+                                currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+                              } else {
+                                break;
+                              }
+
+                              // Stop if we've gone past the calendar month
+                              if (currentDate > monthEnd) break;
+
+                              // Add if this payment is in the calendar month
+                              if (isSameMonth(currentDate, calendarMonth)) {
+                                events.push({
+                                  date: new Date(currentDate),
+                                  type: isLender ? 'receive' : 'send',
+                                  amount: loan.payment_amount || 0,
+                                  username: otherUser?.username || 'user'
+                                });
+                              }
+
+                              iterations++;
+                            }
+                          }
+                        });
+
+                        return events;
+                      };
+
+                      const paymentEvents = getPaymentEvents();
+
+                      // Create empty cells for days before the first day of the month
+                      const emptyCells = Array(startDayOfWeek).fill(null);
+
+                      return (
+                        <div className="grid grid-cols-7 gap-1">
+                          {emptyCells.map((_, index) => (
+                            <div key={`empty-${index}`} className="h-10" />
+                          ))}
+                          {daysInMonth.map(day => {
+                            const dayEvents = paymentEvents.filter(e => isSameDay(e.date, day));
+                            const hasSend = dayEvents.some(e => e.type === 'send');
+                            const hasReceive = dayEvents.some(e => e.type === 'receive');
+                            const isToday = isSameDay(day, new Date());
+
+                            return (
+                              <div
+                                key={day.toISOString()}
+                                className={`h-10 flex flex-col items-center justify-center rounded-lg relative ${
+                                  isToday ? 'bg-white ring-2 ring-[#00A86B]' : ''
+                                }`}
+                              >
+                                <span className={`text-sm ${isToday ? 'font-bold text-[#00A86B]' : 'text-slate-700'}`}>
+                                  {format(day, 'd')}
+                                </span>
+                                {/* Payment Indicators */}
+                                <div className="flex gap-0.5 absolute bottom-0.5">
+                                  {hasSend && (
+                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#35B276' }} />
+                                  )}
+                                  {hasReceive && (
+                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#74FF71' }} />
+                                  )}
+                                </div>
+                                {(hasSend || hasReceive) && (
+                                  <div className="absolute inset-0 rounded-lg" style={{ backgroundColor: hasSend && hasReceive ? '#6EE8A2' : hasSend ? '#35B276' : '#74FF71', opacity: 0.3, zIndex: -1 }} />
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })()}
+
+                    {/* Legend */}
+                    <div className="flex items-center justify-center gap-6 mt-4 pt-3 border-t border-white/50">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#35B276' }} />
+                        <span className="text-sm font-medium text-slate-700">Send</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#74FF71' }} />
+                        <span className="text-sm font-medium text-slate-700">Receive</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#6EE8A2' }} />
+                        <span className="text-sm font-medium text-slate-700">Both</span>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
