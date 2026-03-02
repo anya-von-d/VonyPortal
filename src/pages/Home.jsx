@@ -255,277 +255,211 @@ export default function Home() {
             )}
 
             <div className="grid lg:grid-cols-3 gap-6 items-start">
-            <div className="lg:col-span-2 bg-[#DBFFEB] rounded-2xl p-4 relative">
-              {/* Left Arrow - on outer box */}
-              <button
-                onClick={() => setOverviewType(overviewType === 'lending' ? 'borrowing' : 'lending')}
-                className="absolute left-[-12px] top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors duration-200"
-                style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00A86B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-              </button>
+            {(() => {
+              // Compute data for both views
+              const lentLoans = myLoans.filter(l => l && l.lender_id === user.id && l.status === 'active');
+              const totalLentAmount = lentLoans.reduce((sum, loan) => sum + (loan.total_amount || loan.amount || 0), 0);
+              const totalRepaid = lentLoans.reduce((sum, loan) => sum + (loan.amount_paid || 0), 0);
+              const percentRepaid = totalLentAmount > 0 ? Math.round((totalRepaid / totalLentAmount) * 100) : 0;
 
-              {/* Right Arrow - on outer box */}
-              <button
-                onClick={() => setOverviewType(overviewType === 'lending' ? 'borrowing' : 'lending')}
-                className="absolute right-[-12px] top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors duration-200"
-                style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00A86B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
-              </button>
+              const nextLenderPayment = myLoans
+                .filter(loan => loan && loan.lender_id === user.id && loan.status === 'active' && loan.next_payment_date)
+                .map(loan => {
+                  const otherUser = safeAllProfiles.find(p => p.user_id === loan.borrower_id);
+                  return { ...loan, date: new Date(loan.next_payment_date), username: otherUser?.username || 'user' };
+                })
+                .sort((a, b) => a.date - b.date)[0];
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
-                {/* Pie Chart Card with Carousel */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                  className="flex flex-col"
+              const borrowedLoans = myLoans.filter(l => l && l.borrower_id === user.id && l.status === 'active');
+              const totalBorrowedAmount = borrowedLoans.reduce((sum, loan) => sum + (loan.total_amount || loan.amount || 0), 0);
+              const totalPaidBack = borrowedLoans.reduce((sum, loan) => sum + (loan.amount_paid || 0), 0);
+              const percentPaid = totalBorrowedAmount > 0 ? Math.round((totalPaidBack / totalBorrowedAmount) * 100) : 0;
+
+              const nextBorrowerPayment = myLoans
+                .filter(loan => loan && loan.borrower_id === user.id && loan.status === 'active' && loan.next_payment_date)
+                .map(loan => {
+                  const otherUser = safeAllProfiles.find(p => p.user_id === loan.lender_id);
+                  return { ...loan, date: new Date(loan.next_payment_date), username: otherUser?.username || 'user' };
+                })
+                .sort((a, b) => a.date - b.date)[0];
+
+              return (
+                <div
+                  className="lg:col-span-2 rounded-[22px] p-7 relative transition-all duration-300"
+                  style={{
+                    background: overviewType === 'lending'
+                      ? 'linear-gradient(135deg, #0A3D2A 0%, #0D5C3E 50%, #0A4D32 100%)'
+                      : '#DBFFEB'
+                  }}
                 >
-                  {/* Title */}
-                  <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-3" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                    {overviewType === 'lending' ? 'Lending Overview' : 'Borrowing Overview'}
-                  </p>
-
-                  <div
-                    className={`flex flex-col items-center justify-center transition-colors duration-300 flex-1 ${overviewType === 'lending' ? 'rounded-xl p-3' : 'p-3'}`}
-                    style={{ backgroundColor: overviewType === 'lending' ? '#83F384' : 'transparent' }}
+                  {/* Left Arrow */}
+                  <button
+                    onClick={() => setOverviewType(overviewType === 'lending' ? 'borrowing' : 'lending')}
+                    className="absolute left-[-12px] top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-200"
+                    style={{ backgroundColor: overviewType === 'lending' ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
                   >
-                    <motion.div
-                      key={overviewType}
-                      initial={{ opacity: 0, x: overviewType === 'lending' ? -20 : 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: overviewType === 'lending' ? 20 : -20 }}
-                      transition={{ duration: 0.3, ease: "easeOut" }}
-                      className="flex flex-col items-center"
-                    >
-                      {(() => {
-                        if (overviewType === 'lending') {
-                          const lentLoans = myLoans.filter(l => l && l.lender_id === user.id && l.status === 'active');
-                          const totalLentAmount = lentLoans.reduce((sum, loan) => sum + (loan.total_amount || loan.amount || 0), 0);
-                          const totalRepaid = lentLoans.reduce((sum, loan) => sum + (loan.amount_paid || 0), 0);
-                          const percentRepaid = totalLentAmount > 0 ? Math.round((totalRepaid / totalLentAmount) * 100) : 0;
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={overviewType === 'lending' ? '#83F384' : '#00A86B'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                  </button>
 
-                          return (
-                            <>
-                              <div className="relative w-24 h-24">
-                                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                                  <circle cx="60" cy="60" r="52" fill="none" stroke="#DBFFEB" strokeWidth="7" />
-                                  <circle
-                                    cx="60"
-                                    cy="60"
-                                    r="52"
-                                    fill="none"
-                                    stroke="#00A86B"
-                                    strokeWidth="7"
-                                    strokeLinecap="round"
-                                    strokeDasharray={2 * Math.PI * 52}
-                                    strokeDashoffset={2 * Math.PI * 52 - (percentRepaid / 100) * 2 * Math.PI * 52}
-                                    className="transition-all duration-500"
-                                  />
-                                </svg>
-                                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                  <span className="text-lg font-bold text-slate-800">{percentRepaid}%</span>
-                                  <span className="text-[9px] text-slate-500 uppercase tracking-wider">Repaid</span>
-                                </div>
-                              </div>
-                              <div className="mt-2 text-center">
-                                <p className="text-xs text-slate-500">
-                                  {formatMoney(totalRepaid)} of {formatMoney(totalLentAmount)}
-                                </p>
-                              </div>
-                            </>
-                          );
-                        } else {
-                          // Borrowing Overview
-                          const borrowedLoans = myLoans.filter(l => l && l.borrower_id === user.id && l.status === 'active');
-                          const totalBorrowedAmount = borrowedLoans.reduce((sum, loan) => sum + (loan.total_amount || loan.amount || 0), 0);
-                          const totalPaidBack = borrowedLoans.reduce((sum, loan) => sum + (loan.amount_paid || 0), 0);
-                          const percentPaid = totalBorrowedAmount > 0 ? Math.round((totalPaidBack / totalBorrowedAmount) * 100) : 0;
+                  {/* Right Arrow */}
+                  <button
+                    onClick={() => setOverviewType(overviewType === 'lending' ? 'borrowing' : 'lending')}
+                    className="absolute right-[-12px] top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-200"
+                    style={{ backgroundColor: overviewType === 'lending' ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={overviewType === 'lending' ? '#83F384' : '#00A86B'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </button>
 
-                          return (
-                            <>
-                              <div className="relative w-24 h-24">
-                                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                                  <circle cx="60" cy="60" r="52" fill="none" stroke="#DBFFEB" strokeWidth="7" />
-                                  <circle
-                                    cx="60"
-                                    cy="60"
-                                    r="52"
-                                    fill="none"
-                                    stroke="#00A86B"
-                                    strokeWidth="7"
-                                    strokeLinecap="round"
-                                    strokeDasharray={2 * Math.PI * 52}
-                                    strokeDashoffset={2 * Math.PI * 52 - (percentPaid / 100) * 2 * Math.PI * 52}
-                                    className="transition-all duration-500"
-                                  />
-                                </svg>
-                                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                  <span className="text-lg font-bold text-slate-800">{percentPaid}%</span>
-                                  <span className="text-[9px] text-slate-500 uppercase tracking-wider">Paid</span>
-                                </div>
-                              </div>
-                              <div className="mt-2 text-center">
-                                <p className="text-xs text-slate-500">
-                                  {formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)}
-                                </p>
-                              </div>
-                            </>
-                          );
-                        }
-                      })()}
-                    </motion.div>
-                  </div>
-                </motion.div>
-                {/* Dynamic Stats Cards based on overviewType */}
-                {(() => {
-                  if (overviewType === 'lending') {
-                    // For lenders: show next payment they will RECEIVE
-                    const nextLenderPayment = myLoans
-                      .filter(loan => loan && loan.lender_id === user.id && loan.status === 'active' && loan.next_payment_date)
-                      .map(loan => {
-                        const otherUser = safeAllProfiles.find(p => p.user_id === loan.borrower_id);
-                        return { ...loan, date: new Date(loan.next_payment_date), username: otherUser?.username || 'user' };
-                      })
-                      .sort((a, b) => a.date - b.date)[0];
-
-                    const getDaysUntilPayment = () => {
-                      if (!nextLenderPayment) return 'None';
-                      const today = new Date();
-                      const paymentDate = new Date(nextLenderPayment.date);
-                      const diffTime = paymentDate - today;
-                      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                      if (diffDays < 0) return 'Overdue';
-                      return `${diffDays} day${diffDays !== 1 ? 's' : ''}`;
-                    };
-
-                    return (
+                  <motion.div
+                    key={overviewType}
+                    initial={{ opacity: 0, x: overviewType === 'lending' ? -20 : 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                  >
+                    {overviewType === 'lending' ? (
+                      /* ===== LENDING OVERVIEW — Dark green card ===== */
                       <>
-                        <div className="flex flex-col">
-                          <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-3 invisible" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Spacer</p>
-                          <StatsCard
-                            title="Next Payment"
-                            value={nextLenderPayment ? formatMoney(nextLenderPayment.payment_amount || 0) : '-'}
-                            color="blue"
-                            change={nextLenderPayment ? `from @${nextLenderPayment.username}` : 'N/A'}
-                            index={1}
-                            bgColor="#83F384"
-                          />
-                        </div>
-                        <motion.div
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.4, delay: 0.2, ease: "easeOut" }}
-                          whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                          className="flex flex-col"
-                        >
-                          <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-3 invisible" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Spacer</p>
-                          <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 flex-1 cursor-default border-0" style={{ backgroundColor: '#83F384' }}>
-                            <CardContent className="p-4 flex flex-col h-full">
-                              <p className="text-sm font-medium text-slate-600 mb-2 text-left">Next Payment Date</p>
-                              {nextLenderPayment ? (
-                                <>
-                                  <div className="flex-1 flex flex-col items-center justify-center">
-                                    <p className="text-lg font-bold text-slate-800">
-                                      {format(nextLenderPayment.date, 'EEE')}, {format(nextLenderPayment.date, 'MMM d')}
-                                    </p>
-                                    <div className="mt-2 px-3 py-1 bg-white rounded-full">
-                                      <p className="text-sm font-semibold text-[#00A86B]">
-                                        {(() => {
-                                          const days = Math.ceil((nextLenderPayment.date - new Date()) / (1000 * 60 * 60 * 24));
-                                          return days > 0 ? `${days} day${days !== 1 ? 's' : ''} away` : days === 0 ? 'Due today' : `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`;
-                                        })()}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <p className="text-xs text-slate-500 mt-2 text-right">from @{nextLenderPayment.username}</p>
-                                </>
-                              ) : (
-                                <p className="text-lg font-bold text-slate-800 text-center flex-1 flex items-center justify-center">-</p>
+                        <p className="text-[11px] uppercase tracking-[0.12em] font-medium mb-5" style={{ fontFamily: 'IBM Plex Mono, monospace', color: 'rgba(255,255,255,0.5)' }}>
+                          Lending Overview
+                        </p>
+                        <div className="flex items-center gap-6">
+                          {/* Donut Ring */}
+                          <div className="relative flex-shrink-0" style={{ width: 130, height: 130 }}>
+                            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 140 140">
+                              <circle cx="70" cy="70" r="58" fill="none" stroke="rgba(131,243,132,0.2)" strokeWidth="10" />
+                              <circle
+                                cx="70" cy="70" r="58"
+                                fill="none"
+                                stroke="#36CE8E"
+                                strokeWidth="10"
+                                strokeLinecap="round"
+                                strokeDasharray={2 * Math.PI * 58}
+                                strokeDashoffset={2 * Math.PI * 58 - (percentRepaid / 100) * 2 * Math.PI * 58}
+                                className="transition-all duration-500"
+                              />
+                            </svg>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                              <span className="text-2xl font-bold text-white">{percentRepaid}%</span>
+                            </div>
+                          </div>
+
+                          {/* Left Metrics */}
+                          <div className="flex flex-col gap-4 flex-1">
+                            <div>
+                              <p className="text-sm text-white/50 mb-1">Repayment</p>
+                              <p className="text-lg font-bold">
+                                <span className="text-[#83F384]">{percentRepaid}%</span>
+                                <span className="text-white/70 text-sm font-medium ml-1.5">REPAID</span>
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-white/50 mb-1">Next Payment</p>
+                              <p className="text-lg font-bold text-white">
+                                {nextLenderPayment ? formatMoney(nextLenderPayment.payment_amount || 0) : 'N/A'}
+                              </p>
+                              {nextLenderPayment && (
+                                <p className="text-xs text-white/40 mt-0.5">from @{nextLenderPayment.username}</p>
                               )}
-                            </CardContent>
-                          </Card>
-                        </motion.div>
+                            </div>
+                          </div>
+
+                          {/* Right Metrics */}
+                          <div className="flex flex-col gap-4 flex-1">
+                            <div>
+                              <p className="text-sm text-white/50 mb-1">Total Lent</p>
+                              <p className="text-lg font-bold text-white">
+                                {formatMoney(totalRepaid)} <span className="text-white/40 text-sm font-normal">of {formatMoney(totalLentAmount)}</span>
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-white/50 mb-1">Next Payment Date</p>
+                              <p className="text-lg font-bold text-white">
+                                {nextLenderPayment ? `${format(nextLenderPayment.date, 'EEE')}, ${format(nextLenderPayment.date, 'MMM d')}` : 'N/A'}
+                              </p>
+                              {nextLenderPayment && (
+                                <p className="text-xs text-[#83F384] mt-0.5">
+                                  {(() => {
+                                    const days = Math.ceil((nextLenderPayment.date - new Date()) / (1000 * 60 * 60 * 24));
+                                    return days > 0 ? `${days} day${days !== 1 ? 's' : ''} away` : days === 0 ? 'Due today' : `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`;
+                                  })()}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
                       </>
-                    );
-                  } else {
-                    // For borrowers: show next payment they need to SEND
-                    const nextBorrowerPayment = myLoans
-                      .filter(loan => loan && loan.borrower_id === user.id && loan.status === 'active' && loan.next_payment_date)
-                      .map(loan => {
-                        const otherUser = safeAllProfiles.find(p => p.user_id === loan.lender_id);
-                        return { ...loan, date: new Date(loan.next_payment_date), username: otherUser?.username || 'user' };
-                      })
-                      .sort((a, b) => a.date - b.date)[0];
-
-                    const getDaysUntilPayment = () => {
-                      if (!nextBorrowerPayment) return 'None';
-                      const today = new Date();
-                      const paymentDate = new Date(nextBorrowerPayment.date);
-                      const diffTime = paymentDate - today;
-                      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                      if (diffDays < 0) return 'Overdue';
-                      return `${diffDays} day${diffDays !== 1 ? 's' : ''}`;
-                    };
-
-                    return (
+                    ) : (
+                      /* ===== BORROWING OVERVIEW — Light green card ===== */
                       <>
-                        <div className="flex flex-col">
-                          <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-3 invisible" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Spacer</p>
-                          <StatsCard
-                            title="Next Payment"
-                            value={nextBorrowerPayment ? formatMoney(nextBorrowerPayment.payment_amount || 0) : '-'}
-                            color="blue"
-                            change={nextBorrowerPayment ? `to @${nextBorrowerPayment.username}` : 'N/A'}
-                            index={1}
-                            bgColor="transparent"
-                          />
-                        </div>
-                        <motion.div
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.4, delay: 0.2, ease: "easeOut" }}
-                          whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                          className="flex flex-col"
-                        >
-                          <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-3 invisible" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Spacer</p>
-                          <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 flex-1 cursor-default border-0 shadow-none" style={{ backgroundColor: 'transparent' }}>
-                            <CardContent className="p-4 flex flex-col h-full">
-                              <p className="text-sm font-medium text-slate-600 mb-2 text-left">Next Payment Date</p>
-                              {nextBorrowerPayment ? (
-                                <>
-                                  <div className="flex-1 flex flex-col items-center justify-center">
-                                    <p className="text-lg font-bold text-slate-800">
-                                      {format(nextBorrowerPayment.date, 'EEE')}, {format(nextBorrowerPayment.date, 'MMM d')}
-                                    </p>
-                                    <div className="mt-2 px-3 py-1 bg-white rounded-full">
-                                      <p className="text-sm font-semibold text-[#00A86B]">
-                                        {(() => {
-                                          const days = Math.ceil((nextBorrowerPayment.date - new Date()) / (1000 * 60 * 60 * 24));
-                                          return days > 0 ? `${days} day${days !== 1 ? 's' : ''} away` : days === 0 ? 'Due today' : `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`;
-                                        })()}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <p className="text-xs text-slate-500 mt-2 text-right">to @{nextBorrowerPayment.username}</p>
-                                </>
-                              ) : (
-                                <p className="text-lg font-bold text-slate-800 text-center flex-1 flex items-center justify-center">-</p>
+                        <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-3" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                          Borrowing Overview
+                        </p>
+                        <div className="flex items-center gap-6">
+                          {/* Donut Ring */}
+                          <div className="relative flex-shrink-0 w-24 h-24">
+                            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                              <circle cx="60" cy="60" r="52" fill="none" stroke="#DBFFEB" strokeWidth="7" />
+                              <circle
+                                cx="60" cy="60" r="52"
+                                fill="none"
+                                stroke="#00A86B"
+                                strokeWidth="7"
+                                strokeLinecap="round"
+                                strokeDasharray={2 * Math.PI * 52}
+                                strokeDashoffset={2 * Math.PI * 52 - (percentPaid / 100) * 2 * Math.PI * 52}
+                                className="transition-all duration-500"
+                              />
+                            </svg>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                              <span className="text-lg font-bold text-slate-800">{percentPaid}%</span>
+                              <span className="text-[9px] text-slate-500 uppercase tracking-wider">Paid</span>
+                            </div>
+                          </div>
+
+                          {/* Left Metrics */}
+                          <div className="flex flex-col gap-3 flex-1">
+                            <div>
+                              <p className="text-xs text-slate-500 mb-0.5">{formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-slate-500 mb-1">Next Payment</p>
+                              <p className="text-lg font-bold text-slate-800">
+                                {nextBorrowerPayment ? formatMoney(nextBorrowerPayment.payment_amount || 0) : 'N/A'}
+                              </p>
+                              {nextBorrowerPayment && (
+                                <p className="text-xs text-slate-400 mt-0.5">to @{nextBorrowerPayment.username}</p>
                               )}
-                            </CardContent>
-                          </Card>
-                        </motion.div>
+                            </div>
+                          </div>
+
+                          {/* Right Metrics */}
+                          <div className="flex flex-col gap-3 flex-1">
+                            <div>
+                              <p className="text-sm text-slate-500 mb-1">Next Payment Date</p>
+                              <p className="text-lg font-bold text-slate-800">
+                                {nextBorrowerPayment ? `${format(nextBorrowerPayment.date, 'EEE')}, ${format(nextBorrowerPayment.date, 'MMM d')}` : 'N/A'}
+                              </p>
+                              {nextBorrowerPayment && (
+                                <p className="text-xs text-[#00A86B] mt-0.5">
+                                  {(() => {
+                                    const days = Math.ceil((nextBorrowerPayment.date - new Date()) / (1000 * 60 * 60 * 24));
+                                    return days > 0 ? `${days} day${days !== 1 ? 's' : ''} away` : days === 0 ? 'Due today' : `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`;
+                                  })()}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
                       </>
-                    );
-                  }
-                })()}
-              </div>
-            </div>
+                    )}
+                  </motion.div>
+                </div>
+              );
+            })()}
 
             <div className="lg:col-span-1">
               <QuickActions />
