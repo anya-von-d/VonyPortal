@@ -287,18 +287,16 @@ export default function Home() {
                 <div
                   className="lg:col-span-2 rounded-xl p-7 relative transition-all duration-300"
                   style={{
-                    background: overviewType === 'lending'
-                      ? 'linear-gradient(135deg, #052e16 0%, #14532d 50%, #052e16 100%)'
-                      : '#FFFFFF'
+                    background: '#052e16'
                   }}
                 >
                   {/* Left Arrow */}
                   <button
                     onClick={() => setOverviewType(overviewType === 'lending' ? 'borrowing' : 'lending')}
                     className="absolute left-[-12px] top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-200"
-                    style={{ backgroundColor: overviewType === 'lending' ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+                    style={{ backgroundColor: 'rgba(255,255,255,0.1)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={overviewType === 'lending' ? '#83F384' : '#00A86B'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#83F384" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="15 18 9 12 15 6"></polyline>
                     </svg>
                   </button>
@@ -307,9 +305,9 @@ export default function Home() {
                   <button
                     onClick={() => setOverviewType(overviewType === 'lending' ? 'borrowing' : 'lending')}
                     className="absolute right-[-12px] top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-200"
-                    style={{ backgroundColor: overviewType === 'lending' ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+                    style={{ backgroundColor: 'rgba(255,255,255,0.1)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={overviewType === 'lending' ? '#83F384' : '#00A86B'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#83F384" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="9 18 15 12 9 6"></polyline>
                     </svg>
                   </button>
@@ -323,7 +321,7 @@ export default function Home() {
                     {overviewType === 'lending' ? (
                       /* ===== LENDING OVERVIEW — Dark green card ===== */
                       <>
-                        <p className="text-sm font-semibold mb-5 text-white/50">
+                        <p className="text-xl font-bold mb-5 text-white tracking-tight">
                           Lending Overview
                         </p>
                         <div className="flex items-center gap-6">
@@ -393,58 +391,67 @@ export default function Home() {
                         </div>
                       </>
                     ) : (
-                      /* ===== BORROWING OVERVIEW — Light green card ===== */
+                      /* ===== BORROWING OVERVIEW — Dark green card (same style as lending) ===== */
                       <>
-                        <p className="text-sm font-semibold text-slate-600 mb-3">
+                        <p className="text-xl font-bold mb-5 text-white tracking-tight">
                           Borrowing Overview
                         </p>
                         <div className="flex items-center gap-6">
                           {/* Donut Ring */}
-                          <div className="relative flex-shrink-0 w-24 h-24">
-                            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                              <circle cx="60" cy="60" r="52" fill="none" stroke="#DBFFEB" strokeWidth="7" />
+                          <div className="relative flex-shrink-0" style={{ width: 130, height: 130 }}>
+                            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 140 140">
+                              <circle cx="70" cy="70" r="58" fill="none" stroke="rgba(131,243,132,0.2)" strokeWidth="10" />
                               <circle
-                                cx="60" cy="60" r="52"
+                                cx="70" cy="70" r="58"
                                 fill="none"
-                                stroke="#00A86B"
-                                strokeWidth="7"
+                                stroke="#36CE8E"
+                                strokeWidth="10"
                                 strokeLinecap="round"
-                                strokeDasharray={2 * Math.PI * 52}
-                                strokeDashoffset={2 * Math.PI * 52 - (percentPaid / 100) * 2 * Math.PI * 52}
+                                strokeDasharray={2 * Math.PI * 58}
+                                strokeDashoffset={2 * Math.PI * 58 - (percentPaid / 100) * 2 * Math.PI * 58}
                                 className="transition-all duration-500"
                               />
                             </svg>
                             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                              <span className="text-lg font-bold text-slate-800">{percentPaid}%</span>
-                              <span className="text-[9px] text-slate-500 uppercase tracking-wider">Paid</span>
+                              <span className="text-2xl font-bold text-white">{percentPaid}%</span>
                             </div>
                           </div>
 
                           {/* Left Metrics */}
-                          <div className="flex flex-col gap-3 flex-1">
+                          <div className="flex flex-col gap-4 flex-1">
                             <div>
-                              <p className="text-xs text-slate-500 mb-0.5">{formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)}</p>
+                              <p className="text-sm text-white/50 mb-1">Repayment</p>
+                              <p className="text-lg font-bold">
+                                <span className="text-[#83F384]">{percentPaid}%</span>
+                                <span className="text-white/70 text-sm font-medium ml-1.5">PAID</span>
+                              </p>
                             </div>
                             <div>
-                              <p className="text-sm text-slate-500 mb-1">Next Payment</p>
-                              <p className="text-lg font-bold text-slate-800">
+                              <p className="text-sm text-white/50 mb-1">Next Payment</p>
+                              <p className="text-lg font-bold text-white">
                                 {nextBorrowerPayment ? formatMoney(nextBorrowerPayment.payment_amount || 0) : 'N/A'}
                               </p>
                               {nextBorrowerPayment && (
-                                <p className="text-xs text-slate-400 mt-0.5">to @{nextBorrowerPayment.username}</p>
+                                <p className="text-xs text-white/40 mt-0.5">to @{nextBorrowerPayment.username}</p>
                               )}
                             </div>
                           </div>
 
                           {/* Right Metrics */}
-                          <div className="flex flex-col gap-3 flex-1">
+                          <div className="flex flex-col gap-4 flex-1">
                             <div>
-                              <p className="text-sm text-slate-500 mb-1">Next Payment Date</p>
-                              <p className="text-lg font-bold text-slate-800">
+                              <p className="text-sm text-white/50 mb-1">Total Borrowed</p>
+                              <p className="text-lg font-bold text-white">
+                                {formatMoney(totalPaidBack)} <span className="text-white/40 text-sm font-normal">of {formatMoney(totalBorrowedAmount)}</span>
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-white/50 mb-1">Next Payment Date</p>
+                              <p className="text-lg font-bold text-white">
                                 {nextBorrowerPayment ? `${format(nextBorrowerPayment.date, 'EEE')}, ${format(nextBorrowerPayment.date, 'MMM d')}` : 'N/A'}
                               </p>
                               {nextBorrowerPayment && (
-                                <p className="text-xs text-[#00A86B] mt-0.5">
+                                <p className="text-xs text-[#83F384] mt-0.5">
                                   {(() => {
                                     const days = Math.ceil((nextBorrowerPayment.date - new Date()) / (1000 * 60 * 60 * 24));
                                     return days > 0 ? `${days} day${days !== 1 ? 's' : ''} away` : days === 0 ? 'Due today' : `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`;
@@ -472,215 +479,6 @@ export default function Home() {
               <div>
                 <RecentActivity loans={myLoans} payments={payments} user={user} allUsers={safeAllProfiles} />
               </div>
-
-              {/* Monthly Overview */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.3 }}
-                className="flex flex-col gap-3"
-              >
-                {/* Month Balance Box */}
-                {(() => {
-                  const monthEnd = endOfMonth(calendarMonth);
-                  const activeLoans = myLoans.filter(l => l && l.status === 'active');
-                  let totalReceive = 0;
-                  let totalSend = 0;
-
-                  activeLoans.forEach(loan => {
-                    if (!loan.next_payment_date) return;
-                    const paymentDate = new Date(loan.next_payment_date);
-                    const isLender = loan.lender_id === user.id;
-                    const paymentAmount = loan.payment_amount || 0;
-
-                    const addAmountIfInMonth = (date) => {
-                      if (isSameMonth(date, calendarMonth)) {
-                        if (isLender) {
-                          totalReceive += paymentAmount;
-                        } else {
-                          totalSend += paymentAmount;
-                        }
-                      }
-                    };
-
-                    addAmountIfInMonth(paymentDate);
-
-                    const frequency = loan.payment_frequency;
-                    if (frequency && frequency !== 'none') {
-                      let currentDate = new Date(loan.next_payment_date);
-                      let iterations = 0;
-                      while (iterations < 10) {
-                        if (frequency === 'weekly') {
-                          currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
-                        } else if (frequency === 'biweekly') {
-                          currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
-                        } else if (frequency === 'monthly') {
-                          currentDate = addMonths(currentDate, 1);
-                        } else if (frequency === 'daily') {
-                          currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
-                        } else {
-                          break;
-                        }
-                        if (currentDate > monthEnd) break;
-                        addAmountIfInMonth(currentDate);
-                        iterations++;
-                      }
-                    }
-                  });
-
-                  const netBalance = totalReceive - totalSend;
-                  const isPositive = netBalance >= 0;
-
-                  return (
-                    <div className="bg-[#DBFFEB] rounded-xl p-3 flex items-center justify-between">
-                      <p className="text-sm font-semibold text-[#0A1A10]">
-                        {format(calendarMonth, 'MMMM')} Balance
-                      </p>
-                      <p className="text-sm font-bold text-[#0A1A10]">
-                        {isPositive ? '+' : '-'}${Math.abs(netBalance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </p>
-                    </div>
-                  );
-                })()}
-
-                <Card className="bg-white border-0 rounded-xl overflow-hidden h-full">
-                  <CardContent className="p-5 h-full flex flex-col">
-                    <p className="text-sm font-semibold text-slate-600 mb-4">
-                      {format(calendarMonth, 'MMMM')} Overview
-                    </p>
-
-                    <div className="flex-1 space-y-3 overflow-y-auto max-h-[320px] pr-1" style={{
-                      maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
-                      WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)'
-                    }}>
-                      {(() => {
-                        const monthStart = startOfMonth(calendarMonth);
-                        const monthEnd = endOfMonth(calendarMonth);
-                        const events = [];
-                        const activeLoans = myLoans.filter(l => l && l.status === 'active');
-
-                        activeLoans.forEach(loan => {
-                          if (!loan.next_payment_date) return;
-
-                          const paymentDate = new Date(loan.next_payment_date);
-                          const isLender = loan.lender_id === user.id;
-                          const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
-                          const otherUser = safeAllProfiles.find(p => p.user_id === otherUserId);
-
-                          // Helper to add event if in month
-                          const addEventIfInMonth = (date) => {
-                            if (isSameMonth(date, calendarMonth)) {
-                              events.push({
-                                date: new Date(date),
-                                type: isLender ? 'receive' : 'send',
-                                amount: loan.payment_amount || 0,
-                                username: otherUser?.username || 'user'
-                              });
-                            }
-                          };
-
-                          addEventIfInMonth(paymentDate);
-
-                          // Add recurring payments
-                          const frequency = loan.payment_frequency;
-                          if (frequency && frequency !== 'none') {
-                            let currentDate = new Date(loan.next_payment_date);
-                            const maxIterations = 10;
-                            let iterations = 0;
-
-                            while (iterations < maxIterations) {
-                              if (frequency === 'weekly') {
-                                currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
-                              } else if (frequency === 'biweekly') {
-                                currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
-                              } else if (frequency === 'monthly') {
-                                currentDate = addMonths(currentDate, 1);
-                              } else if (frequency === 'daily') {
-                                currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
-                              } else {
-                                break;
-                              }
-
-                              if (currentDate > monthEnd) break;
-                              addEventIfInMonth(currentDate);
-                              iterations++;
-                            }
-                          }
-                        });
-
-                        // Sort by date
-                        events.sort((a, b) => a.date - b.date);
-
-                        if (events.length === 0) {
-                          return (
-                            <div className="flex flex-col items-center justify-center py-8 text-slate-500">
-                              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40 mb-2">
-                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                <line x1="16" y1="2" x2="16" y2="6"></line>
-                                <line x1="8" y1="2" x2="8" y2="6"></line>
-                                <line x1="3" y1="10" x2="21" y2="10"></line>
-                              </svg>
-                              <p className="text-sm">No payments scheduled this month</p>
-                            </div>
-                          );
-                        }
-
-                        const colors = ['#DBFFEB', '#DBFFEB', '#DBFFEB', '#DBFFEB', '#DBFFEB', '#DBFFEB'];
-
-                        return events.map((event, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center gap-3 p-3 rounded-xl"
-                            style={{ backgroundColor: colors[index % 6] }}
-                          >
-                            {/* Date Box */}
-                            <div className="bg-[#DBFFEB] rounded-lg px-3 py-2 flex-shrink-0 text-center min-w-[50px]">
-                              <p className="text-xs text-slate-500 uppercase" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                                {format(event.date, 'MMM')}
-                              </p>
-                              <p className="text-lg font-bold text-slate-800">
-                                {format(event.date, 'd')}
-                              </p>
-                            </div>
-
-                            {/* Event Details */}
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-slate-800">
-                                <span className={event.type === 'send' ? 'text-red-600' : 'text-[#00A86B]'}>
-                                  {event.type === 'send' ? 'Send' : 'Receive'}
-                                </span>
-                                {' '}
-                                <span className="font-bold">${event.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                {' '}
-                                <span className="text-slate-600">
-                                  {event.type === 'send' ? 'to' : 'from'}
-                                </span>
-                                {' '}
-                                <span className="font-medium">@{event.username}</span>
-                              </p>
-                            </div>
-
-                            {/* Arrow indicator */}
-                            <div className="flex-shrink-0">
-                              {event.type === 'send' ? (
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                                  <polyline points="19 12 12 19 5 12"></polyline>
-                                </svg>
-                              ) : (
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00A86B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <line x1="12" y1="19" x2="12" y2="5"></line>
-                                  <polyline points="5 12 12 5 19 12"></polyline>
-                                </svg>
-                              )}
-                            </div>
-                          </div>
-                        ));
-                      })()}
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
 
               {/* Calendar */}
               <motion.div
@@ -853,6 +651,215 @@ export default function Home() {
                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#6EE8A2' }} />
                         <span className="text-sm font-medium text-slate-700">Both</span>
                       </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* Monthly Overview */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.3 }}
+                className="flex flex-col gap-3"
+              >
+                {/* Month Balance Box */}
+                {(() => {
+                  const monthEnd = endOfMonth(calendarMonth);
+                  const activeLoans = myLoans.filter(l => l && l.status === 'active');
+                  let totalReceive = 0;
+                  let totalSend = 0;
+
+                  activeLoans.forEach(loan => {
+                    if (!loan.next_payment_date) return;
+                    const paymentDate = new Date(loan.next_payment_date);
+                    const isLender = loan.lender_id === user.id;
+                    const paymentAmount = loan.payment_amount || 0;
+
+                    const addAmountIfInMonth = (date) => {
+                      if (isSameMonth(date, calendarMonth)) {
+                        if (isLender) {
+                          totalReceive += paymentAmount;
+                        } else {
+                          totalSend += paymentAmount;
+                        }
+                      }
+                    };
+
+                    addAmountIfInMonth(paymentDate);
+
+                    const frequency = loan.payment_frequency;
+                    if (frequency && frequency !== 'none') {
+                      let currentDate = new Date(loan.next_payment_date);
+                      let iterations = 0;
+                      while (iterations < 10) {
+                        if (frequency === 'weekly') {
+                          currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
+                        } else if (frequency === 'biweekly') {
+                          currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
+                        } else if (frequency === 'monthly') {
+                          currentDate = addMonths(currentDate, 1);
+                        } else if (frequency === 'daily') {
+                          currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+                        } else {
+                          break;
+                        }
+                        if (currentDate > monthEnd) break;
+                        addAmountIfInMonth(currentDate);
+                        iterations++;
+                      }
+                    }
+                  });
+
+                  const netBalance = totalReceive - totalSend;
+                  const isPositive = netBalance >= 0;
+
+                  return (
+                    <div className="bg-[#83F384] rounded-xl p-3 flex items-center justify-between">
+                      <p className="text-sm font-semibold text-[#0A1A10]">
+                        {format(calendarMonth, 'MMMM')} Balance
+                      </p>
+                      <p className="text-sm font-bold text-[#0A1A10]">
+                        {isPositive ? '+' : '-'}${Math.abs(netBalance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </p>
+                    </div>
+                  );
+                })()}
+
+                <Card className="bg-white border-0 rounded-xl overflow-hidden h-full">
+                  <CardContent className="p-5 h-full flex flex-col">
+                    <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight">
+                      {format(calendarMonth, 'MMMM')} Overview
+                    </p>
+
+                    <div className="flex-1 space-y-3 overflow-y-auto max-h-[320px] pr-1" style={{
+                      maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
+                      WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)'
+                    }}>
+                      {(() => {
+                        const monthStart = startOfMonth(calendarMonth);
+                        const monthEnd = endOfMonth(calendarMonth);
+                        const events = [];
+                        const activeLoans = myLoans.filter(l => l && l.status === 'active');
+
+                        activeLoans.forEach(loan => {
+                          if (!loan.next_payment_date) return;
+
+                          const paymentDate = new Date(loan.next_payment_date);
+                          const isLender = loan.lender_id === user.id;
+                          const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
+                          const otherUser = safeAllProfiles.find(p => p.user_id === otherUserId);
+
+                          // Helper to add event if in month
+                          const addEventIfInMonth = (date) => {
+                            if (isSameMonth(date, calendarMonth)) {
+                              events.push({
+                                date: new Date(date),
+                                type: isLender ? 'receive' : 'send',
+                                amount: loan.payment_amount || 0,
+                                username: otherUser?.username || 'user'
+                              });
+                            }
+                          };
+
+                          addEventIfInMonth(paymentDate);
+
+                          // Add recurring payments
+                          const frequency = loan.payment_frequency;
+                          if (frequency && frequency !== 'none') {
+                            let currentDate = new Date(loan.next_payment_date);
+                            const maxIterations = 10;
+                            let iterations = 0;
+
+                            while (iterations < maxIterations) {
+                              if (frequency === 'weekly') {
+                                currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
+                              } else if (frequency === 'biweekly') {
+                                currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
+                              } else if (frequency === 'monthly') {
+                                currentDate = addMonths(currentDate, 1);
+                              } else if (frequency === 'daily') {
+                                currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+                              } else {
+                                break;
+                              }
+
+                              if (currentDate > monthEnd) break;
+                              addEventIfInMonth(currentDate);
+                              iterations++;
+                            }
+                          }
+                        });
+
+                        // Sort by date
+                        events.sort((a, b) => a.date - b.date);
+
+                        if (events.length === 0) {
+                          return (
+                            <div className="flex flex-col items-center justify-center py-8 text-slate-500">
+                              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40 mb-2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                              </svg>
+                              <p className="text-sm">No payments scheduled this month</p>
+                            </div>
+                          );
+                        }
+
+                        const colors = ['#83F384', '#83F384', '#83F384', '#83F384', '#83F384', '#83F384'];
+
+                        return events.map((event, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center gap-3 p-3 rounded-xl"
+                            style={{ backgroundColor: colors[index % 6] }}
+                          >
+                            {/* Date Box */}
+                            <div className="bg-white/50 rounded-lg px-3 py-2 flex-shrink-0 text-center min-w-[50px]">
+                              <p className="text-xs text-slate-500 uppercase" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                                {format(event.date, 'MMM')}
+                              </p>
+                              <p className="text-lg font-bold text-slate-800">
+                                {format(event.date, 'd')}
+                              </p>
+                            </div>
+
+                            {/* Event Details */}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-slate-800">
+                                <span className={event.type === 'send' ? 'text-red-600' : 'text-[#00A86B]'}>
+                                  {event.type === 'send' ? 'Send' : 'Receive'}
+                                </span>
+                                {' '}
+                                <span className="font-bold">${event.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                {' '}
+                                <span className="text-slate-600">
+                                  {event.type === 'send' ? 'to' : 'from'}
+                                </span>
+                                {' '}
+                                <span className="font-medium">@{event.username}</span>
+                              </p>
+                            </div>
+
+                            {/* Arrow indicator */}
+                            <div className="flex-shrink-0">
+                              {event.type === 'send' ? (
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                                  <polyline points="19 12 12 19 5 12"></polyline>
+                                </svg>
+                              ) : (
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00A86B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <line x1="12" y1="19" x2="12" y2="5"></line>
+                                  <polyline points="5 12 12 5 19 12"></polyline>
+                                </svg>
+                              )}
+                            </div>
+                          </div>
+                        ));
+                      })()}
                     </div>
                   </CardContent>
                 </Card>

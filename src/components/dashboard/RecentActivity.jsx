@@ -9,7 +9,7 @@ import { format } from "date-fns";
 import { SkeletonShimmer } from "@/components/ui/animations";
 
 // Background colors that cycle through cards
-const cardBgColors = ['#DBFFEB', '#DBFFEB', '#DBFFEB'];
+const cardBgColors = ['#83F384', '#83F384', '#83F384'];
 // Hover accent colors that cycle through cards
 const hoverAccentColors = ['#00A86B', '#50C878', '#0D9B76', '#00BF7A'];
 
@@ -38,7 +38,7 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
         transition={{ duration: 0.4, delay: 0.3 }}
       >
         <div className="bg-white rounded-xl p-5 max-w-[85%] mx-auto lg:max-w-none">
-          <p className="text-sm font-semibold text-[#7A9A85] mb-4">
+          <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight">
             Activity
           </p>
           <div className="relative">
@@ -144,10 +144,10 @@ export default function RecentActivity({ loans, payments, isLoading, user, allUs
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.3 }}
     >
-      <div className="bg-[#DBFFEB] rounded-2xl p-5 max-w-[85%] mx-auto lg:max-w-none">
+      <div className="bg-white rounded-xl p-5 max-w-[85%] mx-auto lg:max-w-none">
         {/* Title */}
         <div className="flex items-center justify-between mb-4">
-          <p className="text-sm font-semibold text-[#7A9A85]">
+          <p className="text-xl font-bold text-slate-800 tracking-tight">
             Activity
           </p>
           <Link to={createPageUrl("RecentActivity")}>
