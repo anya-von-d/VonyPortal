@@ -292,8 +292,8 @@ export default function Home() {
                   </p>
 
                   <div
-                    className="rounded-xl p-3 flex flex-col items-center justify-center transition-colors duration-300 flex-1"
-                    style={{ backgroundColor: overviewType === 'lending' ? '#83F384' : '#6EE8B5' }}
+                    className={`flex flex-col items-center justify-center transition-colors duration-300 flex-1 ${overviewType === 'lending' ? 'rounded-xl p-3' : 'p-3'}`}
+                    style={{ backgroundColor: overviewType === 'lending' ? '#83F384' : 'transparent' }}
                   >
                     <motion.div
                       key={overviewType}
@@ -483,7 +483,7 @@ export default function Home() {
                             color="blue"
                             change={nextBorrowerPayment ? `to @${nextBorrowerPayment.username}` : 'N/A'}
                             index={1}
-                            bgColor="#6EE8B5"
+                            bgColor="transparent"
                           />
                         </div>
                         <motion.div
@@ -494,7 +494,7 @@ export default function Home() {
                           className="flex flex-col"
                         >
                           <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-3 invisible" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Spacer</p>
-                          <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 flex-1 cursor-default border-0" style={{ backgroundColor: '#6EE8B5' }}>
+                          <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 flex-1 cursor-default border-0 shadow-none" style={{ backgroundColor: 'transparent' }}>
                             <CardContent className="p-4 flex flex-col h-full">
                               <p className="text-sm font-medium text-slate-600 mb-2 text-left">Next Payment Date</p>
                               {nextBorrowerPayment ? (
@@ -532,8 +532,8 @@ export default function Home() {
             </div>
             </div>
 
-            {/* Monthly Overview and Activity Section */}
-            <div className="grid lg:grid-cols-2 gap-6">
+            {/* Monthly Overview Section */}
+            <div>
               {/* Monthly Overview */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -743,10 +743,6 @@ export default function Home() {
                 </Card>
               </motion.div>
 
-              {/* Activity */}
-              <div className="flex flex-col">
-                <RecentActivity loans={myLoans} payments={payments} user={user} allUsers={safeAllProfiles} />
-              </div>
             </div>
 
             {/* Calendar Section */}
@@ -925,6 +921,11 @@ export default function Home() {
                   </CardContent>
                 </Card>
               </motion.div>
+            </div>
+
+            {/* Activity */}
+            <div>
+              <RecentActivity loans={myLoans} payments={payments} user={user} allUsers={safeAllProfiles} />
             </div>
           </div>
 
