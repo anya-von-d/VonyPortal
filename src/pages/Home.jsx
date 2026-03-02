@@ -237,10 +237,10 @@ export default function Home() {
     const paymentStatus = getPaymentStatus();
 
     return (
-        <div className="min-h-screen p-6" style={{backgroundColor: '#C8E6D0'}}>
-           <div className="max-w-6xl mx-auto space-y-7">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="py-5">
-              <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-left">
+        <div className="min-h-screen px-4 py-6 md:p-6" style={{backgroundColor: '#C8E6D0'}}>
+           <div className="max-w-6xl mx-auto space-y-5 md:space-y-7">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="py-3 md:py-5">
+              <h1 className="text-3xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-left">
                 {(() => {
                   const hour = new Date().getHours();
                   const greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
@@ -249,12 +249,12 @@ export default function Home() {
               </h1>
           </motion.div>
 
-          <div className="space-y-7">
+          <div className="space-y-5 md:space-y-7">
             {pendingOffers.length > 0 && (
               <PendingLoanOffers offers={pendingOffers} />
             )}
 
-            <div className="grid lg:grid-cols-[2fr_1fr_1fr] gap-6 items-start">
+            <div className="grid lg:grid-cols-[2fr_1fr_1fr] gap-4 md:gap-6 items-start">
             {(() => {
               // Compute data for both views
               const lentLoans = myLoans.filter(l => l && l.lender_id === user.id && l.status === 'active');
@@ -285,7 +285,7 @@ export default function Home() {
 
               return (
                 <div
-                  className="lg:col-span-2 rounded-lg p-7 relative transition-all duration-300"
+                  className="lg:col-span-2 rounded-lg p-5 md:p-7 relative transition-all duration-300 overflow-hidden"
                   style={{
                     background: '#052e16'
                   }}
@@ -293,10 +293,10 @@ export default function Home() {
                   {/* Left Arrow */}
                   <button
                     onClick={() => setOverviewType(overviewType === 'lending' ? 'borrowing' : 'lending')}
-                    className="absolute left-[-12px] top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-200"
+                    className="absolute left-1 md:left-[-12px] top-1/2 -translate-y-1/2 z-10 w-7 h-7 md:w-9 md:h-9 rounded-full flex items-center justify-center transition-colors duration-200"
                     style={{ backgroundColor: 'rgba(255,255,255,0.1)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#83F384" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#83F384" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="15 18 9 12 15 6"></polyline>
                     </svg>
                   </button>
@@ -304,10 +304,10 @@ export default function Home() {
                   {/* Right Arrow */}
                   <button
                     onClick={() => setOverviewType(overviewType === 'lending' ? 'borrowing' : 'lending')}
-                    className="absolute right-[-12px] top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-200"
+                    className="absolute right-1 md:right-[-12px] top-1/2 -translate-y-1/2 z-10 w-7 h-7 md:w-9 md:h-9 rounded-full flex items-center justify-center transition-colors duration-200"
                     style={{ backgroundColor: 'rgba(255,255,255,0.1)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#83F384" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#83F384" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="9 18 15 12 9 6"></polyline>
                     </svg>
                   </button>
@@ -321,12 +321,12 @@ export default function Home() {
                     {overviewType === 'lending' ? (
                       /* ===== LENDING OVERVIEW — Dark green card ===== */
                       <>
-                        <p className="text-xl font-bold mb-5 text-white tracking-tight font-sans">
+                        <p className="text-lg md:text-xl font-bold mb-4 md:mb-5 text-white tracking-tight font-sans">
                           Lending Overview
                         </p>
-                        <div className="flex items-center gap-6">
+                        <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
                           {/* Donut Ring */}
-                          <div className="relative flex-shrink-0" style={{ width: 130, height: 130 }}>
+                          <div className="relative flex-shrink-0" style={{ width: 100, height: 100 }}>
                             <svg className="w-full h-full transform -rotate-90" viewBox="0 0 140 140">
                               <circle cx="70" cy="70" r="58" fill="none" stroke="rgba(131,243,132,0.2)" strokeWidth="10" />
                               <circle
@@ -341,41 +341,37 @@ export default function Home() {
                               />
                             </svg>
                             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                              <span className="text-2xl font-bold text-white">{percentRepaid}%</span>
+                              <span className="text-xl md:text-2xl font-bold text-white">{percentRepaid}%</span>
                             </div>
                           </div>
 
-                          {/* Left Metrics */}
-                          <div className="flex flex-col gap-4 flex-1">
+                          {/* Metrics Grid */}
+                          <div className="grid grid-cols-2 gap-3 md:gap-4 flex-1 w-full">
                             <div>
-                              <p className="text-sm text-white/50 mb-1">Repayment</p>
-                              <p className="text-lg font-bold">
+                              <p className="text-xs md:text-sm text-white/50 mb-1">Repayment</p>
+                              <p className="text-base md:text-lg font-bold">
                                 <span className="text-[#83F384]">{percentRepaid}%</span>
-                                <span className="text-white/70 text-sm font-medium ml-1.5">REPAID</span>
+                                <span className="text-white/70 text-xs md:text-sm font-medium ml-1">REPAID</span>
                               </p>
                             </div>
                             <div>
-                              <p className="text-sm text-white/50 mb-1">Next Payment</p>
-                              <p className="text-lg font-bold text-white">
+                              <p className="text-xs md:text-sm text-white/50 mb-1">Total Lent</p>
+                              <p className="text-base md:text-lg font-bold text-white">
+                                {formatMoney(totalRepaid)} <span className="text-white/40 text-xs md:text-sm font-normal">of {formatMoney(totalLentAmount)}</span>
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs md:text-sm text-white/50 mb-1">Next Payment</p>
+                              <p className="text-base md:text-lg font-bold text-white">
                                 {nextLenderPayment ? formatMoney(nextLenderPayment.payment_amount || 0) : 'N/A'}
                               </p>
                               {nextLenderPayment && (
                                 <p className="text-xs text-white/40 mt-0.5">from @{nextLenderPayment.username}</p>
                               )}
                             </div>
-                          </div>
-
-                          {/* Right Metrics */}
-                          <div className="flex flex-col gap-4 flex-1">
                             <div>
-                              <p className="text-sm text-white/50 mb-1">Total Lent</p>
-                              <p className="text-lg font-bold text-white">
-                                {formatMoney(totalRepaid)} <span className="text-white/40 text-sm font-normal">of {formatMoney(totalLentAmount)}</span>
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-white/50 mb-1">Next Payment Date</p>
-                              <p className="text-lg font-bold text-white">
+                              <p className="text-xs md:text-sm text-white/50 mb-1">Next Payment Date</p>
+                              <p className="text-base md:text-lg font-bold text-white">
                                 {nextLenderPayment ? `${format(nextLenderPayment.date, 'EEE')}, ${format(nextLenderPayment.date, 'MMM d')}` : 'N/A'}
                               </p>
                               {nextLenderPayment && (
@@ -393,12 +389,12 @@ export default function Home() {
                     ) : (
                       /* ===== BORROWING OVERVIEW — Dark green card (same style as lending) ===== */
                       <>
-                        <p className="text-xl font-bold mb-5 text-white tracking-tight font-sans">
+                        <p className="text-lg md:text-xl font-bold mb-4 md:mb-5 text-white tracking-tight font-sans">
                           Borrowing Overview
                         </p>
-                        <div className="flex items-center gap-6">
+                        <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
                           {/* Donut Ring */}
-                          <div className="relative flex-shrink-0" style={{ width: 130, height: 130 }}>
+                          <div className="relative flex-shrink-0" style={{ width: 100, height: 100 }}>
                             <svg className="w-full h-full transform -rotate-90" viewBox="0 0 140 140">
                               <circle cx="70" cy="70" r="58" fill="none" stroke="rgba(131,243,132,0.2)" strokeWidth="10" />
                               <circle
@@ -413,41 +409,37 @@ export default function Home() {
                               />
                             </svg>
                             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                              <span className="text-2xl font-bold text-white">{percentPaid}%</span>
+                              <span className="text-xl md:text-2xl font-bold text-white">{percentPaid}%</span>
                             </div>
                           </div>
 
-                          {/* Left Metrics */}
-                          <div className="flex flex-col gap-4 flex-1">
+                          {/* Metrics Grid */}
+                          <div className="grid grid-cols-2 gap-3 md:gap-4 flex-1 w-full">
                             <div>
-                              <p className="text-sm text-white/50 mb-1">Repayment</p>
-                              <p className="text-lg font-bold">
+                              <p className="text-xs md:text-sm text-white/50 mb-1">Repayment</p>
+                              <p className="text-base md:text-lg font-bold">
                                 <span className="text-[#83F384]">{percentPaid}%</span>
-                                <span className="text-white/70 text-sm font-medium ml-1.5">PAID</span>
+                                <span className="text-white/70 text-xs md:text-sm font-medium ml-1">PAID</span>
                               </p>
                             </div>
                             <div>
-                              <p className="text-sm text-white/50 mb-1">Next Payment</p>
-                              <p className="text-lg font-bold text-white">
+                              <p className="text-xs md:text-sm text-white/50 mb-1">Total Borrowed</p>
+                              <p className="text-base md:text-lg font-bold text-white">
+                                {formatMoney(totalPaidBack)} <span className="text-white/40 text-xs md:text-sm font-normal">of {formatMoney(totalBorrowedAmount)}</span>
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs md:text-sm text-white/50 mb-1">Next Payment</p>
+                              <p className="text-base md:text-lg font-bold text-white">
                                 {nextBorrowerPayment ? formatMoney(nextBorrowerPayment.payment_amount || 0) : 'N/A'}
                               </p>
                               {nextBorrowerPayment && (
                                 <p className="text-xs text-white/40 mt-0.5">to @{nextBorrowerPayment.username}</p>
                               )}
                             </div>
-                          </div>
-
-                          {/* Right Metrics */}
-                          <div className="flex flex-col gap-4 flex-1">
                             <div>
-                              <p className="text-sm text-white/50 mb-1">Total Borrowed</p>
-                              <p className="text-lg font-bold text-white">
-                                {formatMoney(totalPaidBack)} <span className="text-white/40 text-sm font-normal">of {formatMoney(totalBorrowedAmount)}</span>
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-white/50 mb-1">Next Payment Date</p>
-                              <p className="text-lg font-bold text-white">
+                              <p className="text-xs md:text-sm text-white/50 mb-1">Next Payment Date</p>
+                              <p className="text-base md:text-lg font-bold text-white">
                                 {nextBorrowerPayment ? `${format(nextBorrowerPayment.date, 'EEE')}, ${format(nextBorrowerPayment.date, 'MMM d')}` : 'N/A'}
                               </p>
                               {nextBorrowerPayment && (
@@ -474,7 +466,7 @@ export default function Home() {
             </div>
 
             {/* Activity, Calendar & Monthly Overview Row */}
-            <div className="grid lg:grid-cols-[2fr_1fr_1fr] gap-6">
+            <div className="grid lg:grid-cols-[2fr_1fr_1fr] gap-4 md:gap-6">
               {/* Activity */}
               <div>
                 <RecentActivity loans={myLoans} payments={payments} user={user} allUsers={safeAllProfiles} />
@@ -487,7 +479,7 @@ export default function Home() {
                 transition={{ duration: 0.4, delay: 0.2 }}
               >
                 <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#EBF2EE'}}>
-                  <CardContent className="p-5">
+                  <CardContent className="p-4 md:p-5">
                     {/* Calendar Header with Navigation */}
                     <div className="flex items-center justify-between mb-4">
                       <button
@@ -498,9 +490,9 @@ export default function Home() {
                           <polyline points="15 18 9 12 15 6"></polyline>
                         </svg>
                       </button>
-                      <h3 className="text-lg font-bold text-slate-800">
+                      <p className="text-xl font-bold text-slate-800 tracking-tight font-sans">
                         {format(calendarMonth, 'MMMM yyyy')}
-                      </h3>
+                      </p>
                       <button
                         onClick={() => setCalendarMonth(addMonths(calendarMonth, 1))}
                         className="w-9 h-9 rounded-full bg-white/50 hover:bg-white/80 flex items-center justify-center transition-colors duration-200"
@@ -663,16 +655,13 @@ export default function Home() {
                 transition={{ duration: 0.4, delay: 0.3 }}
                 className="flex flex-col gap-1.5"
               >
-                <Card className="border-0 rounded-lg overflow-hidden h-full" style={{backgroundColor: '#EBF2EE'}}>
-                  <CardContent className="p-5 h-full flex flex-col">
+                <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#EBF2EE'}}>
+                  <CardContent className="p-4 md:p-5 flex flex-col">
                     <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight font-sans">
                       {format(calendarMonth, 'MMMM')} Overview
                     </p>
 
-                    <div className="flex-1 space-y-1.5 overflow-y-auto max-h-[320px] pr-1" style={{
-                      maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
-                      WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)'
-                    }}>
+                    <div className="space-y-1.5 overflow-y-auto max-h-[320px] pr-1">
                       {(() => {
                         const monthStart = startOfMonth(calendarMonth);
                         const monthEnd = endOfMonth(calendarMonth);
