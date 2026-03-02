@@ -244,7 +244,7 @@ export default function Home() {
                 {(() => {
                   const hour = new Date().getHours();
                   const greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
-                  return <>{greeting}, <span style={{color: '#83F384'}}>{user.full_name?.split(' ')[0] || 'User'}</span></>;
+                  return <>{greeting}, <span className="text-black">{user.full_name?.split(' ')[0] || 'User'}</span></>;
                 })()}
               </h1>
           </motion.div>
@@ -486,7 +486,7 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.2 }}
               >
-                <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#EDF5F0'}}>
+                <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#E2EBE5'}}>
                   <CardContent className="p-5">
                     {/* Calendar Header with Navigation */}
                     <div className="flex items-center justify-between mb-4">
@@ -663,7 +663,7 @@ export default function Home() {
                 transition={{ duration: 0.4, delay: 0.3 }}
                 className="flex flex-col gap-1.5"
               >
-                <Card className="border-0 rounded-lg overflow-hidden h-full" style={{backgroundColor: '#EDF5F0'}}>
+                <Card className="border-0 rounded-lg overflow-hidden h-full" style={{backgroundColor: '#E2EBE5'}}>
                   <CardContent className="p-5 h-full flex flex-col">
                     <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight font-serif">
                       {format(calendarMonth, 'MMMM')} Overview
