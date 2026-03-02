@@ -244,7 +244,7 @@ export default function Home() {
                 {(() => {
                   const hour = new Date().getHours();
                   const greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
-                  return <>{greeting}, <span className="text-green-950">{user.full_name?.split(' ')[0] || 'User'}</span></>;
+                  return <>{greeting}, <span style={{color: '#36CE8E'}}>{user.full_name?.split(' ')[0] || 'User'}</span></>;
                 })()}
               </h1>
           </motion.div>
@@ -745,7 +745,7 @@ export default function Home() {
                           );
                         }
 
-                        const colors = ['#83F384', '#83F384', '#83F384', '#83F384', '#83F384', '#83F384'];
+                        const colors = ['#36CE8E', '#36CE8E', '#36CE8E', '#36CE8E', '#36CE8E', '#36CE8E'];
 
                         return events.map((event, index) => (
                           <div
@@ -853,7 +853,7 @@ export default function Home() {
                   const isPositive = netBalance >= 0;
 
                   return (
-                    <div className="bg-[#83F384] rounded-lg p-2.5 flex items-center justify-between">
+                    <div className="bg-[#36CE8E] rounded-lg p-2.5 flex items-center justify-between">
                       <p className="text-sm font-semibold text-[#0A1A10]">
                         {format(calendarMonth, 'MMMM')} Balance
                       </p>
