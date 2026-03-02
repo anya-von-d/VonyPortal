@@ -34,7 +34,7 @@ export default function QuickActions() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.2 }}
     >
-      <div className="rounded-lg p-5 max-w-[85%] mx-auto lg:max-w-none" style={{backgroundColor: '#E2EBE5'}}>
+      <div className="rounded-lg p-5 max-w-[85%] mx-auto lg:max-w-none" style={{backgroundColor: '#EBF2EE'}}>
         {/* Title */}
         <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight font-sans">
           Quick Actions
