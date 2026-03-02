@@ -532,8 +532,8 @@ export default function Home() {
             </div>
             </div>
 
-            {/* Monthly Overview Section */}
-            <div>
+            {/* Monthly Overview, Calendar & Activity Row */}
+            <div className="grid lg:grid-cols-3 gap-6">
               {/* Monthly Overview */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -743,10 +743,7 @@ export default function Home() {
                 </Card>
               </motion.div>
 
-            </div>
-
-            {/* Calendar Section */}
-            <div>
+              {/* Calendar */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -921,11 +918,11 @@ export default function Home() {
                   </CardContent>
                 </Card>
               </motion.div>
-            </div>
 
-            {/* Activity */}
-            <div>
-              <RecentActivity loans={myLoans} payments={payments} user={user} allUsers={safeAllProfiles} />
+              {/* Activity */}
+              <div>
+                <RecentActivity loans={myLoans} payments={payments} user={user} allUsers={safeAllProfiles} />
+              </div>
             </div>
           </div>
 
