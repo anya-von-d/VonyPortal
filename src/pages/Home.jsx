@@ -490,7 +490,7 @@ export default function Home() {
                           <polyline points="15 18 9 12 15 6"></polyline>
                         </svg>
                       </button>
-                      <p className="text-xl font-bold text-slate-800 tracking-tight font-sans">
+                      <p className="text-xl font-bold text-slate-800 tracking-tight font-serif">
                         {format(calendarMonth, 'MMMM yyyy')}
                       </p>
                       <button
@@ -657,7 +657,7 @@ export default function Home() {
               >
                 <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#EBF2EE'}}>
                   <CardContent className="p-4 md:p-5 flex flex-col">
-                    <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight font-sans">
+                    <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight font-serif">
                       {format(calendarMonth, 'MMMM')} Overview
                     </p>
 
