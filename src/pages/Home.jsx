@@ -466,6 +466,7 @@ export default function Home() {
             </div>
 
             {/* Activity, Calendar & Monthly Overview Row */}
+            <div className="rounded-xl p-4 md:p-6" style={{backgroundColor: '#E2F5EA'}}>
             <div className="grid lg:grid-cols-[2fr_1fr_1fr] gap-4 md:gap-6">
               {/* Activity */}
               <div>
@@ -854,6 +855,7 @@ export default function Home() {
                 })()}
               </motion.div>
 
+            </div>
             </div>
           </div>
 
