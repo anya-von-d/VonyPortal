@@ -283,7 +283,7 @@ export default function Home() {
     return (
         <div className="min-h-screen" style={{backgroundColor: '#F4F7F5'}}>
           {/* Hero Section */}
-          <div className="px-4 py-8 md:px-6 md:py-12" style={{backgroundColor: '#83F384'}}>
+          <div className="px-10 py-8 md:px-20 md:py-12 lg:px-28" style={{backgroundColor: '#83F384'}}>
             <div className="max-w-6xl mx-auto">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -421,26 +421,26 @@ export default function Home() {
             )}
 
             {/* Quick Actions & Activity Row */}
-            <div className="grid lg:grid-cols-[1fr_2fr] gap-4 md:gap-6 items-center">
+            <div className="grid lg:grid-cols-[auto_1fr] gap-4 md:gap-6 items-center">
               {/* Stacked Quick Action Buttons */}
-              <div className="flex flex-col gap-2 items-center">
+              <div className="flex flex-col gap-2 items-stretch w-[180px] mx-auto lg:mx-0">
                 <Link
                   to={createPageUrl("Lending")}
-                  className="px-8 py-2.5 rounded-full text-sm font-semibold text-[#1C4332] text-center transition-colors duration-200 hover:opacity-90 whitespace-nowrap"
+                  className="py-2.5 rounded-full text-sm font-semibold text-[#1C4332] text-center transition-colors duration-200 hover:opacity-90 whitespace-nowrap"
                   style={{ backgroundColor: '#83F384' }}
                 >
                   Create Loan Offer
                 </Link>
                 <Link
                   to={createPageUrl("Requests")}
-                  className="px-8 py-2.5 rounded-full text-sm font-semibold text-[#1C4332] text-center transition-colors duration-200 hover:opacity-90 whitespace-nowrap"
+                  className="py-2.5 rounded-full text-sm font-semibold text-[#1C4332] text-center transition-colors duration-200 hover:opacity-90 whitespace-nowrap"
                   style={{ backgroundColor: '#83F384' }}
                 >
                   View Requests
                 </Link>
                 <Link
                   to={createPageUrl("LoanAgreements")}
-                  className="px-8 py-2.5 rounded-full text-sm font-semibold text-[#1C4332] text-center transition-colors duration-200 hover:opacity-90 whitespace-nowrap"
+                  className="py-2.5 rounded-full text-sm font-semibold text-[#1C4332] text-center transition-colors duration-200 hover:opacity-90 whitespace-nowrap"
                   style={{ backgroundColor: '#83F384' }}
                 >
                   View Documents
@@ -530,8 +530,105 @@ export default function Home() {
               </div>
             )}
 
-            {/* Monthly Overview & Your Friends Row */}
-            <div className="grid lg:grid-cols-[1fr_2fr] gap-4 md:gap-6 items-start">
+            {/* Your Friends & Monthly Overview Row */}
+            <div className="grid lg:grid-cols-[2fr_1fr] gap-4 md:gap-6 items-start">
+              {/* Your Friends */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.25 }}
+              >
+                <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#DBFFEB'}}>
+                  <CardContent className="p-4 md:p-5">
+                    <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight font-serif">
+                      Your Friends
+                    </p>
+
+                    <div className="space-y-3 overflow-y-auto max-h-[320px] pr-1">
+                      {(() => {
+                        const acceptedFriends = friendships.filter(f =>
+                          f.status === 'accepted' && (f.user_id === user.id || f.friend_id === user.id)
+                        );
+
+                        if (acceptedFriends.length === 0) {
+                          return (
+                            <div className="flex flex-col items-center justify-center py-6 text-slate-400">
+                              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40 mb-2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <line x1="19" y1="8" x2="19" y2="14"></line>
+                                <line x1="22" y1="11" x2="16" y2="11"></line>
+                              </svg>
+                              <p className="text-sm">No friends yet</p>
+                            </div>
+                          );
+                        }
+
+                        return acceptedFriends.map((friendship) => {
+                          const friendUserId = friendship.user_id === user.id ? friendship.friend_id : friendship.user_id;
+                          const friendProfile = safeAllProfiles.find(p => p.user_id === friendUserId);
+                          const friendActiveLoans = myLoans.filter(l =>
+                            l.status === 'active' && (
+                              (l.lender_id === user.id && l.borrower_id === friendUserId) ||
+                              (l.borrower_id === user.id && l.lender_id === friendUserId)
+                            )
+                          );
+
+                          const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent((friendProfile?.full_name || 'U').charAt(0))}&background=22c55e&color=fff&size=128`;
+
+                          return (
+                            <div key={friendship.id} className="flex items-center gap-3 p-2.5 rounded-lg" style={{ backgroundColor: '#83F384' }}>
+                              {/* Profile Photo */}
+                              <img
+                                src={friendProfile?.profile_picture_url || defaultAvatar}
+                                alt={friendProfile?.full_name || 'Friend'}
+                                className="w-9 h-9 rounded-full object-cover flex-shrink-0 bg-white"
+                              />
+
+                              {/* Name & Active Loans */}
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-[#0A1A10] truncate">
+                                  {friendProfile?.full_name || friendProfile?.username || 'Friend'}
+                                </p>
+                                <div className="bg-white rounded-md px-2 py-0.5 inline-block mt-0.5">
+                                  <p className="text-xs font-medium text-slate-600">
+                                    {friendActiveLoans.length} active loan{friendActiveLoans.length !== 1 ? 's' : ''}
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* Lend & Borrow Buttons */}
+                              <div className="flex gap-1.5 flex-shrink-0">
+                                <Link
+                                  to={createPageUrl("Lending")}
+                                  className="px-3 py-1.5 rounded-md bg-white text-xs font-semibold text-[#1C4332] hover:bg-white/80 transition-colors"
+                                >
+                                  Lend
+                                </Link>
+                                <Link
+                                  to={createPageUrl("Borrowing")}
+                                  className="px-3 py-1.5 rounded-md bg-white text-xs font-semibold text-[#1C4332] hover:bg-white/80 transition-colors"
+                                >
+                                  Borrow
+                                </Link>
+                              </div>
+                            </div>
+                          );
+                        });
+                      })()}
+                    </div>
+
+                    {/* View All Link */}
+                    <Link
+                      to={createPageUrl("Friends")}
+                      className="block mt-4 text-center text-sm font-semibold text-[#00A86B] hover:text-[#0D9B76] transition-colors"
+                    >
+                      View All Friends →
+                    </Link>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
               {/* Monthly Overview */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -737,103 +834,6 @@ export default function Home() {
                 );
               })()}
             </motion.div>
-
-              {/* Your Friends */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.25 }}
-              >
-                <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#DBFFEB'}}>
-                  <CardContent className="p-4 md:p-5">
-                    <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight font-serif">
-                      Your Friends
-                    </p>
-
-                    <div className="space-y-3 overflow-y-auto max-h-[320px] pr-1">
-                      {(() => {
-                        const acceptedFriends = friendships.filter(f =>
-                          f.status === 'accepted' && (f.user_id === user.id || f.friend_id === user.id)
-                        );
-
-                        if (acceptedFriends.length === 0) {
-                          return (
-                            <div className="flex flex-col items-center justify-center py-6 text-slate-400">
-                              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40 mb-2">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="9" cy="7" r="4"></circle>
-                                <line x1="19" y1="8" x2="19" y2="14"></line>
-                                <line x1="22" y1="11" x2="16" y2="11"></line>
-                              </svg>
-                              <p className="text-sm">No friends yet</p>
-                            </div>
-                          );
-                        }
-
-                        return acceptedFriends.map((friendship) => {
-                          const friendUserId = friendship.user_id === user.id ? friendship.friend_id : friendship.user_id;
-                          const friendProfile = safeAllProfiles.find(p => p.user_id === friendUserId);
-                          const friendActiveLoans = myLoans.filter(l =>
-                            l.status === 'active' && (
-                              (l.lender_id === user.id && l.borrower_id === friendUserId) ||
-                              (l.borrower_id === user.id && l.lender_id === friendUserId)
-                            )
-                          );
-
-                          const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent((friendProfile?.full_name || 'U').charAt(0))}&background=22c55e&color=fff&size=128`;
-
-                          return (
-                            <div key={friendship.id} className="flex items-center gap-3 p-2.5 rounded-lg" style={{ backgroundColor: '#83F384' }}>
-                              {/* Profile Photo */}
-                              <img
-                                src={friendProfile?.profile_picture_url || defaultAvatar}
-                                alt={friendProfile?.full_name || 'Friend'}
-                                className="w-9 h-9 rounded-full object-cover flex-shrink-0 bg-white"
-                              />
-
-                              {/* Name & Active Loans */}
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-[#0A1A10] truncate">
-                                  {friendProfile?.full_name || friendProfile?.username || 'Friend'}
-                                </p>
-                                <div className="bg-white rounded-md px-2 py-0.5 inline-block mt-0.5">
-                                  <p className="text-xs font-medium text-slate-600">
-                                    {friendActiveLoans.length} active loan{friendActiveLoans.length !== 1 ? 's' : ''}
-                                  </p>
-                                </div>
-                              </div>
-
-                              {/* Lend & Borrow Buttons */}
-                              <div className="flex gap-1.5 flex-shrink-0">
-                                <Link
-                                  to={createPageUrl("Lending")}
-                                  className="px-3 py-1.5 rounded-md bg-white text-xs font-semibold text-[#1C4332] hover:bg-white/80 transition-colors"
-                                >
-                                  Lend
-                                </Link>
-                                <Link
-                                  to={createPageUrl("Borrowing")}
-                                  className="px-3 py-1.5 rounded-md bg-white text-xs font-semibold text-[#1C4332] hover:bg-white/80 transition-colors"
-                                >
-                                  Borrow
-                                </Link>
-                              </div>
-                            </div>
-                          );
-                        });
-                      })()}
-                    </div>
-
-                    {/* View All Link */}
-                    <Link
-                      to={createPageUrl("Friends")}
-                      className="block mt-4 text-center text-sm font-semibold text-[#00A86B] hover:text-[#0D9B76] transition-colors"
-                    >
-                      View All Friends →
-                    </Link>
-                  </CardContent>
-                </Card>
-              </motion.div>
             </div>
 
           </div>
