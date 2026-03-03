@@ -413,7 +413,7 @@ export default function Home() {
           </div>
 
           {/* Main Content Below Hero */}
-          <div className="px-6 py-6 md:px-10 lg:px-14" style={{backgroundColor: '#1C4332'}}>
+          <div className="px-8 py-6 md:px-14 lg:px-20" style={{backgroundColor: '#1C4332'}}>
            <div className="max-w-6xl mx-auto space-y-5 md:space-y-7">
 
             {pendingOffers.length > 0 && (
@@ -426,21 +426,21 @@ export default function Home() {
               <div className="flex flex-col gap-2 items-center">
                 <Link
                   to={createPageUrl("Lending")}
-                  className="px-4 py-2.5 rounded-full text-sm font-semibold text-[#1C4332] text-center transition-colors duration-200 hover:opacity-90 whitespace-nowrap"
+                  className="px-8 py-2.5 rounded-full text-sm font-semibold text-[#1C4332] text-center transition-colors duration-200 hover:opacity-90 whitespace-nowrap"
                   style={{ backgroundColor: '#83F384' }}
                 >
                   Create Loan Offer
                 </Link>
                 <Link
                   to={createPageUrl("Requests")}
-                  className="px-4 py-2.5 rounded-full text-sm font-semibold text-[#1C4332] text-center transition-colors duration-200 hover:opacity-90 whitespace-nowrap"
+                  className="px-8 py-2.5 rounded-full text-sm font-semibold text-[#1C4332] text-center transition-colors duration-200 hover:opacity-90 whitespace-nowrap"
                   style={{ backgroundColor: '#83F384' }}
                 >
                   View Requests
                 </Link>
                 <Link
                   to={createPageUrl("LoanAgreements")}
-                  className="px-4 py-2.5 rounded-full text-sm font-semibold text-[#1C4332] text-center transition-colors duration-200 hover:opacity-90 whitespace-nowrap"
+                  className="px-8 py-2.5 rounded-full text-sm font-semibold text-[#1C4332] text-center transition-colors duration-200 hover:opacity-90 whitespace-nowrap"
                   style={{ backgroundColor: '#83F384' }}
                 >
                   View Documents
