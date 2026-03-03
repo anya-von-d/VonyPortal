@@ -305,7 +305,32 @@ export default function Home() {
                   })()}
                 </div>
 
-                {/* Right Side - White box with arrows + lending/borrowing overview */}
+                {/* Stacked Quick Action Buttons */}
+                <div className="hidden lg:flex flex-col gap-2 flex-shrink-0">
+                  <Link
+                    to={createPageUrl("Lending")}
+                    className="px-5 py-2.5 rounded-full text-sm font-semibold text-white transition-colors duration-200 hover:opacity-90 text-center"
+                    style={{ backgroundColor: '#1C4332' }}
+                  >
+                    Create Loan Offer
+                  </Link>
+                  <Link
+                    to={createPageUrl("Requests")}
+                    className="px-5 py-2.5 rounded-full text-sm font-semibold text-white transition-colors duration-200 hover:opacity-90 text-center"
+                    style={{ backgroundColor: '#1C4332' }}
+                  >
+                    View Requests
+                  </Link>
+                  <Link
+                    to={createPageUrl("LoanAgreements")}
+                    className="px-5 py-2.5 rounded-full text-sm font-semibold text-white transition-colors duration-200 hover:opacity-90 text-center"
+                    style={{ backgroundColor: '#1C4332' }}
+                  >
+                    View Documents
+                  </Link>
+                </div>
+
+                {/* Right Side - Overview box with arrows */}
                 <div className="rounded-xl p-5 md:p-7 flex-1 lg:max-w-md shadow-sm relative overflow-hidden" style={{backgroundColor: '#DBFFEB'}}>
                   {/* Left Arrow */}
                   <button
@@ -407,8 +432,8 @@ export default function Home() {
 
               </motion.div>
 
-              {/* Quick Action Buttons */}
-              <div className="flex flex-wrap gap-2 mt-5 justify-center lg:justify-end">
+              {/* Quick Action Buttons - Mobile Only */}
+              <div className="flex lg:hidden flex-wrap gap-2 mt-5 justify-center">
                 <Link
                   to={createPageUrl("Lending")}
                   className="px-4 py-2 rounded-full text-sm font-semibold text-white transition-colors duration-200 hover:opacity-90"
@@ -540,7 +565,7 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.25 }}
               >
-                <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#ffffff'}}>
+                <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#DBFFEB'}}>
                   <CardContent className="p-4 md:p-5">
                     <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight font-serif">
                       Requests
@@ -619,7 +644,7 @@ export default function Home() {
                 transition={{ duration: 0.4, delay: 0.3 }}
                 className="flex flex-col gap-1.5"
               >
-                <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#ffffff'}}>
+                <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#DBFFEB'}}>
                   <CardContent className="p-4 md:p-5 flex flex-col">
                     {/* Month Title with Arrows */}
                     <div className="flex items-center justify-center gap-3 mb-4">
