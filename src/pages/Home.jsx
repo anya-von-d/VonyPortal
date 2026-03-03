@@ -413,8 +413,8 @@ export default function Home() {
           </div>
 
           {/* Main Content Below Hero */}
-          <div className="px-10 py-6 md:px-20 lg:px-28" style={{backgroundColor: '#1C4332'}}>
-           <div className="max-w-6xl mx-auto space-y-5 md:space-y-7">
+          <div className="px-10 pt-10 pb-8 md:px-20 md:pt-14 md:pb-10 lg:px-28" style={{backgroundColor: '#1C4332'}}>
+           <div className="max-w-6xl mx-auto space-y-8 md:space-y-10">
 
             {pendingOffers.length > 0 && (
               <PendingLoanOffers offers={pendingOffers} />
@@ -601,15 +601,15 @@ export default function Home() {
                               <div className="flex gap-1.5 flex-shrink-0">
                                 <Link
                                   to={createPageUrl("Lending")}
-                                  className="px-3 py-1.5 rounded-md bg-white text-xs font-semibold text-[#1C4332] hover:bg-white/80 transition-colors"
+                                  className="px-3 py-1.5 rounded-md bg-white text-xs font-semibold text-[#1C4332] hover:bg-white/80 transition-colors whitespace-nowrap"
                                 >
-                                  Lend
+                                  Offer to Lend
                                 </Link>
                                 <Link
                                   to={createPageUrl("Borrowing")}
-                                  className="px-3 py-1.5 rounded-md bg-white text-xs font-semibold text-[#1C4332] hover:bg-white/80 transition-colors"
+                                  className="px-3 py-1.5 rounded-md bg-white text-xs font-semibold text-[#1C4332] hover:bg-white/80 transition-colors whitespace-nowrap"
                                 >
-                                  Borrow
+                                  Request to Borrow
                                 </Link>
                               </div>
                             </div>
