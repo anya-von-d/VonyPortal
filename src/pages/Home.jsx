@@ -295,16 +295,16 @@ export default function Home() {
                     const firstName = user.full_name?.split(' ')[0] || 'User';
                     return (
                       <div>
-                        <p className="text-3xl md:text-5xl font-bold text-[#052e16] tracking-tight leading-tight">{greeting}</p>
-                        <p className="text-3xl md:text-5xl font-bold text-[#052e16] tracking-tight leading-tight">{timeOfDay}</p>
-                        <p className="text-3xl md:text-5xl font-bold text-[#052e16] tracking-tight leading-tight">{firstName}</p>
+                        <p className="text-4xl md:text-6xl font-bold text-[#1C4332] tracking-tight leading-tight font-serif">{greeting}</p>
+                        <p className="text-4xl md:text-6xl font-bold text-[#1C4332] tracking-tight leading-tight font-serif">{timeOfDay}</p>
+                        <p className="text-4xl md:text-6xl font-bold text-[#1C4332] tracking-tight leading-tight font-serif">{firstName}</p>
                       </div>
                     );
                   })()}
                 </div>
 
                 {/* Right Side - White box with arrows + lending/borrowing overview */}
-                <div className="bg-white rounded-xl p-5 md:p-7 flex-1 lg:max-w-md shadow-sm relative overflow-hidden">
+                <div className="rounded-xl p-5 md:p-7 flex-1 lg:max-w-md shadow-sm relative overflow-hidden" style={{backgroundColor: '#DBFFEB'}}>
                   {/* Left Arrow */}
                   <button
                     onClick={() => setOverviewType(overviewType === 'lending' ? 'borrowing' : 'lending')}
