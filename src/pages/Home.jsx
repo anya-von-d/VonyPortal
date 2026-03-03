@@ -236,234 +236,154 @@ export default function Home() {
     
     const paymentStatus = getPaymentStatus();
 
+    // Compute lending/borrowing data for hero section
+    const lentLoans = myLoans.filter(l => l && l.lender_id === user.id && l.status === 'active');
+    const totalLentAmount = lentLoans.reduce((sum, loan) => sum + (loan.total_amount || loan.amount || 0), 0);
+    const totalRepaid = lentLoans.reduce((sum, loan) => sum + (loan.amount_paid || 0), 0);
+    const percentRepaid = totalLentAmount > 0 ? Math.round((totalRepaid / totalLentAmount) * 100) : 0;
+    const totalLentRemaining = totalLentAmount - totalRepaid;
+
+    const nextLenderPayment = myLoans
+      .filter(loan => loan && loan.lender_id === user.id && loan.status === 'active' && loan.next_payment_date)
+      .map(loan => {
+        const otherUser = safeAllProfiles.find(p => p.user_id === loan.borrower_id);
+        return { ...loan, date: new Date(loan.next_payment_date), username: otherUser?.username || 'user' };
+      })
+      .sort((a, b) => a.date - b.date)[0];
+
+    const borrowedLoans = myLoans.filter(l => l && l.borrower_id === user.id && l.status === 'active');
+    const totalBorrowedAmount = borrowedLoans.reduce((sum, loan) => sum + (loan.total_amount || loan.amount || 0), 0);
+    const totalPaidBack = borrowedLoans.reduce((sum, loan) => sum + (loan.amount_paid || 0), 0);
+    const percentPaid = totalBorrowedAmount > 0 ? Math.round((totalPaidBack / totalBorrowedAmount) * 100) : 0;
+    const totalBorrowedRemaining = totalBorrowedAmount - totalPaidBack;
+
+    const nextBorrowerPayment = myLoans
+      .filter(loan => loan && loan.borrower_id === user.id && loan.status === 'active' && loan.next_payment_date)
+      .map(loan => {
+        const otherUser = safeAllProfiles.find(p => p.user_id === loan.lender_id);
+        return { ...loan, date: new Date(loan.next_payment_date), username: otherUser?.username || 'user' };
+      })
+      .sort((a, b) => a.date - b.date)[0];
+
+    // Bar chart max value
+    const barChartMax = Math.max(totalLentAmount, totalBorrowedAmount, 1);
+
     return (
-        <div className="min-h-screen px-4 py-6 md:p-6" style={{backgroundColor: '#F4F7F5'}}>
+        <div className="min-h-screen" style={{backgroundColor: '#F4F7F5'}}>
+          {/* Hero Section */}
+          <div className="px-4 py-8 md:px-6 md:py-12" style={{backgroundColor: '#83F384'}}>
+            <div className="max-w-6xl mx-auto">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 md:gap-10"
+              >
+                {/* Left Side - Greeting on 3 lines */}
+                <div className="flex-shrink-0">
+                  {(() => {
+                    const hour = new Date().getHours();
+                    const greeting = hour < 12 ? "Good" : hour < 18 ? "Good" : "Good";
+                    const timeOfDay = hour < 12 ? "Morning," : hour < 18 ? "Afternoon," : "Evening,";
+                    const firstName = user.full_name?.split(' ')[0] || 'User';
+                    return (
+                      <div>
+                        <p className="text-3xl md:text-5xl font-bold text-[#052e16] tracking-tight leading-tight">{greeting}</p>
+                        <p className="text-3xl md:text-5xl font-bold text-[#052e16] tracking-tight leading-tight">{timeOfDay}</p>
+                        <p className="text-3xl md:text-5xl font-bold text-[#052e16] tracking-tight leading-tight">{firstName}</p>
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                {/* Right Side - White box with bar chart + payment info */}
+                <div className="bg-white rounded-xl p-5 md:p-7 flex-1 lg:max-w-md shadow-sm">
+                  <p className="text-lg font-bold text-slate-800 mb-5 tracking-tight font-serif">Overview</p>
+
+                  {/* Bar Chart */}
+                  <div className="space-y-3 mb-6">
+                    {/* Total Lent bar */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-xs font-medium text-slate-500">Total Lent</p>
+                        <p className="text-xs font-bold text-slate-700">{formatMoney(totalLentAmount)}</p>
+                      </div>
+                      <div className="w-full h-6 bg-[#E2F5EA] rounded-md overflow-hidden">
+                        <div
+                          className="h-full rounded-md transition-all duration-500 flex items-center justify-end pr-2"
+                          style={{
+                            width: `${Math.max((totalLentAmount / barChartMax) * 100, 2)}%`,
+                            backgroundColor: '#052e16'
+                          }}
+                        >
+                          {totalLentAmount > 0 && <span className="text-[10px] font-bold text-white">{formatMoney(totalRepaid)} repaid</span>}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Total Borrowed bar */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-xs font-medium text-slate-500">Total Borrowed</p>
+                        <p className="text-xs font-bold text-slate-700">{formatMoney(totalBorrowedAmount)}</p>
+                      </div>
+                      <div className="w-full h-6 bg-[#E2F5EA] rounded-md overflow-hidden">
+                        <div
+                          className="h-full rounded-md transition-all duration-500 flex items-center justify-end pr-2"
+                          style={{
+                            width: `${Math.max((totalBorrowedAmount / barChartMax) * 100, 2)}%`,
+                            backgroundColor: '#00A86B'
+                          }}
+                        >
+                          {totalBorrowedAmount > 0 && <span className="text-[10px] font-bold text-white">{formatMoney(totalPaidBack)} paid</span>}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Next Payment Info */}
+                  <div className="border-t border-slate-100 pt-4 grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs text-slate-400 mb-1">Next Payment Date</p>
+                      <p className="text-sm font-bold text-slate-800">
+                        {nextBorrowerPayment ? format(nextBorrowerPayment.date, 'EEE, MMM d') : nextLenderPayment ? format(nextLenderPayment.date, 'EEE, MMM d') : 'N/A'}
+                      </p>
+                      {(nextBorrowerPayment || nextLenderPayment) && (
+                        <p className="text-xs text-[#00A86B] mt-0.5">
+                          {(() => {
+                            const payment = nextBorrowerPayment || nextLenderPayment;
+                            const days = Math.ceil((payment.date - new Date()) / (1000 * 60 * 60 * 24));
+                            return days > 0 ? `${days} day${days !== 1 ? 's' : ''} away` : days === 0 ? 'Due today' : `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`;
+                          })()}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-400 mb-1">Next Payment Amount</p>
+                      <p className="text-sm font-bold text-slate-800">
+                        {nextBorrowerPayment ? formatMoney(nextBorrowerPayment.payment_amount || 0) : nextLenderPayment ? formatMoney(nextLenderPayment.payment_amount || 0) : 'N/A'}
+                      </p>
+                      {(nextBorrowerPayment || nextLenderPayment) && (
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          {nextBorrowerPayment ? `to @${nextBorrowerPayment.username}` : `from @${nextLenderPayment.username}`}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+
+          {/* Main Content Below Hero */}
+          <div className="px-4 py-6 md:px-6">
            <div className="max-w-6xl mx-auto space-y-5 md:space-y-7">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="py-3 md:py-5">
-              <h1 className="text-3xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-left">
-                {(() => {
-                  const hour = new Date().getHours();
-                  const greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
-                  return <>{greeting}, <span className="text-black">{user.full_name?.split(' ')[0] || 'User'}</span></>;
-                })()}
-              </h1>
-          </motion.div>
 
           <div className="space-y-5 md:space-y-7">
             {pendingOffers.length > 0 && (
               <PendingLoanOffers offers={pendingOffers} />
             )}
 
-            <div className="grid lg:grid-cols-[2fr_1fr] gap-4 md:gap-6 items-start">
-            {(() => {
-              // Compute data for both views
-              const lentLoans = myLoans.filter(l => l && l.lender_id === user.id && l.status === 'active');
-              const totalLentAmount = lentLoans.reduce((sum, loan) => sum + (loan.total_amount || loan.amount || 0), 0);
-              const totalRepaid = lentLoans.reduce((sum, loan) => sum + (loan.amount_paid || 0), 0);
-              const percentRepaid = totalLentAmount > 0 ? Math.round((totalRepaid / totalLentAmount) * 100) : 0;
-
-              const nextLenderPayment = myLoans
-                .filter(loan => loan && loan.lender_id === user.id && loan.status === 'active' && loan.next_payment_date)
-                .map(loan => {
-                  const otherUser = safeAllProfiles.find(p => p.user_id === loan.borrower_id);
-                  return { ...loan, date: new Date(loan.next_payment_date), username: otherUser?.username || 'user' };
-                })
-                .sort((a, b) => a.date - b.date)[0];
-
-              const borrowedLoans = myLoans.filter(l => l && l.borrower_id === user.id && l.status === 'active');
-              const totalBorrowedAmount = borrowedLoans.reduce((sum, loan) => sum + (loan.total_amount || loan.amount || 0), 0);
-              const totalPaidBack = borrowedLoans.reduce((sum, loan) => sum + (loan.amount_paid || 0), 0);
-              const percentPaid = totalBorrowedAmount > 0 ? Math.round((totalPaidBack / totalBorrowedAmount) * 100) : 0;
-
-              const nextBorrowerPayment = myLoans
-                .filter(loan => loan && loan.borrower_id === user.id && loan.status === 'active' && loan.next_payment_date)
-                .map(loan => {
-                  const otherUser = safeAllProfiles.find(p => p.user_id === loan.lender_id);
-                  return { ...loan, date: new Date(loan.next_payment_date), username: otherUser?.username || 'user' };
-                })
-                .sort((a, b) => a.date - b.date)[0];
-
-              return (
-                <div
-                  className="rounded-lg p-5 md:p-7 relative transition-all duration-300 overflow-hidden"
-                  style={{
-                    background: '#0a4a2e'
-                  }}
-                >
-                  {/* Left Arrow */}
-                  <button
-                    onClick={() => setOverviewType(overviewType === 'lending' ? 'borrowing' : 'lending')}
-                    className="absolute left-1 md:left-[-12px] top-1/2 -translate-y-1/2 z-10 w-7 h-7 md:w-9 md:h-9 rounded-full flex items-center justify-center transition-colors duration-200"
-                    style={{ backgroundColor: 'rgba(255,255,255,0.1)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#83F384" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
-                  </button>
-
-                  {/* Right Arrow */}
-                  <button
-                    onClick={() => setOverviewType(overviewType === 'lending' ? 'borrowing' : 'lending')}
-                    className="absolute right-1 md:right-[-12px] top-1/2 -translate-y-1/2 z-10 w-7 h-7 md:w-9 md:h-9 rounded-full flex items-center justify-center transition-colors duration-200"
-                    style={{ backgroundColor: 'rgba(255,255,255,0.1)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#83F384" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                  </button>
-
-                  <motion.div
-                    key={overviewType}
-                    initial={{ opacity: 0, x: overviewType === 'lending' ? -20 : 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                  >
-                    {overviewType === 'lending' ? (
-                      /* ===== LENDING OVERVIEW — Dark green card ===== */
-                      <>
-                        <p className="text-lg md:text-xl font-bold mb-4 md:mb-5 text-white tracking-tight font-sans">
-                          Lending Overview
-                        </p>
-                        <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
-                          {/* Donut Ring */}
-                          <div className="relative flex-shrink-0" style={{ width: 100, height: 100 }}>
-                            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 140 140">
-                              <circle cx="70" cy="70" r="58" fill="none" stroke="rgba(131,243,132,0.2)" strokeWidth="10" />
-                              <circle
-                                cx="70" cy="70" r="58"
-                                fill="none"
-                                stroke="#83F384"
-                                strokeWidth="10"
-                                strokeLinecap="round"
-                                strokeDasharray={2 * Math.PI * 58}
-                                strokeDashoffset={2 * Math.PI * 58 - (percentRepaid / 100) * 2 * Math.PI * 58}
-                                className="transition-all duration-500"
-                              />
-                            </svg>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                              <span className="text-xl md:text-2xl font-bold text-white">{percentRepaid}%</span>
-                            </div>
-                          </div>
-
-                          {/* Metrics Grid */}
-                          <div className="grid grid-cols-2 gap-3 md:gap-4 flex-1 w-full">
-                            <div>
-                              <p className="text-xs md:text-sm text-white/50 mb-1">Repayment</p>
-                              <p className="text-base md:text-lg font-bold">
-                                <span className="text-[#83F384]">{percentRepaid}%</span>
-                                <span className="text-white/70 text-xs md:text-sm font-medium ml-1">REPAID</span>
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-xs md:text-sm text-white/50 mb-1">Total Lent</p>
-                              <p className="text-base md:text-lg font-bold text-white">
-                                {formatMoney(totalRepaid)} <span className="text-white/40 text-xs md:text-sm font-normal">of {formatMoney(totalLentAmount)}</span>
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-xs md:text-sm text-white/50 mb-1">Next Payment</p>
-                              <p className="text-base md:text-lg font-bold text-white">
-                                {nextLenderPayment ? formatMoney(nextLenderPayment.payment_amount || 0) : 'N/A'}
-                              </p>
-                              {nextLenderPayment && (
-                                <p className="text-xs text-white/40 mt-0.5">from @{nextLenderPayment.username}</p>
-                              )}
-                            </div>
-                            <div>
-                              <p className="text-xs md:text-sm text-white/50 mb-1">Next Payment Date</p>
-                              <p className="text-base md:text-lg font-bold text-white">
-                                {nextLenderPayment ? `${format(nextLenderPayment.date, 'EEE')}, ${format(nextLenderPayment.date, 'MMM d')}` : 'N/A'}
-                              </p>
-                              {nextLenderPayment && (
-                                <p className="text-xs text-[#83F384] mt-0.5">
-                                  {(() => {
-                                    const days = Math.ceil((nextLenderPayment.date - new Date()) / (1000 * 60 * 60 * 24));
-                                    return days > 0 ? `${days} day${days !== 1 ? 's' : ''} away` : days === 0 ? 'Due today' : `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`;
-                                  })()}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      /* ===== BORROWING OVERVIEW — Dark green card (same style as lending) ===== */
-                      <>
-                        <p className="text-lg md:text-xl font-bold mb-4 md:mb-5 text-white tracking-tight font-sans">
-                          Borrowing Overview
-                        </p>
-                        <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
-                          {/* Donut Ring */}
-                          <div className="relative flex-shrink-0" style={{ width: 100, height: 100 }}>
-                            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 140 140">
-                              <circle cx="70" cy="70" r="58" fill="none" stroke="rgba(131,243,132,0.2)" strokeWidth="10" />
-                              <circle
-                                cx="70" cy="70" r="58"
-                                fill="none"
-                                stroke="#83F384"
-                                strokeWidth="10"
-                                strokeLinecap="round"
-                                strokeDasharray={2 * Math.PI * 58}
-                                strokeDashoffset={2 * Math.PI * 58 - (percentPaid / 100) * 2 * Math.PI * 58}
-                                className="transition-all duration-500"
-                              />
-                            </svg>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                              <span className="text-xl md:text-2xl font-bold text-white">{percentPaid}%</span>
-                            </div>
-                          </div>
-
-                          {/* Metrics Grid */}
-                          <div className="grid grid-cols-2 gap-3 md:gap-4 flex-1 w-full">
-                            <div>
-                              <p className="text-xs md:text-sm text-white/50 mb-1">Repayment</p>
-                              <p className="text-base md:text-lg font-bold">
-                                <span className="text-[#83F384]">{percentPaid}%</span>
-                                <span className="text-white/70 text-xs md:text-sm font-medium ml-1">PAID</span>
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-xs md:text-sm text-white/50 mb-1">Total Borrowed</p>
-                              <p className="text-base md:text-lg font-bold text-white">
-                                {formatMoney(totalPaidBack)} <span className="text-white/40 text-xs md:text-sm font-normal">of {formatMoney(totalBorrowedAmount)}</span>
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-xs md:text-sm text-white/50 mb-1">Next Payment</p>
-                              <p className="text-base md:text-lg font-bold text-white">
-                                {nextBorrowerPayment ? formatMoney(nextBorrowerPayment.payment_amount || 0) : 'N/A'}
-                              </p>
-                              {nextBorrowerPayment && (
-                                <p className="text-xs text-white/40 mt-0.5">to @{nextBorrowerPayment.username}</p>
-                              )}
-                            </div>
-                            <div>
-                              <p className="text-xs md:text-sm text-white/50 mb-1">Next Payment Date</p>
-                              <p className="text-base md:text-lg font-bold text-white">
-                                {nextBorrowerPayment ? `${format(nextBorrowerPayment.date, 'EEE')}, ${format(nextBorrowerPayment.date, 'MMM d')}` : 'N/A'}
-                              </p>
-                              {nextBorrowerPayment && (
-                                <p className="text-xs text-[#83F384] mt-0.5">
-                                  {(() => {
-                                    const days = Math.ceil((nextBorrowerPayment.date - new Date()) / (1000 * 60 * 60 * 24));
-                                    return days > 0 ? `${days} day${days !== 1 ? 's' : ''} away` : days === 0 ? 'Due today' : `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`;
-                                  })()}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </motion.div>
-                </div>
-              );
-            })()}
-
-            <div className="lg:col-span-1">
-              <QuickActions />
-            </div>
-            </div>
+            <QuickActions />
 
             {/* Activity, Calendar & Monthly Overview Row */}
             <div className="rounded-xl p-4 md:p-6" style={{backgroundColor: '#E2F5EA'}}>
@@ -859,10 +779,11 @@ export default function Home() {
             </div>
           </div>
 
-            </div>
-            </div>
-            );
-            }
+          </div>
+          </div>
+          </div>
+    );
+    }
 
   return (
     <div className="min-h-screen p-6" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
