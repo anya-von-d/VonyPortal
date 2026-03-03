@@ -407,206 +407,24 @@ export default function Home() {
           </div>
 
           {/* Main Content Below Hero */}
-          <div className="px-4 py-6 md:px-6">
+          <div className="px-4 py-6 md:px-6" style={{backgroundColor: '#1C4332'}}>
            <div className="max-w-6xl mx-auto space-y-5 md:space-y-7">
 
             {pendingOffers.length > 0 && (
               <PendingLoanOffers offers={pendingOffers} />
             )}
 
-            {/* Activity & Monthly Overview Row */}
-            <div className="grid lg:grid-cols-[2fr_1fr] gap-4 md:gap-6 items-start">
+            {/* Quick Actions & Activity Row */}
+            <div className="grid lg:grid-cols-[1fr_2fr] gap-4 md:gap-6 items-start">
+              {/* Quick Actions */}
+              <div>
+                <QuickActions />
+              </div>
+
               {/* Activity */}
               <div>
                 <RecentActivity loans={myLoans} payments={payments} user={user} allUsers={safeAllProfiles} />
               </div>
-
-              {/* Monthly Overview */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.3 }}
-                className="flex flex-col gap-1.5"
-              >
-                <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#ffffff'}}>
-                  <CardContent className="p-4 md:p-5 flex flex-col">
-                    <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight font-serif">
-                      {format(calendarMonth, 'MMMM')} Overview
-                    </p>
-
-                    <div className="space-y-1.5 overflow-y-auto max-h-[320px] pr-1">
-                      {(() => {
-                        const monthStart = startOfMonth(calendarMonth);
-                        const monthEnd = endOfMonth(calendarMonth);
-                        const events = [];
-                        const activeLoans = myLoans.filter(l => l && l.status === 'active');
-
-                        activeLoans.forEach(loan => {
-                          if (!loan.next_payment_date) return;
-
-                          const paymentDate = new Date(loan.next_payment_date);
-                          const isLender = loan.lender_id === user.id;
-                          const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
-                          const otherUser = safeAllProfiles.find(p => p.user_id === otherUserId);
-
-                          const addEventIfInMonth = (date) => {
-                            if (isSameMonth(date, calendarMonth)) {
-                              events.push({
-                                date: new Date(date),
-                                type: isLender ? 'receive' : 'send',
-                                amount: loan.payment_amount || 0,
-                                username: otherUser?.username || 'user'
-                              });
-                            }
-                          };
-
-                          addEventIfInMonth(paymentDate);
-
-                          const frequency = loan.payment_frequency;
-                          if (frequency && frequency !== 'none') {
-                            let currentDate = new Date(loan.next_payment_date);
-                            const maxIterations = 10;
-                            let iterations = 0;
-
-                            while (iterations < maxIterations) {
-                              if (frequency === 'weekly') {
-                                currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
-                              } else if (frequency === 'biweekly') {
-                                currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
-                              } else if (frequency === 'monthly') {
-                                currentDate = addMonths(currentDate, 1);
-                              } else if (frequency === 'daily') {
-                                currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
-                              } else {
-                                break;
-                              }
-
-                              if (currentDate > monthEnd) break;
-                              addEventIfInMonth(currentDate);
-                              iterations++;
-                            }
-                          }
-                        });
-
-                        events.sort((a, b) => a.date - b.date);
-
-                        if (events.length === 0) {
-                          return (
-                            <div className="flex flex-col items-center justify-center py-8 text-slate-500">
-                              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40 mb-2">
-                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                <line x1="16" y1="2" x2="16" y2="6"></line>
-                                <line x1="8" y1="2" x2="8" y2="6"></line>
-                                <line x1="3" y1="10" x2="21" y2="10"></line>
-                              </svg>
-                              <p className="text-sm">No payments scheduled this month</p>
-                            </div>
-                          );
-                        }
-
-                        return events.map((event, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center gap-2.5 p-2 md:p-2.5 rounded-md"
-                            style={{ backgroundColor: '#83F384' }}
-                          >
-                            <div className="bg-white/50 rounded-md px-2.5 py-1.5 flex-shrink-0 text-center min-w-[44px]">
-                              <p className="text-xs text-slate-500 uppercase" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                                {format(event.date, 'MMM')}
-                              </p>
-                              <p className="text-lg font-bold text-slate-800">
-                                {format(event.date, 'd')}
-                              </p>
-                            </div>
-
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-slate-800">
-                                <span className={event.type === 'send' ? 'text-red-600' : 'text-[#00A86B]'}>
-                                  {event.type === 'send' ? 'Send' : 'Receive'}
-                                </span>
-                                {' '}
-                                <span className="font-bold">${event.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                {' '}
-                                <span className="text-slate-600">{event.type === 'send' ? 'to' : 'from'}</span>
-                                {' '}
-                                <span className="font-medium">@{event.username}</span>
-                              </p>
-                            </div>
-
-                            <div className="flex-shrink-0">
-                              {event.type === 'send' ? (
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                                  <polyline points="19 12 12 19 5 12"></polyline>
-                                </svg>
-                              ) : (
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00A86B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <line x1="12" y1="19" x2="12" y2="5"></line>
-                                  <polyline points="5 12 12 5 19 12"></polyline>
-                                </svg>
-                              )}
-                            </div>
-                          </div>
-                        ));
-                      })()}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Month Balance Box */}
-                {(() => {
-                  const monthEnd = endOfMonth(calendarMonth);
-                  const activeLoansForBalance = myLoans.filter(l => l && l.status === 'active');
-                  let totalReceive = 0;
-                  let totalSend = 0;
-
-                  activeLoansForBalance.forEach(loan => {
-                    if (!loan.next_payment_date) return;
-                    const paymentDate = new Date(loan.next_payment_date);
-                    const isLender = loan.lender_id === user.id;
-                    const paymentAmount = loan.payment_amount || 0;
-
-                    const addAmountIfInMonth = (date) => {
-                      if (isSameMonth(date, calendarMonth)) {
-                        if (isLender) totalReceive += paymentAmount;
-                        else totalSend += paymentAmount;
-                      }
-                    };
-
-                    addAmountIfInMonth(paymentDate);
-
-                    const frequency = loan.payment_frequency;
-                    if (frequency && frequency !== 'none') {
-                      let currentDate = new Date(loan.next_payment_date);
-                      let iterations = 0;
-                      while (iterations < 10) {
-                        if (frequency === 'weekly') currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
-                        else if (frequency === 'biweekly') currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
-                        else if (frequency === 'monthly') currentDate = addMonths(currentDate, 1);
-                        else if (frequency === 'daily') currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
-                        else break;
-                        if (currentDate > monthEnd) break;
-                        addAmountIfInMonth(currentDate);
-                        iterations++;
-                      }
-                    }
-                  });
-
-                  const netBalance = totalReceive - totalSend;
-                  const isPositive = netBalance >= 0;
-
-                  return (
-                    <div className="bg-[#83F384] rounded-md p-2.5 flex items-center justify-between">
-                      <p className="text-sm font-semibold text-[#0A1A10]">
-                        {format(calendarMonth, 'MMMM')} Balance
-                      </p>
-                      <p className="text-sm font-bold text-[#0A1A10]">
-                        {isPositive ? '+' : '-'}${Math.abs(netBalance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </p>
-                    </div>
-                  );
-                })()}
-              </motion.div>
             </div>
 
             {/* Record Payment Box */}
@@ -686,8 +504,192 @@ export default function Home() {
               </div>
             )}
 
-            {/* Quick Actions at bottom */}
-            <QuickActions />
+            {/* Monthly Overview at bottom */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+              className="flex flex-col gap-1.5"
+            >
+              <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#ffffff'}}>
+                <CardContent className="p-4 md:p-5 flex flex-col">
+                  <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight font-serif">
+                    {format(calendarMonth, 'MMMM')} Overview
+                  </p>
+
+                  <div className="space-y-1.5 overflow-y-auto max-h-[320px] pr-1">
+                    {(() => {
+                      const monthStart = startOfMonth(calendarMonth);
+                      const monthEnd = endOfMonth(calendarMonth);
+                      const events = [];
+                      const activeLoans = myLoans.filter(l => l && l.status === 'active');
+
+                      activeLoans.forEach(loan => {
+                        if (!loan.next_payment_date) return;
+
+                        const paymentDate = new Date(loan.next_payment_date);
+                        const isLender = loan.lender_id === user.id;
+                        const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
+                        const otherUser = safeAllProfiles.find(p => p.user_id === otherUserId);
+
+                        const addEventIfInMonth = (date) => {
+                          if (isSameMonth(date, calendarMonth)) {
+                            events.push({
+                              date: new Date(date),
+                              type: isLender ? 'receive' : 'send',
+                              amount: loan.payment_amount || 0,
+                              username: otherUser?.username || 'user'
+                            });
+                          }
+                        };
+
+                        addEventIfInMonth(paymentDate);
+
+                        const frequency = loan.payment_frequency;
+                        if (frequency && frequency !== 'none') {
+                          let currentDate = new Date(loan.next_payment_date);
+                          const maxIterations = 10;
+                          let iterations = 0;
+
+                          while (iterations < maxIterations) {
+                            if (frequency === 'weekly') {
+                              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
+                            } else if (frequency === 'biweekly') {
+                              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
+                            } else if (frequency === 'monthly') {
+                              currentDate = addMonths(currentDate, 1);
+                            } else if (frequency === 'daily') {
+                              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+                            } else {
+                              break;
+                            }
+
+                            if (currentDate > monthEnd) break;
+                            addEventIfInMonth(currentDate);
+                            iterations++;
+                          }
+                        }
+                      });
+
+                      events.sort((a, b) => a.date - b.date);
+
+                      if (events.length === 0) {
+                        return (
+                          <div className="flex flex-col items-center justify-center py-8 text-slate-500">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40 mb-2">
+                              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                              <line x1="16" y1="2" x2="16" y2="6"></line>
+                              <line x1="8" y1="2" x2="8" y2="6"></line>
+                              <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            <p className="text-sm">No payments scheduled this month</p>
+                          </div>
+                        );
+                      }
+
+                      return events.map((event, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center gap-2.5 p-2 md:p-2.5 rounded-md"
+                          style={{ backgroundColor: '#83F384' }}
+                        >
+                          <div className="bg-white/50 rounded-md px-2.5 py-1.5 flex-shrink-0 text-center min-w-[44px]">
+                            <p className="text-xs text-slate-500 uppercase" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                              {format(event.date, 'MMM')}
+                            </p>
+                            <p className="text-lg font-bold text-slate-800">
+                              {format(event.date, 'd')}
+                            </p>
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-slate-800">
+                              <span className={event.type === 'send' ? 'text-red-600' : 'text-[#00A86B]'}>
+                                {event.type === 'send' ? 'Send' : 'Receive'}
+                              </span>
+                              {' '}
+                              <span className="font-bold">${event.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                              {' '}
+                              <span className="text-slate-600">{event.type === 'send' ? 'to' : 'from'}</span>
+                              {' '}
+                              <span className="font-medium">@{event.username}</span>
+                            </p>
+                          </div>
+
+                          <div className="flex-shrink-0">
+                            {event.type === 'send' ? (
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <polyline points="19 12 12 19 5 12"></polyline>
+                              </svg>
+                            ) : (
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00A86B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="12" y1="19" x2="12" y2="5"></line>
+                                <polyline points="5 12 12 5 19 12"></polyline>
+                              </svg>
+                            )}
+                          </div>
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Month Balance Box */}
+              {(() => {
+                const monthEnd = endOfMonth(calendarMonth);
+                const activeLoansForBalance = myLoans.filter(l => l && l.status === 'active');
+                let totalReceive = 0;
+                let totalSend = 0;
+
+                activeLoansForBalance.forEach(loan => {
+                  if (!loan.next_payment_date) return;
+                  const paymentDate = new Date(loan.next_payment_date);
+                  const isLender = loan.lender_id === user.id;
+                  const paymentAmount = loan.payment_amount || 0;
+
+                  const addAmountIfInMonth = (date) => {
+                    if (isSameMonth(date, calendarMonth)) {
+                      if (isLender) totalReceive += paymentAmount;
+                      else totalSend += paymentAmount;
+                    }
+                  };
+
+                  addAmountIfInMonth(paymentDate);
+
+                  const frequency = loan.payment_frequency;
+                  if (frequency && frequency !== 'none') {
+                    let currentDate = new Date(loan.next_payment_date);
+                    let iterations = 0;
+                    while (iterations < 10) {
+                      if (frequency === 'weekly') currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
+                      else if (frequency === 'biweekly') currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
+                      else if (frequency === 'monthly') currentDate = addMonths(currentDate, 1);
+                      else if (frequency === 'daily') currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+                      else break;
+                      if (currentDate > monthEnd) break;
+                      addAmountIfInMonth(currentDate);
+                      iterations++;
+                    }
+                  }
+                });
+
+                const netBalance = totalReceive - totalSend;
+                const isPositive = netBalance >= 0;
+
+                return (
+                  <div className="bg-[#83F384] rounded-md p-2.5 flex items-center justify-between">
+                    <p className="text-sm font-semibold text-[#0A1A10]">
+                      {format(calendarMonth, 'MMMM')} Balance
+                    </p>
+                    <p className="text-sm font-bold text-[#0A1A10]">
+                      {isPositive ? '+' : '-'}${Math.abs(netBalance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                );
+              })()}
+            </motion.div>
 
           </div>
           </div>
