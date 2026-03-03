@@ -341,34 +341,10 @@ export default function Home() {
                       <div>
                         <div className="flex items-center justify-between mb-1">
                           <p className="text-xs font-medium text-slate-500">
-                            {overviewType === 'lending' ? 'Total Lent' : 'Total Borrowed'}
-                          </p>
-                          <p className="text-xs font-bold text-slate-700">
-                            {formatMoney(overviewType === 'lending' ? totalLentAmount : totalBorrowedAmount)}
-                          </p>
-                        </div>
-                        <div className="w-full h-6 bg-[#E2F5EA] rounded-md overflow-hidden">
-                          <div
-                            className="h-full rounded-md transition-all duration-500 flex items-center justify-end pr-2"
-                            style={{
-                              width: `${Math.max(((overviewType === 'lending' ? totalLentAmount : totalBorrowedAmount) / Math.max(overviewType === 'lending' ? totalLentAmount : totalBorrowedAmount, 1)) * 100, 2)}%`,
-                              backgroundColor: '#052e16'
-                            }}
-                          >
-                            <span className="text-[10px] font-bold text-white">
-                              {formatMoney(overviewType === 'lending' ? totalLentAmount : totalBorrowedAmount)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <p className="text-xs font-medium text-slate-500">
                             {overviewType === 'lending' ? 'Repaid' : 'Paid Back'}
                           </p>
                           <p className="text-xs font-bold text-[#00A86B]">
-                            {formatMoney(overviewType === 'lending' ? totalRepaid : totalPaidBack)}
+                            {formatMoney(overviewType === 'lending' ? totalRepaid : totalPaidBack)} / {formatMoney(overviewType === 'lending' ? totalLentAmount : totalBorrowedAmount)}
                           </p>
                         </div>
                         <div className="w-full h-6 bg-[#E2F5EA] rounded-md overflow-hidden">
