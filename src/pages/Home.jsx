@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import { Loan, Payment, PublicProfile } from "@/entities/all";
 import { useAuth } from "@/lib/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
@@ -429,7 +431,7 @@ export default function Home() {
 
             {/* Record Payment Box */}
             {myLoans.filter(l => l && l.status === 'active').length > 0 && (
-              <div className="bg-[#96FFD0] rounded-2xl p-5 border-0">
+              <div className="rounded-2xl p-5 border-0" style={{backgroundColor: '#83F384'}}>
                 <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                   Record Payment
                 </p>
@@ -504,18 +506,117 @@ export default function Home() {
               </div>
             )}
 
-            {/* Monthly Overview at bottom */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.3 }}
-              className="flex flex-col gap-1.5"
-            >
-              <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#ffffff'}}>
-                <CardContent className="p-4 md:p-5 flex flex-col">
-                  <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight font-serif">
-                    {format(calendarMonth, 'MMMM')} Overview
-                  </p>
+            {/* Requests & Monthly Overview Row */}
+            <div className="grid lg:grid-cols-[1fr_2fr] gap-4 md:gap-6 items-start">
+              {/* Requests */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.25 }}
+              >
+                <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#ffffff'}}>
+                  <CardContent className="p-4 md:p-5">
+                    <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight font-serif">
+                      Requests
+                    </p>
+
+                    <div className="space-y-2">
+                      {/* Pending Loan Offers */}
+                      {pendingOffers.length > 0 && (
+                        <div className="flex items-center gap-2.5 p-2.5 rounded-md" style={{ backgroundColor: '#83F384' }}>
+                          <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center flex-shrink-0">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A1A10" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-[#0A1A10]">{pendingOffers.length} Loan Offer{pendingOffers.length !== 1 ? 's' : ''}</p>
+                            <p className="text-xs text-[#0A1A10]/60">Awaiting your review</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Payments to Confirm */}
+                      {(() => {
+                        const paymentsToConfirm = payments.filter(p =>
+                          p && p.status === 'pending' && p.confirmed_by_lender === false &&
+                          myLoans.some(l => l.id === p.loan_id && l.lender_id === user.id)
+                        );
+                        if (paymentsToConfirm.length === 0) return null;
+                        return (
+                          <div className="flex items-center gap-2.5 p-2.5 rounded-md" style={{ backgroundColor: '#83F384' }}>
+                            <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center flex-shrink-0">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A1A10" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+                                <path d="M9 12l2 2 4-4"></path>
+                              </svg>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-[#0A1A10]">{paymentsToConfirm.length} Payment{paymentsToConfirm.length !== 1 ? 's' : ''} to Confirm</p>
+                              <p className="text-xs text-[#0A1A10]/60">Needs your confirmation</p>
+                            </div>
+                          </div>
+                        );
+                      })()}
+
+                      {/* No Requests */}
+                      {pendingOffers.length === 0 && payments.filter(p =>
+                        p && p.status === 'pending' && p.confirmed_by_lender === false &&
+                        myLoans.some(l => l.id === p.loan_id && l.lender_id === user.id)
+                      ).length === 0 && (
+                        <div className="flex flex-col items-center justify-center py-6 text-slate-400">
+                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40 mb-2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                          </svg>
+                          <p className="text-sm">No pending requests</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* View All Link */}
+                    <Link
+                      to={createPageUrl("Requests")}
+                      className="block mt-4 text-center text-sm font-semibold text-[#00A86B] hover:text-[#0D9B76] transition-colors"
+                    >
+                      View All Requests →
+                    </Link>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* Monthly Overview */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.3 }}
+                className="flex flex-col gap-1.5"
+              >
+                <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#ffffff'}}>
+                  <CardContent className="p-4 md:p-5 flex flex-col">
+                    {/* Month Title with Arrows */}
+                    <div className="flex items-center justify-center gap-3 mb-4">
+                      <button
+                        onClick={() => setCalendarMonth(subMonths(calendarMonth, 1))}
+                        className="w-7 h-7 rounded-full flex items-center justify-center transition-colors duration-200 bg-[#E2F5EA] hover:bg-[#c8e6d0]"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#052e16" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                      </button>
+                      <p className="text-xl font-bold text-slate-800 tracking-tight font-serif">
+                        {format(calendarMonth, 'MMMM')} Overview
+                      </p>
+                      <button
+                        onClick={() => setCalendarMonth(addMonths(calendarMonth, 1))}
+                        className="w-7 h-7 rounded-full flex items-center justify-center transition-colors duration-200 bg-[#E2F5EA] hover:bg-[#c8e6d0]"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#052e16" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      </button>
+                    </div>
 
                   <div className="space-y-1.5 overflow-y-auto max-h-[320px] pr-1">
                     {(() => {
@@ -690,6 +791,7 @@ export default function Home() {
                 );
               })()}
             </motion.div>
+            </div>
 
           </div>
           </div>
