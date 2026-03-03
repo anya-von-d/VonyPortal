@@ -421,9 +421,9 @@ export default function Home() {
             )}
 
             {/* Quick Actions & Activity Row */}
-            <div className="grid lg:grid-cols-[auto_1fr] gap-4 md:gap-6 items-center">
+            <div className="grid lg:grid-cols-[1fr_2fr] gap-4 md:gap-6 items-center">
               {/* Stacked Quick Action Buttons */}
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 items-center">
                 <Link
                   to={createPageUrl("Lending")}
                   className="px-4 py-2.5 rounded-full text-sm font-semibold text-[#1C4332] text-center transition-colors duration-200 hover:opacity-90 whitespace-nowrap"
