@@ -1178,91 +1178,66 @@ export default function Borrowing() {
                           </div>
                         </div>
 
-                        {/* Progress Pie Chart + Next Payment + Payment Amount */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          {/* Pie Chart - Left */}
-                          <div className="bg-[#C2FFDC] rounded-2xl p-5">
-                            <p className="text-base font-bold text-slate-800 mb-4 tracking-tight font-serif">
+                        {/* Payment Overview - mirrors Borrowing Overview style */}
+                        <div className="rounded-2xl p-4 sm:p-5 border-0 flex" style={{backgroundColor: '#83F384'}}>
+                          {/* Left side: Title + Pie Chart */}
+                          <div className="flex flex-col">
+                            <p className="text-lg font-bold text-slate-800 mb-4 tracking-tight font-serif whitespace-nowrap">
                               Payment Progress
                             </p>
-                            <div className="flex flex-col items-center">
+                            <div className="flex-shrink-0 ml-8">
                               {(() => {
                                 const totalOwed = manageLoanSelected.total_amount || manageLoanSelected.amount || 0;
                                 const amountPaid = manageLoanSelected.amount_paid || 0;
-                                const remaining = totalOwed - amountPaid;
                                 const percentPaid = totalOwed > 0 ? Math.round((amountPaid / totalOwed) * 100) : 0;
-                                const circumference = 2 * Math.PI * 45;
-                                const strokeDashoffset = circumference - (percentPaid / 100) * circumference;
-
                                 return (
-                                  <>
-                                    <div className="relative w-32 h-32">
-                                      <svg className="w-full h-full transform -rotate-90">
-                                        <circle cx="64" cy="64" r="45" fill="none" stroke="#e2e8f0" strokeWidth="12" />
-                                        <circle
-                                          cx="64"
-                                          cy="64"
-                                          r="45"
-                                          fill="none"
-                                          stroke="#00A86B"
-                                          strokeWidth="12"
-                                          strokeLinecap="round"
-                                          strokeDasharray={circumference}
-                                          strokeDashoffset={strokeDashoffset}
-                                          className="transition-all duration-500"
-                                        />
-                                      </svg>
-                                      <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                        <span className="text-2xl font-bold text-slate-800">{percentPaid}%</span>
-                                        <span className="text-xs text-slate-500">Paid</span>
-                                      </div>
+                                  <div className="relative w-28 h-28">
+                                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                                      <circle cx="60" cy="60" r="52" fill="none" stroke="#DBFFEB" strokeWidth="8" />
+                                      <circle
+                                        cx="60"
+                                        cy="60"
+                                        r="52"
+                                        fill="none"
+                                        stroke="#1C4332"
+                                        strokeWidth="8"
+                                        strokeLinecap="round"
+                                        strokeDasharray={2 * Math.PI * 52}
+                                        strokeDashoffset={2 * Math.PI * 52 - (percentPaid / 100) * 2 * Math.PI * 52}
+                                        className="transition-all duration-500"
+                                      />
+                                    </svg>
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                      <span className="text-xl font-bold text-gray-700">{percentPaid}%</span>
+                                      <span className="text-[9px] text-gray-500 uppercase tracking-wider">Paid</span>
                                     </div>
-                                    <div className="mt-3 text-center">
-                                      <p className="text-xs text-slate-600">
-                                        <span className="text-slate-800 font-semibold">${remaining.toLocaleString()}</span> remaining{manageLoanSelected.next_payment_date ? ` due ${format(new Date(manageLoanSelected.next_payment_date), 'MMM d')}` : ''}
-                                      </p>
-                                    </div>
-                                  </>
+                                  </div>
                                 );
                               })()}
                             </div>
                           </div>
 
-                          {/* Next Payment Date - Middle */}
-                          <div className="bg-[#C2FFDC] rounded-2xl p-5 flex flex-col">
-                            <p className="text-base font-bold text-slate-800 mb-2 tracking-tight font-serif">
-                              Next Payment Date
-                            </p>
-                            <div className="flex-1 flex flex-col items-center justify-center">
-                              <p className="text-2xl font-bold text-slate-800">
+                          {/* Stats - Right, vertically centered across full box height */}
+                          <div className="flex flex-col justify-center gap-4 ml-auto pr-0 text-left">
+                            <div>
+                              <p className="text-sm text-gray-600 mb-1">Next Payment Date</p>
+                              <p className="text-lg font-bold text-gray-700">
                                 {manageLoanSelected.next_payment_date
                                   ? format(new Date(manageLoanSelected.next_payment_date), 'MMM d, yyyy')
                                   : 'N/A'}
+                                {manageLoanSelected.next_payment_date && (
+                                  <span className="text-sm font-medium text-gray-600"> · {(() => {
+                                    const days = Math.ceil((new Date(manageLoanSelected.next_payment_date) - new Date()) / (1000 * 60 * 60 * 24));
+                                    return days > 0 ? `${days} day${days !== 1 ? 's' : ''} away` : days === 0 ? 'Due today' : `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`;
+                                  })()}</span>
+                                )}
                               </p>
-                              {manageLoanSelected.next_payment_date && (
-                                <div className="mt-2 px-3 py-1 bg-[#C2FFDC] rounded-full">
-                                  <p className="text-sm font-semibold text-[#00A86B]">
-                                    {(() => {
-                                      const days = Math.ceil((new Date(manageLoanSelected.next_payment_date) - new Date()) / (1000 * 60 * 60 * 24));
-                                      return days > 0 ? `${days} day${days !== 1 ? 's' : ''} away` : days === 0 ? 'Due today' : `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`;
-                                    })()}
-                                  </p>
-                                </div>
-                              )}
                             </div>
-                          </div>
-
-                          {/* Payment Amount - Right */}
-                          <div className="bg-[#C2FFDC] rounded-2xl p-5 flex flex-col">
-                            <p className="text-base font-bold text-slate-800 mb-2 tracking-tight font-serif">
-                              Payment Amount
-                            </p>
-                            <div className="flex-1 flex flex-col items-center justify-center">
-                              <p className="text-3xl font-bold text-slate-800">
+                            <div>
+                              <p className="text-sm text-gray-600 mb-1">Payment Amount</p>
+                              <p className="text-lg font-bold text-gray-700">
                                 ${(manageLoanSelected.payment_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                              </p>
-                              <p className="text-sm text-slate-600 mt-1 capitalize">
-                                {manageLoanSelected.payment_frequency || 'One-time'} payment
+                                <span className="text-sm font-medium text-gray-600 capitalize"> · {manageLoanSelected.payment_frequency || 'One-time'}</span>
                               </p>
                             </div>
                           </div>
