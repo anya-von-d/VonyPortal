@@ -1,4 +1,6 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 
 export default function Footer() {
   return (
@@ -37,12 +39,18 @@ export default function Footer() {
               Coming Soon
             </p>
             <div className="flex flex-col gap-2.5">
-              <p className="text-sm text-[#DBFFEB]/50 font-sans">
+              <Link
+                to={createPageUrl("Shop")}
+                className="text-sm text-[#DBFFEB]/80 hover:text-[#DBFFEB] transition-colors font-sans"
+              >
                 Financial Products
-              </p>
-              <p className="text-sm text-[#DBFFEB]/50 font-sans">
+              </Link>
+              <Link
+                to={createPageUrl("Learn")}
+                className="text-sm text-[#DBFFEB]/80 hover:text-[#DBFFEB] transition-colors font-sans"
+              >
                 Learn
-              </p>
+              </Link>
             </div>
           </div>
         </div>
