@@ -456,6 +456,98 @@ export default function Home() {
                   </div>
                 </div>
 
+                {/* Your Friends */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.25 }}
+                  className="w-full"
+                >
+                  <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
+                    <p className="text-sm font-bold text-[#213B75] mb-2 tracking-tight font-sans">
+                      Your Friends
+                    </p>
+
+                    <div className="space-y-2 overflow-y-auto max-h-[320px] pr-1">
+                      {(() => {
+                        const acceptedFriends = friendships.filter(f =>
+                          f.status === 'accepted' && (f.user_id === user.id || f.friend_id === user.id)
+                        );
+
+                        if (acceptedFriends.length === 0) {
+                          return (
+                            <div className="flex flex-col items-center justify-center py-6 text-[#4C7FC4]">
+                              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40 mb-2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <line x1="19" y1="8" x2="19" y2="14"></line>
+                                <line x1="22" y1="11" x2="16" y2="11"></line>
+                              </svg>
+                              <p className="text-sm">No friends yet</p>
+                            </div>
+                          );
+                        }
+
+                        return acceptedFriends.map((friendship) => {
+                          const friendUserId = friendship.user_id === user.id ? friendship.friend_id : friendship.user_id;
+                          const friendProfile = safeAllProfiles.find(p => p.user_id === friendUserId);
+                          const friendActiveLoans = myLoans.filter(l =>
+                            l.status === 'active' && (
+                              (l.lender_id === user.id && l.borrower_id === friendUserId) ||
+                              (l.borrower_id === user.id && l.lender_id === friendUserId)
+                            )
+                          );
+
+                          const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent((friendProfile?.full_name || 'U').charAt(0))}&background=22c55e&color=fff&size=128`;
+
+                          return (
+                            <div key={friendship.id} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-2.5 rounded-lg bg-[#CDE7F8]">
+                              <div className="flex items-center gap-3 flex-1 min-w-0">
+                                <img
+                                  src={friendProfile?.profile_picture_url || defaultAvatar}
+                                  alt={friendProfile?.full_name || 'Friend'}
+                                  className="w-9 h-9 rounded-full object-cover flex-shrink-0 bg-white"
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-semibold text-[#213B75] truncate">
+                                    {friendProfile?.full_name || friendProfile?.username || 'Friend'}
+                                  </p>
+                                  <div className="bg-white rounded-md px-2 py-0.5 inline-block mt-0.5">
+                                    <p className="text-xs font-medium text-[#4C7FC4]">
+                                      {friendActiveLoans.length} active loan{friendActiveLoans.length !== 1 ? 's' : ''}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex gap-1.5 flex-shrink-0 pl-12 sm:pl-0">
+                                <Link
+                                  to={createPageUrl("Lending")}
+                                  className="px-3 py-1.5 rounded-md bg-white text-xs font-semibold text-[#213B75] hover:bg-white/80 transition-colors whitespace-nowrap"
+                                >
+                                  Offer to Lend
+                                </Link>
+                                <Link
+                                  to={createPageUrl("Borrowing")}
+                                  className="px-3 py-1.5 rounded-md bg-white text-xs font-semibold text-[#213B75] hover:bg-white/80 transition-colors whitespace-nowrap"
+                                >
+                                  Request to Borrow
+                                </Link>
+                              </div>
+                            </div>
+                          );
+                        });
+                      })()}
+                    </div>
+
+                    <Link
+                      to={createPageUrl("Friends")}
+                      className="block mt-3 text-center text-sm font-semibold text-[#4C7FC4] hover:text-[#213B75] transition-colors"
+                    >
+                      View All Friends →
+                    </Link>
+                  </div>
+                </motion.div>
+
               </motion.div>
 
             </div>
@@ -547,108 +639,7 @@ export default function Home() {
               </div>
             )}
 
-            {/* Your Friends & Monthly Overview Row */}
-            <div className="grid lg:grid-cols-[2fr_1fr] gap-4 md:gap-6 items-start">
-              {/* Your Friends */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.25 }}
-              >
-                <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#C2FFDC'}}>
-                  <CardContent className="p-4 md:p-5">
-                    <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight font-sans">
-                      Your Friends
-                    </p>
-
-                    <div className="space-y-3 overflow-y-auto max-h-[320px] pr-1">
-                      {(() => {
-                        const acceptedFriends = friendships.filter(f =>
-                          f.status === 'accepted' && (f.user_id === user.id || f.friend_id === user.id)
-                        );
-
-                        if (acceptedFriends.length === 0) {
-                          return (
-                            <div className="flex flex-col items-center justify-center py-6 text-slate-400">
-                              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40 mb-2">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="9" cy="7" r="4"></circle>
-                                <line x1="19" y1="8" x2="19" y2="14"></line>
-                                <line x1="22" y1="11" x2="16" y2="11"></line>
-                              </svg>
-                              <p className="text-sm">No friends yet</p>
-                            </div>
-                          );
-                        }
-
-                        return acceptedFriends.map((friendship) => {
-                          const friendUserId = friendship.user_id === user.id ? friendship.friend_id : friendship.user_id;
-                          const friendProfile = safeAllProfiles.find(p => p.user_id === friendUserId);
-                          const friendActiveLoans = myLoans.filter(l =>
-                            l.status === 'active' && (
-                              (l.lender_id === user.id && l.borrower_id === friendUserId) ||
-                              (l.borrower_id === user.id && l.lender_id === friendUserId)
-                            )
-                          );
-
-                          const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent((friendProfile?.full_name || 'U').charAt(0))}&background=22c55e&color=fff&size=128`;
-
-                          return (
-                            <div key={friendship.id} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-2.5 rounded-lg" style={{ backgroundColor: '#83F384' }}>
-                              <div className="flex items-center gap-3 flex-1 min-w-0">
-                                {/* Profile Photo */}
-                                <img
-                                  src={friendProfile?.profile_picture_url || defaultAvatar}
-                                  alt={friendProfile?.full_name || 'Friend'}
-                                  className="w-9 h-9 rounded-full object-cover flex-shrink-0 bg-white"
-                                />
-
-                                {/* Name & Active Loans */}
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-semibold text-[#0A1A10] truncate">
-                                    {friendProfile?.full_name || friendProfile?.username || 'Friend'}
-                                  </p>
-                                  <div className="bg-white rounded-md px-2 py-0.5 inline-block mt-0.5">
-                                    <p className="text-xs font-medium text-slate-600">
-                                      {friendActiveLoans.length} active loan{friendActiveLoans.length !== 1 ? 's' : ''}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* Lend & Borrow Buttons */}
-                              <div className="flex gap-1.5 flex-shrink-0 pl-12 sm:pl-0">
-                                <Link
-                                  to={createPageUrl("Lending")}
-                                  className="px-3 py-1.5 rounded-md bg-white text-xs font-semibold text-[#1C4332] hover:bg-white/80 transition-colors whitespace-nowrap"
-                                >
-                                  Offer to Lend
-                                </Link>
-                                <Link
-                                  to={createPageUrl("Borrowing")}
-                                  className="px-3 py-1.5 rounded-md bg-white text-xs font-semibold text-[#1C4332] hover:bg-white/80 transition-colors whitespace-nowrap"
-                                >
-                                  Request to Borrow
-                                </Link>
-                              </div>
-                            </div>
-                          );
-                        });
-                      })()}
-                    </div>
-
-                    {/* View All Link */}
-                    <Link
-                      to={createPageUrl("Friends")}
-                      className="block mt-4 text-center text-sm font-semibold text-[#00A86B] hover:text-[#0D9B76] transition-colors"
-                    >
-                      View All Friends →
-                    </Link>
-                  </CardContent>
-                </Card>
-              </motion.div>
-
-              {/* Monthly Overview */}
+            {/* Monthly Overview */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -856,7 +847,6 @@ export default function Home() {
             </div>
             </div>
 
-          </div>
           </div>
 
           {/* Record Payment Modal */}
