@@ -759,61 +759,49 @@ export default function Borrowing() {
                 {/* Borrowing Overview + Upcoming Payments */}
                 <div className="grid md:grid-cols-2 gap-4">
                   {/* Borrowing Overview Box - Left */}
-                  <div className="bg-[#C2FFDC] rounded-2xl p-5 border-0">
-                    <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight font-serif">
+                  <div className="rounded-xl p-4 sm:p-5 md:p-7 shadow-sm relative overflow-hidden" style={{backgroundColor: '#1C4332'}}>
+                    <p className="text-lg font-bold text-[#C2FFDC] mb-5 tracking-tight font-serif">
                       Borrowing Overview
                     </p>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {/* Pie Chart */}
-                      <div className="flex flex-col items-center justify-center">
-                        {(() => {
-                          const percentPaid = totalOwed > 0 ? Math.round((totalPaid / totalOwed) * 100) : 0;
 
-                          return (
-                            <>
-                              <div className="relative w-24 h-24">
-                                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                                  <circle cx="60" cy="60" r="52" fill="none" stroke="#E2F5EA" strokeWidth="7" />
-                                  <circle
-                                    cx="60"
-                                    cy="60"
-                                    r="52"
-                                    fill="none"
-                                    stroke="#00A86B"
-                                    strokeWidth="7"
-                                    strokeLinecap="round"
-                                    strokeDasharray={2 * Math.PI * 52}
-                                    strokeDashoffset={2 * Math.PI * 52 - (percentPaid / 100) * 2 * Math.PI * 52}
-                                    className="transition-all duration-500"
-                                  />
-                                </svg>
-                                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                  <span className="text-lg font-bold text-slate-800">{percentPaid}%</span>
-                                  <span className="text-[9px] text-slate-500 uppercase tracking-wider">Paid</span>
-                                </div>
-                              </div>
-                              <div className="mt-2 text-center">
-                                <p className="text-xs text-slate-500">
-                                  ${totalPaid.toLocaleString()} of ${totalOwed.toLocaleString()}
-                                </p>
-                              </div>
-                            </>
-                          );
-                        })()}
+                    {/* Bar Chart */}
+                    <div className="space-y-3 mb-6">
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="text-xs font-medium text-[#C2FFDC]/60">Paid Back</p>
+                          <p className="text-xs font-bold text-[#83F384]">
+                            {formatMoney(totalPaid)} / {formatMoney(totalOwed)}
+                          </p>
+                        </div>
+                        <div className="w-full h-6 bg-[#2a5a45] rounded-md overflow-hidden">
+                          <div
+                            className="h-full rounded-md transition-all duration-500 flex items-center justify-end pr-2"
+                            style={{
+                              width: `${Math.max(totalOwed > 0 ? (totalPaid / totalOwed) * 100 : 0, 2)}%`,
+                              backgroundColor: '#83F384'
+                            }}
+                          >
+                            {totalPaid > 0 && (
+                              <span className="text-[10px] font-bold text-[#1C4332]">
+                                {totalOwed > 0 ? Math.round((totalPaid / totalOwed) * 100) : 0}%
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
+                    </div>
 
-                      {/* Stats - Total Borrowed */}
-                      <div className="flex flex-col h-full">
-                        <p className="text-sm font-medium text-slate-600 mb-2 text-left">Total Borrowed</p>
-                        <p className="text-2xl font-bold text-slate-800 text-center flex-1 flex items-center justify-center">${totalBorrowed.toLocaleString()}</p>
-                        <p className="text-xs text-slate-500 text-right">{activeLoans.length} active loans</p>
+                    {/* Stats */}
+                    <div className="border-t border-[#C2FFDC]/20 pt-4 grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-[#C2FFDC]/50 mb-1">Total Borrowed</p>
+                        <p className="text-sm font-bold text-[#C2FFDC]">${totalBorrowed.toLocaleString()}</p>
+                        <p className="text-xs text-[#83F384] mt-0.5">{activeLoans.length} active loan{activeLoans.length !== 1 ? 's' : ''}</p>
                       </div>
-
-                      {/* Stats - Remaining */}
-                      <div className="flex flex-col h-full">
-                        <p className="text-sm font-medium text-slate-600 mb-2 text-left">Remaining Balance</p>
-                        <p className="text-2xl font-bold text-slate-800 text-center flex-1 flex items-center justify-center">${remainingBalance.toLocaleString()}</p>
-                        <p className="text-xs text-slate-500 text-right">${totalPaid.toLocaleString()} paid</p>
+                      <div>
+                        <p className="text-xs text-[#C2FFDC]/50 mb-1">Remaining Balance</p>
+                        <p className="text-sm font-bold text-[#C2FFDC]">${remainingBalance.toLocaleString()}</p>
+                        <p className="text-xs text-[#C2FFDC]/50 mt-0.5">${totalPaid.toLocaleString()} paid</p>
                       </div>
                     </div>
                   </div>
