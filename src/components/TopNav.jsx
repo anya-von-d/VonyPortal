@@ -155,8 +155,8 @@ export default function TopNav({ location }) {
               </AnimatePresence>
             </button>
 
-            {/* Desktop: Top bar links centered */}
-            <div className="hidden md:flex items-center gap-8 mx-auto">
+            {/* Desktop: Top bar links right-aligned */}
+            <div className="hidden md:flex items-center gap-8 ml-auto">
               {topBarItems.map((item) => (
                 <Link
                   key={item.title}
