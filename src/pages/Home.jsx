@@ -294,14 +294,12 @@ export default function Home() {
                 <div className="flex-shrink-0">
                   {(() => {
                     const hour = new Date().getHours();
-                    const greeting = hour < 12 ? "Good" : hour < 18 ? "Good" : "Good";
-                    const timeOfDay = hour < 12 ? "Morning," : hour < 18 ? "Afternoon," : "Evening,";
+                    const greeting = hour < 12 ? "Good Morning," : hour < 18 ? "Good Afternoon," : "Good Evening,";
                     const firstName = user.full_name?.split(' ')[0] || 'User';
                     return (
                       <div>
-                        <p className="text-4xl md:text-6xl font-bold text-[#1C4332] tracking-tight leading-tight font-serif">{greeting}</p>
-                        <p className="text-4xl md:text-6xl font-bold text-[#1C4332] tracking-tight leading-tight font-serif">{timeOfDay}</p>
-                        <p className="text-4xl md:text-6xl font-bold text-[#1C4332] tracking-tight leading-tight font-serif">{firstName}</p>
+                        <p className="text-xl md:text-2xl font-bold text-[#1C4332] tracking-tight leading-tight font-serif">{greeting}</p>
+                        <p className="text-xl md:text-2xl font-bold text-[#1C4332] tracking-tight leading-tight font-serif">{firstName}</p>
                       </div>
                     );
                   })()}
