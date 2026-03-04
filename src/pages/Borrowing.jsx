@@ -777,7 +777,7 @@ export default function Borrowing() {
                                   cy="60"
                                   r="52"
                                   fill="none"
-                                  stroke="#83F384"
+                                  stroke="#DBFFEB"
                                   strokeWidth="8"
                                   strokeLinecap="round"
                                   strokeDasharray={2 * Math.PI * 52}
@@ -964,7 +964,7 @@ export default function Borrowing() {
                                 <div className="w-full h-5 bg-[#2a5a45] rounded-md overflow-hidden">
                                   <div
                                     className="h-full rounded-md transition-all duration-500"
-                                    style={{ width: `${Math.max(percentPaid, 2)}%`, background: percentPaid > 0 ? 'linear-gradient(to right, #83F384 0%, #83F384 8px, #1C4332 8px, #1C4332 100%)' : undefined }}
+                                    style={{ width: `${Math.max(percentPaid, 2)}%`, backgroundColor: '#DBFFEB' }}
                                   />
                                 </div>
                                 <div className="flex justify-between text-xs text-slate-500">
