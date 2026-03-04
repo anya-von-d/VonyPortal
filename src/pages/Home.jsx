@@ -283,7 +283,7 @@ export default function Home() {
     return (
         <div className="min-h-screen" style={{backgroundColor: '#F4F7F5'}}>
           {/* Hero Section */}
-          <div className="px-12 py-8 md:px-24 md:py-12 lg:px-36" style={{backgroundColor: '#DBFFEB'}}>
+          <div className="px-12 py-8 md:px-24 md:py-12 lg:px-36" style={{backgroundColor: '#C2FFDC'}}>
             <div className="max-w-6xl mx-auto">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -312,7 +312,7 @@ export default function Home() {
                     onClick={() => setOverviewType(overviewType === 'lending' ? 'borrowing' : 'lending')}
                     className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 rounded-full flex items-center justify-center transition-colors duration-200 bg-[#2a5a45] hover:bg-[#356e54]"
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DBFFEB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C2FFDC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="15 18 9 12 15 6"></polyline>
                     </svg>
                   </button>
@@ -322,7 +322,7 @@ export default function Home() {
                     onClick={() => setOverviewType(overviewType === 'lending' ? 'borrowing' : 'lending')}
                     className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 rounded-full flex items-center justify-center transition-colors duration-200 bg-[#2a5a45] hover:bg-[#356e54]"
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DBFFEB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C2FFDC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="9 18 15 12 9 6"></polyline>
                     </svg>
                   </button>
@@ -334,7 +334,7 @@ export default function Home() {
                     transition={{ duration: 0.3, ease: "easeOut" }}
                     className="px-6"
                   >
-                    <p className="text-lg font-bold text-[#DBFFEB] mb-5 tracking-tight font-serif">
+                    <p className="text-lg font-bold text-[#C2FFDC] mb-5 tracking-tight font-serif">
                       {overviewType === 'lending' ? 'Lending Overview' : 'Borrowing Overview'}
                     </p>
 
@@ -342,7 +342,7 @@ export default function Home() {
                     <div className="space-y-3 mb-6">
                       <div>
                         <div className="flex items-center justify-between mb-1">
-                          <p className="text-xs font-medium text-[#DBFFEB]/60">
+                          <p className="text-xs font-medium text-[#C2FFDC]/60">
                             {overviewType === 'lending' ? 'Repaid' : 'Paid Back'}
                           </p>
                           <p className="text-xs font-bold text-[#83F384]">
@@ -368,10 +368,10 @@ export default function Home() {
                     </div>
 
                     {/* Next Payment Info */}
-                    <div className="border-t border-[#DBFFEB]/20 pt-4 grid grid-cols-2 gap-4">
+                    <div className="border-t border-[#C2FFDC]/20 pt-4 grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-xs text-[#DBFFEB]/50 mb-1">Next Payment Date</p>
-                        <p className="text-sm font-bold text-[#DBFFEB]">
+                        <p className="text-xs text-[#C2FFDC]/50 mb-1">Next Payment Date</p>
+                        <p className="text-sm font-bold text-[#C2FFDC]">
                           {overviewType === 'lending'
                             ? (nextLenderPayment ? format(nextLenderPayment.date, 'EEE, MMM d') : 'N/A')
                             : (nextBorrowerPayment ? format(nextBorrowerPayment.date, 'EEE, MMM d') : 'N/A')
@@ -388,15 +388,15 @@ export default function Home() {
                         )}
                       </div>
                       <div>
-                        <p className="text-xs text-[#DBFFEB]/50 mb-1">Next Payment Amount</p>
-                        <p className="text-sm font-bold text-[#DBFFEB]">
+                        <p className="text-xs text-[#C2FFDC]/50 mb-1">Next Payment Amount</p>
+                        <p className="text-sm font-bold text-[#C2FFDC]">
                           {overviewType === 'lending'
                             ? (nextLenderPayment ? formatMoney(nextLenderPayment.payment_amount || 0) : 'N/A')
                             : (nextBorrowerPayment ? formatMoney(nextBorrowerPayment.payment_amount || 0) : 'N/A')
                           }
                         </p>
                         {((overviewType === 'lending' && nextLenderPayment) || (overviewType === 'borrowing' && nextBorrowerPayment)) && (
-                          <p className="text-xs text-[#DBFFEB]/50 mt-0.5">
+                          <p className="text-xs text-[#C2FFDC]/50 mt-0.5">
                             {overviewType === 'lending' ? `from @${nextLenderPayment.username}` : `to @${nextBorrowerPayment.username}`}
                           </p>
                         )}
@@ -536,7 +536,7 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.25 }}
               >
-                <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#DBFFEB'}}>
+                <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#C2FFDC'}}>
                   <CardContent className="p-4 md:p-5">
                     <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight font-serif">
                       Your Friends
@@ -634,7 +634,7 @@ export default function Home() {
                 transition={{ duration: 0.4, delay: 0.3 }}
                 className="flex flex-col gap-1.5"
               >
-                <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#DBFFEB'}}>
+                <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#C2FFDC'}}>
                   <CardContent className="p-4 md:p-5 flex flex-col">
                     {/* Month Title with Arrows */}
                     <div className="flex items-center justify-center gap-3 mb-4">
