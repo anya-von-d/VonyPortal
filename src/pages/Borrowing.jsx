@@ -770,8 +770,6 @@ export default function Borrowing() {
                           return (
                             <div className="relative w-28 h-28">
                               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                                <circle cx="60" cy="60" r="57" fill="none" stroke="#83F384" strokeWidth="1.5" />
-                                <circle cx="60" cy="60" r="47" fill="none" stroke="#83F384" strokeWidth="1.5" />
                                 <circle cx="60" cy="60" r="52" fill="none" stroke="#DBFFEB" strokeWidth="8" />
                                 <circle
                                   cx="60"
@@ -962,7 +960,7 @@ export default function Borrowing() {
                                   </div>
                                   <span className="text-xs text-slate-500">{percentPaid}%</span>
                                 </div>
-                                <div className="w-full h-5 rounded-md overflow-hidden border border-[#83F384]" style={{ backgroundColor: '#DBFFEB' }}>
+                                <div className="w-full h-5 rounded-md overflow-hidden" style={{ backgroundColor: '#DBFFEB' }}>
                                   <div
                                     className="h-full rounded-md transition-all duration-500"
                                     style={{ width: `${Math.max(percentPaid, 2)}%`, backgroundColor: '#83F384' }}
