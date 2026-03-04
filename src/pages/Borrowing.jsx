@@ -756,6 +756,107 @@ export default function Borrowing() {
                 className="space-y-8 md:space-y-10"
               >
 
+                {/* Borrowing Overview + Upcoming Payments */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  {/* Borrowing Overview Box - Left */}
+                  <div className="bg-[#DBFFEB] rounded-2xl p-5 border-0">
+                    <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                      Borrowing Overview
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {/* Pie Chart */}
+                      <div className="flex flex-col items-center justify-center">
+                        {(() => {
+                          const percentPaid = totalOwed > 0 ? Math.round((totalPaid / totalOwed) * 100) : 0;
+
+                          return (
+                            <>
+                              <div className="relative w-24 h-24">
+                                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                                  <circle cx="60" cy="60" r="52" fill="none" stroke="#E2F5EA" strokeWidth="7" />
+                                  <circle
+                                    cx="60"
+                                    cy="60"
+                                    r="52"
+                                    fill="none"
+                                    stroke="#00A86B"
+                                    strokeWidth="7"
+                                    strokeLinecap="round"
+                                    strokeDasharray={2 * Math.PI * 52}
+                                    strokeDashoffset={2 * Math.PI * 52 - (percentPaid / 100) * 2 * Math.PI * 52}
+                                    className="transition-all duration-500"
+                                  />
+                                </svg>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                  <span className="text-lg font-bold text-slate-800">{percentPaid}%</span>
+                                  <span className="text-[9px] text-slate-500 uppercase tracking-wider">Paid</span>
+                                </div>
+                              </div>
+                              <div className="mt-2 text-center">
+                                <p className="text-xs text-slate-500">
+                                  ${totalPaid.toLocaleString()} of ${totalOwed.toLocaleString()}
+                                </p>
+                              </div>
+                            </>
+                          );
+                        })()}
+                      </div>
+
+                      {/* Stats - Total Borrowed */}
+                      <div className="flex flex-col h-full">
+                        <p className="text-sm font-medium text-slate-600 mb-2 text-left">Total Borrowed</p>
+                        <p className="text-2xl font-bold text-slate-800 text-center flex-1 flex items-center justify-center">${totalBorrowed.toLocaleString()}</p>
+                        <p className="text-xs text-slate-500 text-right">{activeLoans.length} active loans</p>
+                      </div>
+
+                      {/* Stats - Remaining */}
+                      <div className="flex flex-col h-full">
+                        <p className="text-sm font-medium text-slate-600 mb-2 text-left">Remaining Balance</p>
+                        <p className="text-2xl font-bold text-slate-800 text-center flex-1 flex items-center justify-center">${remainingBalance.toLocaleString()}</p>
+                        <p className="text-xs text-slate-500 text-right">${totalPaid.toLocaleString()} paid</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Upcoming Payments - Right */}
+                  <div className="bg-[#DBFFEB] rounded-2xl p-5 border-0">
+                    <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                      Upcoming Payments
+                    </p>
+                    {activeLoans.filter(l => l.next_payment_date).length === 0 ? (
+                      <p className="text-slate-500 text-sm">No upcoming payments</p>
+                    ) : (
+                      <div className="space-y-3">
+                        {activeLoans
+                          .filter(l => l.next_payment_date)
+                          .sort((a, b) => new Date(a.next_payment_date) - new Date(b.next_payment_date))
+                          .slice(0, 3)
+                          .map((loan, index) => {
+                            const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
+                            const bgColors = ['#83F384', '#83F384', '#83F384', '#83F384', '#83F384', '#83F384'];
+                            return (
+                              <div key={loan.id} className="flex items-center justify-between p-3 rounded-xl" style={{ backgroundColor: bgColors[index % 6] }}>
+                                <div>
+                                  <p className="font-medium text-sm text-slate-800">
+                                    ${loan.payment_amount?.toLocaleString() || 0} to @{lender?.username || 'user'}
+                                  </p>
+                                  <p className="text-xs text-slate-600">
+                                    Due {format(new Date(loan.next_payment_date), 'MMM d, yyyy')}
+                                  </p>
+                                </div>
+                                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
+                                  <span className="text-xs font-bold text-slate-800">
+                                    {Math.ceil((new Date(loan.next_payment_date) - new Date()) / (1000 * 60 * 60 * 24))}d
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
                 {/* Quick Record Payment */}
                 {activeLoans.length > 0 && (
                   <div className="bg-[#DBFFEB] rounded-2xl p-5 border-0">
@@ -837,107 +938,6 @@ export default function Borrowing() {
                     </div>
                   </div>
                 )}
-
-                {/* Upcoming Payments + Month Payment Amount & Overview */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  {/* Upcoming Payments - Left */}
-                  <div className="bg-[#DBFFEB] rounded-2xl p-5 border-0">
-                    <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                      Upcoming Payments
-                    </p>
-                    {activeLoans.filter(l => l.next_payment_date).length === 0 ? (
-                      <p className="text-slate-500 text-sm">No upcoming payments</p>
-                    ) : (
-                      <div className="space-y-3">
-                        {activeLoans
-                          .filter(l => l.next_payment_date)
-                          .sort((a, b) => new Date(a.next_payment_date) - new Date(b.next_payment_date))
-                          .slice(0, 3)
-                          .map((loan, index) => {
-                            const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
-                            const bgColors = ['#83F384', '#83F384', '#83F384', '#83F384', '#83F384', '#83F384'];
-                            return (
-                              <div key={loan.id} className="flex items-center justify-between p-3 rounded-xl" style={{ backgroundColor: bgColors[index % 6] }}>
-                                <div>
-                                  <p className="font-medium text-sm text-slate-800">
-                                    ${loan.payment_amount?.toLocaleString() || 0} to @{lender?.username || 'user'}
-                                  </p>
-                                  <p className="text-xs text-slate-600">
-                                    Due {format(new Date(loan.next_payment_date), 'MMM d, yyyy')}
-                                  </p>
-                                </div>
-                                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
-                                  <span className="text-xs font-bold text-slate-800">
-                                    {Math.ceil((new Date(loan.next_payment_date) - new Date()) / (1000 * 60 * 60 * 24))}d
-                                  </span>
-                                </div>
-                              </div>
-                            );
-                          })}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Borrowing Overview Box - Right */}
-                  <div className="bg-[#DBFFEB] rounded-2xl p-5 border-0">
-                    <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                      Borrowing Overview
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {/* Pie Chart */}
-                      <div className="flex flex-col items-center justify-center">
-                        {(() => {
-                          const percentPaid = totalOwed > 0 ? Math.round((totalPaid / totalOwed) * 100) : 0;
-
-                          return (
-                            <>
-                              <div className="relative w-24 h-24">
-                                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                                  <circle cx="60" cy="60" r="52" fill="none" stroke="#E2F5EA" strokeWidth="7" />
-                                  <circle
-                                    cx="60"
-                                    cy="60"
-                                    r="52"
-                                    fill="none"
-                                    stroke="#00A86B"
-                                    strokeWidth="7"
-                                    strokeLinecap="round"
-                                    strokeDasharray={2 * Math.PI * 52}
-                                    strokeDashoffset={2 * Math.PI * 52 - (percentPaid / 100) * 2 * Math.PI * 52}
-                                    className="transition-all duration-500"
-                                  />
-                                </svg>
-                                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                  <span className="text-lg font-bold text-slate-800">{percentPaid}%</span>
-                                  <span className="text-[9px] text-slate-500 uppercase tracking-wider">Paid</span>
-                                </div>
-                              </div>
-                              <div className="mt-2 text-center">
-                                <p className="text-xs text-slate-500">
-                                  ${totalPaid.toLocaleString()} of ${totalOwed.toLocaleString()}
-                                </p>
-                              </div>
-                            </>
-                          );
-                        })()}
-                      </div>
-
-                      {/* Stats - Total Borrowed */}
-                      <div className="flex flex-col h-full">
-                        <p className="text-sm font-medium text-slate-600 mb-2 text-left">Total Borrowed</p>
-                        <p className="text-2xl font-bold text-slate-800 text-center flex-1 flex items-center justify-center">${totalBorrowed.toLocaleString()}</p>
-                        <p className="text-xs text-slate-500 text-right">{activeLoans.length} active loans</p>
-                      </div>
-
-                      {/* Stats - Remaining */}
-                      <div className="flex flex-col h-full">
-                        <p className="text-sm font-medium text-slate-600 mb-2 text-left">Remaining Balance</p>
-                        <p className="text-2xl font-bold text-slate-800 text-center flex-1 flex items-center justify-center">${remainingBalance.toLocaleString()}</p>
-                        <p className="text-xs text-slate-500 text-right">${totalPaid.toLocaleString()} paid</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
 
                 {/* Individual Loan Progress + Loans Ranked By */}
                 {activeLoans.length > 0 && (
