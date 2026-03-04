@@ -907,7 +907,7 @@ export default function Lending() {
 
         <div className="bg-[#DBFFEB] rounded-2xl p-4 space-y-3">
           <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500">Terms of Repayment</p>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="bg-[#AAFFA3] rounded-xl p-3">
               <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-0.5">Total Due</p>
               <p className="font-bold text-slate-800">{formatMoney(agreement.total_amount)}</p>
@@ -928,7 +928,7 @@ export default function Lending() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="bg-[#DBFFEB] rounded-2xl p-4">
             <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-400 mb-1">Borrower</p>
             <p className="text-lg font-serif italic text-slate-800">{agreement.borrower_name || borrowerInfo.full_name}</p>
@@ -970,7 +970,7 @@ export default function Lending() {
           <p className="text-xs text-slate-400 mt-1">{schedule.length} payments · {agreement.payment_frequency}</p>
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="bg-[#AAFFA3] rounded-2xl p-3 text-center">
             <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-0.5">Principal</p>
             <p className="text-lg font-bold text-slate-800">{formatMoney(agreement.amount)}</p>
@@ -986,7 +986,7 @@ export default function Lending() {
         </div>
 
         <div className="max-h-[300px] overflow-x-auto overflow-y-auto rounded-2xl bg-[#DBFFEB]">
-          <table className="w-full text-xs min-w-[700px]">
+          <table className="w-full text-xs min-w-[580px]">
             <thead className="bg-[#DBFFEB] sticky top-0">
               <tr>
                 <th className="px-2 py-2.5 text-left text-[10px] font-mono uppercase tracking-wider text-slate-500">Payment</th>
@@ -1063,7 +1063,7 @@ export default function Lending() {
           <p className="text-sm font-semibold text-slate-800">{loan?.purpose || agreement.purpose || '_'}</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="bg-[#6EE8A2] rounded-xl p-4">
             <p className="text-xs text-slate-600 mb-1">Loan Amount</p>
             <p className="text-2xl font-bold text-slate-800">{formatMoney(agreement.amount)}</p>
@@ -1091,7 +1091,7 @@ export default function Lending() {
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-4 text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Percent className="w-4 h-4 text-slate-400" />
@@ -1128,7 +1128,7 @@ export default function Lending() {
 
         <div className="border-t border-slate-200 pt-4">
           <h4 className="font-semibold text-slate-800 mb-3">Parties</h4>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex items-center gap-3">
               <img
                 src={lenderInfo.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((lenderInfo.full_name || 'L').charAt(0))}&background=22c55e&color=fff&size=64`}
@@ -2643,7 +2643,7 @@ export default function Lending() {
                                 <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                                   Interest
                                 </p>
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                   <div className="bg-[#6EE8B5] rounded-xl p-4">
                                     <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Interest Accrued</p>
                                     <p className="text-xl font-bold text-slate-800">
@@ -2674,7 +2674,7 @@ export default function Lending() {
                                 <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                                   Loan Progress
                                 </p>
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                   <div className="bg-[#83F384] rounded-xl p-4">
                                     <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Amount Paid</p>
                                     <p className="text-xl font-bold text-black">

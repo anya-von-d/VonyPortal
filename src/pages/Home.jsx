@@ -283,7 +283,7 @@ export default function Home() {
     return (
         <div className="min-h-screen" style={{backgroundColor: '#F4F7F5'}}>
           {/* Hero Section */}
-          <div className="px-12 pt-8 pb-6 md:px-24 md:pt-12 md:pb-6 lg:px-36" style={{backgroundColor: '#C2FFDC'}}>
+          <div className="px-4 pt-8 pb-6 sm:px-8 md:px-24 md:pt-12 md:pb-6 lg:px-36" style={{backgroundColor: '#C2FFDC'}}>
             <div className="max-w-6xl mx-auto">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -298,15 +298,15 @@ export default function Home() {
                     const firstName = user.full_name?.split(' ')[0] || 'User';
                     return (
                       <div>
-                        <p className="text-4xl md:text-5xl font-bold text-[#1C4332] tracking-tight leading-tight font-serif">{greeting}</p>
-                        <p className="text-4xl md:text-5xl font-bold text-[#1C4332] tracking-tight leading-tight font-serif">{firstName}</p>
+                        <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#1C4332] tracking-tight leading-tight font-serif">{greeting}</p>
+                        <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#1C4332] tracking-tight leading-tight font-serif">{firstName}</p>
                       </div>
                     );
                   })()}
                 </div>
 
                 {/* Right Side - Overview box with arrows */}
-                <div className="rounded-xl p-5 md:p-7 flex-1 lg:max-w-md shadow-sm relative overflow-hidden" style={{backgroundColor: '#1C4332'}}>
+                <div className="rounded-xl p-4 sm:p-5 md:p-7 flex-1 lg:max-w-md shadow-sm relative overflow-hidden" style={{backgroundColor: '#1C4332'}}>
                   {/* Left Arrow */}
                   <button
                     onClick={() => setOverviewType(overviewType === 'lending' ? 'borrowing' : 'lending')}
@@ -332,7 +332,7 @@ export default function Home() {
                     initial={{ opacity: 0, x: overviewType === 'lending' ? -20 : 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="px-6"
+                    className="px-3 sm:px-6"
                   >
                     <p className="text-lg font-bold text-[#C2FFDC] mb-5 tracking-tight font-serif">
                       {overviewType === 'lending' ? 'Lending Overview' : 'Borrowing Overview'}
@@ -411,9 +411,9 @@ export default function Home() {
           </div>
 
           {/* Main Content Below Hero */}
-          <div className="px-12 pt-4 pb-8 md:px-24 md:pt-4 md:pb-10 lg:px-36" style={{backgroundColor: '#C2FFDC'}}>
+          <div className="px-4 pt-4 pb-8 sm:px-8 md:px-24 md:pt-4 md:pb-10 lg:px-36" style={{backgroundColor: '#C2FFDC'}}>
            <div className="max-w-6xl mx-auto">
-            <div className="rounded-2xl p-6 md:p-10 space-y-8 md:space-y-10" style={{backgroundColor: '#1C4332'}}>
+            <div className="rounded-2xl p-4 sm:p-6 md:p-10 space-y-6 sm:space-y-8 md:space-y-10" style={{backgroundColor: '#1C4332'}}>
 
             {pendingOffers.length > 0 && (
               <PendingLoanOffers offers={pendingOffers} />
@@ -422,7 +422,7 @@ export default function Home() {
             {/* Quick Actions & Activity Row */}
             <div className="grid lg:grid-cols-[auto_1fr] gap-4 md:gap-6 items-center">
               {/* Stacked Quick Action Buttons */}
-              <div className="flex flex-col gap-2 items-stretch w-[180px] mx-auto lg:mx-0">
+              <div className="flex flex-col gap-2 items-stretch w-full sm:w-[180px] mx-auto lg:mx-0">
                 <Link
                   to={createPageUrl("Lending")}
                   className="py-2.5 rounded-full text-sm font-semibold text-[#1C4332] text-center transition-colors duration-200 hover:opacity-90 whitespace-nowrap"
@@ -454,7 +454,7 @@ export default function Home() {
 
             {/* Record Payment Box */}
             {myLoans.filter(l => l && l.status === 'active').length > 0 && (
-              <div className="rounded-2xl p-5 border-0" style={{backgroundColor: '#83F384'}}>
+              <div className="rounded-2xl p-4 sm:p-5 border-0" style={{backgroundColor: '#83F384'}}>
                 <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                   Record Payment
                 </p>
@@ -576,28 +576,30 @@ export default function Home() {
                           const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent((friendProfile?.full_name || 'U').charAt(0))}&background=22c55e&color=fff&size=128`;
 
                           return (
-                            <div key={friendship.id} className="flex items-center gap-3 p-2.5 rounded-lg" style={{ backgroundColor: '#83F384' }}>
-                              {/* Profile Photo */}
-                              <img
-                                src={friendProfile?.profile_picture_url || defaultAvatar}
-                                alt={friendProfile?.full_name || 'Friend'}
-                                className="w-9 h-9 rounded-full object-cover flex-shrink-0 bg-white"
-                              />
+                            <div key={friendship.id} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-2.5 rounded-lg" style={{ backgroundColor: '#83F384' }}>
+                              <div className="flex items-center gap-3 flex-1 min-w-0">
+                                {/* Profile Photo */}
+                                <img
+                                  src={friendProfile?.profile_picture_url || defaultAvatar}
+                                  alt={friendProfile?.full_name || 'Friend'}
+                                  className="w-9 h-9 rounded-full object-cover flex-shrink-0 bg-white"
+                                />
 
-                              {/* Name & Active Loans */}
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-[#0A1A10] truncate">
-                                  {friendProfile?.full_name || friendProfile?.username || 'Friend'}
-                                </p>
-                                <div className="bg-white rounded-md px-2 py-0.5 inline-block mt-0.5">
-                                  <p className="text-xs font-medium text-slate-600">
-                                    {friendActiveLoans.length} active loan{friendActiveLoans.length !== 1 ? 's' : ''}
+                                {/* Name & Active Loans */}
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-semibold text-[#0A1A10] truncate">
+                                    {friendProfile?.full_name || friendProfile?.username || 'Friend'}
                                   </p>
+                                  <div className="bg-white rounded-md px-2 py-0.5 inline-block mt-0.5">
+                                    <p className="text-xs font-medium text-slate-600">
+                                      {friendActiveLoans.length} active loan{friendActiveLoans.length !== 1 ? 's' : ''}
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
 
                               {/* Lend & Borrow Buttons */}
-                              <div className="flex gap-1.5 flex-shrink-0">
+                              <div className="flex gap-1.5 flex-shrink-0 pl-12 sm:pl-0">
                                 <Link
                                   to={createPageUrl("Lending")}
                                   className="px-3 py-1.5 rounded-md bg-white text-xs font-semibold text-[#1C4332] hover:bg-white/80 transition-colors whitespace-nowrap"
