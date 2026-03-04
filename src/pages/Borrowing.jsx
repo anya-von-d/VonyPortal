@@ -758,7 +758,7 @@ export default function Borrowing() {
                 {/* Borrowing Overview + Upcoming Payments */}
                 <div className="grid md:grid-cols-2 gap-4">
                   {/* Borrowing Overview Box - Left */}
-                  <div className="bg-[#C2FFDC] rounded-2xl p-4 sm:p-5 border-0 flex">
+                  <div className="rounded-2xl p-4 sm:p-5 border-0 flex" style={{backgroundColor: '#83F384'}}>
                     {/* Left side: Title + Pie Chart */}
                     <div className="flex flex-col">
                       <p className="text-lg font-bold text-slate-800 mb-4 tracking-tight font-serif whitespace-nowrap">
@@ -932,7 +932,7 @@ export default function Borrowing() {
                 {activeLoans.length > 0 && (
                   <div className="grid md:grid-cols-2 gap-4">
                     {/* Left column: Individual Loan Progress */}
-                    <div className="bg-[#C2FFDC] rounded-2xl p-5 border-0">
+                    <div className="rounded-2xl p-5 border-0" style={{backgroundColor: '#83F384'}}>
                       <p className="text-lg font-bold text-slate-800 mb-4 tracking-tight font-serif">
                         Individual Loan Progress
                       </p>
