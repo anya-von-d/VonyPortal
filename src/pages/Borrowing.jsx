@@ -353,46 +353,26 @@ export default function Borrowing() {
       }
 
       const startingBalance = remainingBalance;
-      const interestPayment = remainingBalance * periodicRate;
-      let principalPayment = paymentAmount - interestPayment;
 
-      // If payment doesn't cover interest, this loan will never pay off
-      if (principalPayment <= 0 && annualRate > 0) {
-        principalPayment = 0;
-        // Still record the payment but flag that it only covers interest
-        principalToDate += 0;
-        interestToDate += paymentAmount;
-        schedule.push({
-          number: paymentNumber,
-          date: new Date(currentDate),
-          startingBalance,
-          payment: paymentAmount,
-          principal: 0,
-          interest: paymentAmount,
-          principalToDate,
-          interestToDate,
-          endingBalance: startingBalance + (interestPayment - paymentAmount)
-        });
-        remainingBalance = startingBalance + (interestPayment - paymentAmount);
-        paymentNumber++;
-        if (paymentNumber > 600) break;
-        continue;
+      // Round interest to cents, then derive principal from payment minus rounded interest
+      const interestPayment = Math.round(remainingBalance * periodicRate * 100) / 100;
+      let principalPayment = Math.round((paymentAmount - interestPayment) * 100) / 100;
+
+      // Final payment: adjust to zero out the balance exactly
+      if (principalPayment >= remainingBalance) {
+        principalPayment = Math.round(remainingBalance * 100) / 100;
       }
 
-      // Final payment adjustment - don't overpay
-      const actualPayment = Math.min(paymentAmount, principalPayment + interestPayment);
-      principalPayment = Math.min(principalPayment, remainingBalance);
-      const totalPayment = principalPayment + interestPayment;
+      remainingBalance = Math.round((remainingBalance - principalPayment) * 100) / 100;
+      if (remainingBalance < 0) remainingBalance = 0;
 
-      remainingBalance = Math.max(0, remainingBalance - principalPayment);
-      principalToDate += principalPayment;
-      interestToDate += interestPayment;
+      principalToDate = Math.round((principalToDate + principalPayment) * 100) / 100;
+      interestToDate = Math.round((interestToDate + interestPayment) * 100) / 100;
 
       schedule.push({
         number: paymentNumber,
         date: new Date(currentDate),
         startingBalance,
-        payment: totalPayment,
         principal: principalPayment,
         interest: interestPayment,
         principalToDate,
@@ -467,8 +447,6 @@ export default function Borrowing() {
     const schedule = generateAmortizationSchedule(agreement);
     const loan = manageLoanSelected;
     const paidPayments = loan?.amount_paid ? Math.floor(loan.amount_paid / agreement.payment_amount) : 0;
-    const totalInterest = schedule.length > 0 ? schedule[schedule.length - 1].interestToDate : 0;
-    const totalCost = (agreement.amount || 0) + totalInterest;
 
     return (
       <div className="space-y-6">
@@ -483,28 +461,27 @@ export default function Borrowing() {
             <p className="text-lg font-bold text-slate-800">{formatMoney(agreement.amount)}</p>
           </div>
           <div className="bg-[#30FFA8] rounded-xl p-3 text-center">
-            <p className="text-xs text-slate-600">Total Interest</p>
-            <p className="text-lg font-bold text-slate-800">{formatMoney(totalInterest)}</p>
+            <p className="text-xs text-slate-600">Interest</p>
+            <p className="text-lg font-bold text-slate-800">{formatMoney((agreement.total_amount || 0) - (agreement.amount || 0))}</p>
           </div>
           <div className="bg-[#96FFD0] rounded-xl p-3 text-center">
-            <p className="text-xs text-slate-600">Total Cost</p>
-            <p className="text-lg font-bold text-slate-800">{formatMoney(totalCost)}</p>
+            <p className="text-xs text-slate-600">Total</p>
+            <p className="text-lg font-bold text-slate-800">{formatMoney(agreement.total_amount)}</p>
           </div>
         </div>
 
         <div className="max-h-[300px] overflow-x-auto overflow-y-auto rounded-xl border border-slate-200">
-          <table className="w-full text-xs min-w-[800px]">
+          <table className="w-full text-xs min-w-[700px]">
             <thead className="bg-slate-50 sticky top-0">
               <tr>
-                <th className="px-2 py-2 text-left font-medium text-slate-600">#</th>
-                <th className="px-2 py-2 text-left font-medium text-slate-600">Date</th>
-                <th className="px-2 py-2 text-right font-medium text-slate-600">Balance</th>
-                <th className="px-2 py-2 text-right font-medium text-slate-600">Payment</th>
-                <th className="px-2 py-2 text-right font-medium text-slate-600">Principal</th>
-                <th className="px-2 py-2 text-right font-medium text-slate-600">Interest</th>
-                <th className="px-2 py-2 text-right font-medium text-slate-600">Principal TD</th>
-                <th className="px-2 py-2 text-right font-medium text-slate-600">Interest TD</th>
-                <th className="px-2 py-2 text-right font-medium text-slate-600">End Balance</th>
+                <th className="px-2 py-2 text-left font-medium text-slate-600">Payment</th>
+                <th className="px-2 py-2 text-left font-medium text-slate-600">Payment Date</th>
+                <th className="px-2 py-2 text-right font-medium text-slate-600">Starting Balance</th>
+                <th className="px-2 py-2 text-right font-medium text-slate-600">Principal Payment</th>
+                <th className="px-2 py-2 text-right font-medium text-slate-600">Interest Payment</th>
+                <th className="px-2 py-2 text-right font-medium text-slate-600">Principal to Date</th>
+                <th className="px-2 py-2 text-right font-medium text-slate-600">Interest to Date</th>
+                <th className="px-2 py-2 text-right font-medium text-slate-600">Ending Balance</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -513,11 +490,12 @@ export default function Borrowing() {
                   key={row.number}
                   className={index < paidPayments ? 'bg-green-50' : ''}
                 >
-                  <td className="px-2 py-2 text-slate-600">{row.number}</td>
+                  <td className="px-2 py-2 text-slate-600">
+                    {row.number}
+                  </td>
                   <td className="px-2 py-2 text-slate-800">{format(row.date, 'MMM d, yyyy')}</td>
                   <td className="px-2 py-2 text-right text-slate-600">{formatMoney(row.startingBalance)}</td>
-                  <td className="px-2 py-2 text-right font-medium text-slate-800">{formatMoney(row.payment)}</td>
-                  <td className="px-2 py-2 text-right text-slate-800">{formatMoney(row.principal)}</td>
+                  <td className="px-2 py-2 text-right font-medium text-slate-800">{formatMoney(row.principal)}</td>
                   <td className="px-2 py-2 text-right text-slate-600">{formatMoney(row.interest)}</td>
                   <td className="px-2 py-2 text-right text-slate-600">{formatMoney(row.principalToDate)}</td>
                   <td className="px-2 py-2 text-right text-slate-600">{formatMoney(row.interestToDate)}</td>
