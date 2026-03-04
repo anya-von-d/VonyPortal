@@ -1156,14 +1156,7 @@ export default function Borrowing() {
                     </div>
 
                     {/* Loan Details - Below Dropdown */}
-                    {!manageLoanSelected ? (
-                      <div className="bg-[#C2FFDC] rounded-2xl p-5 border-0 flex items-center justify-center py-16">
-                        <div className="text-center text-[#4A6B55]">
-                          <BarChart3 className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                          <p>Select a loan above to view details</p>
-                        </div>
-                      </div>
-                    ) : (
+                    {!manageLoanSelected ? null : (
                       <>
                         {/* Loan Information Box */}
                         <div className="bg-[#C2FFDC] rounded-2xl p-5">
