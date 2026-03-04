@@ -862,7 +862,7 @@ export default function Borrowing() {
                         placeholder=""
                         value={quickPayAmount}
                         onChange={(e) => setQuickPayAmount(e.target.value)}
-                        className="w-24 h-8 px-3 bg-[#C2FFDC] inline-flex"
+                        className="w-24 h-8 px-3 bg-[#C2FFDC] inline-flex border-0"
                         style={{ MozAppearance: 'textfield' }}
                       />
                       <span>to</span>
@@ -871,7 +871,7 @@ export default function Borrowing() {
                         // Reset loan selection when person changes
                         setQuickPayLoanId('');
                       }}>
-                        <SelectTrigger className="w-auto h-8 px-3 bg-[#C2FFDC] inline-flex min-w-[120px]">
+                        <SelectTrigger className="w-auto h-8 px-3 bg-[#C2FFDC] inline-flex min-w-[120px] border-0">
                           <SelectValue placeholder="select person" />
                         </SelectTrigger>
                         <SelectContent>
@@ -884,7 +884,7 @@ export default function Borrowing() {
                       </Select>
                       <span>via</span>
                       <Select value={quickPayMethod} onValueChange={setQuickPayMethod}>
-                        <SelectTrigger className="w-auto h-8 px-3 bg-[#C2FFDC] inline-flex">
+                        <SelectTrigger className="w-auto h-8 px-3 bg-[#C2FFDC] inline-flex border-0">
                           <SelectValue placeholder="select method" />
                         </SelectTrigger>
                         <SelectContent>
@@ -898,7 +898,7 @@ export default function Borrowing() {
                       </Select>
                       <span>for</span>
                       <Select value={quickPayLoanId} onValueChange={setQuickPayLoanId}>
-                        <SelectTrigger className="w-auto h-8 px-3 bg-[#C2FFDC] inline-flex min-w-[140px]">
+                        <SelectTrigger className="w-auto h-8 px-3 bg-[#C2FFDC] inline-flex min-w-[140px] border-0">
                           <SelectValue placeholder="select loan" />
                         </SelectTrigger>
                         <SelectContent>
