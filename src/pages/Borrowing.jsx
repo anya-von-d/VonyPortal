@@ -763,9 +763,9 @@ export default function Borrowing() {
                       Borrowing Overview
                     </p>
 
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-6 pl-4">
                       {/* Pie Chart - Left */}
-                      <div className="flex-shrink-0">
+                      <div className="flex-shrink-0 ml-2">
                         {(() => {
                           const percentPaid = totalOwed > 0 ? Math.round((totalPaid / totalOwed) * 100) : 0;
                           return (
@@ -795,7 +795,7 @@ export default function Borrowing() {
                       </div>
 
                       {/* Stats - Right, stacked */}
-                      <div className="flex flex-col gap-4 flex-1">
+                      <div className="flex flex-col gap-4 flex-1 pl-6">
                         <div>
                           <p className="text-sm text-gray-600 mb-1">Total Borrowed</p>
                           <p className="text-lg font-bold text-gray-700">${totalBorrowed.toLocaleString()} <span className="text-sm font-medium text-gray-600">· {activeLoans.length} active</span></p>
