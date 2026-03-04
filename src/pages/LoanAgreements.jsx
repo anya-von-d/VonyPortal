@@ -125,13 +125,13 @@ export default function LoanAgreements() {
     const r = annualRate > 0 ? (annualRate / 100) / periodsPerYear : 0;
 
     // Payment using amortization formula: P = L * r / (1 - (1 + r)^(-n))
-    let payment;
+    // Keep raw (unrounded) for accurate schedule computation
+    let rawPayment;
     if (r > 0) {
-      payment = loanAmount * r / (1 - Math.pow(1 + r, -totalPayments));
+      rawPayment = loanAmount * r / (1 - Math.pow(1 + r, -totalPayments));
     } else {
-      payment = loanAmount / totalPayments;
+      rawPayment = loanAmount / totalPayments;
     }
-    payment = Math.round(payment * 100) / 100;
 
     let balance = loanAmount;
     let currentDate = new Date(agreement.created_at);
@@ -146,13 +146,17 @@ export default function LoanAgreements() {
 
       const startingBalance = balance;
       const interest = Math.round(balance * r * 100) / 100;
-      let principal = Math.round((payment - interest) * 100) / 100;
-      balance = Math.round((balance - principal) * 100) / 100;
+      let principal;
 
-      // Final payment: zero out balance
       if (i === totalPayments) {
-        principal = Math.round((balance + principal) * 100) / 100;
+        // Final payment: pay off remaining balance
+        principal = balance;
         balance = 0;
+      } else {
+        // New balance = round(oldBalance * (1 + r) - payment, 2)
+        const newBalance = Math.round((balance * (1 + r) - rawPayment) * 100) / 100;
+        principal = Math.round((startingBalance - newBalance) * 100) / 100;
+        balance = newBalance;
       }
 
       principalToDate = Math.round((principalToDate + principal) * 100) / 100;
