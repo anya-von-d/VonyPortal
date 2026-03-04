@@ -281,85 +281,56 @@ export default function Home() {
     const barChartMax = Math.max(totalLentAmount, totalBorrowedAmount, 1);
 
     return (
-        <div className="min-h-screen" style={{backgroundColor: '#F4F7F5'}}>
+        <div className="min-h-screen" style={{backgroundColor: '#CDE7F8'}}>
           {/* Hero Section */}
-          <div className="px-4 pt-8 pb-6 sm:px-8 md:px-24 md:pt-12 md:pb-6 lg:px-36" style={{backgroundColor: '#C2FFDC'}}>
+          <div className="px-4 pt-8 pb-6 sm:px-8 md:px-24 md:pt-12 md:pb-6 lg:px-36" style={{backgroundColor: '#CDE7F8'}}>
             <div className="max-w-6xl mx-auto">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 md:gap-10"
+                className="flex flex-col items-center gap-6 md:gap-8"
               >
-                {/* Left Side - Greeting on 3 lines */}
-                <div className="flex-shrink-0">
+                {/* Centered Greeting */}
+                <div className="text-center">
                   {(() => {
-                    const hour = new Date().getHours();
-                    const greeting = hour < 12 ? "Good Morning," : hour < 18 ? "Good Afternoon," : "Good Evening,";
                     const firstName = user.full_name?.split(' ')[0] || 'User';
                     return (
                       <div>
-                        <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#1C4332] tracking-tight leading-tight font-serif">{greeting}</p>
-                        <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#1C4332] tracking-tight leading-tight font-serif">{firstName}</p>
+                        <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#213B75] tracking-tight leading-tight font-serif">Welcome Back,</p>
+                        <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#213B75] tracking-tight leading-tight font-serif">{firstName}</p>
                       </div>
                     );
                   })()}
                 </div>
 
-                {/* Right Side - Overview box with arrows */}
-                <div className="rounded-xl p-4 sm:p-5 md:p-7 flex-1 lg:max-w-md shadow-sm relative overflow-hidden" style={{backgroundColor: '#1C4332'}}>
-                  {/* Left Arrow */}
-                  <button
-                    onClick={() => setOverviewType(overviewType === 'lending' ? 'borrowing' : 'lending')}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 rounded-full flex items-center justify-center transition-colors duration-200 bg-[#2a5a45] hover:bg-[#356e54]"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C2FFDC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
-                  </button>
-
-                  {/* Right Arrow */}
-                  <button
-                    onClick={() => setOverviewType(overviewType === 'lending' ? 'borrowing' : 'lending')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 rounded-full flex items-center justify-center transition-colors duration-200 bg-[#2a5a45] hover:bg-[#356e54]"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C2FFDC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                  </button>
-
-                  <motion.div
-                    key={overviewType}
-                    initial={{ opacity: 0, x: overviewType === 'lending' ? -20 : 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="px-3 sm:px-6"
-                  >
-                    <p className="text-lg font-bold text-[#C2FFDC] mb-5 tracking-tight font-serif">
-                      {overviewType === 'lending' ? 'Lending Overview' : 'Borrowing Overview'}
+                {/* Two Overview Boxes Side by Side */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 w-full">
+                  {/* Lending Overview Box */}
+                  <div className="rounded-xl p-4 sm:p-5 md:p-7 shadow-sm bg-white">
+                    <p className="text-lg font-bold text-[#213B75] mb-5 tracking-tight font-serif">
+                      Lending Overview
                     </p>
 
                     {/* Bar Chart */}
                     <div className="space-y-3 mb-6">
                       <div>
                         <div className="flex items-center justify-between mb-1">
-                          <p className="text-xs font-medium text-[#C2FFDC]/60">
-                            {overviewType === 'lending' ? 'Repaid' : 'Paid Back'}
-                          </p>
-                          <p className="text-xs font-bold text-[#83F384]">
-                            {formatMoney(overviewType === 'lending' ? totalRepaid : totalPaidBack)} / {formatMoney(overviewType === 'lending' ? totalLentAmount : totalBorrowedAmount)}
+                          <p className="text-xs font-medium text-[#4C7FC4]">Repaid</p>
+                          <p className="text-xs font-bold text-[#213B75]">
+                            {formatMoney(totalRepaid)} / {formatMoney(totalLentAmount)}
                           </p>
                         </div>
-                        <div className="w-full h-6 bg-[#2a5a45] rounded-md overflow-hidden">
+                        <div className="w-full h-6 bg-[#CDE7F8] rounded-md overflow-hidden">
                           <div
                             className="h-full rounded-md transition-all duration-500 flex items-center justify-end pr-2"
                             style={{
-                              width: `${Math.max(((overviewType === 'lending' ? totalRepaid : totalPaidBack) / Math.max(overviewType === 'lending' ? totalLentAmount : totalBorrowedAmount, 1)) * 100, 2)}%`,
-                              backgroundColor: '#83F384'
+                              width: `${Math.max((totalRepaid / Math.max(totalLentAmount, 1)) * 100, 2)}%`,
+                              backgroundColor: '#4C7FC4'
                             }}
                           >
-                            {(overviewType === 'lending' ? totalRepaid : totalPaidBack) > 0 && (
-                              <span className="text-[10px] font-bold text-[#1C4332]">
-                                {overviewType === 'lending' ? percentRepaid : percentPaid}%
+                            {totalRepaid > 0 && (
+                              <span className="text-[10px] font-bold text-white">
+                                {percentRepaid}%
                               </span>
                             )}
                           </div>
@@ -368,41 +339,97 @@ export default function Home() {
                     </div>
 
                     {/* Next Payment Info */}
-                    <div className="border-t border-[#C2FFDC]/20 pt-4 grid grid-cols-2 gap-4">
+                    <div className="border-t border-[#CDE7F8] pt-4 grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-xs text-[#C2FFDC]/50 mb-1">Next Payment Date</p>
-                        <p className="text-sm font-bold text-[#C2FFDC]">
-                          {overviewType === 'lending'
-                            ? (nextLenderPayment ? format(nextLenderPayment.date, 'EEE, MMM d') : 'N/A')
-                            : (nextBorrowerPayment ? format(nextBorrowerPayment.date, 'EEE, MMM d') : 'N/A')
-                          }
+                        <p className="text-xs text-[#4C7FC4] mb-1">Next Payment Date</p>
+                        <p className="text-sm font-bold text-[#213B75]">
+                          {nextLenderPayment ? format(nextLenderPayment.date, 'EEE, MMM d') : 'N/A'}
                         </p>
-                        {((overviewType === 'lending' && nextLenderPayment) || (overviewType === 'borrowing' && nextBorrowerPayment)) && (
-                          <p className="text-xs text-[#83F384] mt-0.5">
+                        {nextLenderPayment && (
+                          <p className="text-xs text-[#4C7FC4] mt-0.5">
                             {(() => {
-                              const payment = overviewType === 'lending' ? nextLenderPayment : nextBorrowerPayment;
-                              const days = Math.ceil((payment.date - new Date()) / (1000 * 60 * 60 * 24));
+                              const days = Math.ceil((nextLenderPayment.date - new Date()) / (1000 * 60 * 60 * 24));
                               return days > 0 ? `${days} day${days !== 1 ? 's' : ''} away` : days === 0 ? 'Due today' : `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`;
                             })()}
                           </p>
                         )}
                       </div>
                       <div>
-                        <p className="text-xs text-[#C2FFDC]/50 mb-1">Next Payment Amount</p>
-                        <p className="text-sm font-bold text-[#C2FFDC]">
-                          {overviewType === 'lending'
-                            ? (nextLenderPayment ? formatMoney(nextLenderPayment.payment_amount || 0) : 'N/A')
-                            : (nextBorrowerPayment ? formatMoney(nextBorrowerPayment.payment_amount || 0) : 'N/A')
-                          }
+                        <p className="text-xs text-[#4C7FC4] mb-1">Next Payment Amount</p>
+                        <p className="text-sm font-bold text-[#213B75]">
+                          {nextLenderPayment ? formatMoney(nextLenderPayment.payment_amount || 0) : 'N/A'}
                         </p>
-                        {((overviewType === 'lending' && nextLenderPayment) || (overviewType === 'borrowing' && nextBorrowerPayment)) && (
-                          <p className="text-xs text-[#C2FFDC]/50 mt-0.5">
-                            {overviewType === 'lending' ? `from @${nextLenderPayment.username}` : `to @${nextBorrowerPayment.username}`}
+                        {nextLenderPayment && (
+                          <p className="text-xs text-[#4C7FC4] mt-0.5">
+                            from @{nextLenderPayment.username}
                           </p>
                         )}
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
+
+                  {/* Borrowing Overview Box */}
+                  <div className="rounded-xl p-4 sm:p-5 md:p-7 shadow-sm bg-white">
+                    <p className="text-lg font-bold text-[#213B75] mb-5 tracking-tight font-serif">
+                      Borrowing Overview
+                    </p>
+
+                    {/* Bar Chart */}
+                    <div className="space-y-3 mb-6">
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="text-xs font-medium text-[#4C7FC4]">Paid Back</p>
+                          <p className="text-xs font-bold text-[#213B75]">
+                            {formatMoney(totalPaidBack)} / {formatMoney(totalBorrowedAmount)}
+                          </p>
+                        </div>
+                        <div className="w-full h-6 bg-[#CDE7F8] rounded-md overflow-hidden">
+                          <div
+                            className="h-full rounded-md transition-all duration-500 flex items-center justify-end pr-2"
+                            style={{
+                              width: `${Math.max((totalPaidBack / Math.max(totalBorrowedAmount, 1)) * 100, 2)}%`,
+                              backgroundColor: '#4C7FC4'
+                            }}
+                          >
+                            {totalPaidBack > 0 && (
+                              <span className="text-[10px] font-bold text-white">
+                                {percentPaid}%
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Next Payment Info */}
+                    <div className="border-t border-[#CDE7F8] pt-4 grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-[#4C7FC4] mb-1">Next Payment Date</p>
+                        <p className="text-sm font-bold text-[#213B75]">
+                          {nextBorrowerPayment ? format(nextBorrowerPayment.date, 'EEE, MMM d') : 'N/A'}
+                        </p>
+                        {nextBorrowerPayment && (
+                          <p className="text-xs text-[#4C7FC4] mt-0.5">
+                            {(() => {
+                              const days = Math.ceil((nextBorrowerPayment.date - new Date()) / (1000 * 60 * 60 * 24));
+                              return days > 0 ? `${days} day${days !== 1 ? 's' : ''} away` : days === 0 ? 'Due today' : `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`;
+                            })()}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-xs text-[#4C7FC4] mb-1">Next Payment Amount</p>
+                        <p className="text-sm font-bold text-[#213B75]">
+                          {nextBorrowerPayment ? formatMoney(nextBorrowerPayment.payment_amount || 0) : 'N/A'}
+                        </p>
+                        {nextBorrowerPayment && (
+                          <p className="text-xs text-[#4C7FC4] mt-0.5">
+                            to @{nextBorrowerPayment.username}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
               </motion.div>
@@ -411,7 +438,7 @@ export default function Home() {
           </div>
 
           {/* Main Content Below Hero */}
-          <div className="px-4 pt-4 pb-8 sm:px-8 md:px-24 md:pt-4 md:pb-10 lg:px-36" style={{backgroundColor: '#C2FFDC'}}>
+          <div className="px-4 pt-4 pb-8 sm:px-8 md:px-24 md:pt-4 md:pb-10 lg:px-36" style={{backgroundColor: '#CDE7F8'}}>
            <div className="max-w-6xl mx-auto">
             <div className="rounded-2xl p-4 sm:p-6 md:p-10 space-y-6 sm:space-y-8 md:space-y-10" style={{backgroundColor: '#1C4332'}}>
 
