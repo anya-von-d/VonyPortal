@@ -860,7 +860,7 @@ export default function Borrowing() {
                   </div>
                 )}
 
-                {/* Upcoming Payments + Individual Loan Progress */}
+                {/* Upcoming Payments + Month Payment Amount & Overview */}
                 <div className="grid md:grid-cols-2 gap-4">
                   {/* Upcoming Payments - Left */}
                   <div className="bg-[#DBFFEB] rounded-2xl p-5 border-0">
@@ -900,14 +900,213 @@ export default function Borrowing() {
                     )}
                   </div>
 
-                  {/* Individual Loan Progress - Right */}
-                  <div className="bg-[#DBFFEB] rounded-2xl p-5 border-0">
-                    <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                      Individual Loan Progress
-                    </p>
-                    {activeLoans.length === 0 ? (
-                      <p className="text-slate-500 text-sm">No active loans to track</p>
-                    ) : (
+                  {/* Month Payment Amount + Overview - Right */}
+                  <div className="space-y-4">
+                    {/* Month Payment Amount Box */}
+                    {(() => {
+                      const monthEnd = endOfMonth(selectedMonth);
+                      let totalSend = 0;
+
+                      activeLoans.forEach(loan => {
+                        if (!loan.next_payment_date) return;
+                        const paymentDate = new Date(loan.next_payment_date);
+                        const paymentAmount = loan.payment_amount || 0;
+
+                        const addAmountIfInMonth = (date) => {
+                          if (isSameMonth(date, selectedMonth)) {
+                            totalSend += paymentAmount;
+                          }
+                        };
+
+                        addAmountIfInMonth(paymentDate);
+
+                        const frequency = loan.payment_frequency;
+                        if (frequency && frequency !== 'none') {
+                          let currentDate = new Date(loan.next_payment_date);
+                          let iterations = 0;
+                          while (iterations < 10) {
+                            if (frequency === 'weekly') {
+                              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
+                            } else if (frequency === 'biweekly') {
+                              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
+                            } else if (frequency === 'monthly') {
+                              currentDate = addMonths(currentDate, 1);
+                            } else if (frequency === 'daily') {
+                              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+                            } else {
+                              break;
+                            }
+                            if (currentDate > monthEnd) break;
+                            addAmountIfInMonth(currentDate);
+                            iterations++;
+                          }
+                        }
+                      });
+
+                      return (
+                        <div className="bg-[#30FFA8] rounded-xl p-3 flex items-center justify-between">
+                          <p className="text-[11px] text-[#0A1A10] uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                            {format(selectedMonth, 'MMMM')} Payment Amount
+                          </p>
+                          <p className="text-sm font-bold text-[#0A1A10]">
+                            -${totalSend.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </p>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Month Payment Overview Box */}
+                    <div className="bg-[#DBFFEB] rounded-2xl p-5">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="relative">
+                          <button
+                            onClick={() => setShowMonthDropdown(!showMonthDropdown)}
+                            className="flex items-center gap-2 text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium hover:text-slate-800 transition-colors"
+                            style={{ fontFamily: 'IBM Plex Mono, monospace' }}
+                          >
+                            {format(selectedMonth, 'MMMM')} Payment Overview
+                            <ChevronDown className={`w-4 h-4 transition-transform ${showMonthDropdown ? 'rotate-180' : ''}`} />
+                          </button>
+
+                          {showMonthDropdown && (
+                            <>
+                              <div className="fixed inset-0 z-10" onClick={() => setShowMonthDropdown(false)} />
+                              <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-lg border z-20 py-2 min-w-[160px] max-h-[120px] overflow-y-auto">
+                                {Array.from({ length: 12 }, (_, i) => {
+                                  const monthDate = new Date(new Date().getFullYear(), i, 1);
+                                  return (
+                                    <button
+                                      key={i}
+                                      onClick={() => {
+                                        setSelectedMonth(monthDate);
+                                        setShowMonthDropdown(false);
+                                      }}
+                                      className={`w-full px-4 py-2 text-left text-sm hover:bg-[#AAFFA3] transition-colors ${
+                                        isSameMonth(monthDate, selectedMonth) ? 'bg-[#30FFA8] font-medium text-[#00A86B]' : 'text-slate-700'
+                                      }`}
+                                    >
+                                      {format(monthDate, 'MMMM')}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1" style={{
+                        maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
+                        WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)'
+                      }}>
+                        {(() => {
+                          const monthEnd = endOfMonth(selectedMonth);
+                          const events = [];
+
+                          activeLoans.forEach(loan => {
+                            if (!loan.next_payment_date) return;
+
+                            const paymentDate = new Date(loan.next_payment_date);
+                            const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
+
+                            const addEventIfInMonth = (date) => {
+                              if (isSameMonth(date, selectedMonth)) {
+                                events.push({
+                                  date: new Date(date),
+                                  amount: loan.payment_amount || 0,
+                                  username: lender?.username || 'user'
+                                });
+                              }
+                            };
+
+                            addEventIfInMonth(paymentDate);
+
+                            const frequency = loan.payment_frequency;
+                            if (frequency && frequency !== 'none') {
+                              let currentDate = new Date(loan.next_payment_date);
+                              let iterations = 0;
+                              while (iterations < 10) {
+                                if (frequency === 'weekly') {
+                                  currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
+                                } else if (frequency === 'biweekly') {
+                                  currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
+                                } else if (frequency === 'monthly') {
+                                  currentDate = addMonths(currentDate, 1);
+                                } else if (frequency === 'daily') {
+                                  currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+                                } else {
+                                  break;
+                                }
+                                if (currentDate > monthEnd) break;
+                                addEventIfInMonth(currentDate);
+                                iterations++;
+                              }
+                            }
+                          });
+
+                          events.sort((a, b) => a.date - b.date);
+
+                          if (events.length === 0) {
+                            return (
+                              <div className="flex flex-col items-center justify-center py-8 text-slate-500">
+                                <Calendar className="w-10 h-10 opacity-40 mb-2" />
+                                <p className="text-sm">No payments due this month</p>
+                              </div>
+                            );
+                          }
+
+                          const colors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#6EE8B5', '#83F384', '#6EE8A2'];
+
+                          return events.map((event, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center gap-3 p-3 rounded-xl"
+                              style={{ backgroundColor: colors[index % 6] }}
+                            >
+                              <div className="bg-[#96FFD0] rounded-lg px-3 py-2 flex-shrink-0 text-center min-w-[50px]">
+                                <p className="text-xs text-slate-500 uppercase" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                                  {format(event.date, 'MMM')}
+                                </p>
+                                <p className="text-lg font-bold text-slate-800">
+                                  {format(event.date, 'd')}
+                                </p>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-slate-800">
+                                  <span className="text-red-600">Send</span>
+                                  {' '}
+                                  <span className="font-bold">${event.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                  {' '}
+                                  <span className="text-slate-600">to</span>
+                                  {' '}
+                                  <span className="font-medium">@{event.username}</span>
+                                </p>
+                              </div>
+                              <div className="flex-shrink-0">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                                  <polyline points="19 12 12 19 5 12"></polyline>
+                                </svg>
+                              </div>
+                            </div>
+                          ));
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Individual Loan Progress + Loans Ranked By */}
+                {activeLoans.length > 0 && (
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {/* Left column: Individual Loan Progress */}
+                    <div className="bg-[#DBFFEB] rounded-2xl p-5 border-0">
+                      <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                        Individual Loan Progress
+                      </p>
+                      {activeLoans.length === 0 ? (
+                        <p className="text-slate-500 text-sm">No active loans to track</p>
+                      ) : (
                         <div className="space-y-4">
                           {activeLoans.slice(0, 5).map(loan => {
                             const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
@@ -953,205 +1152,6 @@ export default function Borrowing() {
                           )}
                         </div>
                       )}
-                  </div>
-                </div>
-
-                {/* Month Payment + Loans Ranked By */}
-                {activeLoans.length > 0 && (
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {/* Left column: Month Payment Amount + Overview stacked */}
-                    <div className="space-y-4">
-                      {/* Month Payment Amount Box */}
-                      {(() => {
-                        const monthEnd = endOfMonth(selectedMonth);
-                        let totalSend = 0;
-
-                        activeLoans.forEach(loan => {
-                          if (!loan.next_payment_date) return;
-                          const paymentDate = new Date(loan.next_payment_date);
-                          const paymentAmount = loan.payment_amount || 0;
-
-                          const addAmountIfInMonth = (date) => {
-                            if (isSameMonth(date, selectedMonth)) {
-                              totalSend += paymentAmount;
-                            }
-                          };
-
-                          addAmountIfInMonth(paymentDate);
-
-                          const frequency = loan.payment_frequency;
-                          if (frequency && frequency !== 'none') {
-                            let currentDate = new Date(loan.next_payment_date);
-                            let iterations = 0;
-                            while (iterations < 10) {
-                              if (frequency === 'weekly') {
-                                currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
-                              } else if (frequency === 'biweekly') {
-                                currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
-                              } else if (frequency === 'monthly') {
-                                currentDate = addMonths(currentDate, 1);
-                              } else if (frequency === 'daily') {
-                                currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
-                              } else {
-                                break;
-                              }
-                              if (currentDate > monthEnd) break;
-                              addAmountIfInMonth(currentDate);
-                              iterations++;
-                            }
-                          }
-                        });
-
-                        return (
-                          <div className="bg-[#30FFA8] rounded-xl p-3 flex items-center justify-between">
-                            <p className="text-[11px] text-[#0A1A10] uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                              {format(selectedMonth, 'MMMM')} Payment Amount
-                            </p>
-                            <p className="text-sm font-bold text-[#0A1A10]">
-                              -${totalSend.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                            </p>
-                          </div>
-                        );
-                      })()}
-
-                      {/* Month Payment Overview Box */}
-                      <div className="bg-[#DBFFEB] rounded-2xl p-5">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="relative">
-                      <button
-                        onClick={() => setShowMonthDropdown(!showMonthDropdown)}
-                        className="flex items-center gap-2 text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium hover:text-slate-800 transition-colors"
-                        style={{ fontFamily: 'IBM Plex Mono, monospace' }}
-                      >
-                        {format(selectedMonth, 'MMMM')} Payment Overview
-                        <ChevronDown className={`w-4 h-4 transition-transform ${showMonthDropdown ? 'rotate-180' : ''}`} />
-                      </button>
-
-                      {showMonthDropdown && (
-                        <>
-                          <div className="fixed inset-0 z-10" onClick={() => setShowMonthDropdown(false)} />
-                          <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-lg border z-20 py-2 min-w-[160px] max-h-[120px] overflow-y-auto">
-                            {Array.from({ length: 12 }, (_, i) => {
-                              const monthDate = new Date(new Date().getFullYear(), i, 1);
-                              return (
-                                <button
-                                  key={i}
-                                  onClick={() => {
-                                    setSelectedMonth(monthDate);
-                                    setShowMonthDropdown(false);
-                                  }}
-                                  className={`w-full px-4 py-2 text-left text-sm hover:bg-[#AAFFA3] transition-colors ${
-                                    isSameMonth(monthDate, selectedMonth) ? 'bg-[#30FFA8] font-medium text-[#00A86B]' : 'text-slate-700'
-                                  }`}
-                                >
-                                  {format(monthDate, 'MMMM')}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1" style={{
-                    maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
-                    WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)'
-                  }}>
-                    {(() => {
-                      const monthEnd = endOfMonth(selectedMonth);
-                      const events = [];
-
-                      activeLoans.forEach(loan => {
-                        if (!loan.next_payment_date) return;
-
-                        const paymentDate = new Date(loan.next_payment_date);
-                        const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
-
-                        const addEventIfInMonth = (date) => {
-                          if (isSameMonth(date, selectedMonth)) {
-                            events.push({
-                              date: new Date(date),
-                              amount: loan.payment_amount || 0,
-                              username: lender?.username || 'user'
-                            });
-                          }
-                        };
-
-                        addEventIfInMonth(paymentDate);
-
-                        const frequency = loan.payment_frequency;
-                        if (frequency && frequency !== 'none') {
-                          let currentDate = new Date(loan.next_payment_date);
-                          let iterations = 0;
-                          while (iterations < 10) {
-                            if (frequency === 'weekly') {
-                              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
-                            } else if (frequency === 'biweekly') {
-                              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
-                            } else if (frequency === 'monthly') {
-                              currentDate = addMonths(currentDate, 1);
-                            } else if (frequency === 'daily') {
-                              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
-                            } else {
-                              break;
-                            }
-                            if (currentDate > monthEnd) break;
-                            addEventIfInMonth(currentDate);
-                            iterations++;
-                          }
-                        }
-                      });
-
-                      events.sort((a, b) => a.date - b.date);
-
-                      if (events.length === 0) {
-                        return (
-                          <div className="flex flex-col items-center justify-center py-8 text-slate-500">
-                            <Calendar className="w-10 h-10 opacity-40 mb-2" />
-                            <p className="text-sm">No payments due this month</p>
-                          </div>
-                        );
-                      }
-
-                      const colors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#6EE8B5', '#83F384', '#6EE8A2'];
-
-                      return events.map((event, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center gap-3 p-3 rounded-xl"
-                          style={{ backgroundColor: colors[index % 6] }}
-                        >
-                          <div className="bg-[#96FFD0] rounded-lg px-3 py-2 flex-shrink-0 text-center min-w-[50px]">
-                            <p className="text-xs text-slate-500 uppercase" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                              {format(event.date, 'MMM')}
-                            </p>
-                            <p className="text-lg font-bold text-slate-800">
-                              {format(event.date, 'd')}
-                            </p>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-slate-800">
-                              <span className="text-red-600">Send</span>
-                              {' '}
-                              <span className="font-bold">${event.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                              {' '}
-                              <span className="text-slate-600">to</span>
-                              {' '}
-                              <span className="font-medium">@{event.username}</span>
-                            </p>
-                          </div>
-                          <div className="flex-shrink-0">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <line x1="12" y1="5" x2="12" y2="19"></line>
-                              <polyline points="19 12 12 19 5 12"></polyline>
-                            </svg>
-                          </div>
-                        </div>
-                      ));
-                    })()}
-                  </div>
-                </div>
                     </div>
 
                     {/* Loans Ranked By - Right */}
