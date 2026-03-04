@@ -771,13 +771,13 @@ export default function Borrowing() {
                           return (
                             <div className="relative w-28 h-28">
                               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                                <circle cx="60" cy="60" r="52" fill="none" stroke="#E2F5EA" strokeWidth="8" />
+                                <circle cx="60" cy="60" r="52" fill="none" stroke="#1C4332" strokeWidth="8" />
                                 <circle
                                   cx="60"
                                   cy="60"
                                   r="52"
                                   fill="none"
-                                  stroke="#1C4332"
+                                  stroke="#83F384"
                                   strokeWidth="8"
                                   strokeLinecap="round"
                                   strokeDasharray={2 * Math.PI * 52}
@@ -963,8 +963,8 @@ export default function Borrowing() {
                                 </div>
                                 <div className="relative h-3 bg-gray-200 rounded-full overflow-hidden">
                                   <div
-                                    className="absolute top-0 left-0 h-full bg-[#1C4332] rounded-full transition-all duration-500"
-                                    style={{ width: `${percentPaid}%` }}
+                                    className="absolute top-0 left-0 h-full rounded-full transition-all duration-500"
+                                    style={{ width: `${percentPaid}%`, background: 'linear-gradient(to right, #83F384 0%, #83F384 12%, #1C4332 12%, #1C4332 100%)' }}
                                   />
                                 </div>
                                 <div className="flex justify-between text-xs text-slate-500">
