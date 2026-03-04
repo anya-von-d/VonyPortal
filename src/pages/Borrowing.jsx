@@ -963,7 +963,7 @@ export default function Borrowing() {
                                   />
                                 </div>
                                 <div className="flex justify-between text-xs text-slate-500">
-                                  <span>${amountPaid.toLocaleString()} paid</span>
+                                  <span>${amountPaid.toLocaleString()} paid {loan.next_payment_date && <span>· Next Payment on {format(new Date(loan.next_payment_date), 'MMM d')}</span>}</span>
                                   <span>${loanTotalOwed.toLocaleString()} total</span>
                                 </div>
                               </div>
