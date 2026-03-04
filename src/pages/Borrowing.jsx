@@ -776,7 +776,7 @@ export default function Borrowing() {
                                   cy="60"
                                   r="52"
                                   fill="none"
-                                  stroke="#83F384"
+                                  stroke="#1C4332"
                                   strokeWidth="8"
                                   strokeLinecap="round"
                                   strokeDasharray={2 * Math.PI * 52}
@@ -848,7 +848,7 @@ export default function Borrowing() {
 
                 {/* Quick Record Payment */}
                 {activeLoans.length > 0 && (
-                  <div className="rounded-2xl p-5 border-0" style={{backgroundColor: '#83F384'}}>
+                  <div className="rounded-2xl p-5 border-0 bg-[#C2FFDC]">
                     <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                       Record Payment
                     </p>
@@ -862,7 +862,7 @@ export default function Borrowing() {
                         placeholder=""
                         value={quickPayAmount}
                         onChange={(e) => setQuickPayAmount(e.target.value)}
-                        className="w-24 h-8 px-3 bg-[#C2FFDC] inline-flex border-0"
+                        className="w-24 h-8 px-3 inline-flex border-0" style={{backgroundColor: '#83F384'}}
                         style={{ MozAppearance: 'textfield' }}
                       />
                       <span>to</span>
@@ -871,7 +871,7 @@ export default function Borrowing() {
                         // Reset loan selection when person changes
                         setQuickPayLoanId('');
                       }}>
-                        <SelectTrigger className="w-auto h-8 px-3 bg-[#C2FFDC] inline-flex min-w-[120px] border-0">
+                        <SelectTrigger className="w-auto h-8 px-3 inline-flex min-w-[120px] border-0" style={{backgroundColor: '#83F384'}}>
                           <SelectValue placeholder="select person" />
                         </SelectTrigger>
                         <SelectContent>
@@ -884,7 +884,7 @@ export default function Borrowing() {
                       </Select>
                       <span>via</span>
                       <Select value={quickPayMethod} onValueChange={setQuickPayMethod}>
-                        <SelectTrigger className="w-auto h-8 px-3 bg-[#C2FFDC] inline-flex border-0">
+                        <SelectTrigger className="w-auto h-8 px-3 inline-flex border-0" style={{backgroundColor: '#83F384'}}>
                           <SelectValue placeholder="select method" />
                         </SelectTrigger>
                         <SelectContent>
@@ -898,7 +898,7 @@ export default function Borrowing() {
                       </Select>
                       <span>for</span>
                       <Select value={quickPayLoanId} onValueChange={setQuickPayLoanId}>
-                        <SelectTrigger className="w-auto h-8 px-3 bg-[#C2FFDC] inline-flex min-w-[140px] border-0">
+                        <SelectTrigger className="w-auto h-8 px-3 inline-flex min-w-[140px] border-0" style={{backgroundColor: '#83F384'}}>
                           <SelectValue placeholder="select loan" />
                         </SelectTrigger>
                         <SelectContent>
@@ -950,7 +950,7 @@ export default function Borrowing() {
                               <div key={loan.id} className="space-y-1">
                                 <div className="flex items-center justify-between">
                                   <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 rounded-full bg-[#00A86B]/20 flex items-center justify-center">
+                                    <div className="w-6 h-6 rounded-full bg-[#C2FFDC] flex items-center justify-center">
                                       <span className="text-xs font-medium text-[#00A86B]">
                                         {lender?.full_name?.charAt(0) || '?'}
                                       </span>
@@ -963,7 +963,7 @@ export default function Borrowing() {
                                 <div className="w-full h-5 rounded-md overflow-hidden" style={{ backgroundColor: '#DBFFEB' }}>
                                   <div
                                     className="h-full rounded-md transition-all duration-500"
-                                    style={{ width: `${Math.max(percentPaid, 2)}%`, backgroundColor: '#83F384' }}
+                                    style={{ width: `${Math.max(percentPaid, 2)}%`, backgroundColor: '#1C4332' }}
                                   />
                                 </div>
                                 <div className="flex justify-between text-xs text-slate-500">
@@ -1114,7 +1114,7 @@ export default function Borrowing() {
                                 const lender = publicProfiles.find(p => p.user_id === manageLoanSelected.lender_id);
                                 return (
                                   <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 rounded-full bg-[#00A86B]/20 flex items-center justify-center">
+                                    <div className="w-6 h-6 rounded-full bg-[#C2FFDC] flex items-center justify-center">
                                       <span className="text-xs font-medium text-[#00A86B]">
                                         {lender?.full_name?.charAt(0) || '?'}
                                       </span>
@@ -1138,7 +1138,7 @@ export default function Borrowing() {
                               return (
                                 <SelectItem key={loan.id} value={loan.id}>
                                   <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 rounded-full bg-[#00A86B]/20 flex items-center justify-center">
+                                    <div className="w-6 h-6 rounded-full bg-[#C2FFDC] flex items-center justify-center">
                                       <span className="text-xs font-medium text-[#00A86B]">
                                         {lender?.full_name?.charAt(0) || '?'}
                                       </span>
