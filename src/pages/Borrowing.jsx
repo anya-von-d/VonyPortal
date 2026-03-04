@@ -795,7 +795,7 @@ export default function Borrowing() {
                       </div>
 
                       {/* Stats - Right, stacked */}
-                      <div className="flex flex-col gap-4 flex-1 pl-10">
+                      <div className="flex flex-col gap-4 flex-1 pl-10 ml-auto">
                         <div>
                           <p className="text-sm text-gray-600 mb-1">Total Borrowed</p>
                           <p className="text-lg font-bold text-gray-700">${totalBorrowed.toLocaleString()} <span className="text-sm font-medium text-gray-600">· {activeLoans.length} active</span></p>
@@ -964,7 +964,7 @@ export default function Borrowing() {
                                 <div className="relative h-3 bg-gray-200 rounded-full overflow-hidden">
                                   <div
                                     className="absolute top-0 left-0 h-full rounded-full transition-all duration-500"
-                                    style={{ width: `${percentPaid}%`, background: 'linear-gradient(to right, #83F384 0%, #83F384 12%, #1C4332 12%, #1C4332 100%)' }}
+                                    style={{ width: `${percentPaid}%`, background: percentPaid > 0 ? 'linear-gradient(to right, #83F384 0%, #83F384 6px, #1C4332 6px, #1C4332 100%)' : undefined }}
                                   />
                                 </div>
                                 <div className="flex justify-between text-xs text-slate-500">
@@ -1170,25 +1170,25 @@ export default function Borrowing() {
                           </p>
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             <div className="bg-[#83F384] rounded-xl p-4">
-                              <p className="text-xs font-semibold text-slate-500 mb-1 tracking-tight font-serif">Amount</p>
+                              <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Amount</p>
                               <p className="text-xl font-bold text-slate-800">
                                 ${(manageLoanSelected.amount || 0).toLocaleString()}
                               </p>
                             </div>
                             <div className="bg-[#83F384] rounded-xl p-4">
-                              <p className="text-xs font-semibold text-slate-500 mb-1 tracking-tight font-serif">Interest</p>
+                              <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Interest</p>
                               <p className="text-xl font-bold text-slate-800">
                                 {manageLoanSelected.interest_rate || 0}%
                               </p>
                             </div>
                             <div className="bg-[#83F384] rounded-xl p-4">
-                              <p className="text-xs font-semibold text-slate-500 mb-1 tracking-tight font-serif">Term</p>
+                              <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Term</p>
                               <p className="text-xl font-bold text-slate-800">
                                 {manageLoanSelected.repayment_period || 0} {manageLoanSelected.repayment_unit || 'months'}
                               </p>
                             </div>
                             <div className="bg-[#83F384] rounded-xl p-4">
-                              <p className="text-xs font-semibold text-slate-500 mb-1 tracking-tight font-serif">Payment</p>
+                              <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Payment</p>
                               <p className="text-xl font-bold text-slate-800">
                                 ${(manageLoanSelected.payment_amount || 0).toLocaleString()}
                               </p>
@@ -1296,7 +1296,7 @@ export default function Borrowing() {
                               </p>
                               <div className="grid grid-cols-2 gap-3">
                                 <div className="bg-[#83F384] rounded-xl p-4">
-                                  <p className="text-xs font-semibold text-slate-500 mb-1 tracking-tight font-serif">Interest Accrued</p>
+                                  <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Interest Accrued</p>
                                   <p className="text-xl font-bold text-slate-800">
                                     ${(() => {
                                       const principal = manageLoanSelected.amount || 0;
@@ -1306,7 +1306,7 @@ export default function Borrowing() {
                                   </p>
                                 </div>
                                 <div className="bg-[#83F384] rounded-xl p-4">
-                                  <p className="text-xs font-semibold text-slate-500 mb-1 tracking-tight font-serif">Predicted Interest</p>
+                                  <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Predicted Interest</p>
                                   <p className="text-xl font-bold text-slate-800">
                                     ${(() => {
                                       const principal = manageLoanSelected.amount || 0;
@@ -1327,13 +1327,13 @@ export default function Borrowing() {
                               </p>
                               <div className="grid grid-cols-2 gap-3">
                                 <div className="bg-[#83F384] rounded-xl p-4">
-                                  <p className="text-xs font-semibold text-slate-500 mb-1 tracking-tight font-serif">Amount Paid</p>
+                                  <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Amount Paid</p>
                                   <p className="text-xl font-bold text-black">
                                     ${(manageLoanSelected.amount_paid || 0).toLocaleString()}
                                   </p>
                                 </div>
                                 <div className="bg-[#83F384] rounded-xl p-4">
-                                  <p className="text-xs font-semibold text-slate-500 mb-1 tracking-tight font-serif">Completed Payments</p>
+                                  <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Completed Payments</p>
                                   <p className="text-xl font-bold text-slate-800">
                                     {(() => {
                                       const paymentAmt = manageLoanSelected.payment_amount || 0;
