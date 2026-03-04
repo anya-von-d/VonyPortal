@@ -773,12 +773,12 @@ export default function Borrowing() {
                             {formatMoney(totalPaid)} / {formatMoney(totalOwed)}
                           </p>
                         </div>
-                        <div className="w-full h-6 bg-[#E2F5EA] rounded-md overflow-hidden">
+                        <div className="w-full h-6 bg-[#83F384] rounded-md overflow-hidden">
                           <div
                             className="h-full rounded-md transition-all duration-500 flex items-center justify-end pr-2"
                             style={{
                               width: `${Math.max(totalOwed > 0 ? (totalPaid / totalOwed) * 100 : 0, 2)}%`,
-                              backgroundColor: '#00A86B'
+                              backgroundColor: '#1C4332'
                             }}
                           >
                             {totalPaid > 0 && (
@@ -959,9 +959,9 @@ export default function Borrowing() {
                                   </div>
                                   <span className="text-xs text-slate-500">{percentPaid}%</span>
                                 </div>
-                                <div className="relative h-3 bg-white rounded-full overflow-hidden">
+                                <div className="relative h-3 bg-[#83F384] rounded-full overflow-hidden">
                                   <div
-                                    className="absolute top-0 left-0 h-full bg-[#00A86B] rounded-full transition-all duration-500"
+                                    className="absolute top-0 left-0 h-full bg-[#1C4332] rounded-full transition-all duration-500"
                                     style={{ width: `${percentPaid}%` }}
                                   />
                                 </div>
