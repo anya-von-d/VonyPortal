@@ -338,9 +338,10 @@ export default function Home() {
                       {overviewType === 'lending' ? 'Lending Overview' : 'Borrowing Overview'}
                     </p>
 
-                    {/* Bar Chart */}
-                    <div className="space-y-3 mb-6">
-                      <div>
+                    {/* Bar Chart + Next Payment Side by Side */}
+                    <div className="flex gap-4 items-start">
+                      {/* Bar Chart */}
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
                           <p className="text-xs font-medium text-slate-500">
                             {overviewType === 'lending' ? 'Repaid' : 'Paid Back'}
@@ -365,41 +366,41 @@ export default function Home() {
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Next Payment Info */}
-                    <div className="border-t border-slate-100 pt-4 grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-xs text-slate-400 mb-1">Next Payment Date</p>
-                        <p className="text-sm font-bold text-slate-800">
-                          {overviewType === 'lending'
-                            ? (nextLenderPayment ? format(nextLenderPayment.date, 'EEE, MMM d') : 'N/A')
-                            : (nextBorrowerPayment ? format(nextBorrowerPayment.date, 'EEE, MMM d') : 'N/A')
-                          }
-                        </p>
-                        {((overviewType === 'lending' && nextLenderPayment) || (overviewType === 'borrowing' && nextBorrowerPayment)) && (
-                          <p className="text-xs text-[#00A86B] mt-0.5">
-                            {(() => {
-                              const payment = overviewType === 'lending' ? nextLenderPayment : nextBorrowerPayment;
-                              const days = Math.ceil((payment.date - new Date()) / (1000 * 60 * 60 * 24));
-                              return days > 0 ? `${days} day${days !== 1 ? 's' : ''} away` : days === 0 ? 'Due today' : `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`;
-                            })()}
+                      {/* Next Payment Info */}
+                      <div className="flex-shrink-0 border-l border-slate-200 pl-4 space-y-2">
+                        <div>
+                          <p className="text-xs text-slate-400 mb-0.5">Next Payment Date</p>
+                          <p className="text-sm font-bold text-slate-800">
+                            {overviewType === 'lending'
+                              ? (nextLenderPayment ? format(nextLenderPayment.date, 'EEE, MMM d') : 'N/A')
+                              : (nextBorrowerPayment ? format(nextBorrowerPayment.date, 'EEE, MMM d') : 'N/A')
+                            }
                           </p>
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-xs text-slate-400 mb-1">Next Payment Amount</p>
-                        <p className="text-sm font-bold text-slate-800">
-                          {overviewType === 'lending'
-                            ? (nextLenderPayment ? formatMoney(nextLenderPayment.payment_amount || 0) : 'N/A')
-                            : (nextBorrowerPayment ? formatMoney(nextBorrowerPayment.payment_amount || 0) : 'N/A')
-                          }
-                        </p>
-                        {((overviewType === 'lending' && nextLenderPayment) || (overviewType === 'borrowing' && nextBorrowerPayment)) && (
-                          <p className="text-xs text-slate-400 mt-0.5">
-                            {overviewType === 'lending' ? `from @${nextLenderPayment.username}` : `to @${nextBorrowerPayment.username}`}
+                          {((overviewType === 'lending' && nextLenderPayment) || (overviewType === 'borrowing' && nextBorrowerPayment)) && (
+                            <p className="text-xs text-[#00A86B] mt-0.5">
+                              {(() => {
+                                const payment = overviewType === 'lending' ? nextLenderPayment : nextBorrowerPayment;
+                                const days = Math.ceil((payment.date - new Date()) / (1000 * 60 * 60 * 24));
+                                return days > 0 ? `${days} day${days !== 1 ? 's' : ''} away` : days === 0 ? 'Due today' : `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`;
+                              })()}
+                            </p>
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-400 mb-0.5">Next Payment Amount</p>
+                          <p className="text-sm font-bold text-slate-800">
+                            {overviewType === 'lending'
+                              ? (nextLenderPayment ? formatMoney(nextLenderPayment.payment_amount || 0) : 'N/A')
+                              : (nextBorrowerPayment ? formatMoney(nextBorrowerPayment.payment_amount || 0) : 'N/A')
+                            }
                           </p>
-                        )}
+                          {((overviewType === 'lending' && nextLenderPayment) || (overviewType === 'borrowing' && nextBorrowerPayment)) && (
+                            <p className="text-xs text-slate-400 mt-0.5">
+                              {overviewType === 'lending' ? `from @${nextLenderPayment.username}` : `to @${nextBorrowerPayment.username}`}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </motion.div>
