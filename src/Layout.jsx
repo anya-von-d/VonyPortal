@@ -3,10 +3,42 @@ import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useAuth } from "@/lib/AuthContext";
 import TopNav from "@/components/TopNav";
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { Keyboard } from '@capacitor/keyboard';
+
+// Check if running as native app
+const isNativeApp = () => {
+  try {
+    if (typeof window !== 'undefined' && window.Capacitor) {
+      return window.Capacitor.isNativePlatform();
+    }
+    return false;
+  } catch {
+    return false;
+  }
+};
 
 export default function Layout({ children }) {
   const location = useLocation();
   const { userProfile, isLoadingAuth, refreshProfile } = useAuth();
+
+  // Configure status bar and keyboard for native app
+  useEffect(() => {
+    if (isNativeApp()) {
+      try {
+        StatusBar.setStyle({ style: Style.Light });
+        StatusBar.setBackgroundColor({ color: '#1C4332' });
+      } catch (e) {
+        console.log('StatusBar config error:', e);
+      }
+
+      try {
+        Keyboard.setAccessoryBarVisible({ isVisible: true });
+      } catch (e) {
+        console.log('Keyboard config error:', e);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     // Listen for theme changes and profile updates from Profile page
@@ -63,7 +95,7 @@ export default function Layout({ children }) {
   }, [theme, location.pathname]);
 
   return (
-    <div className="min-h-screen flex flex-col w-full" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
+    <div className="min-h-screen flex flex-col w-full safe-area-inset-top safe-area-inset-bottom" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
       {/* TopNav handles its own fixed positioning and mobile menu */}
       {user && <TopNav location={location} />}
 

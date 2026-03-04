@@ -1,5 +1,7 @@
 import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import { App as CapApp } from '@capacitor/app';
+import { Browser } from '@capacitor/browser';
 
 const AuthContext = createContext();
 
@@ -114,8 +116,37 @@ export const AuthProvider = ({ children }) => {
       }
     });
 
+    // Listen for deep link OAuth callbacks (native mobile)
+    let appUrlListener;
+    if (isNativeApp()) {
+      appUrlListener = CapApp.addListener('appUrlOpen', async ({ url }) => {
+        console.log('App URL opened:', url);
+        // Handle OAuth callback deep link: com.vony.lend://auth/callback#access_token=...
+        if (url.includes('auth/callback')) {
+          const hashPart = url.split('#')[1];
+          if (hashPart) {
+            const params = new URLSearchParams(hashPart);
+            const accessToken = params.get('access_token');
+            const refreshToken = params.get('refresh_token');
+            if (accessToken && refreshToken) {
+              console.log('Native OAuth callback: setting session...');
+              await supabase.auth.setSession({
+                access_token: accessToken,
+                refresh_token: refreshToken
+              });
+              // Close the browser that was opened for OAuth
+              try { await Browser.close(); } catch (e) { /* already closed */ }
+            }
+          }
+        }
+      });
+    }
+
     return () => {
       subscription?.unsubscribe();
+      if (appUrlListener) {
+        appUrlListener.then(l => l.remove());
+      }
     };
   }, []);
 
@@ -150,17 +181,38 @@ export const AuthProvider = ({ children }) => {
 
   const navigateToLogin = async () => {
     try {
-      // Web: Normal OAuth redirect
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin
-        }
-      });
+      if (isNativeApp()) {
+        // Native mobile: Open OAuth in system browser with deep link redirect
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: 'com.vony.lend://auth/callback',
+            skipBrowserRedirect: true,
+          }
+        });
 
-      if (error) {
-        console.error('OAuth error:', error);
-        throw error;
+        if (error) {
+          console.error('OAuth error:', error);
+          throw error;
+        }
+
+        // Open the OAuth URL in the system browser
+        if (data?.url) {
+          await Browser.open({ url: data.url });
+        }
+      } else {
+        // Web: Normal OAuth redirect
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: window.location.origin
+          }
+        });
+
+        if (error) {
+          console.error('OAuth error:', error);
+          throw error;
+        }
       }
     } catch (error) {
       console.error('Login error:', error);
