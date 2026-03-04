@@ -303,127 +303,155 @@ export default function Home() {
                   })()}
                 </div>
 
-                {/* Two Overview Boxes Side by Side */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 w-full">
-                  {/* Lending Overview Box */}
-                  <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
-                    <p className="text-sm font-bold text-[#213B75] mb-2 tracking-tight font-sans">
-                      Lending Overview
-                    </p>
-
-                    {/* Bar Chart */}
-                    <div className="mb-3">
-                      <div className="flex items-center justify-between mb-0.5">
-                        <p className="text-[11px] font-medium text-[#4C7FC4]">Repaid</p>
-                        <p className="text-[11px] font-bold text-[#213B75]">
-                          {formatMoney(totalRepaid)} / {formatMoney(totalLentAmount)}
-                        </p>
+                {/* Two-Column Layout: Left = Overviews stacked, Right = Buttons + Activity */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4 w-full">
+                  {/* Left Column: Lending Overview + Borrowing Overview stacked */}
+                  <div className="flex flex-col gap-3 md:gap-4">
+                    {/* Lending Overview Box */}
+                    <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
+                      <p className="text-sm font-bold text-[#213B75] mb-2 tracking-tight font-sans">
+                        Lending Overview
+                      </p>
+                      <div className="mb-3">
+                        <div className="flex items-center justify-between mb-0.5">
+                          <p className="text-[11px] font-medium text-[#4C7FC4]">Repaid</p>
+                          <p className="text-[11px] font-bold text-[#213B75]">
+                            {formatMoney(totalRepaid)} / {formatMoney(totalLentAmount)}
+                          </p>
+                        </div>
+                        <div className="w-full h-5 bg-[#CDE7F8] rounded-md overflow-hidden">
+                          <div
+                            className="h-full rounded-md transition-all duration-500 flex items-center justify-end pr-2"
+                            style={{
+                              width: `${Math.max((totalRepaid / Math.max(totalLentAmount, 1)) * 100, 2)}%`,
+                              backgroundColor: '#4C7FC4'
+                            }}
+                          >
+                            {totalRepaid > 0 && (
+                              <span className="text-[10px] font-bold text-white">
+                                {percentRepaid}%
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <div className="w-full h-5 bg-[#CDE7F8] rounded-md overflow-hidden">
-                        <div
-                          className="h-full rounded-md transition-all duration-500 flex items-center justify-end pr-2"
-                          style={{
-                            width: `${Math.max((totalRepaid / Math.max(totalLentAmount, 1)) * 100, 2)}%`,
-                            backgroundColor: '#4C7FC4'
-                          }}
-                        >
-                          {totalRepaid > 0 && (
-                            <span className="text-[10px] font-bold text-white">
-                              {percentRepaid}%
-                            </span>
+                      <div className="border-t border-[#CDE7F8] pt-2 grid grid-cols-2 gap-3">
+                        <div>
+                          <p className="text-[11px] text-[#4C7FC4] mb-0.5">Next Payment Date</p>
+                          <p className="text-sm font-bold text-[#213B75]">
+                            {nextLenderPayment ? format(nextLenderPayment.date, 'EEE, MMM d') : 'N/A'}
+                          </p>
+                          {nextLenderPayment && (
+                            <p className="text-[11px] text-[#4C7FC4]">
+                              {(() => {
+                                const days = Math.ceil((nextLenderPayment.date - new Date()) / (1000 * 60 * 60 * 24));
+                                return days > 0 ? `${days} day${days !== 1 ? 's' : ''} away` : days === 0 ? 'Due today' : `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`;
+                              })()}
+                            </p>
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-[11px] text-[#4C7FC4] mb-0.5">Next Payment Amount</p>
+                          <p className="text-sm font-bold text-[#213B75]">
+                            {nextLenderPayment ? formatMoney(nextLenderPayment.payment_amount || 0) : 'N/A'}
+                          </p>
+                          {nextLenderPayment && (
+                            <p className="text-[11px] text-[#4C7FC4]">
+                              from @{nextLenderPayment.username}
+                            </p>
                           )}
                         </div>
                       </div>
                     </div>
 
-                    {/* Next Payment Info */}
-                    <div className="border-t border-[#CDE7F8] pt-2 grid grid-cols-2 gap-3">
-                      <div>
-                        <p className="text-[11px] text-[#4C7FC4] mb-0.5">Next Payment Date</p>
-                        <p className="text-sm font-bold text-[#213B75]">
-                          {nextLenderPayment ? format(nextLenderPayment.date, 'EEE, MMM d') : 'N/A'}
-                        </p>
-                        {nextLenderPayment && (
-                          <p className="text-[11px] text-[#4C7FC4]">
-                            {(() => {
-                              const days = Math.ceil((nextLenderPayment.date - new Date()) / (1000 * 60 * 60 * 24));
-                              return days > 0 ? `${days} day${days !== 1 ? 's' : ''} away` : days === 0 ? 'Due today' : `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`;
-                            })()}
+                    {/* Borrowing Overview Box */}
+                    <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
+                      <p className="text-sm font-bold text-[#213B75] mb-2 tracking-tight font-sans">
+                        Borrowing Overview
+                      </p>
+                      <div className="mb-3">
+                        <div className="flex items-center justify-between mb-0.5">
+                          <p className="text-[11px] font-medium text-[#4C7FC4]">Paid Back</p>
+                          <p className="text-[11px] font-bold text-[#213B75]">
+                            {formatMoney(totalPaidBack)} / {formatMoney(totalBorrowedAmount)}
                           </p>
-                        )}
+                        </div>
+                        <div className="w-full h-5 bg-[#CDE7F8] rounded-md overflow-hidden">
+                          <div
+                            className="h-full rounded-md transition-all duration-500 flex items-center justify-end pr-2"
+                            style={{
+                              width: `${Math.max((totalPaidBack / Math.max(totalBorrowedAmount, 1)) * 100, 2)}%`,
+                              backgroundColor: '#4C7FC4'
+                            }}
+                          >
+                            {totalPaidBack > 0 && (
+                              <span className="text-[10px] font-bold text-white">
+                                {percentPaid}%
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-[11px] text-[#4C7FC4] mb-0.5">Next Payment Amount</p>
-                        <p className="text-sm font-bold text-[#213B75]">
-                          {nextLenderPayment ? formatMoney(nextLenderPayment.payment_amount || 0) : 'N/A'}
-                        </p>
-                        {nextLenderPayment && (
-                          <p className="text-[11px] text-[#4C7FC4]">
-                            from @{nextLenderPayment.username}
+                      <div className="border-t border-[#CDE7F8] pt-2 grid grid-cols-2 gap-3">
+                        <div>
+                          <p className="text-[11px] text-[#4C7FC4] mb-0.5">Next Payment Date</p>
+                          <p className="text-sm font-bold text-[#213B75]">
+                            {nextBorrowerPayment ? format(nextBorrowerPayment.date, 'EEE, MMM d') : 'N/A'}
                           </p>
-                        )}
+                          {nextBorrowerPayment && (
+                            <p className="text-[11px] text-[#4C7FC4]">
+                              {(() => {
+                                const days = Math.ceil((nextBorrowerPayment.date - new Date()) / (1000 * 60 * 60 * 24));
+                                return days > 0 ? `${days} day${days !== 1 ? 's' : ''} away` : days === 0 ? 'Due today' : `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`;
+                              })()}
+                            </p>
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-[11px] text-[#4C7FC4] mb-0.5">Next Payment Amount</p>
+                          <p className="text-sm font-bold text-[#213B75]">
+                            {nextBorrowerPayment ? formatMoney(nextBorrowerPayment.payment_amount || 0) : 'N/A'}
+                          </p>
+                          {nextBorrowerPayment && (
+                            <p className="text-[11px] text-[#4C7FC4]">
+                              to @{nextBorrowerPayment.username}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Borrowing Overview Box */}
-                  <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
-                    <p className="text-sm font-bold text-[#213B75] mb-2 tracking-tight font-sans">
-                      Borrowing Overview
-                    </p>
-
-                    {/* Bar Chart */}
-                    <div className="mb-3">
-                      <div className="flex items-center justify-between mb-0.5">
-                        <p className="text-[11px] font-medium text-[#4C7FC4]">Paid Back</p>
-                        <p className="text-[11px] font-bold text-[#213B75]">
-                          {formatMoney(totalPaidBack)} / {formatMoney(totalBorrowedAmount)}
-                        </p>
-                      </div>
-                      <div className="w-full h-5 bg-[#CDE7F8] rounded-md overflow-hidden">
-                        <div
-                          className="h-full rounded-md transition-all duration-500 flex items-center justify-end pr-2"
-                          style={{
-                            width: `${Math.max((totalPaidBack / Math.max(totalBorrowedAmount, 1)) * 100, 2)}%`,
-                            backgroundColor: '#4C7FC4'
-                          }}
-                        >
-                          {totalPaidBack > 0 && (
-                            <span className="text-[10px] font-bold text-white">
-                              {percentPaid}%
-                            </span>
-                          )}
-                        </div>
-                      </div>
+                  {/* Right Column: Three buttons horizontal + Activity below */}
+                  <div className="flex flex-col gap-3 md:gap-4">
+                    {/* Three Quick Action Buttons - horizontal */}
+                    <div className="grid grid-cols-3 gap-2">
+                      <Link
+                        to={createPageUrl("Lending")}
+                        className="rounded-xl px-3 py-3 shadow-sm bg-white text-center"
+                      >
+                        <p className="text-sm font-bold text-[#213B75] tracking-tight font-sans">Create Loan Offer</p>
+                      </Link>
+                      <Link
+                        to={createPageUrl("Requests")}
+                        className="rounded-xl px-3 py-3 shadow-sm bg-white text-center"
+                      >
+                        <p className="text-sm font-bold text-[#213B75] tracking-tight font-sans">View Requests</p>
+                      </Link>
+                      <Link
+                        to={createPageUrl("LoanAgreements")}
+                        className="rounded-xl px-3 py-3 shadow-sm bg-white text-center"
+                      >
+                        <p className="text-sm font-bold text-[#213B75] tracking-tight font-sans">View Documents</p>
+                      </Link>
                     </div>
 
-                    {/* Next Payment Info */}
-                    <div className="border-t border-[#CDE7F8] pt-2 grid grid-cols-2 gap-3">
-                      <div>
-                        <p className="text-[11px] text-[#4C7FC4] mb-0.5">Next Payment Date</p>
-                        <p className="text-sm font-bold text-[#213B75]">
-                          {nextBorrowerPayment ? format(nextBorrowerPayment.date, 'EEE, MMM d') : 'N/A'}
-                        </p>
-                        {nextBorrowerPayment && (
-                          <p className="text-[11px] text-[#4C7FC4]">
-                            {(() => {
-                              const days = Math.ceil((nextBorrowerPayment.date - new Date()) / (1000 * 60 * 60 * 24));
-                              return days > 0 ? `${days} day${days !== 1 ? 's' : ''} away` : days === 0 ? 'Due today' : `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`;
-                            })()}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-[11px] text-[#4C7FC4] mb-0.5">Next Payment Amount</p>
-                        <p className="text-sm font-bold text-[#213B75]">
-                          {nextBorrowerPayment ? formatMoney(nextBorrowerPayment.payment_amount || 0) : 'N/A'}
-                        </p>
-                        {nextBorrowerPayment && (
-                          <p className="text-[11px] text-[#4C7FC4]">
-                            to @{nextBorrowerPayment.username}
-                          </p>
-                        )}
-                      </div>
+                    {/* Activity Box - matching overview style */}
+                    <div className="rounded-xl px-4 py-3 shadow-sm bg-white flex-1">
+                      <p className="text-sm font-bold text-[#213B75] mb-2 tracking-tight font-sans">
+                        Activity
+                      </p>
+                      <RecentActivity loans={myLoans} payments={payments} user={user} allUsers={safeAllProfiles} />
                     </div>
                   </div>
                 </div>
@@ -441,39 +469,6 @@ export default function Home() {
             {pendingOffers.length > 0 && (
               <PendingLoanOffers offers={pendingOffers} />
             )}
-
-            {/* Quick Actions & Activity Row */}
-            <div className="grid lg:grid-cols-[auto_1fr] gap-4 md:gap-6 items-center">
-              {/* Stacked Quick Action Buttons */}
-              <div className="flex flex-col gap-2 items-stretch w-full sm:w-[180px] mx-auto lg:mx-0">
-                <Link
-                  to={createPageUrl("Lending")}
-                  className="py-2.5 rounded-full text-sm font-semibold text-[#1C4332] text-center transition-colors duration-200 hover:opacity-90 whitespace-nowrap"
-                  style={{ backgroundColor: '#83F384' }}
-                >
-                  Create Loan Offer
-                </Link>
-                <Link
-                  to={createPageUrl("Requests")}
-                  className="py-2.5 rounded-full text-sm font-semibold text-[#1C4332] text-center transition-colors duration-200 hover:opacity-90 whitespace-nowrap"
-                  style={{ backgroundColor: '#83F384' }}
-                >
-                  View Requests
-                </Link>
-                <Link
-                  to={createPageUrl("LoanAgreements")}
-                  className="py-2.5 rounded-full text-sm font-semibold text-[#1C4332] text-center transition-colors duration-200 hover:opacity-90 whitespace-nowrap"
-                  style={{ backgroundColor: '#83F384' }}
-                >
-                  View Documents
-                </Link>
-              </div>
-
-              {/* Activity */}
-              <div>
-                <RecentActivity loans={myLoans} payments={payments} user={user} allUsers={safeAllProfiles} />
-              </div>
-            </div>
 
             {/* Record Payment Box */}
             {myLoans.filter(l => l && l.status === 'active').length > 0 && (
