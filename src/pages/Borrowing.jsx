@@ -670,10 +670,11 @@ export default function Borrowing() {
         )}
       </AnimatePresence>
 
-      <div className="min-h-screen" style={{backgroundColor: '#F4F7F5'}}>
-        {/* Hero Section */}
-        <div className="px-10 py-8 md:px-20 md:py-12 lg:px-28" style={{backgroundColor: '#83F384'}}>
-          <div className="max-w-6xl mx-auto">
+      <div className="min-h-screen" style={{backgroundColor: '#83F384'}}>
+        {/* Full page bright green background */}
+        <div className="px-10 py-8 md:px-20 md:py-12 lg:px-28">
+          <div className="max-w-6xl mx-auto space-y-8 md:space-y-10">
+            {/* Hero - Title + Overview Box */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -746,31 +747,29 @@ export default function Borrowing() {
                 </div>
               </div>
             </motion.div>
-          </div>
-        </div>
 
-        {/* Main Content Below Hero */}
-        <div className="px-10 pt-10 pb-8 md:px-20 md:pt-14 md:pb-10 lg:px-28" style={{backgroundColor: '#1C4332'}}>
-          <div className="max-w-6xl mx-auto space-y-8 md:space-y-10">
+            {/* Tab Navigation */}
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {tabs.map(tab => (
+                <Button
+                  key={tab.id}
+                  onClick={() => setActiveSection(tab.id)}
+                  variant={activeSection === tab.id ? 'default' : 'outline'}
+                  className={`whitespace-nowrap ${
+                    activeSection === tab.id
+                      ? 'bg-[#1C4332] hover:bg-[#163828] text-white'
+                      : 'bg-white border-0 text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+                </Button>
+              ))}
+            </div>
 
-          {/* Tab Navigation */}
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            {tabs.map(tab => (
-              <Button
-                key={tab.id}
-                onClick={() => setActiveSection(tab.id)}
-                variant={activeSection === tab.id ? 'default' : 'outline'}
-                className={`whitespace-nowrap ${
-                  activeSection === tab.id
-                    ? 'bg-[#00A86B] hover:bg-[#0D9B76] text-white'
-                    : 'bg-white border-0 text-slate-600 hover:bg-slate-50'
-                }`}
-              >
-                <span className="hidden sm:inline">{tab.label}</span>
-                <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
-              </Button>
-            ))}
-          </div>
+            {/* Dark Green Content Box */}
+            <div className="rounded-2xl p-6 md:p-8 lg:p-10" style={{backgroundColor: '#1C4332'}}>
+              <div className="space-y-8 md:space-y-10">
 
           {/* Content Sections */}
           <AnimatePresence mode="wait">
@@ -1680,6 +1679,8 @@ export default function Borrowing() {
             )}
 
           </AnimatePresence>
+              </div>
+            </div>
           </div>
         </div>
       </div>
