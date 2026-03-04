@@ -670,8 +670,8 @@ export default function Borrowing() {
         )}
       </AnimatePresence>
 
-      <div className="min-h-screen" style={{backgroundColor: '#83F384'}}>
-        {/* Full page bright green background */}
+      <div className="min-h-screen" style={{backgroundColor: '#1C4332'}}>
+        {/* Full page dark green background */}
         <div className="px-10 py-8 md:px-20 md:py-12 lg:px-28">
           <div className="max-w-6xl mx-auto space-y-8 md:space-y-10">
             {/* Hero - Title + Overview Box */}
@@ -682,8 +682,8 @@ export default function Borrowing() {
             >
               {/* Left Side - Title */}
               <div className="flex-shrink-0">
-                <p className="text-4xl md:text-6xl font-bold text-[#1C4332] tracking-tight leading-tight font-serif">Borrowing</p>
-                <p className="text-4xl md:text-6xl font-bold text-[#1C4332] tracking-tight leading-tight font-serif">Overview</p>
+                <p className="text-4xl md:text-6xl font-bold text-[#83F384] tracking-tight leading-tight font-serif">Borrowing</p>
+                <p className="text-4xl md:text-6xl font-bold text-[#83F384] tracking-tight leading-tight font-serif">Overview</p>
               </div>
 
               {/* Right Side - Overview box */}
@@ -757,8 +757,8 @@ export default function Borrowing() {
                   variant={activeSection === tab.id ? 'default' : 'outline'}
                   className={`whitespace-nowrap ${
                     activeSection === tab.id
-                      ? 'bg-[#1C4332] hover:bg-[#163828] text-white'
-                      : 'bg-white border-0 text-slate-600 hover:bg-slate-50'
+                      ? 'bg-[#83F384] hover:bg-[#6fe06f] text-[#1C4332] font-bold'
+                      : 'bg-white/20 border-0 text-white hover:bg-white/30'
                   }`}
                 >
                   <span className="hidden sm:inline">{tab.label}</span>
@@ -767,8 +767,8 @@ export default function Borrowing() {
               ))}
             </div>
 
-            {/* Dark Green Content Box */}
-            <div className="rounded-2xl p-6 md:p-8 lg:p-10" style={{backgroundColor: '#1C4332'}}>
+            {/* Bright Green Content Box */}
+            <div className="rounded-2xl p-6 md:p-8 lg:p-10" style={{backgroundColor: '#83F384'}}>
               <div className="space-y-8 md:space-y-10">
 
           {/* Content Sections */}
