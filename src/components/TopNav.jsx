@@ -7,6 +7,10 @@ import { motion, AnimatePresence } from "framer-motion";
 // Top bar items
 const topBarItems = [
   {
+    title: "Friends",
+    url: createPageUrl("Friends"),
+  },
+  {
     title: "My Loan Documents",
     url: createPageUrl("LoanAgreements"),
   },
@@ -54,7 +58,7 @@ const bottomRightItems = [
   },
 ];
 
-const allNavItems = [...bottomLeftItems, ...bottomRightItems, ...topBarItems, { title: "Friends", url: createPageUrl("Friends") }];
+const allNavItems = [...bottomLeftItems, ...bottomRightItems, ...topBarItems];
 
 export default function TopNav({ location }) {
   const [menuOpen, setMenuOpen] = useState(false);
