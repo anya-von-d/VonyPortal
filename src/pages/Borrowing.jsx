@@ -670,18 +670,88 @@ export default function Borrowing() {
         )}
       </AnimatePresence>
 
-      <div className="min-h-screen p-6" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
-        <div className="max-w-4xl mx-auto space-y-7">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="py-5"
-          >
-            <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-left">
-              Borrowing
-            </h1>
-          </motion.div>
+      <div className="min-h-screen" style={{backgroundColor: '#F4F7F5'}}>
+        {/* Hero Section */}
+        <div className="px-10 py-8 md:px-20 md:py-12 lg:px-28" style={{backgroundColor: '#83F384'}}>
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 md:gap-10"
+            >
+              {/* Left Side - Title */}
+              <div className="flex-shrink-0">
+                <p className="text-4xl md:text-6xl font-bold text-[#1C4332] tracking-tight leading-tight font-serif">Borrowing</p>
+                <p className="text-4xl md:text-6xl font-bold text-[#1C4332] tracking-tight leading-tight font-serif">Overview</p>
+              </div>
+
+              {/* Right Side - Overview box */}
+              <div className="bg-white rounded-xl p-5 md:p-7 flex-1 lg:max-w-md shadow-sm">
+                <p className="text-lg font-bold text-slate-800 mb-5 tracking-tight font-serif">
+                  Borrowing Overview
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Pie Chart */}
+                  <div className="rounded-xl p-3 flex flex-col items-center justify-center" style={{ backgroundColor: '#DBFFEB' }}>
+                    {(() => {
+                      const percentPaid = totalOwed > 0 ? Math.round((totalPaid / totalOwed) * 100) : 0;
+
+                      return (
+                        <>
+                          <div className="relative w-24 h-24">
+                            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                              <circle cx="60" cy="60" r="52" fill="none" stroke="#E2F5EA" strokeWidth="7" />
+                              <circle
+                                cx="60"
+                                cy="60"
+                                r="52"
+                                fill="none"
+                                stroke="#00A86B"
+                                strokeWidth="7"
+                                strokeLinecap="round"
+                                strokeDasharray={2 * Math.PI * 52}
+                                strokeDashoffset={2 * Math.PI * 52 - (percentPaid / 100) * 2 * Math.PI * 52}
+                                className="transition-all duration-500"
+                              />
+                            </svg>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                              <span className="text-lg font-bold text-slate-800">{percentPaid}%</span>
+                              <span className="text-[9px] text-slate-500 uppercase tracking-wider">Paid</span>
+                            </div>
+                          </div>
+                          <div className="mt-2 text-center">
+                            <p className="text-xs text-slate-500">
+                              ${totalPaid.toLocaleString()} of ${totalOwed.toLocaleString()}
+                            </p>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+
+                  {/* Stats Card - Total Borrowed */}
+                  <div className="rounded-xl p-4 flex flex-col h-full" style={{ backgroundColor: '#DBFFEB' }}>
+                    <p className="text-sm font-medium text-slate-600 mb-2 text-left">Total Borrowed</p>
+                    <p className="text-2xl font-bold text-slate-800 text-center flex-1 flex items-center justify-center">${totalBorrowed.toLocaleString()}</p>
+                    <p className="text-xs text-slate-500 text-right">{activeLoans.length} active loans</p>
+                  </div>
+
+                  {/* Stats Card - Remaining */}
+                  <div className="rounded-xl p-4 flex flex-col h-full" style={{ backgroundColor: '#DBFFEB' }}>
+                    <p className="text-sm font-medium text-slate-600 mb-2 text-left">Remaining Balance</p>
+                    <p className="text-2xl font-bold text-slate-800 text-center flex-1 flex items-center justify-center">${remainingBalance.toLocaleString()}</p>
+                    <p className="text-xs text-slate-500 text-right">${totalPaid.toLocaleString()} paid</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Main Content Below Hero */}
+        <div className="px-10 pt-10 pb-8 md:px-20 md:pt-14 md:pb-10 lg:px-28" style={{backgroundColor: '#1C4332'}}>
+          <div className="max-w-6xl mx-auto space-y-8 md:space-y-10">
 
           {/* Tab Navigation */}
           <div className="flex gap-2 overflow-x-auto pb-2">
@@ -710,72 +780,8 @@ export default function Borrowing() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="space-y-7"
+                className="space-y-8 md:space-y-10"
               >
-                {/* Borrowing Overview Section */}
-                <div className="bg-[#DBFFEB] rounded-2xl p-4">
-                  <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-3" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                    Borrowing Overview
-                  </p>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* Pie Chart */}
-                    <div className="rounded-xl p-3 flex flex-col items-center justify-center" style={{ backgroundColor: '#6EE8B5' }}>
-                      {(() => {
-                        const percentPaid = totalOwed > 0 ? Math.round((totalPaid / totalOwed) * 100) : 0;
-
-                        return (
-                          <>
-                            <div className="relative w-24 h-24">
-                              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                                <circle cx="60" cy="60" r="52" fill="none" stroke="#DBFFEB" strokeWidth="7" />
-                                <circle
-                                  cx="60"
-                                  cy="60"
-                                  r="52"
-                                  fill="none"
-                                  stroke="#00A86B"
-                                  strokeWidth="7"
-                                  strokeLinecap="round"
-                                  strokeDasharray={2 * Math.PI * 52}
-                                  strokeDashoffset={2 * Math.PI * 52 - (percentPaid / 100) * 2 * Math.PI * 52}
-                                  className="transition-all duration-500"
-                                />
-                              </svg>
-                              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                <span className="text-lg font-bold text-slate-800">{percentPaid}%</span>
-                                <span className="text-[9px] text-slate-500 uppercase tracking-wider">Paid</span>
-                              </div>
-                            </div>
-                            <div className="mt-2 text-center">
-                              <p className="text-xs text-slate-500">
-                                ${totalPaid.toLocaleString()} of ${totalOwed.toLocaleString()}
-                              </p>
-                            </div>
-                          </>
-                        );
-                      })()}
-                    </div>
-
-                    {/* Stats Card - Total Borrowed */}
-                    <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0 rounded-xl" style={{ backgroundColor: '#83F384' }}>
-                      <CardContent className="p-4 flex flex-col h-full">
-                        <p className="text-sm font-medium text-slate-600 mb-2 text-left">Total Borrowed</p>
-                        <p className="text-2xl font-bold text-slate-800 text-center flex-1 flex items-center justify-center">${totalBorrowed.toLocaleString()}</p>
-                        <p className="text-xs text-slate-500 text-right">{activeLoans.length} active loans</p>
-                      </CardContent>
-                    </Card>
-
-                    {/* Stats Card - Remaining */}
-                    <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0 rounded-xl" style={{ backgroundColor: '#6EE8B5' }}>
-                      <CardContent className="p-4 flex flex-col h-full">
-                        <p className="text-sm font-medium text-slate-600 mb-2 text-left">Remaining Balance</p>
-                        <p className="text-2xl font-bold text-slate-800 text-center flex-1 flex items-center justify-center">${remainingBalance.toLocaleString()}</p>
-                        <p className="text-xs text-slate-500 text-right">${totalPaid.toLocaleString()} paid</p>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
 
                 {/* Quick Record Payment */}
                 {activeLoans.length > 0 && (
@@ -1674,6 +1680,7 @@ export default function Borrowing() {
             )}
 
           </AnimatePresence>
+          </div>
         </div>
       </div>
 
