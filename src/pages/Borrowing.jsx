@@ -319,68 +319,80 @@ export default function Borrowing() {
   // Generate amortization schedule
   const generateAmortizationSchedule = (agreement) => {
     const schedule = [];
-    const principal = agreement.amount || 0;
-    const paymentAmount = agreement.payment_amount || 0;
+    const loanAmount = agreement.amount || 0;
     const frequency = agreement.payment_frequency || 'monthly';
     const annualRate = agreement.interest_rate || 0;
 
-    if (paymentAmount <= 0 || principal <= 0) return schedule;
+    if (loanAmount <= 0) return schedule;
 
-    // Determine periods per year based on payment frequency
+    // Convert repayment period to total months
+    const repaymentPeriod = agreement.repayment_period || 1;
+    const repaymentUnit = agreement.repayment_unit || 'months';
+    let totalMonths = repaymentPeriod;
+    if (repaymentUnit === 'years') totalMonths = repaymentPeriod * 12;
+    else if (repaymentUnit === 'weeks') totalMonths = repaymentPeriod / 4.333;
+
+    // Total number of payments based on frequency
+    let totalPayments;
+    if (frequency === 'weekly') totalPayments = Math.round(totalMonths * 4.333);
+    else if (frequency === 'biweekly') totalPayments = Math.round(totalMonths * 2.167);
+    else if (frequency === 'daily') totalPayments = Math.round(totalMonths * 30.417);
+    else totalPayments = Math.round(totalMonths);
+
+    if (totalPayments <= 0) totalPayments = 1;
+
+    // Periodic interest rate
     let periodsPerYear = 12;
     if (frequency === 'weekly') periodsPerYear = 52;
     else if (frequency === 'biweekly') periodsPerYear = 26;
     else if (frequency === 'daily') periodsPerYear = 365;
 
-    const periodicRate = annualRate > 0 ? (annualRate / 100) / periodsPerYear : 0;
+    const r = annualRate > 0 ? (annualRate / 100) / periodsPerYear : 0;
 
-    let remainingBalance = principal;
+    // Payment using amortization formula: P = L * r / (1 - (1 + r)^(-n))
+    let payment;
+    if (r > 0) {
+      payment = loanAmount * r / (1 - Math.pow(1 + r, -totalPayments));
+    } else {
+      payment = loanAmount / totalPayments;
+    }
+    payment = Math.round(payment * 100) / 100;
+
+    let balance = loanAmount;
     let currentDate = new Date(agreement.created_at);
-    let paymentNumber = 1;
     let principalToDate = 0;
     let interestToDate = 0;
 
-    while (remainingBalance > 0.01 && paymentNumber <= 600) {
-      // Advance date based on frequency
-      if (frequency === 'weekly') {
-        currentDate = addWeeks(currentDate, 1);
-      } else if (frequency === 'biweekly') {
-        currentDate = addWeeks(currentDate, 2);
-      } else if (frequency === 'daily') {
-        currentDate = addDays(currentDate, 1);
-      } else {
-        currentDate = addMonths(currentDate, 1);
+    for (let i = 1; i <= totalPayments; i++) {
+      if (frequency === 'weekly') currentDate = addWeeks(currentDate, 1);
+      else if (frequency === 'biweekly') currentDate = addWeeks(currentDate, 2);
+      else if (frequency === 'daily') currentDate = addDays(currentDate, 1);
+      else currentDate = addMonths(currentDate, 1);
+
+      const startingBalance = balance;
+      const interest = Math.round(balance * r * 100) / 100;
+      let principal = Math.round((payment - interest) * 100) / 100;
+      balance = Math.round((balance - principal) * 100) / 100;
+
+      // Final payment: zero out balance
+      if (i === totalPayments) {
+        principal = Math.round((balance + principal) * 100) / 100;
+        balance = 0;
       }
 
-      const startingBalance = remainingBalance;
-
-      // Round interest to cents, then derive principal from payment minus rounded interest
-      const interestPayment = Math.round(remainingBalance * periodicRate * 100) / 100;
-      let principalPayment = Math.round((paymentAmount - interestPayment) * 100) / 100;
-
-      // Final payment: adjust to zero out the balance exactly
-      if (principalPayment >= remainingBalance) {
-        principalPayment = Math.round(remainingBalance * 100) / 100;
-      }
-
-      remainingBalance = Math.round((remainingBalance - principalPayment) * 100) / 100;
-      if (remainingBalance < 0) remainingBalance = 0;
-
-      principalToDate = Math.round((principalToDate + principalPayment) * 100) / 100;
-      interestToDate = Math.round((interestToDate + interestPayment) * 100) / 100;
+      principalToDate = Math.round((principalToDate + principal) * 100) / 100;
+      interestToDate = Math.round((interestToDate + interest) * 100) / 100;
 
       schedule.push({
-        number: paymentNumber,
+        number: i,
         date: new Date(currentDate),
         startingBalance,
-        principal: principalPayment,
-        interest: interestPayment,
+        principal,
+        interest,
         principalToDate,
         interestToDate,
-        endingBalance: remainingBalance
+        endingBalance: balance
       });
-
-      paymentNumber++;
     }
 
     return schedule;
