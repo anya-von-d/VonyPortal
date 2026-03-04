@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useAuth } from "@/lib/AuthContext";
 import TopNav from "@/components/TopNav";
+import Footer from "@/components/Footer";
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Keyboard } from '@capacitor/keyboard';
 
@@ -103,6 +104,9 @@ export default function Layout({ children }) {
       <main className="flex-1 overflow-auto">
         {children}
       </main>
+
+      {/* Footer */}
+      {user && <Footer />}
     </div>
   );
 }

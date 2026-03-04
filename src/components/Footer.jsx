@@ -1,0 +1,99 @@
+import React from "react";
+
+export default function Footer() {
+  return (
+    <footer className="w-full" style={{ backgroundColor: '#1C4332' }}>
+      {/* Top Section: About + Coming Soon */}
+      <div className="px-6 md:px-10 lg:px-20 pt-10 pb-8">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-16">
+          {/* About Section */}
+          <div>
+            <p className="text-xs font-semibold text-[#83F384] uppercase tracking-widest mb-4 font-sans">
+              About
+            </p>
+            <div className="flex flex-col gap-2.5">
+              <a
+                href="https://lend-with-vony.com/home"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-[#DBFFEB]/80 hover:text-[#DBFFEB] transition-colors font-sans"
+              >
+                About Vony Lending
+              </a>
+              <a
+                href="https://lend-with-vony.com/home#faq"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-[#DBFFEB]/80 hover:text-[#DBFFEB] transition-colors font-sans"
+              >
+                FAQ
+              </a>
+            </div>
+          </div>
+
+          {/* Coming Soon Section */}
+          <div>
+            <p className="text-xs font-semibold text-[#83F384] uppercase tracking-widest mb-4 font-sans">
+              Coming Soon
+            </p>
+            <div className="flex flex-col gap-2.5">
+              <p className="text-sm text-[#DBFFEB]/50 font-sans">
+                Financial Products
+              </p>
+              <p className="text-sm text-[#DBFFEB]/50 font-sans">
+                Learn
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div className="px-6 md:px-10 lg:px-20">
+        <div className="max-w-6xl mx-auto border-t border-[#DBFFEB]/15" />
+      </div>
+
+      {/* Bottom Section: Logo + Flag, Legal, Copyright */}
+      <div className="px-6 md:px-10 lg:px-20 pt-6 pb-8">
+        <div className="max-w-6xl mx-auto space-y-5">
+          {/* Logo Row + Flag */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <img
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/e492d87a7_Logo.png"
+                alt="Vony Logo"
+                className="w-8 h-8 rounded-full object-cover"
+              />
+              <span className="font-display italic text-xl text-[#DBFFEB] tracking-wide">
+                Vony
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🇺🇸</span>
+              <span className="text-sm text-[#DBFFEB]/80 font-sans">United States</span>
+            </div>
+          </div>
+
+          {/* Legal Links */}
+          <div className="flex flex-wrap items-center gap-1 text-xs text-[#DBFFEB]/60 font-sans">
+            <span className="hover:text-[#DBFFEB] cursor-pointer transition-colors">Terms of Service</span>
+            <span className="mx-1">|</span>
+            <span className="hover:text-[#DBFFEB] cursor-pointer transition-colors">Privacy Center</span>
+            <span className="mx-1">|</span>
+            <span className="hover:text-[#DBFFEB] cursor-pointer transition-colors">Do not sell or share my personal information</span>
+          </div>
+
+          {/* Disclaimer */}
+          <p className="text-[11px] text-[#DBFFEB]/40 leading-relaxed font-sans">
+            All users of our online services are subject to our Privacy Statement and agree to be bound by the Terms of Service. Please review.
+          </p>
+
+          {/* Copyright */}
+          <p className="text-[11px] text-[#DBFFEB]/40 font-sans">
+            © 2026 Vony Lending All rights reserved
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}

@@ -19,16 +19,6 @@ const topBarItems = [
     url: createPageUrl("RecentActivity"),
   },
   {
-    title: "Financial Products",
-    url: createPageUrl("Shop"),
-    comingSoon: true,
-  },
-  {
-    title: "Learn",
-    url: createPageUrl("Learn"),
-    comingSoon: true,
-  },
-  {
     title: "Profile",
     url: createPageUrl("Profile"),
   },
