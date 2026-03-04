@@ -759,51 +759,51 @@ export default function Borrowing() {
                 <div className="grid md:grid-cols-2 gap-4">
                   {/* Borrowing Overview Box - Left */}
                   <div className="rounded-2xl p-4 sm:p-5 border-0 flex" style={{backgroundColor: '#83F384'}}>
-                    {/* Left side: Title + Stats */}
+                    {/* Left side: Title + Pie Chart */}
                     <div className="flex flex-col">
                       <p className="text-lg font-bold text-slate-800 mb-4 tracking-tight font-serif whitespace-nowrap">
                         Borrowing Overview
                       </p>
-                      <div className="flex flex-col justify-center gap-4 text-left pl-2">
-                        <div>
-                          <p className="text-sm text-gray-600 mb-1">Total Borrowed</p>
-                          <p className="text-lg font-bold text-gray-700">${totalBorrowed.toLocaleString()} <span className="text-sm font-medium text-gray-600">· {activeLoans.length} active</span></p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600 mb-1">Remaining Balance</p>
-                          <p className="text-lg font-bold text-gray-700">${remainingBalance.toLocaleString()} <span className="text-sm font-medium text-gray-600">· ${totalPaid.toLocaleString()} paid</span></p>
-                        </div>
+                      <div className="flex-shrink-0 ml-4">
+                        {(() => {
+                          const percentPaid = totalOwed > 0 ? Math.round((totalPaid / totalOwed) * 100) : 0;
+                          return (
+                            <div className="relative w-28 h-28">
+                              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                                <circle cx="60" cy="60" r="52" fill="none" stroke="#DBFFEB" strokeWidth="8" />
+                                <circle
+                                  cx="60"
+                                  cy="60"
+                                  r="52"
+                                  fill="none"
+                                  stroke="#1C4332"
+                                  strokeWidth="8"
+                                  strokeLinecap="round"
+                                  strokeDasharray={2 * Math.PI * 52}
+                                  strokeDashoffset={2 * Math.PI * 52 - (percentPaid / 100) * 2 * Math.PI * 52}
+                                  className="transition-all duration-500"
+                                />
+                              </svg>
+                              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                <span className="text-xl font-bold text-gray-700">{percentPaid}%</span>
+                                <span className="text-[9px] text-gray-500 uppercase tracking-wider">Paid</span>
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
 
-                    {/* Pie Chart - Right, vertically centered across full box height */}
-                    <div className="flex items-center ml-auto pr-2">
-                      {(() => {
-                        const percentPaid = totalOwed > 0 ? Math.round((totalPaid / totalOwed) * 100) : 0;
-                        return (
-                          <div className="relative w-28 h-28">
-                            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                              <circle cx="60" cy="60" r="52" fill="none" stroke="#DBFFEB" strokeWidth="8" />
-                              <circle
-                                cx="60"
-                                cy="60"
-                                r="52"
-                                fill="none"
-                                stroke="#1C4332"
-                                strokeWidth="8"
-                                strokeLinecap="round"
-                                strokeDasharray={2 * Math.PI * 52}
-                                strokeDashoffset={2 * Math.PI * 52 - (percentPaid / 100) * 2 * Math.PI * 52}
-                                className="transition-all duration-500"
-                              />
-                            </svg>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                              <span className="text-xl font-bold text-gray-700">{percentPaid}%</span>
-                              <span className="text-[9px] text-gray-500 uppercase tracking-wider">Paid</span>
-                            </div>
-                          </div>
-                        );
-                      })()}
+                    {/* Stats - Right, vertically centered across full box height */}
+                    <div className="flex flex-col justify-center gap-4 ml-auto pr-4 text-left">
+                      <div>
+                        <p className="text-sm text-gray-600 mb-1">Total Borrowed</p>
+                        <p className="text-lg font-bold text-gray-700">${totalBorrowed.toLocaleString()} <span className="text-sm font-medium text-gray-600">· {activeLoans.length} active</span></p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600 mb-1">Remaining Balance</p>
+                        <p className="text-lg font-bold text-gray-700">${remainingBalance.toLocaleString()} <span className="text-sm font-medium text-gray-600">· ${totalPaid.toLocaleString()} paid</span></p>
+                      </div>
                     </div>
                   </div>
 
