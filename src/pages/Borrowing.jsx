@@ -771,13 +771,13 @@ export default function Borrowing() {
                           return (
                             <div className="relative w-28 h-28">
                               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                                <circle cx="60" cy="60" r="52" fill="none" stroke="#1C4332" strokeWidth="8" />
+                                <circle cx="60" cy="60" r="52" fill="none" stroke="#DBFFEB" strokeWidth="8" />
                                 <circle
                                   cx="60"
                                   cy="60"
                                   r="52"
                                   fill="none"
-                                  stroke="#DBFFEB"
+                                  stroke="#83F384"
                                   strokeWidth="8"
                                   strokeLinecap="round"
                                   strokeDasharray={2 * Math.PI * 52}
@@ -961,10 +961,10 @@ export default function Borrowing() {
                                   </div>
                                   <span className="text-xs text-slate-500">{percentPaid}%</span>
                                 </div>
-                                <div className="w-full h-5 bg-[#2a5a45] rounded-md overflow-hidden">
+                                <div className="w-full h-5 rounded-md overflow-hidden" style={{ backgroundColor: '#DBFFEB' }}>
                                   <div
                                     className="h-full rounded-md transition-all duration-500"
-                                    style={{ width: `${Math.max(percentPaid, 2)}%`, backgroundColor: '#DBFFEB' }}
+                                    style={{ width: `${Math.max(percentPaid, 2)}%`, backgroundColor: '#83F384' }}
                                   />
                                 </div>
                                 <div className="flex justify-between text-xs text-slate-500">
