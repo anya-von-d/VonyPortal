@@ -296,8 +296,8 @@ export default function Home() {
                     const firstName = user.full_name?.split(' ')[0] || 'User';
                     return (
                       <div>
-                        <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#213B75] tracking-tight leading-tight font-serif">Welcome Back,</p>
-                        <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#213B75] tracking-tight leading-tight font-serif">{firstName}</p>
+                        <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#213B75] tracking-tight leading-tight font-sans">Welcome Back,</p>
+                        <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#213B75] tracking-tight leading-tight font-sans">{firstName}</p>
                       </div>
                     );
                   })()}
@@ -307,7 +307,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 w-full">
                   {/* Lending Overview Box */}
                   <div className="rounded-xl p-4 sm:p-5 md:p-7 shadow-sm bg-white">
-                    <p className="text-lg font-bold text-[#213B75] mb-5 tracking-tight font-serif">
+                    <p className="text-lg font-bold text-[#213B75] mb-5 tracking-tight font-sans">
                       Lending Overview
                     </p>
 
@@ -370,7 +370,7 @@ export default function Home() {
 
                   {/* Borrowing Overview Box */}
                   <div className="rounded-xl p-4 sm:p-5 md:p-7 shadow-sm bg-white">
-                    <p className="text-lg font-bold text-[#213B75] mb-5 tracking-tight font-serif">
+                    <p className="text-lg font-bold text-[#213B75] mb-5 tracking-tight font-sans">
                       Borrowing Overview
                     </p>
 
@@ -482,7 +482,7 @@ export default function Home() {
             {/* Record Payment Box */}
             {myLoans.filter(l => l && l.status === 'active').length > 0 && (
               <div className="rounded-2xl p-4 sm:p-5 border-0" style={{backgroundColor: '#83F384'}}>
-                <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'Outfit, sans-serif' }}>
                   Record Payment
                 </p>
                 <div className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
@@ -566,7 +566,7 @@ export default function Home() {
               >
                 <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#C2FFDC'}}>
                   <CardContent className="p-4 md:p-5">
-                    <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight font-serif">
+                    <p className="text-xl font-bold text-slate-800 mb-4 tracking-tight font-sans">
                       Your Friends
                     </p>
 
@@ -676,7 +676,7 @@ export default function Home() {
                           <polyline points="15 18 9 12 15 6"></polyline>
                         </svg>
                       </button>
-                      <p className="text-base font-bold text-slate-800 tracking-tight font-serif">
+                      <p className="text-base font-bold text-slate-800 tracking-tight font-sans">
                         {format(calendarMonth, 'MMMM')} Overview
                       </p>
                       <button
@@ -766,7 +766,7 @@ export default function Home() {
                           style={{ backgroundColor: '#83F384' }}
                         >
                           <div className="bg-white/50 rounded-md px-2.5 py-1.5 flex-shrink-0 text-center min-w-[44px]">
-                            <p className="text-xs text-slate-500 uppercase" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                            <p className="text-xs text-slate-500 uppercase" style={{ fontFamily: 'Outfit, sans-serif' }}>
                               {format(event.date, 'MMM')}
                             </p>
                             <p className="text-lg font-bold text-slate-800">
