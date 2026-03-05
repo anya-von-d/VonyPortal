@@ -651,7 +651,7 @@ export default function Home() {
 
                     {/* Record Payment Box */}
                     {myLoans.filter(l => l && l.status === 'active').length > 0 && (
-                      <div className="rounded-xl px-4 py-3 shadow-sm" style={{ backgroundColor: '#4C7FC4' }}>
+                      <div className="rounded-xl px-4 py-3 shadow-sm mt-2 mb-2 lg:mt-0 lg:mb-0" style={{ backgroundColor: '#4C7FC4' }}>
                         <p className="text-sm font-bold text-white mb-2 tracking-tight font-sans">
                           Record Payment
                         </p>

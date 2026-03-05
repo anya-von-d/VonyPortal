@@ -121,32 +121,15 @@ export default function TopNav({ location }) {
             <button
               type="button"
               onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden w-8 h-8 flex items-center justify-center text-white"
+              className="md:hidden w-10 h-10 -ml-1 flex items-center justify-center text-white active:bg-white/10 rounded-lg transition-colors"
               aria-label="Toggle menu"
+              style={{ minWidth: '44px', minHeight: '44px' }}
             >
-              <AnimatePresence mode="wait">
-                {menuOpen ? (
-                  <motion.div
-                    key="close"
-                    initial={{ rotate: -90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: 90, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <X className="w-[20px] h-[20px]" strokeWidth={1.5} />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="menu"
-                    initial={{ rotate: 90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: -90, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Menu className="w-[20px] h-[20px]" strokeWidth={1.5} />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {menuOpen ? (
+                <X className="w-[22px] h-[22px]" strokeWidth={2} />
+              ) : (
+                <Menu className="w-[22px] h-[22px]" strokeWidth={2} />
+              )}
             </button>
 
             {/* Desktop: Top bar links right-aligned */}
@@ -188,7 +171,7 @@ export default function TopNav({ location }) {
         </div>
 
         {/* Bottom Bar - Medium Blue (#4C7FC4) primary navigation with centered Vony logo */}
-        <div className="h-12" style={{backgroundColor: '#4C7FC4'}}>
+        <div className={`h-12 ${menuOpen ? 'hidden md:block' : ''}`} style={{backgroundColor: '#4C7FC4'}}>
           <div className="h-full px-6 md:px-10 flex items-center justify-center">
             {/* Mobile: Main nav links */}
             <div className="flex md:hidden items-center gap-6">
@@ -263,8 +246,12 @@ export default function TopNav({ location }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 flex flex-col"
-            style={{ top: '88px', backgroundColor: '#4C7FC4' }}
+            className="fixed inset-0 z-40 flex flex-col md:hidden"
+            style={{ top: '40px', backgroundColor: '#4C7FC4' }}
+            onClick={(e) => {
+              // Close menu when tapping the background (not a link)
+              if (e.target === e.currentTarget) setMenuOpen(false);
+            }}
           >
             {/* Navigation Links */}
             <motion.nav
