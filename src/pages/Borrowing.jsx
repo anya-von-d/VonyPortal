@@ -59,7 +59,6 @@ export default function Borrowing() {
   const [isQuickSuccess, setIsQuickSuccess] = useState(false);
   const [quickPayTransactionId, setQuickPayTransactionId] = useState('');
   const [allPayments, setAllPayments] = useState([]);
-  const [activeLoanTooltip, setActiveLoanTooltip] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -1196,172 +1195,161 @@ export default function Borrowing() {
 
                       return (
                         <div className="mt-4">
-                          {/* Header bar — shows selected loan summary or section title */}
-                          {manageLoanSelected ? (
-                            (() => {
-                              const selLender = publicProfiles.find(p => p.user_id === manageLoanSelected.lender_id);
-                              return (
-                                <div className="rounded-xl px-4 py-2.5 mb-3 flex items-center gap-3" style={{ backgroundColor: '#00A86B' }}>
-                                  <img
-                                    src={selLender?.profile_picture_url || selLender?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((selLender?.full_name || 'U').charAt(0))}&background=1C4332&color=fff&size=64`}
-                                    alt={selLender?.full_name || 'Lender'}
-                                    className="w-8 h-8 rounded-full object-cover flex-shrink-0 bg-white"
-                                  />
-                                  <p className="text-sm font-semibold text-white font-sans">
-                                    @{selLender?.username || 'user'} lent you ${(manageLoanSelected.amount || 0).toLocaleString()} to help with {manageLoanSelected.purpose || 'personal expenses'}
-                                  </p>
-                                </div>
-                              );
-                            })()
-                          ) : (
-                            <p className="text-sm font-bold text-[#C2FFDC] tracking-tight font-sans mb-3">
-                              Your Loans
-                            </p>
-                          )}
-                          <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr_1fr] gap-4 md:gap-5">
-                            {/* Left: Select a Loan to Learn More */}
-                            <div className="bg-white rounded-xl px-3 py-3 shadow-sm">
-                              <p className="text-xs font-bold text-[#1C4332] mb-2 tracking-tight font-sans">
-                                Select a Loan to Learn More
-                              </p>
+                          <p className="text-sm font-bold text-[#C2FFDC] tracking-tight font-sans mb-3">
+                            Your Loans
+                          </p>
 
-                              {/* Scrollable Loan List */}
-                              <div className="overflow-y-auto space-y-1 scroll-smooth" style={{ maxHeight: '260px' }} id="loan-list-scroll">
-                                {manageableLoans.length === 0 ? (
-                                  <div className="text-center py-4">
-                                    <p className="text-xs text-[#00A86B]/60 font-sans">No loans found</p>
+                          {/* Select a Loan — single-row horizontal scroll */}
+                          <div className="bg-white rounded-xl px-3 py-2.5 shadow-sm mb-4">
+                            <p className="text-xs font-bold text-[#1C4332] mb-1.5 tracking-tight font-sans">
+                              Select a Loan to Learn More
+                            </p>
+                            <div className="overflow-x-auto scroll-smooth flex gap-1.5 pb-1" id="loan-list-scroll" style={{ scrollbarWidth: 'thin' }}>
+                              {manageableLoans.map((loan) => {
+                                const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
+                                const isSelected = manageLoanSelected?.id === loan.id;
+                                const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent((lender?.full_name || 'U').charAt(0))}&background=00A86B&color=fff&size=128`;
+
+                                return (
+                                  <button
+                                    key={loan.id}
+                                    id={`loan-item-${loan.id}`}
+                                    onClick={() => {
+                                      setManageLoanSelected(loan);
+                                      setTimeout(() => {
+                                        const el = document.getElementById(`loan-item-${loan.id}`);
+                                        if (el) {
+                                          el.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+                                        }
+                                      }, 50);
+                                    }}
+                                    className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-left transition-all cursor-pointer flex items-center gap-2 ${
+                                      isSelected
+                                        ? 'bg-[#6AD478]'
+                                        : 'bg-[#C2FFDC] hover:bg-[#b0f0c8]'
+                                    }`}
+                                  >
+                                    <img
+                                      src={lender?.profile_picture_url || lender?.avatar_url || defaultAvatar}
+                                      alt={lender?.full_name || 'Lender'}
+                                      className="w-6 h-6 rounded-full object-cover flex-shrink-0 bg-white"
+                                    />
+                                    <div className="min-w-0">
+                                      <p className="text-[11px] font-semibold text-[#1C4332] whitespace-nowrap font-sans">
+                                        @{lender?.username || 'user'}
+                                      </p>
+                                      <p className="text-[9px] text-[#1C4332]/60 whitespace-nowrap font-sans">
+                                        ${loan.amount?.toLocaleString()}
+                                        {loan.status === 'cancelled' && ' · Cancelled'}
+                                      </p>
+                                    </div>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          {/* Two-column grid: Left = Payment History, Right = Loan Information */}
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5">
+                            {/* Left: Payment Bar Chart */}
+                            <div className="flex flex-col gap-4">
+                              {/* Summary bar — only over chart + info columns */}
+                              {manageLoanSelected && (() => {
+                                const selLender = publicProfiles.find(p => p.user_id === manageLoanSelected.lender_id);
+                                return (
+                                  <div className="rounded-xl px-4 py-2.5 flex items-center gap-3" style={{ backgroundColor: '#00A86B' }}>
+                                    <img
+                                      src={selLender?.profile_picture_url || selLender?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((selLender?.full_name || 'U').charAt(0))}&background=1C4332&color=fff&size=64`}
+                                      alt={selLender?.full_name || 'Lender'}
+                                      className="w-7 h-7 rounded-full object-cover flex-shrink-0 bg-white"
+                                    />
+                                    <p className="text-[13px] font-semibold text-white font-sans">
+                                      @{selLender?.username || 'user'} lent you ${(manageLoanSelected.amount || 0).toLocaleString()} to help with {manageLoanSelected.purpose || 'personal expenses'}
+                                    </p>
+                                  </div>
+                                );
+                              })()}
+
+                              <div className="bg-white rounded-xl px-4 py-3 shadow-sm">
+                                <p className="text-sm font-bold text-[#1C4332] mb-2.5 tracking-tight font-sans">
+                                  Payment History
+                                </p>
+                                {!manageLoanSelected ? (
+                                  <div className="flex items-center justify-center" style={{ height: chartHeight }}>
+                                    <p className="text-xs text-[#00A86B]/60 font-sans">Select a loan to view chart</p>
+                                  </div>
+                                ) : chartData.length === 0 ? (
+                                  <div className="flex items-center justify-center" style={{ height: chartHeight }}>
+                                    <p className="text-xs text-[#00A86B]/60 font-sans">No payment schedule</p>
                                   </div>
                                 ) : (
-                                  manageableLoans.map((loan) => {
-                                    const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
-                                    const isSelected = manageLoanSelected?.id === loan.id;
-                                    const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent((lender?.full_name || 'U').charAt(0))}&background=00A86B&color=fff&size=128`;
-
-                                    return (
-                                      <button
-                                        key={loan.id}
-                                        id={`loan-item-${loan.id}`}
-                                        onClick={() => {
-                                          setManageLoanSelected(loan);
-                                          setActiveLoanTooltip(null);
-                                          setTimeout(() => {
-                                            const el = document.getElementById(`loan-item-${loan.id}`);
-                                            const container = document.getElementById('loan-list-scroll');
-                                            if (el && container) {
-                                              container.scrollTo({ top: el.offsetTop - container.offsetTop, behavior: 'smooth' });
-                                            }
-                                          }, 50);
-                                        }}
-                                        className={`w-full p-2 rounded-lg text-left transition-all cursor-pointer ${
-                                          isSelected
-                                            ? 'bg-[#6AD478]'
-                                            : 'bg-[#C2FFDC] hover:bg-[#b0f0c8]'
-                                        }`}
-                                      >
-                                        <div className="flex items-center gap-2">
-                                          <img
-                                            src={lender?.profile_picture_url || lender?.avatar_url || defaultAvatar}
-                                            alt={lender?.full_name || 'Lender'}
-                                            className="w-7 h-7 rounded-full object-cover flex-shrink-0 bg-white"
-                                          />
-                                          <div className="flex-1 min-w-0">
-                                            <p className={`text-xs font-semibold truncate font-sans ${isSelected ? 'text-[#1C4332]' : 'text-[#1C4332]'}`}>
-                                              @{lender?.username || 'user'}
-                                            </p>
-                                            <p className={`text-[10px] truncate font-sans ${isSelected ? 'text-[#1C4332]/70' : 'text-[#00A86B]/70'}`}>
-                                              ${loan.amount?.toLocaleString()}
-                                              {loan.status === 'cancelled' && ' · Cancelled'}
-                                            </p>
+                                  <div className="relative">
+                                    {/* Chart area */}
+                                    <div className="flex items-end gap-0.5" style={{ height: chartHeight }}>
+                                      {/* Y-axis labels */}
+                                      <div className="flex flex-col justify-between pr-1.5 flex-shrink-0 h-full">
+                                        <p className="text-[9px] text-[#00A86B]/60 font-mono">${maxChartVal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                                        <p className="text-[9px] text-[#00A86B]/60 font-mono">${Math.round(maxChartVal / 2).toLocaleString()}</p>
+                                        <p className="text-[9px] text-[#00A86B]/60 font-mono">$0</p>
+                                      </div>
+                                      {/* Bars */}
+                                      <div className="flex-1 flex items-end justify-between relative h-full">
+                                        {/* Dashed line at planned payment amount */}
+                                        {plannedPaymentAmount > 0 && (
+                                          <div
+                                            className="absolute left-0 right-0 border-t-2 border-dashed border-[#1C4332]/40 z-10"
+                                            style={{ bottom: `${(plannedPaymentAmount / maxChartVal) * 100}%` }}
+                                          >
+                                            <span className="absolute -top-3.5 right-0 text-[8px] font-semibold text-[#1C4332]/60 font-mono bg-white px-1">
+                                              ${plannedPaymentAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                            </span>
                                           </div>
-                                        </div>
-                                      </button>
-                                    );
-                                  })
+                                        )}
+                                        {chartData.map((d, i) => {
+                                          const barHeight = maxChartVal > 0 ? (d.amount / maxChartVal) * chartHeight : 0;
+                                          const isOver = d.amount >= plannedPaymentAmount && plannedPaymentAmount > 0;
+                                          return (
+                                            <div key={i} className="flex flex-col items-center flex-1" style={{ maxWidth: 40 }}>
+                                              <div className="w-full flex justify-center">
+                                                <div
+                                                  className={`rounded-t-sm transition-all ${
+                                                    d.amount === 0
+                                                      ? 'bg-[#C2FFDC]/50'
+                                                      : isOver
+                                                        ? 'bg-[#00A86B]'
+                                                        : 'bg-[#00A86B]/60'
+                                                  }`}
+                                                  style={{
+                                                    height: Math.max(barHeight, d.amount > 0 ? 4 : 2),
+                                                    width: '70%',
+                                                    minWidth: 8
+                                                  }}
+                                                  title={`${d.label}: $${d.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+                                                />
+                                              </div>
+                                              <p className="text-[8px] text-[#1C4332]/50 font-sans mt-1 leading-none">{d.label}</p>
+                                            </div>
+                                          );
+                                        })}
+                                      </div>
+                                    </div>
+                                    {/* Legend */}
+                                    <div className="flex items-center gap-3 mt-2 pt-2 border-t border-[#C2FFDC]">
+                                      <div className="flex items-center gap-1">
+                                        <div className="w-2.5 h-2.5 rounded-sm bg-[#00A86B]" />
+                                        <span className="text-[9px] text-[#1C4332]/60 font-sans">Paid</span>
+                                      </div>
+                                      <div className="flex items-center gap-1">
+                                        <div className="w-4 h-0 border-t-2 border-dashed border-[#1C4332]/40" />
+                                        <span className="text-[9px] text-[#1C4332]/60 font-sans">Plan Amount</span>
+                                      </div>
+                                    </div>
+                                  </div>
                                 )}
                               </div>
                             </div>
 
-                            {/* Middle: Payment Bar Chart */}
-                            <div className="bg-white rounded-xl px-4 py-3 shadow-sm">
-                              <p className="text-sm font-bold text-[#1C4332] mb-2.5 tracking-tight font-sans">
-                                Payment History
-                              </p>
-                              {!manageLoanSelected ? (
-                                <div className="flex items-center justify-center" style={{ height: chartHeight }}>
-                                  <p className="text-xs text-[#00A86B]/60 font-sans">Select a loan to view chart</p>
-                                </div>
-                              ) : chartData.length === 0 ? (
-                                <div className="flex items-center justify-center" style={{ height: chartHeight }}>
-                                  <p className="text-xs text-[#00A86B]/60 font-sans">No payment schedule</p>
-                                </div>
-                              ) : (
-                                <div className="relative">
-                                  {/* Chart area */}
-                                  <div className="flex items-end gap-0.5" style={{ height: chartHeight }}>
-                                    {/* Y-axis labels */}
-                                    <div className="flex flex-col justify-between pr-1.5 flex-shrink-0 h-full">
-                                      <p className="text-[9px] text-[#00A86B]/60 font-mono">${maxChartVal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
-                                      <p className="text-[9px] text-[#00A86B]/60 font-mono">${Math.round(maxChartVal / 2).toLocaleString()}</p>
-                                      <p className="text-[9px] text-[#00A86B]/60 font-mono">$0</p>
-                                    </div>
-                                    {/* Bars */}
-                                    <div className="flex-1 flex items-end justify-between relative h-full">
-                                      {/* Dashed line at planned payment amount */}
-                                      {plannedPaymentAmount > 0 && (
-                                        <div
-                                          className="absolute left-0 right-0 border-t-2 border-dashed border-[#1C4332]/40 z-10"
-                                          style={{ bottom: `${(plannedPaymentAmount / maxChartVal) * 100}%` }}
-                                        >
-                                          <span className="absolute -top-3.5 right-0 text-[8px] font-semibold text-[#1C4332]/60 font-mono bg-white px-1">
-                                            ${plannedPaymentAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                          </span>
-                                        </div>
-                                      )}
-                                      {chartData.map((d, i) => {
-                                        const barHeight = maxChartVal > 0 ? (d.amount / maxChartVal) * chartHeight : 0;
-                                        const isOver = d.amount >= plannedPaymentAmount && plannedPaymentAmount > 0;
-                                        const isUnder = d.amount > 0 && d.amount < plannedPaymentAmount;
-                                        return (
-                                          <div key={i} className="flex flex-col items-center flex-1" style={{ maxWidth: 40 }}>
-                                            <div className="w-full flex justify-center">
-                                              <div
-                                                className={`rounded-t-sm transition-all ${
-                                                  d.amount === 0
-                                                    ? 'bg-[#C2FFDC]/50'
-                                                    : isOver
-                                                      ? 'bg-[#00A86B]'
-                                                      : 'bg-[#00A86B]/60'
-                                                }`}
-                                                style={{
-                                                  height: Math.max(barHeight, d.amount > 0 ? 4 : 2),
-                                                  width: '70%',
-                                                  minWidth: 8
-                                                }}
-                                                title={`${d.label}: $${d.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
-                                              />
-                                            </div>
-                                            <p className="text-[8px] text-[#1C4332]/50 font-sans mt-1 leading-none">{d.label}</p>
-                                          </div>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
-                                  {/* Legend */}
-                                  <div className="flex items-center gap-3 mt-2 pt-2 border-t border-[#C2FFDC]">
-                                    <div className="flex items-center gap-1">
-                                      <div className="w-2.5 h-2.5 rounded-sm bg-[#00A86B]" />
-                                      <span className="text-[9px] text-[#1C4332]/60 font-sans">Paid</span>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                      <div className="w-4 h-0 border-t-2 border-dashed border-[#1C4332]/40" />
-                                      <span className="text-[9px] text-[#1C4332]/60 font-sans">Plan Amount</span>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Right: Loan Details */}
+                            {/* Right: Loan Information + Actions */}
                             <div className="flex flex-col gap-3">
                               {!manageLoanSelected ? (
                                 <div className="bg-white rounded-xl px-4 py-3 shadow-sm flex items-center justify-center min-h-[200px]">
@@ -1372,7 +1360,7 @@ export default function Borrowing() {
                                 </div>
                               ) : (
                                 <>
-                                  {/* Loan Information Box */}
+                                  {/* Loan Information Box — row-based */}
                                   <div className="bg-white rounded-xl px-4 py-3 shadow-sm relative">
                                     <p className="text-sm font-bold text-[#1C4332] mb-2.5 tracking-tight font-sans">
                                       Loan Information
@@ -1387,59 +1375,33 @@ export default function Borrowing() {
                                       const repaymentUnit = manageLoanSelected.repayment_unit || 'months';
                                       const paymentFrequency = manageLoanSelected.payment_frequency || 'monthly';
                                       const paymentAmount = manageLoanSelected.payment_amount || 0;
+                                      const totalAmount = manageLoanSelected.total_amount || amount;
+                                      const amountPaid = manageLoanSelected.amount_paid || 0;
+                                      const remainingBal = totalAmount - amountPaid;
+                                      const status = manageLoanSelected.status || 'active';
 
-                                      const tooltips = {
-                                        amount: { title: 'Loan Amount', desc: 'The total principal sum borrowed from the lender.' },
-                                        interest: { title: 'Interest Rate', desc: 'The annual percentage charged on the borrowed amount.' },
-                                        term: { title: 'Loan Term', desc: 'The total length of time you have to repay the loan.' },
-                                        frequency: { title: 'Payment Frequency', desc: 'How often you are required to make a payment.' },
-                                        payment: { title: 'Payment Amount', desc: 'The fixed amount due each payment period.' },
-                                      };
-
-                                      const GreenTerm = ({ id, children }) => (
-                                        <span className="relative inline-block">
-                                          <button
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              setActiveLoanTooltip(activeLoanTooltip === id ? null : id);
-                                            }}
-                                            className="text-[#00A86B] font-bold cursor-pointer hover:underline decoration-[#00A86B]/40 underline-offset-2 transition-all"
-                                          >
-                                            {children}
-                                          </button>
-                                          <AnimatePresence>
-                                            {activeLoanTooltip === id && (
-                                              <motion.div
-                                                initial={{ opacity: 0, y: 6, scale: 0.95 }}
-                                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                exit={{ opacity: 0, y: 6, scale: 0.95 }}
-                                                transition={{ duration: 0.15 }}
-                                                className="absolute z-50 left-1/2 -translate-x-1/2 mt-1.5 w-48 bg-[#1C4332] rounded-lg shadow-lg px-3 py-2.5"
-                                                onClick={(e) => e.stopPropagation()}
-                                              >
-                                                <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#1C4332] rotate-45 rounded-sm" />
-                                                <p className="text-xs font-bold text-[#6AD478] mb-0.5 relative">{tooltips[id].title}</p>
-                                                <p className="text-[11px] text-[#C2FFDC]/80 leading-relaxed relative">{tooltips[id].desc}</p>
-                                              </motion.div>
-                                            )}
-                                          </AnimatePresence>
-                                        </span>
-                                      );
+                                      const rows = [
+                                        { label: 'Loan Amount', value: `$${amount.toLocaleString()}` },
+                                        { label: 'Interest Rate', value: `${interestRate}%` },
+                                        { label: 'Term', value: `${repaymentPeriod} ${repaymentUnit}` },
+                                        { label: 'Payment Frequency', value: paymentFrequency.charAt(0).toUpperCase() + paymentFrequency.slice(1) },
+                                        { label: 'Payment Amount', value: `$${paymentAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+                                        { label: 'Number of Payments', value: `${repaymentPeriod}` },
+                                        { label: 'Total Owed', value: `$${totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+                                        { label: 'Amount Paid', value: `$${amountPaid.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+                                        { label: 'Remaining Balance', value: `$${remainingBal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+                                        { label: 'Purpose', value: purpose },
+                                        { label: 'Status', value: status.charAt(0).toUpperCase() + status.slice(1) },
+                                      ];
 
                                       return (
-                                        <div onClick={() => setActiveLoanTooltip(null)}>
-                                          <p className="text-[13px] text-[#1C4332] leading-relaxed font-sans">
-                                            @{lenderUsername} lent you{' '}
-                                            <GreenTerm id="amount">${amount.toLocaleString()}</GreenTerm>{' '}
-                                            at{' '}
-                                            <GreenTerm id="interest">{interestRate}% interest</GreenTerm>{' '}
-                                            for {purpose}. You agreed to pay back the loan over{' '}
-                                            <GreenTerm id="term">{repaymentPeriod} {repaymentUnit}</GreenTerm>{' '}
-                                            in{' '}
-                                            <GreenTerm id="frequency">{paymentFrequency}</GreenTerm>{' '}
-                                            payments of{' '}
-                                            <GreenTerm id="payment">${paymentAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</GreenTerm>.
-                                          </p>
+                                        <div className="divide-y divide-[#C2FFDC]">
+                                          {rows.map((row, idx) => (
+                                            <div key={idx} className="flex items-center justify-between py-2 first:pt-0 last:pb-0">
+                                              <p className="text-[11px] text-[#00A86B] font-medium font-sans">{row.label}</p>
+                                              <p className="text-[12px] font-semibold text-[#1C4332] font-sans text-right">{row.value}</p>
+                                            </div>
+                                          ))}
                                         </div>
                                       );
                                     })()}
