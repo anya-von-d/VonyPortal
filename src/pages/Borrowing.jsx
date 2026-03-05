@@ -891,42 +891,30 @@ export default function Borrowing() {
                           ))}
                         </SelectContent>
                       </Select>
-                      <span>for</span>
-                      <Select value={quickPayLoanId} onValueChange={setQuickPayLoanId}>
-                        <SelectTrigger className="w-auto h-8 px-2 inline-flex min-w-[140px] border-0 bg-transparent focus:ring-0 focus:ring-offset-0">
-                          <SelectValue placeholder="select loan" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {filteredLoansForQuickPay.map((loan) => {
-                            const lender = getUserById(loan.lender_id);
-                            return (
-                              <SelectItem key={loan.id} value={loan.id}>
-                                @{lender?.username || 'user'} - {loan.purpose || `$${loan.amount}`}
-                              </SelectItem>
-                            );
-                          })}
-                        </SelectContent>
-                      </Select>
-                      <span>via</span>
-                      <Select value={quickPayMethod} onValueChange={setQuickPayMethod}>
-                        <SelectTrigger className="w-auto h-8 px-2 inline-flex border-0 bg-transparent focus:ring-0 focus:ring-offset-0">
-                          <SelectValue placeholder="select method" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="venmo">Venmo</SelectItem>
-                          <SelectItem value="zelle">Zelle</SelectItem>
-                          <SelectItem value="cashapp">Cash App</SelectItem>
-                          <SelectItem value="paypal">PayPal</SelectItem>
-                          <SelectItem value="cash">Cash</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
                       <Button
                         type="button"
-                        onClick={handleQuickPaySubmit}
-                        disabled={!quickPayLoanId || !quickPayAmount || !quickPayMethod}
+                        onClick={() => {
+                          const matchingLoans = quickPayPerson
+                            ? activeLoans.filter(l => l.lender_id === quickPayPerson)
+                            : activeLoans;
+                          if (matchingLoans.length === 1) {
+                            setSelectedLoan({
+                              ...matchingLoans[0],
+                              _prefillAmount: quickPayAmount,
+                            });
+                            setShowPaymentModal(true);
+                          } else if (matchingLoans.length > 1) {
+                            setSelectedLoan({
+                              ...matchingLoans[0],
+                              _prefillAmount: quickPayAmount,
+                              _candidateLoans: matchingLoans,
+                            });
+                            setShowPaymentModal(true);
+                          }
+                        }}
+                        disabled={!quickPayPerson || !quickPayAmount}
                         className={`h-8 px-4 rounded-lg text-sm font-medium border-0 transition-all ${
-                          !quickPayLoanId || !quickPayAmount || !quickPayMethod
+                          !quickPayPerson || !quickPayAmount
                             ? 'bg-[#00A86B]/50 text-white/70 cursor-not-allowed'
                             : 'bg-[#00A86B] text-white hover:bg-[#0D9B76]'
                         }`}
@@ -1548,6 +1536,7 @@ export default function Borrowing() {
       {showPaymentModal && selectedLoan && (
         <RecordPaymentModal
           loan={selectedLoan}
+          candidateLoans={selectedLoan._candidateLoans || []}
           onClose={() => setShowPaymentModal(false)}
           onPaymentComplete={handlePaymentComplete}
           isLender={false}

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion";
-import { format, startOfMonth, endOfMonth, isSameMonth, addMonths, subMonths, differenceInDays } from "date-fns";
+import { format, startOfMonth, addMonths } from "date-fns";
 import { formatMoney } from "@/components/utils/formatMoney";
 import RecordPaymentModal from "@/components/loans/RecordPaymentModal";
 import { AnimatePresence } from "framer-motion";
@@ -176,13 +176,14 @@ export default function Home() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [overviewType, setOverviewType] = useState('lending'); // 'lending' or 'borrowing'
-  const [calendarMonth, setCalendarMonth] = useState(new Date());
   const [quickPayAmount, setQuickPayAmount] = useState('');
   const [quickPayMethod, setQuickPayMethod] = useState('');
   const [quickPayLoanId, setQuickPayLoanId] = useState('');
-  const [quickPayPerson, setQuickPayPerson] = useState('');
+  const [quickPayFromPerson, setQuickPayFromPerson] = useState('');
+  const [quickPayToPerson, setQuickPayToPerson] = useState('');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedLoan, setSelectedLoan] = useState(null);
+  const [candidateLoans, setCandidateLoans] = useState([]);
 
   // Use profile from context
   const user = userProfile ? { ...userProfile, id: authUser?.id, email: authUser?.email } : null;
@@ -654,35 +655,82 @@ export default function Home() {
                     {myLoans.filter(l => l && l.status === 'active').length > 0 && (() => {
                       const activeLoansAll = myLoans.filter(l => l && l.status === 'active');
 
-                      // Build person list: "Yourself" first (if you have borrowing loans), then people who owe you (lending loans)
-                      const personOptions = [];
-                      const borrowingLoansExist = activeLoansAll.some(l => l.borrower_id === user.id);
-                      if (borrowingLoansExist) {
-                        personOptions.push({ userId: 'self', username: 'Yourself', fullName: user.full_name });
-                      }
-                      // People who owe you (you are lender)
+                      // "From" options: everyone who owes you money (borrowers in your lending loans)
+                      const fromOptions = [];
                       const lendingLoansActive = activeLoansAll.filter(l => l.lender_id === user.id);
                       const borrowerIds = [...new Set(lendingLoansActive.map(l => l.borrower_id))];
                       borrowerIds.forEach(bId => {
                         const profile = safeAllProfiles.find(p => p.user_id === bId);
-                        if (!personOptions.find(p => p.userId === bId)) {
-                          personOptions.push({ userId: bId, username: profile?.username || 'user', fullName: profile?.full_name || 'Unknown' });
-                        }
+                        fromOptions.push({ userId: bId, username: profile?.username || 'user', fullName: profile?.full_name || 'Unknown' });
                       });
 
-                      // Filter loans based on person selection
-                      let filteredLoans = activeLoansAll;
-                      if (quickPayPerson === 'self') {
-                        filteredLoans = activeLoansAll.filter(l => l.borrower_id === user.id);
-                      } else if (quickPayPerson) {
-                        filteredLoans = activeLoansAll.filter(l => l.lender_id === user.id && l.borrower_id === quickPayPerson);
-                      }
+                      // "To" options: everyone you owe money to (lenders in your borrowing loans)
+                      const toOptions = [];
+                      const borrowingLoansActive = activeLoansAll.filter(l => l.borrower_id === user.id);
+                      const lenderIds = [...new Set(borrowingLoansActive.map(l => l.lender_id))];
+                      lenderIds.forEach(lId => {
+                        const profile = safeAllProfiles.find(p => p.user_id === lId);
+                        toOptions.push({ userId: lId, username: profile?.username || 'user', fullName: profile?.full_name || 'Unknown' });
+                      });
 
-                      // Auto-select loan if only one option
-                      const shouldAutoFill = filteredLoans.length === 1 && quickPayLoanId !== filteredLoans[0].id;
-                      if (shouldAutoFill) {
-                        setTimeout(() => setQuickPayLoanId(filteredLoans[0].id), 0);
-                      }
+                      // Self-filtering: if "from" selected, check if that person also appears as someone you owe (unlikely but handle)
+                      // If "to" selected, check if that person also appears as someone who owes you
+                      // The dropdowns auto-fill each other if there's a unique match through a shared loan
+
+                      const handleFromChange = (val) => {
+                        setQuickPayFromPerson(val);
+                        // Check if this person has a loan where they also appear in the "to" direction
+                        // Find loans where this person owes you
+                        const loansFromPerson = lendingLoansActive.filter(l => l.borrower_id === val);
+                        // If only one "to" person matches across those loans, auto-fill
+                        if (!quickPayToPerson) {
+                          // No auto-fill needed for "to" from "from" - they are independent directions
+                        }
+                      };
+
+                      const handleToChange = (val) => {
+                        setQuickPayToPerson(val);
+                      };
+
+                      // Determine which loans match the current selection for the modal
+                      const getMatchingLoans = () => {
+                        if (quickPayFromPerson && !quickPayToPerson) {
+                          // Recording a payment FROM someone who owes you (lending loan)
+                          return lendingLoansActive.filter(l => l.borrower_id === quickPayFromPerson);
+                        } else if (quickPayToPerson && !quickPayFromPerson) {
+                          // Recording a payment TO someone you owe (borrowing loan)
+                          return borrowingLoansActive.filter(l => l.lender_id === quickPayToPerson);
+                        } else if (quickPayFromPerson && quickPayToPerson) {
+                          // Both selected — find loans matching either direction
+                          const fromLoans = lendingLoansActive.filter(l => l.borrower_id === quickPayFromPerson);
+                          const toLoans = borrowingLoansActive.filter(l => l.lender_id === quickPayToPerson);
+                          return [...fromLoans, ...toLoans];
+                        }
+                        return activeLoansAll;
+                      };
+
+                      const handleSubmit = () => {
+                        const matching = getMatchingLoans();
+                        if (matching.length === 1) {
+                          setSelectedLoan({
+                            ...matching[0],
+                            _prefillAmount: quickPayAmount,
+                            _prefillMethod: quickPayMethod,
+                          });
+                          setCandidateLoans([]);
+                          setShowPaymentModal(true);
+                        } else if (matching.length > 1) {
+                          setCandidateLoans(matching);
+                          setSelectedLoan({
+                            ...matching[0],
+                            _prefillAmount: quickPayAmount,
+                            _prefillMethod: quickPayMethod,
+                          });
+                          setShowPaymentModal(true);
+                        }
+                      };
+
+                      const canSubmit = quickPayAmount && (quickPayFromPerson || quickPayToPerson);
 
                       return (
                         <div className="rounded-xl px-4 py-3 shadow-sm mt-2 mb-2 lg:mt-0 lg:mb-0" style={{ backgroundColor: '#4C7FC4' }}>
@@ -702,59 +750,52 @@ export default function Home() {
                               className="w-20 h-7 px-2 bg-white/20 border-0 text-xs inline-flex rounded-md text-white placeholder:text-white/50"
                               style={{ MozAppearance: 'textfield' }}
                             />
-                            <span>from</span>
-                            <Select
-                              value={quickPayPerson}
-                              onValueChange={(val) => {
-                                setQuickPayPerson(val);
-                                setQuickPayLoanId('');
-                              }}
-                            >
-                              <SelectTrigger className="w-auto h-7 px-2 bg-white/20 border-0 text-xs inline-flex rounded-md text-white">
-                                <SelectValue placeholder="select person" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {personOptions.map((person) => (
-                                  <SelectItem key={person.userId} value={person.userId}>
-                                    {person.userId === 'self' ? 'Yourself' : `@${person.username}`}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <span>for</span>
-                            <Select value={quickPayLoanId} onValueChange={setQuickPayLoanId}>
-                              <SelectTrigger className="w-auto h-7 px-2 bg-white/20 border-0 text-xs inline-flex min-w-[120px] rounded-md text-white">
-                                <SelectValue placeholder="select loan" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {filteredLoans.map((loan) => {
-                                  const isLender = loan.lender_id === user.id;
-                                  const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
-                                  const otherUser = safeAllProfiles.find(p => p.user_id === otherUserId);
-                                  return (
-                                    <SelectItem key={loan.id} value={loan.id}>
-                                      @{otherUser?.username || 'user'} - {loan.purpose || `$${loan.amount}`}
-                                    </SelectItem>
-                                  );
-                                })}
-                              </SelectContent>
-                            </Select>
+                            {fromOptions.length > 0 && (
+                              <>
+                                <span>from</span>
+                                <Select
+                                  value={quickPayFromPerson}
+                                  onValueChange={handleFromChange}
+                                >
+                                  <SelectTrigger className="w-auto h-7 px-2 bg-white/20 border-0 text-xs inline-flex rounded-md text-white">
+                                    <SelectValue placeholder="select person" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {fromOptions.map((person) => (
+                                      <SelectItem key={person.userId} value={person.userId}>
+                                        @{person.username}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </>
+                            )}
+                            {toOptions.length > 0 && (
+                              <>
+                                <span>to</span>
+                                <Select
+                                  value={quickPayToPerson}
+                                  onValueChange={handleToChange}
+                                >
+                                  <SelectTrigger className="w-auto h-7 px-2 bg-white/20 border-0 text-xs inline-flex rounded-md text-white">
+                                    <SelectValue placeholder="select person" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {toOptions.map((person) => (
+                                      <SelectItem key={person.userId} value={person.userId}>
+                                        @{person.username}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </>
+                            )}
                             <Button
                               type="button"
-                              onClick={() => {
-                                const loan = myLoans.find(l => l.id === quickPayLoanId);
-                                if (loan) {
-                                  setSelectedLoan({
-                                    ...loan,
-                                    _prefillAmount: quickPayAmount,
-                                    _prefillMethod: quickPayMethod,
-                                  });
-                                  setShowPaymentModal(true);
-                                }
-                              }}
-                              disabled={!quickPayLoanId || !quickPayAmount}
+                              onClick={handleSubmit}
+                              disabled={!canSubmit}
                               className={`h-7 px-3 rounded-md text-xs font-semibold border-0 transition-all ${
-                                !quickPayLoanId || !quickPayAmount
+                                !canSubmit
                                   ? 'bg-white/30 text-white/70 cursor-not-allowed'
                                   : 'bg-white text-[#4C7FC4] hover:bg-white/90'
                               }`}
@@ -793,230 +834,191 @@ export default function Home() {
                       )}
                     </div>
 
-                    {/* Monthly Overview Box */}
+                    {/* Loans Over Time Bar Chart */}
                     <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
-                      <div className="flex items-center gap-2 mb-3">
-                        <p className="text-sm font-bold text-[#213B75] tracking-tight font-sans">
-                          {format(calendarMonth, 'MMMM')} Overview
-                        </p>
-                        <button
-                          onClick={() => setCalendarMonth(subMonths(calendarMonth, 1))}
-                          className="w-6 h-6 rounded-full flex items-center justify-center transition-colors duration-200 bg-[#CDE7F8] hover:bg-[#b8d9f0]"
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#213B75" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="15 18 9 12 15 6"></polyline>
-                          </svg>
-                        </button>
-                        <button
-                          onClick={() => setCalendarMonth(addMonths(calendarMonth, 1))}
-                          className="w-6 h-6 rounded-full flex items-center justify-center transition-colors duration-200 bg-[#CDE7F8] hover:bg-[#b8d9f0]"
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#213B75" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                          </svg>
-                        </button>
-                      </div>
+                      <p className="text-sm font-bold text-[#213B75] mb-3 tracking-tight font-sans">
+                        Loans Over Time
+                      </p>
 
-                      <div className="space-y-1.5 overflow-y-auto max-h-[320px] pr-1">
-                        {(() => {
-                          const monthStart = startOfMonth(calendarMonth);
-                          const monthEnd = endOfMonth(calendarMonth);
-                          const events = [];
-                          const activeLoans = myLoans.filter(l => l && l.status === 'active');
-                          const safePayments = Array.isArray(payments) ? payments : [];
-
-                          activeLoans.forEach(loan => {
-                            if (!loan.next_payment_date) return;
-
-                            const paymentDate = new Date(loan.next_payment_date);
-                            const isLender = loan.lender_id === user.id;
-                            const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
-                            const otherUser = safeAllProfiles.find(p => p.user_id === otherUserId);
-
-                            const addEventIfInMonth = (date) => {
-                              if (isSameMonth(date, calendarMonth)) {
-                                // Check payment status for this date
-                                const eventDate = new Date(date);
-                                const loanPayments = safePayments.filter(p => p && p.loan_id === loan.id);
-
-                                // Find if there's a completed or pending payment for this period
-                                const matchingPayment = loanPayments.find(p => {
-                                  const pDate = new Date(p.payment_date || p.created_at);
-                                  const dayDiff = Math.abs(Math.ceil((pDate - eventDate) / (1000 * 60 * 60 * 24)));
-                                  return dayDiff <= 7; // Within a week of the expected date
-                                });
-
-                                let paymentStatus = 'none'; // no payment recorded
-                                if (matchingPayment) {
-                                  if (matchingPayment.status === 'completed') paymentStatus = 'completed';
-                                  else if (matchingPayment.status === 'pending') paymentStatus = 'pending';
-                                  else paymentStatus = 'none';
-                                }
-
-                                events.push({
-                                  date: new Date(date),
-                                  type: isLender ? 'receive' : 'send',
-                                  amount: loan.payment_amount || 0,
-                                  username: otherUser?.username || 'user',
-                                  loanId: loan.id,
-                                  loan: loan,
-                                  paymentStatus: paymentStatus
-                                });
-                              }
-                            };
-
-                            addEventIfInMonth(paymentDate);
-
-                            const frequency = loan.payment_frequency;
-                            if (frequency && frequency !== 'none') {
-                              let currentDate = new Date(loan.next_payment_date);
-                              const maxIterations = 10;
-                              let iterations = 0;
-
-                              while (iterations < maxIterations) {
-                                if (frequency === 'weekly') {
-                                  currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
-                                } else if (frequency === 'biweekly') {
-                                  currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
-                                } else if (frequency === 'monthly') {
-                                  currentDate = addMonths(currentDate, 1);
-                                } else if (frequency === 'daily') {
-                                  currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
-                                } else {
-                                  break;
-                                }
-
-                                if (currentDate > monthEnd) break;
-                                addEventIfInMonth(currentDate);
-                                iterations++;
-                              }
-                            }
-                          });
-
-                          events.sort((a, b) => a.date - b.date);
-
-                          if (events.length === 0) {
-                            return (
-                              <div className="flex flex-col items-center justify-center py-8 text-[#4C7FC4]">
-                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40 mb-2">
-                                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                  <line x1="16" y1="2" x2="16" y2="6"></line>
-                                  <line x1="8" y1="2" x2="8" y2="6"></line>
-                                  <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
-                                <p className="text-sm">No payments this month</p>
-                              </div>
-                            );
-                          }
-
-                          return events.map((event, index) => {
-                            const daysUntil = differenceInDays(event.date, new Date());
-                            let statusText = '';
-                            let statusColor = 'text-[#4C7FC4]';
-                            if (event.paymentStatus === 'completed') {
-                              statusText = 'Payment completed';
-                              statusColor = 'text-[#00A86B]';
-                            } else if (event.paymentStatus === 'pending') {
-                              statusText = 'Pending confirmation';
-                              statusColor = 'text-[#F59E0B]';
-                            } else if (daysUntil > 0) {
-                              statusText = `Due in ${daysUntil} day${daysUntil !== 1 ? 's' : ''}`;
-                            } else if (daysUntil === 0) {
-                              statusText = 'Due today';
-                              statusColor = 'text-[#F59E0B]';
-                            } else {
-                              statusText = `Overdue by ${Math.abs(daysUntil)} day${Math.abs(daysUntil) !== 1 ? 's' : ''}`;
-                              statusColor = 'text-red-500';
-                            }
-
-                            const amountFormatted = event.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-                            return (
-                              <div
-                                key={index}
-                                className="flex items-center gap-2.5 p-2.5 rounded-lg bg-[#CDE7F8]"
-                              >
-                                <div className="bg-white rounded-md px-2 py-1.5 flex-shrink-0 text-center min-w-[48px]">
-                                  <p className="text-xs font-bold text-[#213B75] whitespace-nowrap">
-                                    {format(event.date, 'MMM d')}
-                                  </p>
-                                </div>
-
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-xs text-[#213B75] truncate">
-                                    <span className="font-semibold">{event.type === 'send' ? 'Payment' : 'Repayment'}</span>{' '}
-                                    of <span className="font-bold">${amountFormatted}</span>{' '}
-                                    {event.type === 'send' ? 'to' : 'from'} @{event.username}
-                                  </p>
-                                  <p className={`text-[11px] ${statusColor}`}>
-                                    {statusText}
-                                  </p>
-                                </div>
-
-                                <p className={`text-xs font-bold flex-shrink-0 ${event.type === 'receive' ? 'text-[#00A86B]' : 'text-[#213B75]'}`}>
-                                  {event.type === 'receive' ? '+' : '-'}${amountFormatted}
-                                </p>
-                              </div>
-                            );
-                          });
-                        })()}
-                      </div>
-
-                    </div>
-
-                    {/* Month Balance - outside overview box, darker blue */}
-                    {(() => {
-                      const monthEnd = endOfMonth(calendarMonth);
-                      const activeLoansForBalance = myLoans.filter(l => l && l.status === 'active');
-                      let totalReceive = 0;
-                      let totalSend = 0;
-
-                      activeLoansForBalance.forEach(loan => {
-                        if (!loan.next_payment_date) return;
-                        const paymentDate = new Date(loan.next_payment_date);
-                        const isLender = loan.lender_id === user.id;
-                        const paymentAmount = loan.payment_amount || 0;
-
-                        const addAmountIfInMonth = (date) => {
-                          if (isSameMonth(date, calendarMonth)) {
-                            if (isLender) totalReceive += paymentAmount;
-                            else totalSend += paymentAmount;
-                          }
-                        };
-
-                        addAmountIfInMonth(paymentDate);
-
-                        const frequency = loan.payment_frequency;
-                        if (frequency && frequency !== 'none') {
-                          let currentDate = new Date(loan.next_payment_date);
-                          let iterations = 0;
-                          while (iterations < 10) {
-                            if (frequency === 'weekly') currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
-                            else if (frequency === 'biweekly') currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
-                            else if (frequency === 'monthly') currentDate = addMonths(currentDate, 1);
-                            else if (frequency === 'daily') currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
-                            else break;
-                            if (currentDate > monthEnd) break;
-                            addAmountIfInMonth(currentDate);
-                            iterations++;
-                          }
+                      {(() => {
+                        const allActiveAndCompleted = myLoans.filter(l => l && (l.status === 'active' || l.status === 'completed'));
+                        if (allActiveAndCompleted.length === 0) {
+                          return (
+                            <div className="flex flex-col items-center justify-center py-8 text-[#4C7FC4]">
+                              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40 mb-2">
+                                <path d="M18 20V10"></path>
+                                <path d="M12 20V4"></path>
+                                <path d="M6 20v-6"></path>
+                              </svg>
+                              <p className="text-sm">No loan data yet</p>
+                            </div>
+                          );
                         }
-                      });
 
-                      const netBalance = totalReceive - totalSend;
-                      const isPositive = netBalance >= 0;
+                        // Find the earliest loan creation month
+                        const loanDates = allActiveAndCompleted
+                          .map(l => new Date(l.created_at))
+                          .filter(d => !isNaN(d.getTime()));
+                        if (loanDates.length === 0) {
+                          return <p className="text-xs text-slate-400 text-center py-4">No loan dates available</p>;
+                        }
+                        const earliestDate = loanDates.reduce((min, d) => d < min ? d : min, loanDates[0]);
+                        const chartStartMonth = startOfMonth(earliestDate);
+                        const now = new Date();
+                        const currentMonth = startOfMonth(now);
 
-                      return (
-                        <div className="rounded-xl px-4 py-2.5 flex items-center justify-between shadow-sm" style={{ backgroundColor: '#4C7FC4' }}>
-                          <p className="text-xs font-semibold text-white font-sans">
-                            {format(calendarMonth, 'MMMM')} Balance
-                          </p>
-                          <p className="text-xs font-bold text-white font-sans">
-                            {isPositive ? '+' : '-'}${Math.abs(netBalance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </p>
-                        </div>
-                      );
-                    })()}
+                        // Build array of months from earliest to current
+                        const months = [];
+                        let m = new Date(chartStartMonth);
+                        while (m <= currentMonth) {
+                          months.push(new Date(m));
+                          m = addMonths(m, 1);
+                        }
+                        // Ensure at least current month
+                        if (months.length === 0) months.push(currentMonth);
+
+                        // For each month, calculate total owed to you (lending) and total you owe (borrowing)
+                        // Based on remaining balance of active loans at each month point
+                        const chartData = months.map(monthDate => {
+                          let owedToYou = 0; // lending: what others owe you
+                          let youOwe = 0; // borrowing: what you owe others
+
+                          allActiveAndCompleted.forEach(loan => {
+                            const loanCreated = startOfMonth(new Date(loan.created_at));
+                            // Only count loan if it was created on or before this month
+                            if (loanCreated > monthDate) return;
+
+                            const totalAmount = loan.total_amount || loan.amount || 0;
+                            const paymentAmount = loan.payment_amount || 0;
+                            const isLender = loan.lender_id === user.id;
+
+                            // Calculate how many payments would have been made by this month
+                            const frequency = loan.payment_frequency || 'monthly';
+                            let monthsBetween = 0;
+                            const tempStart = new Date(loanCreated);
+                            let tempDate = new Date(tempStart);
+                            while (tempDate < monthDate) {
+                              tempDate = addMonths(tempDate, 1);
+                              monthsBetween++;
+                            }
+
+                            let paymentsPerMonth = 1;
+                            if (frequency === 'weekly') paymentsPerMonth = 4.33;
+                            else if (frequency === 'biweekly') paymentsPerMonth = 2.17;
+                            else if (frequency === 'daily') paymentsPerMonth = 30;
+
+                            const totalPaymentsMade = Math.floor(monthsBetween * paymentsPerMonth);
+                            const totalPaid = Math.min(totalPaymentsMade * paymentAmount, totalAmount);
+                            const remaining = Math.max(0, totalAmount - totalPaid);
+
+                            if (isLender) {
+                              owedToYou += remaining;
+                            } else {
+                              youOwe += remaining;
+                            }
+                          });
+
+                          return {
+                            month: monthDate,
+                            owedToYou,
+                            youOwe,
+                            label: format(monthDate, 'MMM')
+                          };
+                        });
+
+                        // Find max value for scaling
+                        const maxOwed = Math.max(...chartData.map(d => d.owedToYou), 1);
+                        const maxOwe = Math.max(...chartData.map(d => d.youOwe), 1);
+                        const maxVal = Math.max(maxOwed, maxOwe);
+
+                        // Chart dimensions
+                        const chartHeight = 140;
+                        const halfHeight = chartHeight / 2;
+                        const barWidth = Math.max(12, Math.min(28, Math.floor(240 / Math.max(chartData.length, 1))));
+                        const barGap = Math.max(2, Math.min(6, Math.floor(60 / Math.max(chartData.length, 1))));
+
+                        return (
+                          <div>
+                            {/* Bar Chart */}
+                            <div className="relative overflow-x-auto pb-1">
+                              <div className="flex items-end justify-center" style={{ minHeight: chartHeight + 24 }}>
+                                <div className="relative flex items-center" style={{ height: chartHeight }}>
+                                  {/* Y=0 line */}
+                                  <div
+                                    className="absolute left-0 right-0 border-t border-[#213B75]/20"
+                                    style={{ top: halfHeight }}
+                                  />
+
+                                  <div className="flex items-center" style={{ height: chartHeight, gap: barGap }}>
+                                    {chartData.map((data, i) => {
+                                      const upHeight = maxVal > 0 ? (data.owedToYou / maxVal) * (halfHeight - 4) : 0;
+                                      const downHeight = maxVal > 0 ? (data.youOwe / maxVal) * (halfHeight - 4) : 0;
+
+                                      return (
+                                        <div key={i} className="flex flex-col items-center relative" style={{ height: chartHeight }}>
+                                          {/* Upper bar (owed to you) — grows upward from center */}
+                                          <div className="flex flex-col justify-end" style={{ height: halfHeight }}>
+                                            {upHeight > 0 && (
+                                              <div
+                                                className="rounded-t-sm transition-all duration-300"
+                                                style={{
+                                                  width: barWidth,
+                                                  height: Math.max(upHeight, 2),
+                                                  backgroundColor: '#4C7FC4'
+                                                }}
+                                                title={`${data.label}: $${data.owedToYou.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} owed to you`}
+                                              />
+                                            )}
+                                          </div>
+                                          {/* Lower bar (you owe) — grows downward from center */}
+                                          <div className="flex flex-col justify-start" style={{ height: halfHeight }}>
+                                            {downHeight > 0 && (
+                                              <div
+                                                className="rounded-b-sm transition-all duration-300"
+                                                style={{
+                                                  width: barWidth,
+                                                  height: Math.max(downHeight, 2),
+                                                  backgroundColor: '#213B75'
+                                                }}
+                                                title={`${data.label}: $${data.youOwe.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} you owe`}
+                                              />
+                                            )}
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              </div>
+                              {/* Month labels */}
+                              <div className="flex justify-center" style={{ gap: barGap }}>
+                                {chartData.map((data, i) => (
+                                  <p
+                                    key={i}
+                                    className="text-[9px] text-[#4C7FC4] text-center"
+                                    style={{ width: barWidth }}
+                                  >
+                                    {data.label}
+                                  </p>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Key / Legend */}
+                            <div className="flex items-center gap-4 mt-3 pt-2.5 border-t border-[#CDE7F8]">
+                              <div className="flex items-center gap-1.5">
+                                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#4C7FC4' }} />
+                                <p className="text-[11px] text-[#213B75]">Owed to you</p>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#213B75' }} />
+                                <p className="text-[11px] text-[#213B75]">You owe</p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
                   </div>
                 </div>
 
@@ -1080,21 +1082,26 @@ export default function Home() {
           {showPaymentModal && selectedLoan && (
             <RecordPaymentModal
               loan={selectedLoan}
+              candidateLoans={candidateLoans}
               onClose={() => {
                 setShowPaymentModal(false);
                 setSelectedLoan(null);
+                setCandidateLoans([]);
                 setQuickPayAmount('');
                 setQuickPayMethod('');
                 setQuickPayLoanId('');
-                setQuickPayPerson('');
+                setQuickPayFromPerson('');
+                setQuickPayToPerson('');
               }}
               onPaymentComplete={() => {
                 setShowPaymentModal(false);
                 setSelectedLoan(null);
+                setCandidateLoans([]);
                 setQuickPayAmount('');
                 setQuickPayMethod('');
                 setQuickPayLoanId('');
-                setQuickPayPerson('');
+                setQuickPayFromPerson('');
+                setQuickPayToPerson('');
                 loadData();
               }}
               isLender={selectedLoan.lender_id === user.id}

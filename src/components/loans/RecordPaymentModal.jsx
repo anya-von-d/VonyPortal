@@ -45,17 +45,40 @@ const generateTransactionId = () => {
   return `VNY-${timestamp}-${random}`.toUpperCase();
 };
 
-export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, isLender = false, currentUserId = null }) {
-  const [amount, setAmount] = useState(loan._prefillAmount || loan.payment_amount?.toFixed(2) || "");
-  const [paymentMethod, setPaymentMethod] = useState(loan._prefillMethod || "");
+export default function RecordPaymentModal({ loan: initialLoan, candidateLoans = [], onClose, onPaymentComplete, isLender: isLenderProp = false, currentUserId = null }) {
+  const [activeLoan, setActiveLoan] = useState(initialLoan);
+  const loan = activeLoan;
+  const [currentUserIdState, setCurrentUserIdState] = useState(currentUserId);
+  const [amount, setAmount] = useState(initialLoan._prefillAmount || initialLoan.payment_amount?.toFixed(2) || "");
+  const [paymentMethod, setPaymentMethod] = useState(initialLoan._prefillMethod || "");
   const [paymentDate, setPaymentDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState("");
   const [recipientInfo, setRecipientInfo] = useState(null);
+  const [allProfiles, setAllProfiles] = useState([]);
 
-  // Multi-step flow
-  const [step, setStep] = useState(1); // 1: Enter details, 2: Confirm, 3: Success
+  // Dynamically determine isLender based on active loan and current user
+  const [resolvedUserId, setResolvedUserId] = useState(null);
+  const isLender = resolvedUserId ? loan.lender_id === resolvedUserId : isLenderProp;
+
+  // Fetch current user ID for dynamic isLender detection
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const me = await User.me();
+        setResolvedUserId(me?.id);
+        setCurrentUserIdState(me?.id);
+      } catch (e) {
+        // Fall back to prop
+      }
+    };
+    fetchUser();
+  }, []);
+
+  // Multi-step flow: 0 = loan selection (if candidates), 1 = details, 2 = confirm, 3 = success
+  const hasMultipleCandidates = candidateLoans.length > 1;
+  const [step, setStep] = useState(hasMultipleCandidates ? 0 : 1);
   const [transactionId, setTransactionId] = useState("");
 
   const remainingBalance = (loan.total_amount || 0) - (loan.amount_paid || 0);
@@ -83,6 +106,7 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
       try {
         const recipientId = isLender ? loan.borrower_id : loan.lender_id;
         const profiles = await PublicProfile.list();
+        setAllProfiles(profiles || []);
         const recipientProfile = profiles.find(p => p.user_id === recipientId);
         setRecipientInfo(recipientProfile);
       } catch (error) {
@@ -127,8 +151,7 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
     setIsProcessing(true);
 
     try {
-      const user = await User.me();
-      const recordedById = user?.id || currentUserId;
+      const recordedById = resolvedUserId || currentUserIdState;
 
       const txnId = generateTransactionId();
       setTransactionId(txnId);
@@ -164,6 +187,68 @@ export default function RecordPaymentModal({ loan, onClose, onPaymentComplete, i
   const loanAmount = loan.total_amount || loan.amount || 0;
   const nextPaymentAmount = loan.payment_amount || 0;
   const nextPaymentDate = loan.next_payment_date ? format(new Date(loan.next_payment_date), 'MMM d, yyyy') : 'N/A';
+
+  // Step 0: Loan Selection (when multiple candidates)
+  if (step === 0 && hasMultipleCandidates) {
+    return (
+      <Dialog open={true} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto p-0 border-0 bg-[#DBEEE3] rounded-2xl">
+          <div className="p-5 space-y-4">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-8 h-8 rounded-full bg-[#DBFFEB] flex items-center justify-center">
+                <DollarSign className="w-4 h-4 text-[#00A86B]" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-slate-800">Select Loan</h3>
+                <p className="text-xs text-slate-500">Multiple loans match — which one is this payment for?</p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              {candidateLoans.map((cl) => {
+                const clIsLender = resolvedUserId ? cl.lender_id === resolvedUserId : isLenderProp;
+                const otherUserId = clIsLender ? cl.borrower_id : cl.lender_id;
+                const otherProfile = allProfiles.find(p => p.user_id === otherUserId);
+                const otherUsername = otherProfile?.username || 'user';
+                const clDirection = clIsLender ? 'from' : 'to';
+                const clAmount = cl.total_amount || cl.amount || 0;
+
+                return (
+                  <motion.button
+                    key={cl.id}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
+                    onClick={() => {
+                      setActiveLoan({ ...cl, _prefillAmount: initialLoan._prefillAmount, _prefillMethod: initialLoan._prefillMethod });
+                      setStep(1);
+                    }}
+                    className="w-full text-left bg-[#DBFFEB] rounded-xl p-4 hover:bg-[#AAFFA3] transition-colors"
+                  >
+                    <p className="text-sm font-semibold text-slate-800">
+                      ${clAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} loan {clDirection} @{otherUsername}
+                    </p>
+                    <p className="text-xs text-slate-600 mt-0.5">
+                      {cl.purpose || 'Personal loan'}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      Remaining: ${((cl.total_amount || 0) - (cl.amount_paid || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                  </motion.button>
+                );
+              })}
+            </div>
+
+            <Button
+              onClick={onClose}
+              className="w-full bg-white hover:bg-white/80 text-slate-700 border-0 rounded-xl"
+            >
+              Cancel
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   // Step 3: Success
   if (step === 3 && isSuccess) {
