@@ -4,7 +4,7 @@ import { createPageUrl } from "@/utils";
 
 export default function Footer() {
   return (
-    <footer className="w-full" style={{ backgroundColor: '#00A86B' }}>
+    <footer className="w-full" style={{ backgroundColor: '#081A11' }}>
       {/* Top Section: About + Coming Soon + Contact Us */}
       <div className="px-6 md:px-10 lg:px-20 pt-10 pb-8">
         <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-16">
