@@ -68,6 +68,7 @@ export default function Requests() {
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedLoanForPayment, setSelectedLoanForPayment] = useState(null);
+  const [viewingPayment, setViewingPayment] = useState(null);
 
   useEffect(() => {
     if (user?.id) {
@@ -463,7 +464,7 @@ export default function Requests() {
   const totalRequests = paymentsToConfirm.length + paymentsAwaitingConfirmation.length + termChangeRequests.length + totalLoanOffers + friendRequestsReceived.length;
 
   const tabs = [
-    { id: 'all', label: 'All', count: totalRequests },
+    { id: 'all', label: 'View All Requests', count: totalRequests },
     { id: 'friends', label: 'Friend Requests', count: friendRequestsReceived.length },
     { id: 'offers', label: 'Loan Offers', count: totalLoanOffers },
     { id: 'payments', label: 'Payments', count: paymentsToConfirm.length + paymentsAwaitingConfirmation.length },
@@ -555,7 +556,38 @@ export default function Requests() {
             </div>
           </motion.div>
 
-          {/* Requests Box */}
+          {/* Tab Navigation — between Reminders and Requests */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.07 }}
+          >
+            <div className="flex gap-2 overflow-x-auto py-1">
+              {tabs.map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold font-sans transition-all whitespace-nowrap ${
+                    activeTab === tab.id
+                      ? 'bg-[#213B75] text-white'
+                      : 'bg-[#CDE7F8] text-[#4C7FC4] hover:bg-[#b8daf3]'
+                  }`}
+                >
+                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="sm:hidden">{tab.id === 'all' ? 'All' : tab.label.split(' ')[0]}</span>
+                  {tab.count > 0 && (
+                    <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] ${
+                      activeTab === tab.id ? 'bg-white/20' : 'bg-white'
+                    }`}>
+                      {tab.count}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Requests Box — all request types combined, sorted oldest to newest */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -566,348 +598,252 @@ export default function Requests() {
                 Requests
               </p>
 
-              {/* Tab Navigation */}
-              <div className="flex gap-2 overflow-x-auto pb-3 mb-3">
-                {tabs.map(tab => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold font-sans transition-all whitespace-nowrap ${
-                      activeTab === tab.id
-                        ? 'bg-[#213B75] text-white'
-                        : 'bg-[#CDE7F8] text-[#4C7FC4] hover:bg-[#b8daf3]'
-                    }`}
-                  >
-                    <span className="hidden sm:inline">{tab.label}</span>
-                    <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
-                    {tab.count > 0 && (
-                      <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] ${
-                        activeTab === tab.id ? 'bg-white/20' : 'bg-white'
-                      }`}>
-                        {tab.count}
-                      </span>
-                    )}
-                  </button>
-                ))}
-              </div>
+              {(() => {
+                // Build a unified list of all requests with timestamps for sorting
+                const allItems = [];
 
-              {/* No Requests State */}
-              {totalRequests === 0 && (
-                <div className="text-center py-8">
-                  <CheckCircle className="w-10 h-10 mx-auto mb-2 text-[#CDE7F8]" />
-                  <p className="text-[#213B75] font-semibold font-sans mb-1">All caught up!</p>
-                  <p className="text-[#4C7FC4] text-sm font-sans">You have no pending requests to review.</p>
-                </div>
-              )}
+                // Friend Requests
+                if (activeTab === 'all' || activeTab === 'friends') {
+                  friendRequestsReceived.forEach(request => {
+                    const senderProfile = profiles.find(p => p.user_id === request.user_id);
+                    allItems.push({
+                      type: 'friend',
+                      id: `friend-${request.id}`,
+                      timestamp: new Date(request.created_at || 0),
+                      data: request,
+                      senderProfile,
+                    });
+                  });
+                }
 
-              <div className="space-y-4">
-                {/* Loan Offers Received */}
-                {(activeTab === 'all' || activeTab === 'offers') && loanOffersReceived.length > 0 && (
-                  <div>
-                    <p className="text-[11px] font-semibold text-[#4C7FC4] uppercase tracking-widest mb-2 font-sans">
-                      Loan Offers For You
-                    </p>
-                    <div className="space-y-2">
-                      {loanOffersReceived.map((offer, index) => {
-                        const lender = getUserById(offer.lender_id);
-                        return (
-                          <motion.div
-                            key={offer.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            className="p-3 rounded-lg bg-[#CDE7F8]"
-                          >
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-[#213B75] font-sans">
-                                  @{lender?.username || 'unknown'} wants to lend you ${offer.amount?.toLocaleString()} for {offer.purpose || 'Reason'}
-                                </p>
-                                <p className="text-xs text-[#4C7FC4] font-sans">
-                                  {offer.interest_rate}% APR · {offer.repayment_period} months · ${offer.payment_amount?.toFixed(2)}/{offer.payment_frequency || 'monthly'}
-                                </p>
-                              </div>
+                // Loan Offers Received
+                if (activeTab === 'all' || activeTab === 'offers') {
+                  loanOffersReceived.forEach(offer => {
+                    const lender = getUserById(offer.lender_id);
+                    allItems.push({
+                      type: 'offer_received',
+                      id: `offer-recv-${offer.id}`,
+                      timestamp: new Date(offer.created_at || 0),
+                      data: offer,
+                      otherProfile: lender,
+                    });
+                  });
+
+                  // Loan Offers Sent
+                  loanOffersSent.forEach(offer => {
+                    const borrower = getUserById(offer.borrower_id);
+                    allItems.push({
+                      type: 'offer_sent',
+                      id: `offer-sent-${offer.id}`,
+                      timestamp: new Date(offer.created_at || 0),
+                      data: offer,
+                      otherProfile: borrower,
+                    });
+                  });
+                }
+
+                // Payment Confirmations Needed
+                if (activeTab === 'all' || activeTab === 'payments') {
+                  paymentsToConfirm.forEach(payment => {
+                    const methodInfo = getPaymentMethodInfo(payment.payment_method);
+                    const otherName = getOtherPartyName(payment);
+                    allItems.push({
+                      type: 'payment_confirm',
+                      id: `pmt-confirm-${payment.id}`,
+                      timestamp: new Date(payment.created_at || payment.payment_date || 0),
+                      data: payment,
+                      methodInfo,
+                      otherName,
+                    });
+                  });
+
+                  // Payments Awaiting Confirmation from Others
+                  paymentsAwaitingConfirmation.forEach(payment => {
+                    const methodInfo = getPaymentMethodInfo(payment.payment_method);
+                    const otherName = getOtherPartyName(payment, true);
+                    allItems.push({
+                      type: 'payment_awaiting',
+                      id: `pmt-await-${payment.id}`,
+                      timestamp: new Date(payment.created_at || payment.payment_date || 0),
+                      data: payment,
+                      methodInfo,
+                      otherName,
+                    });
+                  });
+                }
+
+                // Term Change Requests
+                if (activeTab === 'all' || activeTab === 'terms') {
+                  termChangeRequests.forEach(loan => {
+                    allItems.push({
+                      type: 'term_change',
+                      id: `term-${loan.id}`,
+                      timestamp: new Date(loan.updated_at || loan.created_at || 0),
+                      data: loan,
+                      otherName: getLoanOtherParty(loan),
+                    });
+                  });
+                }
+
+                // Sort oldest to most recent
+                allItems.sort((a, b) => a.timestamp - b.timestamp);
+
+                if (allItems.length === 0) {
+                  return (
+                    <div className="text-center py-8">
+                      <CheckCircle className="w-10 h-10 mx-auto mb-2 text-[#CDE7F8]" />
+                      <p className="text-[#213B75] font-semibold font-sans mb-1">All caught up!</p>
+                      <p className="text-[#4C7FC4] text-sm font-sans">You have no pending requests to review.</p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="space-y-2">
+                    {allItems.map((item, index) => (
+                      <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.03 }}
+                        className="p-3 rounded-lg bg-[#CDE7F8]"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1 min-w-0">
+                            {/* Friend Request */}
+                            {item.type === 'friend' && (
+                              <p className="text-sm font-semibold text-[#213B75] font-sans">
+                                @{item.senderProfile?.username || 'unknown'} sent you a friend request
+                              </p>
+                            )}
+
+                            {/* Loan Offer Received */}
+                            {item.type === 'offer_received' && (
+                              <p className="text-sm font-semibold text-[#213B75] font-sans">
+                                @{item.otherProfile?.username || 'unknown'} sent you a loan offer
+                              </p>
+                            )}
+
+                            {/* Loan Offer Sent */}
+                            {item.type === 'offer_sent' && (
+                              <p className="text-sm font-semibold text-[#213B75] font-sans">
+                                You sent @{item.otherProfile?.username || 'unknown'} a loan offer
+                              </p>
+                            )}
+
+                            {/* Payment Confirmation Needed */}
+                            {item.type === 'payment_confirm' && (
+                              <p className="text-sm font-semibold text-[#213B75] font-sans">
+                                Confirm payment of ${item.data.amount?.toFixed(2)} from @{item.otherName} via {item.methodInfo.label}
+                              </p>
+                            )}
+
+                            {/* Payment Awaiting Confirmation */}
+                            {item.type === 'payment_awaiting' && (
+                              <p className="text-sm font-semibold text-[#213B75] font-sans">
+                                Confirm payment of ${item.data.amount?.toFixed(2)} to @{item.otherName} via {item.methodInfo.label}
+                              </p>
+                            )}
+
+                            {/* Term Change Request */}
+                            {item.type === 'term_change' && (
+                              <p className="text-sm font-semibold text-[#213B75] font-sans">
+                                @{item.otherName} sent you a loan change request
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex-shrink-0">
+                            {/* Friend Request → Go to Friends page */}
+                            {item.type === 'friend' && (
+                              <Link
+                                to={createPageUrl("Friends")}
+                                className="bg-[#213B75] rounded-lg px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#1a3060] transition-colors font-sans inline-block"
+                              >
+                                View Friends
+                              </Link>
+                            )}
+
+                            {/* Loan Offer Received → View Offer (opens signature modal) */}
+                            {item.type === 'offer_received' && (
                               <button
                                 onClick={() => {
-                                  setSelectedOffer(offer);
+                                  setSelectedOffer(item.data);
                                   setShowSignatureModal(true);
                                 }}
-                                disabled={processingId === offer.id}
-                                className="bg-white rounded-lg px-3 py-1.5 flex items-center gap-1.5 hover:bg-white/80 transition-colors disabled:opacity-50 flex-shrink-0"
+                                disabled={processingId === item.data.id}
+                                className="bg-[#213B75] rounded-lg px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#1a3060] transition-colors disabled:opacity-50 font-sans"
                               >
-                                <Eye className="w-3.5 h-3.5 text-[#4C7FC4]" />
-                                <span className="text-xs font-semibold text-[#213B75] font-sans">View Details</span>
+                                View Offer
                               </button>
-                            </div>
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
+                            )}
 
-                {/* Loan Offers Sent */}
-                {(activeTab === 'all' || activeTab === 'offers') && loanOffersSent.length > 0 && (
-                  <div>
-                    <p className="text-[11px] font-semibold text-[#4C7FC4] uppercase tracking-widest mb-2 font-sans">
-                      Loan Offers You Sent
-                    </p>
-                    <div className="space-y-2">
-                      {loanOffersSent.map((offer, index) => {
-                        const borrower = getUserById(offer.borrower_id);
-                        return (
-                          <motion.div
-                            key={offer.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            className="p-3 rounded-lg bg-[#CDE7F8]"
-                          >
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-[#213B75] font-sans">
-                                  ${offer.amount?.toLocaleString()} to @{borrower?.username || 'unknown'} for {offer.purpose || 'Reason'}
-                                </p>
-                                <p className="text-xs text-[#4C7FC4] font-sans">
-                                  {offer.interest_rate}% APR · Awaiting acceptance
-                                </p>
-                              </div>
-                              <div className="flex items-center gap-2 flex-shrink-0">
-                                <span className="text-[10px] font-semibold text-[#4C7FC4] bg-white rounded-md px-2 py-0.5 font-sans">Pending</span>
+                            {/* Loan Offer Sent → Cancel + View */}
+                            {item.type === 'offer_sent' && (
+                              <div className="flex items-center gap-2">
                                 <button
-                                  onClick={() => setConfirmingDeleteOffer(offer)}
-                                  disabled={processingId === offer.id}
-                                  className="bg-white rounded-lg px-3 py-1.5 flex items-center gap-1.5 hover:bg-red-50 transition-colors disabled:opacity-50"
+                                  onClick={() => setConfirmingDeleteOffer(item.data)}
+                                  disabled={processingId === item.data.id}
+                                  className="bg-white rounded-lg px-3 py-1.5 text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50 font-sans"
                                 >
-                                  <XCircle className="w-3.5 h-3.5 text-red-500" />
-                                  <span className="text-xs font-semibold text-red-500 font-sans">Cancel</span>
+                                  Cancel
                                 </button>
                                 <button
                                   onClick={() => {
-                                    setSelectedOffer(offer);
+                                    setSelectedOffer(item.data);
                                     setShowSignatureModal(true);
                                   }}
-                                  className="bg-white rounded-lg px-3 py-1.5 flex items-center gap-1.5 hover:bg-white/80 transition-colors"
+                                  className="bg-[#213B75] rounded-lg px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#1a3060] transition-colors font-sans"
                                 >
-                                  <Eye className="w-3.5 h-3.5 text-[#4C7FC4]" />
-                                  <span className="text-xs font-semibold text-[#213B75] font-sans">View</span>
+                                  View Offer
                                 </button>
-                              </div>
-                            </div>
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* Friend Requests */}
-                {(activeTab === 'all' || activeTab === 'friends') && friendRequestsReceived.length > 0 && (
-                  <div>
-                    <p className="text-[11px] font-semibold text-[#4C7FC4] uppercase tracking-widest mb-2 font-sans">
-                      Friend Requests
-                    </p>
-                    <div className="space-y-2">
-                      {friendRequestsReceived.map((request, index) => {
-                        const senderProfile = profiles.find(p => p.user_id === request.user_id);
-                        const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent((senderProfile?.full_name || 'U').charAt(0))}&background=4C7FC4&color=fff&size=128`;
-
-                        return (
-                          <motion.div
-                            key={request.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            className="p-3 rounded-lg bg-[#CDE7F8]"
-                          >
-                            <div className="flex items-center gap-3">
-                              <img
-                                src={senderProfile?.profile_picture_url || senderProfile?.avatar_url || defaultAvatar}
-                                alt={senderProfile?.full_name || 'User'}
-                                className="w-10 h-10 rounded-full object-cover flex-shrink-0 bg-white"
-                              />
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-[#213B75] truncate font-sans">
-                                  {senderProfile?.full_name || senderProfile?.username}
-                                </p>
-                                <p className="text-xs text-[#4C7FC4] truncate font-sans">
-                                  @{senderProfile?.username} wants to be your friend
-                                </p>
-                              </div>
-                              <Link
-                                to={createPageUrl("Friends")}
-                                className="flex-shrink-0 bg-[#213B75] rounded-lg px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#1a3060] transition-colors font-sans"
-                              >
-                                View Request
-                              </Link>
-                            </div>
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* Payment Confirmations Needed */}
-                {(activeTab === 'all' || activeTab === 'payments') && paymentsToConfirm.length > 0 && (
-                  <div>
-                    <p className="text-[11px] font-semibold text-[#4C7FC4] uppercase tracking-widest mb-2 font-sans">
-                      Payments Awaiting Your Confirmation
-                    </p>
-                    <div className="space-y-2">
-                      {paymentsToConfirm.map((payment, index) => {
-                        const methodInfo = getPaymentMethodInfo(payment.payment_method);
-                        return (
-                          <motion.div
-                            key={payment.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            className="p-3 rounded-lg bg-[#CDE7F8]"
-                          >
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-[#213B75] font-sans">
-                                  ${payment.amount?.toFixed(2)} from @{getOtherPartyName(payment)}
-                                </p>
-                                <p className="text-xs text-[#4C7FC4] font-sans">
-                                  via {methodInfo.label} · {format(new Date(payment.payment_date), 'MMM d, yyyy')}
-                                </p>
-                              </div>
-                              <div className="flex items-center gap-2 flex-shrink-0">
-                                <button
-                                  onClick={() => setConfirmingDeny(payment)}
-                                  disabled={processingId === payment.id}
-                                  className="bg-white rounded-lg px-3 py-1.5 flex items-center gap-1.5 hover:bg-red-50 transition-colors disabled:opacity-50"
-                                >
-                                  <XCircle className="w-3.5 h-3.5 text-red-500" />
-                                  <span className="text-xs font-semibold text-red-500 font-sans">Deny</span>
-                                </button>
-                                <button
-                                  onClick={() => handleConfirmPayment(payment)}
-                                  disabled={processingId === payment.id}
-                                  className="bg-[#213B75] rounded-lg px-3 py-1.5 flex items-center gap-1.5 hover:bg-[#1a3060] transition-colors disabled:opacity-50"
-                                >
-                                  <CheckCircle className="w-3.5 h-3.5 text-white" />
-                                  <span className="text-xs font-semibold text-white font-sans">Confirm</span>
-                                </button>
-                              </div>
-                            </div>
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* Payments Awaiting Confirmation from Others */}
-                {(activeTab === 'all' || activeTab === 'payments') && paymentsAwaitingConfirmation.length > 0 && (
-                  <div>
-                    <p className="text-[11px] font-semibold text-[#4C7FC4] uppercase tracking-widest mb-2 font-sans">
-                      Your Payments Awaiting Confirmation
-                    </p>
-                    <div className="space-y-2">
-                      {paymentsAwaitingConfirmation.map((payment, index) => {
-                        const methodInfo = getPaymentMethodInfo(payment.payment_method);
-                        return (
-                          <motion.div
-                            key={payment.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            className="p-3 rounded-lg bg-[#CDE7F8]"
-                          >
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-[#213B75] font-sans">
-                                  ${payment.amount?.toFixed(2)} to @{getOtherPartyName(payment, true)}
-                                </p>
-                                <p className="text-xs text-[#4C7FC4] font-sans">
-                                  via {methodInfo.label} · Waiting for confirmation
-                                </p>
-                              </div>
-                              <div className="flex items-center gap-2 flex-shrink-0">
-                                <span className="text-[10px] font-semibold text-[#4C7FC4] bg-white rounded-md px-2 py-0.5 font-sans">Pending</span>
-                                <button
-                                  onClick={() => handleConfirmPayment(payment)}
-                                  disabled={processingId === payment.id}
-                                  className="bg-[#213B75] rounded-lg px-3 py-1.5 flex items-center gap-1.5 hover:bg-[#1a3060] transition-colors disabled:opacity-50"
-                                >
-                                  <CheckCircle className="w-3.5 h-3.5 text-white" />
-                                  <span className="text-xs font-semibold text-white font-sans">Confirm</span>
-                                </button>
-                                <button
-                                  onClick={() => setConfirmingCancel(payment)}
-                                  disabled={processingId === payment.id}
-                                  className="bg-white rounded-lg px-3 py-1.5 flex items-center gap-1.5 hover:bg-red-50 transition-colors disabled:opacity-50"
-                                >
-                                  <XCircle className="w-3.5 h-3.5 text-red-500" />
-                                  <span className="text-xs font-semibold text-red-500 font-sans">Cancel</span>
-                                </button>
-                              </div>
-                            </div>
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* Term Change Requests */}
-                {(activeTab === 'all' || activeTab === 'terms') && termChangeRequests.length > 0 && (
-                  <div>
-                    <p className="text-[11px] font-semibold text-[#4C7FC4] uppercase tracking-widest mb-2 font-sans">
-                      Term Change Requests
-                    </p>
-                    <div className="space-y-2">
-                      {termChangeRequests.map((loan, index) => (
-                        <motion.div
-                          key={loan.id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          className="p-3 rounded-lg bg-[#CDE7F8]"
-                        >
-                          <div className="flex flex-col gap-3">
-                            <div>
-                              <p className="text-sm font-semibold text-[#213B75] font-sans">
-                                @{getLoanOtherParty(loan)} wants to modify loan terms
-                              </p>
-                              <p className="text-xs text-[#4C7FC4] font-sans">
-                                Loan: ${loan.amount?.toLocaleString()} · {loan.purpose || 'No purpose specified'}
-                              </p>
-                            </div>
-
-                            {loan.contract_modification_notes && (
-                              <div className="bg-white rounded-lg p-2.5">
-                                <p className="text-xs font-medium text-[#4C7FC4] mb-0.5 font-sans">Changes:</p>
-                                <p className="text-sm text-[#213B75] font-sans">{loan.contract_modification_notes}</p>
                               </div>
                             )}
 
-                            <div className="flex gap-2 justify-end">
+                            {/* Payment Confirmation → View Payment (opens popup) */}
+                            {item.type === 'payment_confirm' && (
                               <button
-                                onClick={() => handleRejectTermChange(loan)}
-                                disabled={processingId === loan.id}
-                                className="bg-white rounded-lg px-3 py-1.5 text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50 font-sans"
-                              >
-                                Reject
-                              </button>
-                              <button
-                                onClick={() => handleApproveTermChange(loan)}
-                                disabled={processingId === loan.id}
+                                onClick={() => setViewingPayment({ payment: item.data, direction: 'confirm' })}
+                                disabled={processingId === item.data.id}
                                 className="bg-[#213B75] rounded-lg px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#1a3060] transition-colors disabled:opacity-50 font-sans"
                               >
-                                Approve
+                                View Payment
                               </button>
-                            </div>
+                            )}
+
+                            {/* Payment Awaiting → View Payment (opens popup) */}
+                            {item.type === 'payment_awaiting' && (
+                              <button
+                                onClick={() => setViewingPayment({ payment: item.data, direction: 'awaiting' })}
+                                disabled={processingId === item.data.id}
+                                className="bg-[#213B75] rounded-lg px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#1a3060] transition-colors disabled:opacity-50 font-sans"
+                              >
+                                View Payment
+                              </button>
+                            )}
+
+                            {/* Term Change → View Request */}
+                            {item.type === 'term_change' && (
+                              <button
+                                onClick={() => {
+                                  // Scroll to or expand the term change details inline
+                                  // For now, approve/reject in a simple popup-like expand
+                                  setViewingPayment({ termChange: item.data, direction: 'term' });
+                                }}
+                                disabled={processingId === item.data.id}
+                                className="bg-[#213B75] rounded-lg px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#1a3060] transition-colors disabled:opacity-50 font-sans"
+                              >
+                                View Request
+                              </button>
+                            )}
                           </div>
-                        </motion.div>
-                      ))}
-                    </div>
+                        </div>
+                      </motion.div>
+                    ))}
                   </div>
-                )}
-              </div>
+                );
+              })()}
             </div>
           </motion.div>
 
@@ -1026,6 +962,138 @@ export default function Requests() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* View Payment / View Term Change Popup */}
+      <AnimatePresence>
+        {viewingPayment && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            onClick={() => setViewingPayment(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Payment Confirm Popup */}
+              {viewingPayment.direction === 'confirm' && (() => {
+                const payment = viewingPayment.payment;
+                const methodInfo = getPaymentMethodInfo(payment.payment_method);
+                const otherName = getOtherPartyName(payment);
+                return (
+                  <>
+                    <h3 className="font-semibold text-lg text-[#213B75] font-sans mb-1">Confirm Payment</h3>
+                    <p className="text-sm text-[#4C7FC4] font-sans mb-4">
+                      @{otherName} recorded a payment of <span className="font-bold text-[#213B75]">${payment.amount?.toFixed(2)}</span> via {methodInfo.label} on {format(new Date(payment.payment_date), 'MMM d, yyyy')}.
+                    </p>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => {
+                          setConfirmingDeny(payment);
+                          setViewingPayment(null);
+                        }}
+                        className="flex-1 px-4 py-2 rounded-lg bg-[#CDE7F8] text-red-500 text-sm font-semibold font-sans hover:bg-red-50"
+                      >
+                        Deny
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleConfirmPayment(payment);
+                          setViewingPayment(null);
+                        }}
+                        disabled={processingId === payment.id}
+                        className="flex-1 px-4 py-2 rounded-lg bg-[#213B75] text-white text-sm font-semibold font-sans hover:bg-[#1a3060] disabled:opacity-50"
+                      >
+                        Confirm
+                      </button>
+                    </div>
+                  </>
+                );
+              })()}
+
+              {/* Payment Awaiting Popup */}
+              {viewingPayment.direction === 'awaiting' && (() => {
+                const payment = viewingPayment.payment;
+                const methodInfo = getPaymentMethodInfo(payment.payment_method);
+                const otherName = getOtherPartyName(payment, true);
+                return (
+                  <>
+                    <h3 className="font-semibold text-lg text-[#213B75] font-sans mb-1">Payment Details</h3>
+                    <p className="text-sm text-[#4C7FC4] font-sans mb-2">
+                      You recorded a payment of <span className="font-bold text-[#213B75]">${payment.amount?.toFixed(2)}</span> to @{otherName} via {methodInfo.label}.
+                    </p>
+                    <p className="text-xs text-[#4C7FC4] font-sans mb-4">Waiting for @{otherName} to confirm.</p>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => {
+                          setConfirmingCancel(payment);
+                          setViewingPayment(null);
+                        }}
+                        className="flex-1 px-4 py-2 rounded-lg bg-[#CDE7F8] text-red-500 text-sm font-semibold font-sans hover:bg-red-50"
+                      >
+                        Cancel Payment
+                      </button>
+                      <button
+                        onClick={() => setViewingPayment(null)}
+                        className="flex-1 px-4 py-2 rounded-lg bg-[#213B75] text-white text-sm font-semibold font-sans hover:bg-[#1a3060]"
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </>
+                );
+              })()}
+
+              {/* Term Change Popup */}
+              {viewingPayment.direction === 'term' && (() => {
+                const loan = viewingPayment.termChange;
+                const otherName = getLoanOtherParty(loan);
+                return (
+                  <>
+                    <h3 className="font-semibold text-lg text-[#213B75] font-sans mb-1">Loan Change Request</h3>
+                    <p className="text-sm text-[#4C7FC4] font-sans mb-2">
+                      @{otherName} wants to modify the terms of your ${loan.amount?.toLocaleString()} loan{loan.purpose ? ` for ${loan.purpose}` : ''}.
+                    </p>
+                    {loan.contract_modification_notes && (
+                      <div className="bg-[#CDE7F8] rounded-lg p-2.5 mb-4">
+                        <p className="text-xs font-medium text-[#4C7FC4] mb-0.5 font-sans">Proposed changes:</p>
+                        <p className="text-sm text-[#213B75] font-sans">{loan.contract_modification_notes}</p>
+                      </div>
+                    )}
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => {
+                          handleRejectTermChange(loan);
+                          setViewingPayment(null);
+                        }}
+                        disabled={processingId === loan.id}
+                        className="flex-1 px-4 py-2 rounded-lg bg-[#CDE7F8] text-red-500 text-sm font-semibold font-sans hover:bg-red-50 disabled:opacity-50"
+                      >
+                        Reject
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleApproveTermChange(loan);
+                          setViewingPayment(null);
+                        }}
+                        disabled={processingId === loan.id}
+                        className="flex-1 px-4 py-2 rounded-lg bg-[#213B75] text-white text-sm font-semibold font-sans hover:bg-[#1a3060] disabled:opacity-50"
+                      >
+                        Approve
+                      </button>
+                    </div>
+                  </>
+                );
+              })()}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Borrower Signature Modal */}
       {showSignatureModal && selectedOffer && (
