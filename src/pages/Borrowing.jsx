@@ -1522,6 +1522,73 @@ export default function Borrowing() {
                                     })()}
                                   </div>
 
+                                  {/* Document Icons — under Loan Terms */}
+                                  <div className="flex items-start justify-center gap-5 py-1">
+                                    {/* Promissory Note */}
+                                    <button onClick={() => {
+                                      const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id);
+                                      if (agreement) openDocPopup('promissory', agreement);
+                                    }} className="flex flex-col items-center gap-1.5 group cursor-pointer">
+                                      <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow relative">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                          <polyline points="14 2 14 8 20 8"></polyline>
+                                          <line x1="16" y1="13" x2="8" y2="13"></line>
+                                          <line x1="16" y1="17" x2="8" y2="17"></line>
+                                          <polyline points="10 9 9 9 8 9"></polyline>
+                                        </svg>
+                                        <div className="absolute -top-0.5 -right-0.5 group/pn" onClick={(e) => e.stopPropagation()}>
+                                          <div className="w-4 h-4 rounded-full bg-[#00A86B] flex items-center justify-center cursor-help">
+                                            <span className="text-[9px] font-bold text-white leading-none">i</span>
+                                          </div>
+                                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1.5 bg-[#1C4332] rounded-lg shadow-lg opacity-0 group-hover/pn:opacity-100 pointer-events-none group-hover/pn:pointer-events-auto transition-opacity whitespace-nowrap z-50">
+                                            <p className="text-[10px] font-bold text-[#6AD478] mb-0.5">Promissory Note</p>
+                                            <p className="text-[9px] text-[#C2FFDC]/80 leading-snug">A legal document where the borrower<br/>promises to repay the lender.</p>
+                                            <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-[#1C4332] rotate-45 -mt-1"></div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">Promissory<br/>Note</p>
+                                    </button>
+                                    {/* Amortization Schedule */}
+                                    <button onClick={() => {
+                                      const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id);
+                                      if (agreement) openDocPopup('amortization', agreement);
+                                    }} className="flex flex-col items-center gap-1.5 group cursor-pointer">
+                                      <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow relative">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                          <line x1="16" y1="2" x2="16" y2="6"></line>
+                                          <line x1="8" y1="2" x2="8" y2="6"></line>
+                                          <line x1="3" y1="10" x2="21" y2="10"></line>
+                                        </svg>
+                                        <div className="absolute -top-0.5 -right-0.5 group/as" onClick={(e) => e.stopPropagation()}>
+                                          <div className="w-4 h-4 rounded-full bg-[#00A86B] flex items-center justify-center cursor-help">
+                                            <span className="text-[9px] font-bold text-white leading-none">i</span>
+                                          </div>
+                                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1.5 bg-[#1C4332] rounded-lg shadow-lg opacity-0 group-hover/as:opacity-100 pointer-events-none group-hover/as:pointer-events-auto transition-opacity whitespace-nowrap z-50">
+                                            <p className="text-[10px] font-bold text-[#6AD478] mb-0.5">Amortization Schedule</p>
+                                            <p className="text-[9px] text-[#C2FFDC]/80 leading-snug">A table showing each payment broken<br/>down into principal and interest.</p>
+                                            <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-[#1C4332] rotate-45 -mt-1"></div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">Amortization<br/>Schedule</p>
+                                    </button>
+                                    {/* Loan Summary */}
+                                    <button onClick={() => {
+                                      const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id);
+                                      if (agreement) openDocPopup('summary', agreement);
+                                    }} className="flex flex-col items-center gap-1.5 group cursor-pointer">
+                                      <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                        </svg>
+                                      </div>
+                                      <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">Loan<br/>Summary</p>
+                                    </button>
+                                  </div>
+
                                   {/* Loan Progress Box — horizontal row style */}
                                   <div className="bg-white rounded-xl px-4 py-3 shadow-sm relative">
                                     <p className="text-sm font-bold text-[#1C4332] mb-2.5 tracking-tight font-sans">
@@ -1675,106 +1742,6 @@ export default function Borrowing() {
                                       );
                                     })()}
                                   </div>
-
-                                  {/* Action Circles - only show for active loans */}
-                                  {manageLoanSelected.status !== 'cancelled' && (
-                                  <div className="flex flex-wrap items-start justify-center gap-4 py-2">
-                                    {/* Record Payment */}
-                                    <button onClick={() => handleMakePayment(manageLoanSelected)} className="flex flex-col items-center gap-1.5 group cursor-pointer">
-                                      <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                          <line x1="12" y1="1" x2="12" y2="23"></line>
-                                          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                                        </svg>
-                                      </div>
-                                      <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">Record<br/>Payment</p>
-                                    </button>
-                                    {/* Request Loan Edit */}
-                                    <button onClick={() => handleEditLoan(manageLoanSelected)} className="flex flex-col items-center gap-1.5 group cursor-pointer">
-                                      <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                        </svg>
-                                      </div>
-                                      <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">Request<br/>Loan Edit</p>
-                                    </button>
-                                    {/* Request Cancellation */}
-                                    <button onClick={() => handleCancelLoan(manageLoanSelected)} className="flex flex-col items-center gap-1.5 group cursor-pointer">
-                                      <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                          <circle cx="12" cy="12" r="10"></circle>
-                                          <line x1="15" y1="9" x2="9" y2="15"></line>
-                                          <line x1="9" y1="9" x2="15" y2="15"></line>
-                                        </svg>
-                                      </div>
-                                      <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">Request<br/>Cancellation</p>
-                                    </button>
-                                    {/* Promissory Note */}
-                                    <button onClick={() => {
-                                      const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id);
-                                      if (agreement) openDocPopup('promissory', agreement);
-                                    }} className="flex flex-col items-center gap-1.5 group cursor-pointer">
-                                      <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow relative">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                          <polyline points="14 2 14 8 20 8"></polyline>
-                                          <line x1="16" y1="13" x2="8" y2="13"></line>
-                                          <line x1="16" y1="17" x2="8" y2="17"></line>
-                                          <polyline points="10 9 9 9 8 9"></polyline>
-                                        </svg>
-                                        <div className="absolute -top-0.5 -right-0.5 group/pn" onClick={(e) => e.stopPropagation()}>
-                                          <div className="w-4 h-4 rounded-full bg-[#00A86B] flex items-center justify-center cursor-help">
-                                            <span className="text-[9px] font-bold text-white leading-none">i</span>
-                                          </div>
-                                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1.5 bg-[#1C4332] rounded-lg shadow-lg opacity-0 group-hover/pn:opacity-100 pointer-events-none group-hover/pn:pointer-events-auto transition-opacity whitespace-nowrap z-50">
-                                            <p className="text-[10px] font-bold text-[#6AD478] mb-0.5">Promissory Note</p>
-                                            <p className="text-[9px] text-[#C2FFDC]/80 leading-snug">A legal document where the borrower<br/>promises to repay the lender.</p>
-                                            <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-[#1C4332] rotate-45 -mt-1"></div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">Promissory<br/>Note</p>
-                                    </button>
-                                    {/* Amortization Schedule */}
-                                    <button onClick={() => {
-                                      const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id);
-                                      if (agreement) openDocPopup('amortization', agreement);
-                                    }} className="flex flex-col items-center gap-1.5 group cursor-pointer">
-                                      <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow relative">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                          <line x1="16" y1="2" x2="16" y2="6"></line>
-                                          <line x1="8" y1="2" x2="8" y2="6"></line>
-                                          <line x1="3" y1="10" x2="21" y2="10"></line>
-                                        </svg>
-                                        <div className="absolute -top-0.5 -right-0.5 group/as" onClick={(e) => e.stopPropagation()}>
-                                          <div className="w-4 h-4 rounded-full bg-[#00A86B] flex items-center justify-center cursor-help">
-                                            <span className="text-[9px] font-bold text-white leading-none">i</span>
-                                          </div>
-                                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1.5 bg-[#1C4332] rounded-lg shadow-lg opacity-0 group-hover/as:opacity-100 pointer-events-none group-hover/as:pointer-events-auto transition-opacity whitespace-nowrap z-50">
-                                            <p className="text-[10px] font-bold text-[#6AD478] mb-0.5">Amortization Schedule</p>
-                                            <p className="text-[9px] text-[#C2FFDC]/80 leading-snug">A table showing each payment broken<br/>down into principal and interest.</p>
-                                            <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-[#1C4332] rotate-45 -mt-1"></div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">Amortization<br/>Schedule</p>
-                                    </button>
-                                    {/* Loan Summary */}
-                                    <button onClick={() => {
-                                      const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id);
-                                      if (agreement) openDocPopup('summary', agreement);
-                                    }} className="flex flex-col items-center gap-1.5 group cursor-pointer">
-                                      <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                                        </svg>
-                                      </div>
-                                      <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">Loan<br/>Summary</p>
-                                    </button>
-                                  </div>
-                                  )}
 
                                   {/* Cancelled notice */}
                                   {manageLoanSelected.status === 'cancelled' && (
