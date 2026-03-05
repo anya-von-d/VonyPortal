@@ -783,9 +783,10 @@ export default function Borrowing() {
                 className="space-y-8 md:space-y-10"
               >
 
-                {/* Loan Progress + Next Payment */}
+                {/* Loan Progress + Upcoming Payments | Next Payment + Overdue */}
                 <div className="grid md:grid-cols-2 gap-4">
-                  {/* Left: Loan Progress */}
+                  {/* Left: Loan Progress + Upcoming Payments */}
+                  <div className="flex flex-col gap-4">
                   <div className="rounded-2xl p-4 sm:p-5 border-0" style={{backgroundColor: '#83F384'}}>
                     <p className="text-lg font-bold text-slate-800 mb-4 tracking-tight font-serif">
                       Loan Progress
@@ -858,6 +859,54 @@ export default function Borrowing() {
                         })}
                       </div>
                     )}
+                  </div>
+
+                  {/* Upcoming Payments */}
+                  {(() => {
+                    const upcomingLoans = activeLoans
+                      .filter(l => l.next_payment_date && new Date(l.next_payment_date) >= new Date())
+                      .map(l => {
+                        const lender = publicProfiles.find(p => p.user_id === l.lender_id);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        const payDate = new Date(l.next_payment_date);
+                        payDate.setHours(0, 0, 0, 0);
+                        const days = Math.ceil((payDate - today) / (1000 * 60 * 60 * 24));
+                        return { ...l, lenderUsername: lender?.username || 'user', days, payDate };
+                      })
+                      .sort((a, b) => a.payDate - b.payDate)
+                      .slice(0, 5);
+
+                    if (upcomingLoans.length === 0) return null;
+
+                    return (
+                      <div className="rounded-2xl p-4 sm:p-5 border-0 bg-[#C2FFDC]">
+                        <p className="text-lg font-bold text-slate-800 mb-4 tracking-tight font-serif">
+                          Upcoming Payments
+                        </p>
+                        <div className="space-y-2">
+                          {upcomingLoans.map(loan => (
+                            <div key={loan.id} className="flex items-center gap-3 p-3 rounded-xl" style={{ backgroundColor: '#83F384' }}>
+                              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#C2FFDC] flex items-center justify-center">
+                                <p className="text-[10px] font-bold text-[#1C4332] text-center leading-tight">
+                                  {loan.days}
+                                  <span className="block text-[7px] font-medium text-[#1C4332]/60">
+                                    {loan.days === 1 ? 'day' : 'days'}
+                                  </span>
+                                </p>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm text-slate-800">
+                                  Send <span className="font-semibold">${(loan.payment_amount || 0).toLocaleString()}</span> to <span className="font-semibold">@{loan.lenderUsername}</span>
+                                </p>
+                                <p className="text-xs text-slate-500 mt-0.5">{format(loan.payDate, 'MMM d, yyyy')}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
                   </div>
 
                   {/* Right: Next Payment + Overdue Notifications */}
@@ -938,76 +987,134 @@ export default function Borrowing() {
                   </div>
                 </div>
 
-                {/* Record Payment — right half */}
+                {/* Record Payment + Loans Ranked By — right half */}
                 {activeLoans.length > 0 && (
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>{/* spacer for left half */}</div>
-                    <div className="rounded-2xl p-5 border-0 bg-[#C2FFDC]">
-                      <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                        Record Payment
-                      </p>
-                      <div className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
-                        <span>Record payment of</span>
-                        <span className="font-medium">$</span>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          min="0.01"
-                          placeholder="______"
-                          value={quickPayAmount}
-                          onChange={(e) => setQuickPayAmount(e.target.value)}
-                          className="w-24 h-8 px-1 inline-flex border-0 bg-transparent text-[#1C4332] placeholder:text-[#1C4332] focus-visible:ring-0 focus-visible:ring-offset-0"
-                          style={{ MozAppearance: 'textfield' }}
-                        />
-                        <span>to</span>
-                        <Select
-                          value={quickPayPerson}
-                          onValueChange={(val) => {
-                            setQuickPayPerson(val);
-                            setQuickPayLoanId('');
-                          }}
-                        >
-                          <SelectTrigger className="w-auto h-8 px-2 inline-flex border-0 bg-transparent focus:ring-0 focus:ring-offset-0">
-                            <SelectValue placeholder="select person" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {uniqueLenders.map((lender) => (
-                              <SelectItem key={lender.userId} value={lender.userId}>
-                                @{lender.username || 'user'}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <Button
-                          type="button"
-                          onClick={() => {
-                            const matchingLoans = quickPayPerson
-                              ? activeLoans.filter(l => l.lender_id === quickPayPerson)
-                              : activeLoans;
-                            if (matchingLoans.length === 1) {
-                              setSelectedLoan({
-                                ...matchingLoans[0],
-                                _prefillAmount: quickPayAmount,
-                              });
-                              setShowPaymentModal(true);
-                            } else if (matchingLoans.length > 1) {
-                              setSelectedLoan({
-                                ...matchingLoans[0],
-                                _prefillAmount: quickPayAmount,
-                                _candidateLoans: matchingLoans,
-                              });
-                              setShowPaymentModal(true);
-                            }
-                          }}
-                          disabled={!quickPayPerson || !quickPayAmount}
-                          className={`h-8 px-4 rounded-lg text-sm font-medium border-0 transition-all ${
-                            !quickPayPerson || !quickPayAmount
-                              ? 'bg-[#00A86B]/50 text-white/70 cursor-not-allowed'
-                              : 'bg-[#00A86B] text-white hover:bg-[#0D9B76]'
-                          }`}
-                        >
-                          Submit
-                        </Button>
+                    <div className="flex flex-col gap-4">
+                      {/* Record Payment */}
+                      <div className="rounded-2xl p-5 border-0 bg-[#C2FFDC]">
+                        <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                          Record Payment
+                        </p>
+                        <div className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
+                          <span>Record payment of</span>
+                          <span className="font-medium">$</span>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            min="0.01"
+                            placeholder="______"
+                            value={quickPayAmount}
+                            onChange={(e) => setQuickPayAmount(e.target.value)}
+                            className="w-24 h-8 px-1 inline-flex border-0 bg-transparent text-[#1C4332] placeholder:text-[#1C4332] focus-visible:ring-0 focus-visible:ring-offset-0"
+                            style={{ MozAppearance: 'textfield' }}
+                          />
+                          <span>to</span>
+                          <Select
+                            value={quickPayPerson}
+                            onValueChange={(val) => {
+                              setQuickPayPerson(val);
+                              setQuickPayLoanId('');
+                            }}
+                          >
+                            <SelectTrigger className="w-auto h-8 px-2 inline-flex border-0 bg-transparent focus:ring-0 focus:ring-offset-0">
+                              <SelectValue placeholder="select person" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {uniqueLenders.map((lender) => (
+                                <SelectItem key={lender.userId} value={lender.userId}>
+                                  @{lender.username || 'user'}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            type="button"
+                            onClick={() => {
+                              const matchingLoans = quickPayPerson
+                                ? activeLoans.filter(l => l.lender_id === quickPayPerson)
+                                : activeLoans;
+                              if (matchingLoans.length === 1) {
+                                setSelectedLoan({
+                                  ...matchingLoans[0],
+                                  _prefillAmount: quickPayAmount,
+                                });
+                                setShowPaymentModal(true);
+                              } else if (matchingLoans.length > 1) {
+                                setSelectedLoan({
+                                  ...matchingLoans[0],
+                                  _prefillAmount: quickPayAmount,
+                                  _candidateLoans: matchingLoans,
+                                });
+                                setShowPaymentModal(true);
+                              }
+                            }}
+                            disabled={!quickPayPerson || !quickPayAmount}
+                            className={`h-8 px-4 rounded-lg text-sm font-medium border-0 transition-all ${
+                              !quickPayPerson || !quickPayAmount
+                                ? 'bg-[#00A86B]/50 text-white/70 cursor-not-allowed'
+                                : 'bg-[#00A86B] text-white hover:bg-[#0D9B76]'
+                            }`}
+                          >
+                            Submit
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Loans Ranked By */}
+                      <div className="rounded-2xl p-5 border-0 bg-[#C2FFDC]">
+                        <div className="flex items-center justify-between mb-4">
+                          <p className="text-lg font-bold text-slate-800 tracking-tight font-serif">
+                            Loans Ranked By
+                          </p>
+                          <Select value={rankingFilter} onValueChange={setRankingFilter}>
+                            <SelectTrigger className="w-auto h-7 px-2 border-0 bg-[#83F384] text-xs font-medium rounded-lg">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="highest_interest">Highest Interest</SelectItem>
+                              <SelectItem value="highest_payment">Highest Payment</SelectItem>
+                              <SelectItem value="soonest_deadline">Soonest Deadline</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          {(() => {
+                            const sorted = [...activeLoans].sort((a, b) => {
+                              if (rankingFilter === 'highest_interest') return (b.interest_rate || 0) - (a.interest_rate || 0);
+                              if (rankingFilter === 'highest_payment') return (b.payment_amount || 0) - (a.payment_amount || 0);
+                              if (rankingFilter === 'soonest_deadline') {
+                                const dateA = a.next_payment_date ? new Date(a.next_payment_date) : new Date('2099-01-01');
+                                const dateB = b.next_payment_date ? new Date(b.next_payment_date) : new Date('2099-01-01');
+                                return dateA - dateB;
+                              }
+                              return 0;
+                            });
+                            return sorted.slice(0, 5).map((loan, idx) => {
+                              const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
+                              const rankValue = rankingFilter === 'highest_interest'
+                                ? `${loan.interest_rate || 0}%`
+                                : rankingFilter === 'highest_payment'
+                                  ? `$${(loan.payment_amount || 0).toLocaleString()}`
+                                  : loan.next_payment_date ? format(new Date(loan.next_payment_date), 'MMM d') : 'N/A';
+
+                              return (
+                                <div key={loan.id} className="flex items-center gap-3 p-3 rounded-xl" style={{ backgroundColor: '#83F384' }}>
+                                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[#C2FFDC] flex items-center justify-center">
+                                    <span className="text-xs font-bold text-[#1C4332]">{idx + 1}</span>
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-slate-800 truncate">
+                                      @{lender?.username || 'user'} · {loan.purpose || 'Loan'}
+                                    </p>
+                                  </div>
+                                  <span className="text-sm font-bold text-[#1C4332] flex-shrink-0">{rankValue}</span>
+                                </div>
+                              );
+                            });
+                          })()}
+                        </div>
                       </div>
                     </div>
                   </div>

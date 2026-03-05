@@ -454,7 +454,8 @@ export default function Home() {
                     <Link to={createPageUrl("RecentActivity")} className="flex flex-col items-center gap-1.5 group">
                       <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4C7FC4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <polyline points="12 6 12 12 16 14"></polyline>
                         </svg>
                       </div>
                       <p className="text-[10px] font-semibold text-[#213B75] text-center leading-tight font-sans">View Recent<br/>Activity</p>
@@ -1078,44 +1079,41 @@ export default function Home() {
                       const current = notifications[safeIdx];
 
                       return (
-                        <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
-                          <p className="text-sm font-bold text-[#213B75] mb-2 tracking-tight font-sans">
-                            Notifications
-                          </p>
-                          <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-[#CDE7F8]">
-                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
-                              <span className="text-base">🕐</span>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <AnimatePresence mode="wait">
-                                <motion.p
-                                  key={safeIdx}
-                                  initial={{ opacity: 0, y: 8 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  exit={{ opacity: 0, y: -8 }}
-                                  transition={{ duration: 0.25 }}
-                                  className="text-[11px] text-[#213B75] leading-snug"
-                                >
-                                  {current.text}
-                                </motion.p>
-                              </AnimatePresence>
-                            </div>
-                            <Link
-                              to={createPageUrl(current.link)}
-                              className="flex-shrink-0 text-[9px] font-semibold px-2 py-1 rounded-md whitespace-nowrap"
-                              style={{ backgroundColor: '#213B75', color: '#FFFFFF' }}
-                            >
-                              Go to {current.link}
-                            </Link>
+                        <div className="rounded-xl px-4 py-3 shadow-sm flex items-center gap-3" style={{ backgroundColor: '#4C7FC4' }}>
+                          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                              <circle cx="12" cy="12" r="10"></circle>
+                              <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
                           </div>
+                          <div className="flex-1 min-w-0">
+                            <AnimatePresence mode="wait">
+                              <motion.p
+                                key={safeIdx}
+                                initial={{ opacity: 0, y: 8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -8 }}
+                                transition={{ duration: 0.25 }}
+                                className="text-sm font-bold text-white tracking-tight font-sans leading-snug"
+                              >
+                                {current.text}
+                              </motion.p>
+                            </AnimatePresence>
+                          </div>
+                          <Link
+                            to={createPageUrl(current.link)}
+                            className="flex-shrink-0 px-4 py-1.5 rounded-lg bg-white text-xs font-semibold text-[#213B75] hover:bg-white/90 transition-colors font-sans whitespace-nowrap"
+                          >
+                            Go to {current.link}
+                          </Link>
                           {notifications.length > 1 && (
-                            <div className="flex items-center justify-center gap-1.5 mt-2">
+                            <div className="flex flex-col items-center gap-1 flex-shrink-0">
                               {notifications.map((_, i) => (
                                 <button
                                   key={i}
                                   onClick={() => setNotifIndex(i)}
                                   className={`rounded-full transition-all cursor-pointer ${
-                                    i === safeIdx ? 'w-4 h-1.5 bg-[#213B75]' : 'w-1.5 h-1.5 bg-[#4C7FC4]/40'
+                                    i === safeIdx ? 'w-1.5 h-3 bg-white' : 'w-1.5 h-1.5 bg-white/40'
                                   }`}
                                 />
                               ))}
@@ -1222,17 +1220,15 @@ export default function Home() {
                                             : <>Send payment of <span className="font-semibold">${amountStr}</span> to <span className="font-semibold">@{event.username}</span></>
                                           }
                                         </p>
-                                        <div className="flex items-center gap-2 mt-0.5">
-                                          <p className="text-[10px] text-[#4C7FC4]">{dueDateStr}</p>
-                                          <Link
-                                            to={createPageUrl(loanPage)}
-                                            className="text-[9px] font-semibold px-2 py-0.5 rounded-md"
-                                            style={{ backgroundColor: '#213B75', color: '#FFFFFF' }}
-                                          >
-                                            View Loan
-                                          </Link>
-                                        </div>
+                                        <p className="text-[10px] text-[#4C7FC4] mt-0.5">{dueDateStr}</p>
                                       </div>
+                                      <Link
+                                        to={createPageUrl(loanPage)}
+                                        className="flex-shrink-0 text-[9px] font-semibold px-2.5 py-1 rounded-md"
+                                        style={{ backgroundColor: '#213B75', color: '#FFFFFF' }}
+                                      >
+                                        View Loan
+                                      </Link>
                                     </div>
                                   );
                                 })}
@@ -1285,6 +1281,28 @@ export default function Home() {
                         </>
                       );
                     })()}
+
+                    {/* View Lending / Borrowing Details */}
+                    <div className="flex items-center justify-center gap-8 py-2">
+                      <Link to={createPageUrl("Lending")} className="flex flex-col items-center gap-1.5 group">
+                        <div className="w-11 h-11 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C7FC4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                          </svg>
+                        </div>
+                        <p className="text-[10px] font-semibold text-[#213B75] text-center leading-tight font-sans">View Lending<br/>Details</p>
+                      </Link>
+                      <Link to={createPageUrl("Borrowing")} className="flex flex-col items-center gap-1.5 group">
+                        <div className="w-11 h-11 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C7FC4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                          </svg>
+                        </div>
+                        <p className="text-[10px] font-semibold text-[#213B75] text-center leading-tight font-sans">View Borrowing<br/>Details</p>
+                      </Link>
+                    </div>
 
                     {/* Recent Activity Box */}
                     <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
