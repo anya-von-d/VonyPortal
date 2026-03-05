@@ -183,7 +183,7 @@ export default function TopNav({ location }) {
         </div>
 
         {/* Bottom Bar - Transparent primary navigation, left-aligned */}
-        <div className={`h-12 ${menuOpen ? 'hidden md:block' : ''}`} style={{backgroundColor: '#0A3D22'}}>
+        <div className={`h-12 ${menuOpen ? 'hidden md:block' : ''}`} style={{backgroundColor: 'transparent'}}>
           <div className="h-full px-4 sm:px-8 md:px-24 lg:px-36 mx-auto flex items-center justify-start">
             {/* Mobile: Main nav links left-aligned */}
             <div className="flex md:hidden items-center gap-6">
