@@ -1485,10 +1485,10 @@ export default function Borrowing() {
                                 </div>
                               ) : (
                                 <>
-                                  {/* Loan Terms Box */}
+                                  {/* Your Loan Box — top 4 items in a row */}
                                   <div className="bg-white rounded-xl px-4 py-3 shadow-sm relative">
                                     <p className="text-sm font-bold text-[#1C4332] mb-2.5 tracking-tight font-sans">
-                                      Loan Terms
+                                      Your Loan
                                     </p>
                                     {(() => {
                                       const amount = manageLoanSelected.amount || 0;
@@ -1496,13 +1496,37 @@ export default function Borrowing() {
                                       const repaymentPeriod = manageLoanSelected.repayment_period || 0;
                                       const repaymentUnit = manageLoanSelected.repayment_unit || 'months';
                                       const paymentFrequency = manageLoanSelected.payment_frequency || 'monthly';
-                                      const paymentAmount = manageLoanSelected.payment_amount || 0;
 
-                                      const termRows = [
+                                      const items = [
                                         { label: 'Loan Amount', value: `$${amount.toLocaleString()}` },
                                         { label: 'Interest Rate', value: `${interestRate}%` },
                                         { label: 'Term', value: `${repaymentPeriod} ${repaymentUnit}` },
-                                        { label: 'Payment Frequency', value: paymentFrequency.charAt(0).toUpperCase() + paymentFrequency.slice(1) },
+                                        { label: 'Frequency', value: paymentFrequency.charAt(0).toUpperCase() + paymentFrequency.slice(1) },
+                                      ];
+
+                                      return (
+                                        <div className="grid grid-cols-4 gap-2">
+                                          {items.map((item, idx) => (
+                                            <div key={idx} className="text-center">
+                                              <p className="text-[10px] text-[#00A86B] font-medium font-sans mb-0.5">{item.label}</p>
+                                              <p className="text-[13px] font-bold text-[#1C4332] font-sans">{item.value}</p>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      );
+                                    })()}
+                                  </div>
+
+                                  {/* Loan Terms Box */}
+                                  <div className="bg-white rounded-xl px-4 py-3 shadow-sm relative">
+                                    <p className="text-sm font-bold text-[#1C4332] mb-2.5 tracking-tight font-sans">
+                                      Loan Terms
+                                    </p>
+                                    {(() => {
+                                      const paymentAmount = manageLoanSelected.payment_amount || 0;
+                                      const repaymentPeriod = manageLoanSelected.repayment_period || 0;
+
+                                      const termRows = [
                                         { label: 'Payment Amount', value: `$${paymentAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
                                         { label: 'Number of Payments', value: `${repaymentPeriod}` },
                                       ];
