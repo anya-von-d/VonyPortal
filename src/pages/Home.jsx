@@ -288,10 +288,10 @@ export default function Home() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col items-center gap-6 md:gap-8"
+                className="flex flex-col gap-6 md:gap-8 w-full"
               >
-                {/* Centered Greeting */}
-                <div className="text-center">
+                {/* Left-Aligned Greeting */}
+                <div>
                   {(() => {
                     const firstName = user.full_name?.split(' ')[0] || 'User';
                     return (
@@ -303,7 +303,40 @@ export default function Home() {
                   })()}
                 </div>
 
-                {/* Two-Column Layout: Left = Overviews stacked, Right = Buttons + Activity */}
+                {/* Quick Action Circles */}
+                <div className="flex items-start gap-6 sm:gap-8">
+                  <Link to={createPageUrl("Lending")} className="flex flex-col items-center gap-2 group">
+                    <div className="w-14 h-14 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4C7FC4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <polyline points="5 12 12 5 19 12"></polyline>
+                      </svg>
+                    </div>
+                    <p className="text-[11px] font-semibold text-[#213B75] text-center leading-tight font-sans">Make<br/>Lending Offer</p>
+                  </Link>
+                  <Link to={createPageUrl("Borrowing")} className="flex flex-col items-center gap-2 group">
+                    <div className="w-14 h-14 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4C7FC4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="12" y1="19" x2="12" y2="5"></line>
+                        <polyline points="19 12 12 19 5 12"></polyline>
+                      </svg>
+                    </div>
+                    <p className="text-[11px] font-semibold text-[#213B75] text-center leading-tight font-sans">Request<br/>to Borrow</p>
+                  </Link>
+                  <Link to={createPageUrl("LoanAgreements")} className="flex flex-col items-center gap-2 group">
+                    <div className="w-14 h-14 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4C7FC4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                      </svg>
+                    </div>
+                    <p className="text-[11px] font-semibold text-[#213B75] text-center leading-tight font-sans">View<br/>Documents</p>
+                  </Link>
+                </div>
+
+                {/* Two-Column Layout: Left = Overviews stacked, Right = Activity */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4 w-full">
                   {/* Left Column: Lending Overview + Borrowing Overview stacked */}
                   <div className="flex flex-col gap-3 md:gap-4">
@@ -422,30 +455,8 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Right Column: Three buttons horizontal + Activity below */}
+                  {/* Right Column: Activity */}
                   <div className="flex flex-col gap-3 md:gap-4">
-                    {/* Three Quick Action Buttons - horizontal */}
-                    <div className="grid grid-cols-3 gap-2">
-                      <Link
-                        to={createPageUrl("Lending")}
-                        className="rounded-xl px-3 py-3 shadow-sm bg-white text-center"
-                      >
-                        <p className="text-sm font-bold text-[#213B75] tracking-tight font-sans">Create Loan Offer</p>
-                      </Link>
-                      <Link
-                        to={createPageUrl("Requests")}
-                        className="rounded-xl px-3 py-3 shadow-sm bg-white text-center"
-                      >
-                        <p className="text-sm font-bold text-[#213B75] tracking-tight font-sans">View Requests</p>
-                      </Link>
-                      <Link
-                        to={createPageUrl("LoanAgreements")}
-                        className="rounded-xl px-3 py-3 shadow-sm bg-white text-center"
-                      >
-                        <p className="text-sm font-bold text-[#213B75] tracking-tight font-sans">View Documents</p>
-                      </Link>
-                    </div>
-
                     {/* Activity Box - matching overview style */}
                     <div className="rounded-xl px-4 py-3 shadow-sm bg-white flex-1">
                       <p className="text-sm font-bold text-[#213B75] mb-2 tracking-tight font-sans">
