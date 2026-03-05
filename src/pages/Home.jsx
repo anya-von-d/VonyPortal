@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Loan, Payment, PublicProfile, Friendship } from "@/entities/all";
+import { Loan, Payment, PublicProfile } from "@/entities/all";
 import { useAuth } from "@/lib/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, getDay } from "date-fns";
+import { format, startOfMonth, endOfMonth, isSameMonth, addMonths, subMonths } from "date-fns";
 import { formatMoney } from "@/components/utils/formatMoney";
 import RecordPaymentModal from "@/components/loans/RecordPaymentModal";
 
-import StatsCard from "../components/dashboard/StatsCard";
 import RecentActivity from "../components/dashboard/RecentActivity";
 import PendingLoanOffers from "../components/dashboard/PendingLoanOffers";
-import LoanProgress from "../components/dashboard/LoanProgress";
 
 // Helper function to sync public profile, moved here to adhere to file structure rules
 const syncPublicProfile = async (userData) => {
@@ -50,7 +48,6 @@ export default function Home() {
   const [loans, setLoans] = useState([]);
   const [payments, setPayments] = useState([]);
   const [publicProfiles, setPublicProfiles] = useState([]);
-  const [friendships, setFriendships] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -84,17 +81,15 @@ export default function Home() {
     setIsLoading(true);
     try {
       // Only fetch loan data - user profile comes from context
-      const [allLoans, recentPayments, allProfiles, allFriendships] = await Promise.all([
+      const [allLoans, recentPayments, allProfiles] = await Promise.all([
         safeEntityCall(() => Loan.list('-created_at')),
         safeEntityCall(() => Payment.list('-created_at', 10)),
         safeEntityCall(() => PublicProfile.list()),
-        safeEntityCall(() => Friendship.list()),
       ]);
 
       setLoans(allLoans);
       setPayments(recentPayments);
       setPublicProfiles(allProfiles);
-      setFriendships(allFriendships);
       setDataLoaded(true);
 
       // Sync profile in background if we have user data
@@ -290,15 +285,36 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex flex-col gap-6 md:gap-8 w-full"
               >
+                {/* Updates Box - Mobile: shows first, Desktop: hidden here (shown in right column) */}
+                <div className="lg:hidden rounded-xl px-4 py-3 shadow-sm w-full flex items-center gap-3" style={{ backgroundColor: '#4C7FC4' }}>
+                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                      <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                  </div>
+                  <p className="text-sm font-bold text-white tracking-tight font-sans flex-1">
+                    {pendingOffers.length > 0
+                      ? `You have ${pendingOffers.length} new update${pendingOffers.length !== 1 ? 's' : ''}`
+                      : 'You have no new requests'
+                    }
+                  </p>
+                  {pendingOffers.length > 0 && (
+                    <Link
+                      to={createPageUrl("Requests")}
+                      className="flex-shrink-0 px-4 py-1.5 rounded-lg bg-white text-xs font-semibold text-[#213B75] hover:bg-white/90 transition-colors font-sans"
+                    >
+                      View Updates
+                    </Link>
+                  )}
+                </div>
+
                 {/* Left-Aligned Greeting */}
                 <div>
                   {(() => {
                     const firstName = user.full_name?.split(' ')[0] || 'User';
                     return (
-                      <div>
-                        <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#213B75] tracking-tight leading-tight font-sans">Welcome Back,</p>
-                        <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#213B75] tracking-tight leading-tight font-sans">{firstName}</p>
-                      </div>
+                      <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#213B75] tracking-tight leading-tight font-sans">Welcome Back, {firstName}</p>
                     );
                   })()}
                 </div>
@@ -336,25 +352,7 @@ export default function Home() {
                   </Link>
                 </div>
 
-                {/* Pending Requests Box */}
-                <div className="rounded-xl px-4 py-3 shadow-sm text-center w-full" style={{ backgroundColor: '#4C7FC4' }}>
-                  <p className="text-sm font-bold text-white tracking-tight font-sans">
-                    {pendingOffers.length > 0
-                      ? `You have ${pendingOffers.length} pending request${pendingOffers.length !== 1 ? 's' : ''}`
-                      : 'You have no new requests'
-                    }
-                  </p>
-                  {pendingOffers.length > 0 && (
-                    <Link
-                      to={createPageUrl("Requests")}
-                      className="inline-block mt-2 px-4 py-1.5 rounded-lg bg-white text-xs font-semibold text-[#213B75] hover:bg-white/90 transition-colors font-sans"
-                    >
-                      View Requests
-                    </Link>
-                  )}
-                </div>
-
-                {/* Two-Column Layout: Left = Overviews stacked, Right = Activity */}
+                {/* Two-Column Layout: Left = Overviews stacked, Right = Updates + Activity */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4 w-full">
                   {/* Left Column: Lending Overview + Borrowing Overview stacked */}
                   <div className="flex flex-col gap-3 md:gap-4">
@@ -471,111 +469,337 @@ export default function Home() {
                         </div>
                       </div>
                     </div>
+
+                    {/* Record Payment Box */}
+                    {myLoans.filter(l => l && l.status === 'active').length > 0 && (
+                      <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
+                        <p className="text-sm font-bold text-[#213B75] mb-2 tracking-tight font-sans">
+                          Record Payment
+                        </p>
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-[#213B75]">
+                          <span>Record payment of</span>
+                          <span className="font-medium">$</span>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            min="0.01"
+                            placeholder=""
+                            value={quickPayAmount}
+                            onChange={(e) => setQuickPayAmount(e.target.value)}
+                            className="w-20 h-7 px-2 bg-[#CDE7F8] border-0 text-xs inline-flex rounded-md"
+                            style={{ MozAppearance: 'textfield' }}
+                          />
+                          <span>via</span>
+                          <Select value={quickPayMethod} onValueChange={setQuickPayMethod}>
+                            <SelectTrigger className="w-auto h-7 px-2 bg-[#CDE7F8] border-0 text-xs inline-flex rounded-md">
+                              <SelectValue placeholder="select method" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="venmo">Venmo</SelectItem>
+                              <SelectItem value="zelle">Zelle</SelectItem>
+                              <SelectItem value="cashapp">Cash App</SelectItem>
+                              <SelectItem value="paypal">PayPal</SelectItem>
+                              <SelectItem value="cash">Cash</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <span>for</span>
+                          <Select value={quickPayLoanId} onValueChange={setQuickPayLoanId}>
+                            <SelectTrigger className="w-auto h-7 px-2 bg-[#CDE7F8] border-0 text-xs inline-flex min-w-[120px] rounded-md">
+                              <SelectValue placeholder="select loan" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {myLoans.filter(l => l && l.status === 'active').map((loan) => {
+                                const isLender = loan.lender_id === user.id;
+                                const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
+                                const otherUser = safeAllProfiles.find(p => p.user_id === otherUserId);
+                                return (
+                                  <SelectItem key={loan.id} value={loan.id}>
+                                    @{otherUser?.username || 'user'} - {loan.purpose || `$${loan.amount}`}
+                                  </SelectItem>
+                                );
+                              })}
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            type="button"
+                            onClick={() => {
+                              const loan = myLoans.find(l => l.id === quickPayLoanId);
+                              if (loan) {
+                                setSelectedLoan({
+                                  ...loan,
+                                  _prefillAmount: quickPayAmount,
+                                  _prefillMethod: quickPayMethod,
+                                });
+                                setShowPaymentModal(true);
+                              }
+                            }}
+                            disabled={!quickPayLoanId || !quickPayAmount}
+                            className={`h-7 px-3 rounded-md text-xs font-semibold border-0 transition-all ${
+                              !quickPayLoanId || !quickPayAmount
+                                ? 'bg-[#4C7FC4]/50 text-white/70 cursor-not-allowed'
+                                : 'bg-[#4C7FC4] text-white hover:bg-[#3a6bb0]'
+                            }`}
+                          >
+                            Submit
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Right Column: Activity */}
+                  {/* Right Column: Updates + Monthly Overview */}
                   <div className="flex flex-col gap-3 md:gap-4">
-                    {/* Activity Box - matching overview style */}
-                    <div className="rounded-xl px-4 py-3 shadow-sm bg-white flex-1">
-                      <p className="text-sm font-bold text-[#213B75] mb-2 tracking-tight font-sans">
-                        Activity
+                    {/* Updates Box - Desktop only (mobile version is at top) */}
+                    <div className="hidden lg:flex rounded-xl px-4 py-3 shadow-sm items-center gap-3" style={{ backgroundColor: '#4C7FC4' }}>
+                      <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                      </div>
+                      <p className="text-sm font-bold text-white tracking-tight font-sans flex-1">
+                        {pendingOffers.length > 0
+                          ? `You have ${pendingOffers.length} new update${pendingOffers.length !== 1 ? 's' : ''}`
+                          : 'You have no new requests'
+                        }
                       </p>
-                      <RecentActivity loans={myLoans} payments={payments} user={user} allUsers={safeAllProfiles} />
+                      {pendingOffers.length > 0 && (
+                        <Link
+                          to={createPageUrl("Requests")}
+                          className="flex-shrink-0 px-4 py-1.5 rounded-lg bg-white text-xs font-semibold text-[#213B75] hover:bg-white/90 transition-colors font-sans"
+                        >
+                          View Updates
+                        </Link>
+                      )}
+                    </div>
+
+                    {/* Monthly Overview Box */}
+                    <div className="rounded-xl px-4 py-3 shadow-sm bg-white flex-1">
+                      <div className="flex items-center justify-between mb-3">
+                        <button
+                          onClick={() => setCalendarMonth(subMonths(calendarMonth, 1))}
+                          className="w-7 h-7 rounded-full flex items-center justify-center transition-colors duration-200 bg-[#CDE7F8] hover:bg-[#b8d9f0]"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#213B75" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                          </svg>
+                        </button>
+                        <p className="text-sm font-bold text-[#213B75] tracking-tight font-sans">
+                          {format(calendarMonth, 'MMMM')} Overview
+                        </p>
+                        <button
+                          onClick={() => setCalendarMonth(addMonths(calendarMonth, 1))}
+                          className="w-7 h-7 rounded-full flex items-center justify-center transition-colors duration-200 bg-[#CDE7F8] hover:bg-[#b8d9f0]"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#213B75" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                          </svg>
+                        </button>
+                      </div>
+
+                      <div className="space-y-1.5 overflow-y-auto max-h-[320px] pr-1">
+                        {(() => {
+                          const monthStart = startOfMonth(calendarMonth);
+                          const monthEnd = endOfMonth(calendarMonth);
+                          const events = [];
+                          const activeLoans = myLoans.filter(l => l && l.status === 'active');
+                          const safePayments = Array.isArray(payments) ? payments : [];
+
+                          activeLoans.forEach(loan => {
+                            if (!loan.next_payment_date) return;
+
+                            const paymentDate = new Date(loan.next_payment_date);
+                            const isLender = loan.lender_id === user.id;
+                            const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
+                            const otherUser = safeAllProfiles.find(p => p.user_id === otherUserId);
+
+                            const addEventIfInMonth = (date) => {
+                              if (isSameMonth(date, calendarMonth)) {
+                                // Check payment status for this date
+                                const eventDate = new Date(date);
+                                const loanPayments = safePayments.filter(p => p && p.loan_id === loan.id);
+
+                                // Find if there's a completed or pending payment for this period
+                                const matchingPayment = loanPayments.find(p => {
+                                  const pDate = new Date(p.payment_date || p.created_at);
+                                  const dayDiff = Math.abs(Math.ceil((pDate - eventDate) / (1000 * 60 * 60 * 24)));
+                                  return dayDiff <= 7; // Within a week of the expected date
+                                });
+
+                                let paymentStatus = 'none'; // no payment recorded
+                                if (matchingPayment) {
+                                  if (matchingPayment.status === 'completed') paymentStatus = 'completed';
+                                  else if (matchingPayment.status === 'pending') paymentStatus = 'pending';
+                                  else paymentStatus = 'none';
+                                }
+
+                                events.push({
+                                  date: new Date(date),
+                                  type: isLender ? 'receive' : 'send',
+                                  amount: loan.payment_amount || 0,
+                                  username: otherUser?.username || 'user',
+                                  loanId: loan.id,
+                                  loan: loan,
+                                  paymentStatus: paymentStatus
+                                });
+                              }
+                            };
+
+                            addEventIfInMonth(paymentDate);
+
+                            const frequency = loan.payment_frequency;
+                            if (frequency && frequency !== 'none') {
+                              let currentDate = new Date(loan.next_payment_date);
+                              const maxIterations = 10;
+                              let iterations = 0;
+
+                              while (iterations < maxIterations) {
+                                if (frequency === 'weekly') {
+                                  currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
+                                } else if (frequency === 'biweekly') {
+                                  currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
+                                } else if (frequency === 'monthly') {
+                                  currentDate = addMonths(currentDate, 1);
+                                } else if (frequency === 'daily') {
+                                  currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+                                } else {
+                                  break;
+                                }
+
+                                if (currentDate > monthEnd) break;
+                                addEventIfInMonth(currentDate);
+                                iterations++;
+                              }
+                            }
+                          });
+
+                          events.sort((a, b) => a.date - b.date);
+
+                          if (events.length === 0) {
+                            return (
+                              <div className="flex flex-col items-center justify-center py-8 text-[#4C7FC4]">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40 mb-2">
+                                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                <p className="text-sm">No payments this month</p>
+                              </div>
+                            );
+                          }
+
+                          return events.map((event, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center gap-2.5 p-2.5 rounded-lg bg-[#CDE7F8]"
+                            >
+                              <div className="bg-white rounded-md px-2 py-1 flex-shrink-0 text-center min-w-[40px]">
+                                <p className="text-[10px] text-[#4C7FC4] uppercase font-sans">
+                                  {format(event.date, 'MMM')}
+                                </p>
+                                <p className="text-base font-bold text-[#213B75]">
+                                  {format(event.date, 'd')}
+                                </p>
+                              </div>
+
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-medium text-[#213B75]">
+                                  <span className={event.type === 'send' ? 'text-red-500 font-semibold' : 'text-[#00A86B] font-semibold'}>
+                                    {event.type === 'send' ? 'Send' : 'Receive'} Payment
+                                  </span>
+                                  {' of '}
+                                  <span className="font-bold">${event.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                  {' '}
+                                  <span className="text-[#4C7FC4]">{event.type === 'send' ? 'to' : 'from'}</span>
+                                  {' '}
+                                  <span className="font-semibold">@{event.username}</span>
+                                </p>
+                              </div>
+
+                              <div className="flex-shrink-0">
+                                {event.paymentStatus === 'completed' ? (
+                                  <span className="px-2.5 py-1 rounded-md bg-[#00A86B] text-[10px] font-semibold text-white whitespace-nowrap">
+                                    Payment Complete
+                                  </span>
+                                ) : event.paymentStatus === 'pending' ? (
+                                  <span className="px-2.5 py-1 rounded-md bg-[#F59E0B] text-[10px] font-semibold text-white whitespace-nowrap">
+                                    Pending Confirmation
+                                  </span>
+                                ) : (
+                                  <button
+                                    onClick={() => {
+                                      setSelectedLoan(event.loan);
+                                      setShowPaymentModal(true);
+                                    }}
+                                    className="px-2.5 py-1 rounded-md bg-[#4C7FC4] text-[10px] font-semibold text-white hover:bg-[#3a6bb0] transition-colors whitespace-nowrap"
+                                  >
+                                    Record Payment
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          ));
+                        })()}
+                      </div>
+
+                      {/* Month Balance */}
+                      {(() => {
+                        const monthEnd = endOfMonth(calendarMonth);
+                        const activeLoansForBalance = myLoans.filter(l => l && l.status === 'active');
+                        let totalReceive = 0;
+                        let totalSend = 0;
+
+                        activeLoansForBalance.forEach(loan => {
+                          if (!loan.next_payment_date) return;
+                          const paymentDate = new Date(loan.next_payment_date);
+                          const isLender = loan.lender_id === user.id;
+                          const paymentAmount = loan.payment_amount || 0;
+
+                          const addAmountIfInMonth = (date) => {
+                            if (isSameMonth(date, calendarMonth)) {
+                              if (isLender) totalReceive += paymentAmount;
+                              else totalSend += paymentAmount;
+                            }
+                          };
+
+                          addAmountIfInMonth(paymentDate);
+
+                          const frequency = loan.payment_frequency;
+                          if (frequency && frequency !== 'none') {
+                            let currentDate = new Date(loan.next_payment_date);
+                            let iterations = 0;
+                            while (iterations < 10) {
+                              if (frequency === 'weekly') currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
+                              else if (frequency === 'biweekly') currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
+                              else if (frequency === 'monthly') currentDate = addMonths(currentDate, 1);
+                              else if (frequency === 'daily') currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+                              else break;
+                              if (currentDate > monthEnd) break;
+                              addAmountIfInMonth(currentDate);
+                              iterations++;
+                            }
+                          }
+                        });
+
+                        const netBalance = totalReceive - totalSend;
+                        const isPositive = netBalance >= 0;
+
+                        return (
+                          <div className="mt-3 rounded-lg p-2.5 flex items-center justify-between bg-[#CDE7F8]">
+                            <p className="text-xs font-semibold text-[#213B75]">
+                              {format(calendarMonth, 'MMMM')} Balance
+                            </p>
+                            <p className="text-xs font-bold text-[#213B75]">
+                              {isPositive ? '+' : '-'}${Math.abs(netBalance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </p>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
                 </div>
-
-                {/* Your Friends */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.25 }}
-                  className="w-full"
-                >
-                  <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
-                    <p className="text-sm font-bold text-[#213B75] mb-2 tracking-tight font-sans">
-                      Your Friends
-                    </p>
-
-                    <div className="space-y-2 overflow-y-auto max-h-[320px] pr-1">
-                      {(() => {
-                        const acceptedFriends = friendships.filter(f =>
-                          f.status === 'accepted' && (f.user_id === user.id || f.friend_id === user.id)
-                        );
-
-                        if (acceptedFriends.length === 0) {
-                          return (
-                            <div className="flex flex-col items-center justify-center py-6 text-[#4C7FC4]">
-                              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40 mb-2">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="9" cy="7" r="4"></circle>
-                                <line x1="19" y1="8" x2="19" y2="14"></line>
-                                <line x1="22" y1="11" x2="16" y2="11"></line>
-                              </svg>
-                              <p className="text-sm">No friends yet</p>
-                            </div>
-                          );
-                        }
-
-                        return acceptedFriends.map((friendship) => {
-                          const friendUserId = friendship.user_id === user.id ? friendship.friend_id : friendship.user_id;
-                          const friendProfile = safeAllProfiles.find(p => p.user_id === friendUserId);
-                          const friendActiveLoans = myLoans.filter(l =>
-                            l.status === 'active' && (
-                              (l.lender_id === user.id && l.borrower_id === friendUserId) ||
-                              (l.borrower_id === user.id && l.lender_id === friendUserId)
-                            )
-                          );
-
-                          const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent((friendProfile?.full_name || 'U').charAt(0))}&background=22c55e&color=fff&size=128`;
-
-                          return (
-                            <div key={friendship.id} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-2.5 rounded-lg bg-[#CDE7F8]">
-                              <div className="flex items-center gap-3 flex-1 min-w-0">
-                                <img
-                                  src={friendProfile?.profile_picture_url || defaultAvatar}
-                                  alt={friendProfile?.full_name || 'Friend'}
-                                  className="w-9 h-9 rounded-full object-cover flex-shrink-0 bg-white"
-                                />
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-semibold text-[#213B75] truncate">
-                                    {friendProfile?.full_name || friendProfile?.username || 'Friend'}
-                                  </p>
-                                  <div className="bg-white rounded-md px-2 py-0.5 inline-block mt-0.5">
-                                    <p className="text-xs font-medium text-[#4C7FC4]">
-                                      {friendActiveLoans.length} active loan{friendActiveLoans.length !== 1 ? 's' : ''}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="flex gap-1.5 flex-shrink-0 pl-12 sm:pl-0">
-                                <Link
-                                  to={createPageUrl("Lending")}
-                                  className="px-3 py-1.5 rounded-md bg-white text-xs font-semibold text-[#213B75] hover:bg-white/80 transition-colors whitespace-nowrap"
-                                >
-                                  Offer to Lend
-                                </Link>
-                                <Link
-                                  to={createPageUrl("Borrowing")}
-                                  className="px-3 py-1.5 rounded-md bg-white text-xs font-semibold text-[#213B75] hover:bg-white/80 transition-colors whitespace-nowrap"
-                                >
-                                  Request to Borrow
-                                </Link>
-                              </div>
-                            </div>
-                          );
-                        });
-                      })()}
-                    </div>
-
-                    <Link
-                      to={createPageUrl("Friends")}
-                      className="block mt-3 text-center text-sm font-semibold text-[#4C7FC4] hover:text-[#213B75] transition-colors"
-                    >
-                      View All Friends →
-                    </Link>
-                  </div>
-                </motion.div>
 
               </motion.div>
 
@@ -591,288 +815,21 @@ export default function Home() {
               <PendingLoanOffers offers={pendingOffers} />
             )}
 
-            {/* Record Payment Box */}
-            {myLoans.filter(l => l && l.status === 'active').length > 0 && (
-              <div className="rounded-2xl p-4 sm:p-5 border-0" style={{backgroundColor: '#83F384'}}>
-                <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                  Record Payment
-                </p>
-                <div className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
-                  <span>Record payment of</span>
-                  <span className="font-medium">$</span>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    min="0.01"
-                    placeholder=""
-                    value={quickPayAmount}
-                    onChange={(e) => setQuickPayAmount(e.target.value)}
-                    className="w-24 h-8 px-3 bg-white inline-flex"
-                    style={{ MozAppearance: 'textfield' }}
-                  />
-                  <span>via</span>
-                  <Select value={quickPayMethod} onValueChange={setQuickPayMethod}>
-                    <SelectTrigger className="w-auto h-8 px-3 bg-white inline-flex">
-                      <SelectValue placeholder="select method" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="venmo">Venmo</SelectItem>
-                      <SelectItem value="zelle">Zelle</SelectItem>
-                      <SelectItem value="cashapp">Cash App</SelectItem>
-                      <SelectItem value="paypal">PayPal</SelectItem>
-                      <SelectItem value="cash">Cash</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <span>for</span>
-                  <Select value={quickPayLoanId} onValueChange={setQuickPayLoanId}>
-                    <SelectTrigger className="w-auto h-8 px-3 bg-white inline-flex min-w-[140px]">
-                      <SelectValue placeholder="select loan" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {myLoans.filter(l => l && l.status === 'active').map((loan) => {
-                        const isLender = loan.lender_id === user.id;
-                        const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
-                        const otherUser = safeAllProfiles.find(p => p.user_id === otherUserId);
-                        return (
-                          <SelectItem key={loan.id} value={loan.id}>
-                            @{otherUser?.username || 'user'} - {loan.purpose || `$${loan.amount}`}
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      const loan = myLoans.find(l => l.id === quickPayLoanId);
-                      if (loan) {
-                        setSelectedLoan({
-                          ...loan,
-                          _prefillAmount: quickPayAmount,
-                          _prefillMethod: quickPayMethod,
-                        });
-                        setShowPaymentModal(true);
-                      }
-                    }}
-                    disabled={!quickPayLoanId || !quickPayAmount}
-                    className={`h-8 px-4 rounded-lg text-sm font-medium border-0 transition-all ${
-                      !quickPayLoanId || !quickPayAmount
-                        ? 'bg-[#00A86B]/50 text-white/70 cursor-not-allowed'
-                        : 'bg-[#00A86B] text-white hover:bg-[#0D9B76]'
-                    }`}
-                  >
-                    Submit
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {/* Monthly Overview */}
+            {/* Activity */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.3 }}
-                className="flex flex-col gap-1.5"
               >
                 <Card className="border-0 rounded-lg overflow-hidden" style={{backgroundColor: '#C2FFDC'}}>
-                  <CardContent className="p-4 md:p-5 flex flex-col">
-                    {/* Month Title with Arrows */}
-                    <div className="flex items-center justify-center gap-3 mb-4">
-                      <button
-                        onClick={() => setCalendarMonth(subMonths(calendarMonth, 1))}
-                        className="w-7 h-7 rounded-full flex items-center justify-center transition-colors duration-200 bg-[#E2F5EA] hover:bg-[#c8e6d0]"
-                      >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#052e16" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="15 18 9 12 15 6"></polyline>
-                        </svg>
-                      </button>
-                      <p className="text-base font-bold text-slate-800 tracking-tight font-sans">
-                        {format(calendarMonth, 'MMMM')} Overview
-                      </p>
-                      <button
-                        onClick={() => setCalendarMonth(addMonths(calendarMonth, 1))}
-                        className="w-7 h-7 rounded-full flex items-center justify-center transition-colors duration-200 bg-[#E2F5EA] hover:bg-[#c8e6d0]"
-                      >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#052e16" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                      </button>
-                    </div>
-
-                  <div className="space-y-1.5 overflow-y-auto max-h-[320px] pr-1">
-                    {(() => {
-                      const monthStart = startOfMonth(calendarMonth);
-                      const monthEnd = endOfMonth(calendarMonth);
-                      const events = [];
-                      const activeLoans = myLoans.filter(l => l && l.status === 'active');
-
-                      activeLoans.forEach(loan => {
-                        if (!loan.next_payment_date) return;
-
-                        const paymentDate = new Date(loan.next_payment_date);
-                        const isLender = loan.lender_id === user.id;
-                        const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
-                        const otherUser = safeAllProfiles.find(p => p.user_id === otherUserId);
-
-                        const addEventIfInMonth = (date) => {
-                          if (isSameMonth(date, calendarMonth)) {
-                            events.push({
-                              date: new Date(date),
-                              type: isLender ? 'receive' : 'send',
-                              amount: loan.payment_amount || 0,
-                              username: otherUser?.username || 'user'
-                            });
-                          }
-                        };
-
-                        addEventIfInMonth(paymentDate);
-
-                        const frequency = loan.payment_frequency;
-                        if (frequency && frequency !== 'none') {
-                          let currentDate = new Date(loan.next_payment_date);
-                          const maxIterations = 10;
-                          let iterations = 0;
-
-                          while (iterations < maxIterations) {
-                            if (frequency === 'weekly') {
-                              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
-                            } else if (frequency === 'biweekly') {
-                              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
-                            } else if (frequency === 'monthly') {
-                              currentDate = addMonths(currentDate, 1);
-                            } else if (frequency === 'daily') {
-                              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
-                            } else {
-                              break;
-                            }
-
-                            if (currentDate > monthEnd) break;
-                            addEventIfInMonth(currentDate);
-                            iterations++;
-                          }
-                        }
-                      });
-
-                      events.sort((a, b) => a.date - b.date);
-
-                      if (events.length === 0) {
-                        return (
-                          <div className="flex flex-col items-center justify-center py-8 text-slate-500">
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40 mb-2">
-                              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                              <line x1="16" y1="2" x2="16" y2="6"></line>
-                              <line x1="8" y1="2" x2="8" y2="6"></line>
-                              <line x1="3" y1="10" x2="21" y2="10"></line>
-                            </svg>
-                            <p className="text-sm">No payments scheduled this month</p>
-                          </div>
-                        );
-                      }
-
-                      return events.map((event, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center gap-2.5 p-2 md:p-2.5 rounded-md"
-                          style={{ backgroundColor: '#83F384' }}
-                        >
-                          <div className="bg-white/50 rounded-md px-2.5 py-1.5 flex-shrink-0 text-center min-w-[44px]">
-                            <p className="text-xs text-slate-500 uppercase" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                              {format(event.date, 'MMM')}
-                            </p>
-                            <p className="text-lg font-bold text-slate-800">
-                              {format(event.date, 'd')}
-                            </p>
-                          </div>
-
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-slate-800">
-                              <span className={event.type === 'send' ? 'text-red-600' : 'text-[#00A86B]'}>
-                                {event.type === 'send' ? 'Send' : 'Receive'}
-                              </span>
-                              {' '}
-                              <span className="font-bold">${event.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                              {' '}
-                              <span className="text-slate-600">{event.type === 'send' ? 'to' : 'from'}</span>
-                              {' '}
-                              <span className="font-medium">@{event.username}</span>
-                            </p>
-                          </div>
-
-                          <div className="flex-shrink-0">
-                            {event.type === 'send' ? (
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <line x1="12" y1="5" x2="12" y2="19"></line>
-                                <polyline points="19 12 12 19 5 12"></polyline>
-                              </svg>
-                            ) : (
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00A86B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <line x1="12" y1="19" x2="12" y2="5"></line>
-                                <polyline points="5 12 12 5 19 12"></polyline>
-                              </svg>
-                            )}
-                          </div>
-                        </div>
-                      ));
-                    })()}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Month Balance Box */}
-              {(() => {
-                const monthEnd = endOfMonth(calendarMonth);
-                const activeLoansForBalance = myLoans.filter(l => l && l.status === 'active');
-                let totalReceive = 0;
-                let totalSend = 0;
-
-                activeLoansForBalance.forEach(loan => {
-                  if (!loan.next_payment_date) return;
-                  const paymentDate = new Date(loan.next_payment_date);
-                  const isLender = loan.lender_id === user.id;
-                  const paymentAmount = loan.payment_amount || 0;
-
-                  const addAmountIfInMonth = (date) => {
-                    if (isSameMonth(date, calendarMonth)) {
-                      if (isLender) totalReceive += paymentAmount;
-                      else totalSend += paymentAmount;
-                    }
-                  };
-
-                  addAmountIfInMonth(paymentDate);
-
-                  const frequency = loan.payment_frequency;
-                  if (frequency && frequency !== 'none') {
-                    let currentDate = new Date(loan.next_payment_date);
-                    let iterations = 0;
-                    while (iterations < 10) {
-                      if (frequency === 'weekly') currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
-                      else if (frequency === 'biweekly') currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
-                      else if (frequency === 'monthly') currentDate = addMonths(currentDate, 1);
-                      else if (frequency === 'daily') currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
-                      else break;
-                      if (currentDate > monthEnd) break;
-                      addAmountIfInMonth(currentDate);
-                      iterations++;
-                    }
-                  }
-                });
-
-                const netBalance = totalReceive - totalSend;
-                const isPositive = netBalance >= 0;
-
-                return (
-                  <div className="bg-[#83F384] rounded-md p-2.5 flex items-center justify-between">
-                    <p className="text-sm font-semibold text-[#0A1A10]">
-                      {format(calendarMonth, 'MMMM')} Balance
+                  <CardContent className="p-4 md:p-5">
+                    <p className="text-base font-bold text-slate-800 tracking-tight font-sans mb-3">
+                      Activity
                     </p>
-                    <p className="text-sm font-bold text-[#0A1A10]">
-                      {isPositive ? '+' : '-'}${Math.abs(netBalance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </p>
-                  </div>
-                );
-              })()}
-            </motion.div>
+                    <RecentActivity loans={myLoans} payments={payments} user={user} allUsers={safeAllProfiles} />
+                  </CardContent>
+                </Card>
+              </motion.div>
             </div>
             </div>
 
