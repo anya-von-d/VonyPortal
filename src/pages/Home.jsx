@@ -1212,13 +1212,20 @@ export default function Home() {
                                         </p>
                                         <p className={`text-[10px] mt-0.5 ${isOverdue ? 'text-red-400' : 'text-[#00A86B]'}`}>{dueDateStr}</p>
                                       </div>
-                                      <Link
-                                        to={createPageUrl(loanPage)}
-                                        className="flex-shrink-0 text-[9px] font-semibold px-2.5 py-1 rounded-md"
-                                        style={{ backgroundColor: '#6AD478', color: '#1C4332' }}
-                                      >
-                                        View Loan
-                                      </Link>
+                                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                                        {isOverdue && (
+                                          <span className="text-[9px] font-semibold px-2.5 py-1 rounded-md bg-red-500 text-white">
+                                            Overdue
+                                          </span>
+                                        )}
+                                        <Link
+                                          to={createPageUrl(loanPage)}
+                                          className="text-[9px] font-semibold px-2.5 py-1 rounded-md"
+                                          style={{ backgroundColor: '#6AD478', color: '#1C4332' }}
+                                        >
+                                          View Loan
+                                        </Link>
+                                      </div>
                                     </div>
                                   );
                                 })}
