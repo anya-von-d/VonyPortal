@@ -45,6 +45,7 @@ export default function Borrowing() {
   const [showSignModal, setShowSignModal] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [manageLoanSelected, setManageLoanSelected] = useState(null);
+  const [manageLoanInitialized, setManageLoanInitialized] = useState(false);
   const [rankingFilter, setRankingFilter] = useState('highest_interest'); // 'highest_interest', 'highest_payment', 'soonest_deadline'
   const [loanAgreements, setLoanAgreements] = useState([]);
   const [activeDocPopup, setActiveDocPopup] = useState(null);
@@ -254,6 +255,15 @@ export default function Borrowing() {
   // Filter loans by status
   const activeLoans = loans.filter(loan => loan.status === 'active');
   const manageableLoans = loans.filter(loan => loan.status === 'active' || loan.status === 'cancelled');
+
+  // Auto-select first loan when loans load
+  useEffect(() => {
+    if (!manageLoanInitialized && manageableLoans.length > 0) {
+      setManageLoanSelected(manageableLoans[0]);
+      setManageLoanInitialized(true);
+    }
+  }, [manageableLoans, manageLoanInitialized]);
+
   const pendingOffers = loans.filter(loan => loan.status === 'pending');
   const completedLoans = loans.filter(loan => loan.status === 'completed' || loan.status === 'cancelled');
 
