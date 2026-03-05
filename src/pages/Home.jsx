@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion";
-import { format, startOfMonth, endOfMonth, addMonths, isBefore, isAfter } from "date-fns";
+import { format, startOfMonth, endOfMonth, addMonths, isBefore, isAfter, differenceInDays } from "date-fns";
 import { formatMoney } from "@/components/utils/formatMoney";
 import RecordPaymentModal from "@/components/loans/RecordPaymentModal";
 import { AnimatePresence } from "framer-motion";
@@ -822,7 +822,7 @@ export default function Home() {
                       const chartStartMonth = startOfMonth(earliestDate);
                       const now = new Date();
                       const currentMonth = startOfMonth(now);
-                      const isCurrentMonth = (m) => m.getFullYear() === currentMonth.getFullYear() && m.getMonth() === currentMonth.getMonth();
+                      const isCurrentMonthFn = (m) => m.getFullYear() === currentMonth.getFullYear() && m.getMonth() === currentMonth.getMonth();
 
                       // Build exactly 6 months starting from earliest loan month
                       const months = [];
@@ -830,27 +830,22 @@ export default function Home() {
                         months.push(addMonths(chartStartMonth, i));
                       }
 
-                      // For each month, compute end-of-month values using actual payment data
-                      // For past months: value at the last day of that month
-                      // For current month: current live value
                       const chartData = months.map(monthDate => {
-                        const monthEnd = endOfMonth(monthDate);
-                        const isCurrent = isCurrentMonth(monthDate);
+                        const monthEndDate = endOfMonth(monthDate);
+                        const isCurrent = isCurrentMonthFn(monthDate);
                         const isFuture = isAfter(monthDate, currentMonth);
-                        const snapshotDate = isCurrent ? now : (isFuture ? now : monthEnd);
+                        const snapshotDate = isCurrent ? now : (isFuture ? now : monthEndDate);
 
                         let owedToYou = 0;
                         let youOwe = 0;
 
                         allRelevantLoans.forEach(loan => {
                           const loanCreated = new Date(loan.created_at);
-                          // Only count if loan existed by this snapshot date
                           if (isAfter(loanCreated, snapshotDate)) return;
 
                           const totalAmount = loan.total_amount || loan.amount || 0;
                           const isLender = loan.lender_id === user.id;
 
-                          // Sum all completed payments for this loan up to the snapshot date
                           const loanPayments = safePayments.filter(p =>
                             p && p.loan_id === loan.id &&
                             (p.status === 'completed' || p.status === 'pending_confirmation') &&
@@ -858,11 +853,9 @@ export default function Home() {
                           );
                           const totalPaid = loanPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
 
-                          // Also use amount_paid from the loan for current values (covers all historical payments)
                           const effectivePaid = isCurrent ? (loan.amount_paid || 0) : totalPaid;
                           const remaining = Math.max(0, totalAmount - effectivePaid);
 
-                          // For future months, use current values
                           if (isFuture) {
                             const currentRemaining = Math.max(0, totalAmount - (loan.amount_paid || 0));
                             if (isLender) owedToYou += currentRemaining;
@@ -870,11 +863,8 @@ export default function Home() {
                             return;
                           }
 
-                          if (isLender) {
-                            owedToYou += remaining;
-                          } else {
-                            youOwe += remaining;
-                          }
+                          if (isLender) owedToYou += remaining;
+                          else youOwe += remaining;
                         });
 
                         return {
@@ -887,7 +877,6 @@ export default function Home() {
                         };
                       });
 
-                      // Find max for scaling (both bars go up now)
                       const maxVal = Math.max(
                         ...chartData.map(d => d.owedToYou),
                         ...chartData.map(d => d.youOwe),
@@ -896,8 +885,12 @@ export default function Home() {
 
                       const chartHeight = 120;
                       const barWidth = 14;
-                      const pairGap = 3; // gap between the two bars in a pair
-                      const groupGap = 12; // gap between month groups
+                      const pairGap = 3;
+
+                      // Y-axis labels: show 3 ticks (0, mid, max)
+                      const yMax = maxVal;
+                      const yMid = Math.round(yMax / 2);
+                      const formatYLabel = (v) => v >= 1000 ? `$${(v / 1000).toFixed(v >= 10000 ? 0 : 1)}k` : `$${v}`;
 
                       return (
                         <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
@@ -905,19 +898,25 @@ export default function Home() {
                             Loans Over Time
                           </p>
 
-                          {/* Bar Chart — both bars go up, side by side */}
-                          <div className="overflow-x-auto">
-                            <div className="flex items-end justify-center" style={{ minHeight: chartHeight + 28 }}>
-                              <div className="flex items-end" style={{ gap: groupGap }}>
+                          {/* Chart with Y-axis */}
+                          <div className="flex">
+                            {/* Y-axis labels */}
+                            <div className="flex flex-col justify-between pr-2 flex-shrink-0" style={{ height: chartHeight }}>
+                              <p className="text-[9px] text-[#4C7FC4] text-right leading-none">{formatYLabel(Math.round(yMax))}</p>
+                              <p className="text-[9px] text-[#4C7FC4] text-right leading-none">{formatYLabel(yMid)}</p>
+                              <p className="text-[9px] text-[#4C7FC4] text-right leading-none">$0</p>
+                            </div>
+
+                            {/* Bars — spread to fill full width */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-end justify-between w-full" style={{ height: chartHeight }}>
                                 {chartData.map((data, i) => {
                                   const owedHeight = maxVal > 0 ? (data.owedToYou / maxVal) * chartHeight : 0;
                                   const oweHeight = maxVal > 0 ? (data.youOwe / maxVal) * chartHeight : 0;
 
                                   return (
-                                    <div key={i} className="flex flex-col items-center">
-                                      {/* Bar pair */}
-                                      <div className="flex items-end" style={{ gap: pairGap, height: chartHeight }}>
-                                        {/* Owed to you bar */}
+                                    <div key={i} className="flex flex-col items-center flex-1">
+                                      <div className="flex items-end justify-center" style={{ gap: pairGap, height: chartHeight }}>
                                         <div
                                           className="rounded-t-sm transition-all duration-300"
                                           style={{
@@ -928,7 +927,6 @@ export default function Home() {
                                           }}
                                           title={`${data.label}: $${data.owedToYou.toLocaleString(undefined, { maximumFractionDigits: 0 })} owed to you`}
                                         />
-                                        {/* You owe bar */}
                                         <div
                                           className="rounded-t-sm transition-all duration-300"
                                           style={{
@@ -940,21 +938,26 @@ export default function Home() {
                                           title={`${data.label}: $${data.youOwe.toLocaleString(undefined, { maximumFractionDigits: 0 })} you owe`}
                                         />
                                       </div>
-                                      {/* Month label */}
-                                      <p className={`text-[10px] mt-1.5 text-center ${data.isCurrent ? 'font-bold text-[#213B75]' : 'text-[#4C7FC4]'}`}
-                                        style={{ width: barWidth * 2 + pairGap }}
-                                      >
-                                        {data.label}
-                                      </p>
                                     </div>
                                   );
                                 })}
                               </div>
+                              {/* Month labels — spread to match */}
+                              <div className="flex justify-between w-full mt-1.5">
+                                {chartData.map((data, i) => (
+                                  <p
+                                    key={i}
+                                    className={`text-[10px] text-center flex-1 ${data.isCurrent ? 'font-bold text-[#213B75]' : 'text-[#4C7FC4]'}`}
+                                  >
+                                    {data.label}
+                                  </p>
+                                ))}
+                              </div>
                             </div>
                           </div>
 
-                          {/* Key / Legend */}
-                          <div className="flex items-center gap-4 mt-3 pt-2.5 border-t border-[#CDE7F8]">
+                          {/* Key / Legend — centered */}
+                          <div className="flex items-center justify-center gap-4 mt-3 pt-2.5 border-t border-[#CDE7F8]">
                             <div className="flex items-center gap-1.5">
                               <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#4C7FC4' }} />
                               <p className="text-[11px] text-[#213B75]">Owed to you</p>
@@ -993,6 +996,90 @@ export default function Home() {
                           View Updates
                         </Link>
                       )}
+                    </div>
+
+                    {/* Upcoming Payments Box */}
+                    <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
+                      <p className="text-sm font-bold text-[#213B75] mb-2.5 tracking-tight font-sans">
+                        Upcoming Payments
+                      </p>
+                      {(() => {
+                        const activeLoansForPayments = myLoans.filter(l => l && l.status === 'active' && l.next_payment_date);
+                        if (activeLoansForPayments.length === 0) {
+                          return (
+                            <div className="flex flex-col items-center justify-center py-6 text-[#4C7FC4]">
+                              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40 mb-1.5">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                              </svg>
+                              <p className="text-xs">No upcoming payments</p>
+                            </div>
+                          );
+                        }
+
+                        // Build upcoming payment events from all active loans, sorted chronologically
+                        const upcomingEvents = activeLoansForPayments
+                          .map(loan => {
+                            const isLender = loan.lender_id === user.id;
+                            const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
+                            const otherProfile = safeAllProfiles.find(p => p.user_id === otherUserId);
+                            const paymentDate = new Date(loan.next_payment_date);
+                            const days = differenceInDays(paymentDate, new Date());
+
+                            return {
+                              date: paymentDate,
+                              days,
+                              amount: loan.payment_amount || 0,
+                              username: otherProfile?.username || 'user',
+                              isLender,
+                              loanId: loan.id
+                            };
+                          })
+                          .sort((a, b) => a.date - b.date)
+                          .slice(0, 5);
+
+                        return (
+                          <div className="space-y-1.5">
+                            {upcomingEvents.map((event, idx) => {
+                              let statusText = '';
+                              let statusColor = 'text-[#4C7FC4]';
+                              if (event.days > 0) {
+                                statusText = `in ${event.days} day${event.days !== 1 ? 's' : ''}`;
+                              } else if (event.days === 0) {
+                                statusText = 'today';
+                                statusColor = 'text-[#F59E0B]';
+                              } else {
+                                statusText = `${Math.abs(event.days)}d overdue`;
+                                statusColor = 'text-red-500';
+                              }
+
+                              const amountStr = event.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+                              return (
+                                <div key={idx} className="flex items-center gap-2.5 p-2 rounded-lg bg-[#CDE7F8]">
+                                  <div className="bg-white rounded-md px-1.5 py-1 flex-shrink-0 text-center min-w-[44px]">
+                                    <p className="text-[10px] font-bold text-[#213B75] whitespace-nowrap">
+                                      {format(event.date, 'MMM d')}
+                                    </p>
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-[11px] text-[#213B75] truncate">
+                                      <span className="font-semibold">${amountStr}</span>{' '}
+                                      {event.isLender ? 'from' : 'to'} @{event.username}
+                                    </p>
+                                    <p className={`text-[10px] ${statusColor}`}>{statusText}</p>
+                                  </div>
+                                  <p className={`text-[11px] font-bold flex-shrink-0 ${event.isLender ? 'text-[#00A86B]' : 'text-[#213B75]'}`}>
+                                    {event.isLender ? '+' : '-'}${amountStr}
+                                  </p>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        );
+                      })()}
                     </div>
 
                   </div>
