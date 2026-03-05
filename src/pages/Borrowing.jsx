@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   Clock, Calendar, DollarSign, AlertCircle, FileText, BarChart3,
-  Pencil, X, FolderOpen, ClipboardList, Info, Check, Shield, Smartphone, CreditCard, Banknote, CheckCircle, Search
+  Pencil, X, FolderOpen, ClipboardList, Info, Check, Shield, Smartphone, CreditCard, Banknote, CheckCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { format, addDays, addMonths, addWeeks } from "date-fns";
@@ -45,7 +45,6 @@ export default function Borrowing() {
   const [showSignModal, setShowSignModal] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [manageLoanSelected, setManageLoanSelected] = useState(null);
-  const [manageLoanSearch, setManageLoanSearch] = useState('');
   const [rankingFilter, setRankingFilter] = useState('highest_interest'); // 'highest_interest', 'highest_payment', 'soonest_deadline'
   const [loanAgreements, setLoanAgreements] = useState([]);
   const [activeDocPopup, setActiveDocPopup] = useState(null);
@@ -1155,17 +1154,6 @@ export default function Borrowing() {
 
                     {/* Your Loans Section — thin list + chart + details */}
                     {!isLoading && manageableLoans.length > 0 && (() => {
-                      const searchQuery = manageLoanSearch.toLowerCase().trim();
-                      const filteredLoans = searchQuery
-                        ? manageableLoans.filter(loan => {
-                            const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
-                            const username = (lender?.username || '').toLowerCase();
-                            const fullName = (lender?.full_name || '').toLowerCase();
-                            const purpose = (loan.purpose || '').toLowerCase();
-                            const amount = `$${loan.amount}`;
-                            return username.includes(searchQuery) || fullName.includes(searchQuery) || purpose.includes(searchQuery) || amount.includes(searchQuery);
-                          })
-                        : manageableLoans;
 
                       // Build payment chart data for selected loan
                       let chartData = [];
@@ -1208,40 +1196,43 @@ export default function Borrowing() {
 
                       return (
                         <div className="mt-4">
-                          <p className="text-sm font-bold text-[#C2FFDC] tracking-tight font-sans mb-3">
-                            Your Loans
-                          </p>
+                          {/* Header bar — shows selected loan summary or section title */}
+                          {manageLoanSelected ? (
+                            (() => {
+                              const selLender = publicProfiles.find(p => p.user_id === manageLoanSelected.lender_id);
+                              return (
+                                <div className="rounded-xl px-4 py-2.5 mb-3 flex items-center gap-3" style={{ backgroundColor: '#00A86B' }}>
+                                  <img
+                                    src={selLender?.profile_picture_url || selLender?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((selLender?.full_name || 'U').charAt(0))}&background=1C4332&color=fff&size=64`}
+                                    alt={selLender?.full_name || 'Lender'}
+                                    className="w-8 h-8 rounded-full object-cover flex-shrink-0 bg-white"
+                                  />
+                                  <p className="text-sm font-semibold text-white font-sans">
+                                    @{selLender?.username || 'user'} lent you ${(manageLoanSelected.amount || 0).toLocaleString()} to help with {manageLoanSelected.purpose || 'personal expenses'}
+                                  </p>
+                                </div>
+                              );
+                            })()
+                          ) : (
+                            <p className="text-sm font-bold text-[#C2FFDC] tracking-tight font-sans mb-3">
+                              Your Loans
+                            </p>
+                          )}
                           <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr_1fr] gap-4 md:gap-5">
-                            {/* Left: Thin Search + Scrollable Loan List */}
+                            {/* Left: Select a Loan to Learn More */}
                             <div className="bg-white rounded-xl px-3 py-3 shadow-sm">
-                              {/* Search Bar */}
-                              <div className="relative mb-2">
-                                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#00A86B]/50" />
-                                <Input
-                                  type="text"
-                                  placeholder="Search..."
-                                  value={manageLoanSearch}
-                                  onChange={(e) => setManageLoanSearch(e.target.value)}
-                                  className="pl-8 bg-[#C2FFDC] border-0 text-[#1C4332] placeholder:text-[#00A86B]/50 font-sans text-xs h-8"
-                                />
-                                {manageLoanSearch && (
-                                  <button
-                                    onClick={() => setManageLoanSearch('')}
-                                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#00A86B] hover:text-[#1C4332]"
-                                  >
-                                    <X className="w-3 h-3" />
-                                  </button>
-                                )}
-                              </div>
+                              <p className="text-xs font-bold text-[#1C4332] mb-2 tracking-tight font-sans">
+                                Select a Loan to Learn More
+                              </p>
 
-                              {/* Scrollable Loan List (max 5 visible) */}
-                              <div className="overflow-y-auto space-y-1" style={{ maxHeight: '260px' }}>
-                                {filteredLoans.length === 0 ? (
+                              {/* Scrollable Loan List */}
+                              <div className="overflow-y-auto space-y-1 scroll-smooth" style={{ maxHeight: '260px' }} id="loan-list-scroll">
+                                {manageableLoans.length === 0 ? (
                                   <div className="text-center py-4">
                                     <p className="text-xs text-[#00A86B]/60 font-sans">No loans found</p>
                                   </div>
                                 ) : (
-                                  filteredLoans.map((loan) => {
+                                  manageableLoans.map((loan) => {
                                     const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
                                     const isSelected = manageLoanSelected?.id === loan.id;
                                     const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent((lender?.full_name || 'U').charAt(0))}&background=00A86B&color=fff&size=128`;
@@ -1249,10 +1240,21 @@ export default function Borrowing() {
                                     return (
                                       <button
                                         key={loan.id}
-                                        onClick={() => { setManageLoanSelected(loan); setActiveLoanTooltip(null); }}
+                                        id={`loan-item-${loan.id}`}
+                                        onClick={() => {
+                                          setManageLoanSelected(loan);
+                                          setActiveLoanTooltip(null);
+                                          setTimeout(() => {
+                                            const el = document.getElementById(`loan-item-${loan.id}`);
+                                            const container = document.getElementById('loan-list-scroll');
+                                            if (el && container) {
+                                              container.scrollTo({ top: el.offsetTop - container.offsetTop, behavior: 'smooth' });
+                                            }
+                                          }, 50);
+                                        }}
                                         className={`w-full p-2 rounded-lg text-left transition-all cursor-pointer ${
                                           isSelected
-                                            ? 'bg-[#1C4332] ring-2 ring-[#00A86B]'
+                                            ? 'bg-[#6AD478]'
                                             : 'bg-[#C2FFDC] hover:bg-[#b0f0c8]'
                                         }`}
                                       >
@@ -1263,10 +1265,10 @@ export default function Borrowing() {
                                             className="w-7 h-7 rounded-full object-cover flex-shrink-0 bg-white"
                                           />
                                           <div className="flex-1 min-w-0">
-                                            <p className={`text-xs font-semibold truncate font-sans ${isSelected ? 'text-[#C2FFDC]' : 'text-[#1C4332]'}`}>
+                                            <p className={`text-xs font-semibold truncate font-sans ${isSelected ? 'text-[#1C4332]' : 'text-[#1C4332]'}`}>
                                               @{lender?.username || 'user'}
                                             </p>
-                                            <p className={`text-[10px] truncate font-sans ${isSelected ? 'text-[#00A86B]' : 'text-[#00A86B]/70'}`}>
+                                            <p className={`text-[10px] truncate font-sans ${isSelected ? 'text-[#1C4332]/70' : 'text-[#00A86B]/70'}`}>
                                               ${loan.amount?.toLocaleString()}
                                               {loan.status === 'cancelled' && ' · Cancelled'}
                                             </p>
