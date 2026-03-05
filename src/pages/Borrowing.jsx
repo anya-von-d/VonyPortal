@@ -1710,12 +1710,12 @@ export default function Borrowing() {
                                       </div>
                                       <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">Request<br/>Cancellation</p>
                                     </button>
-                                    {/* View Documents */}
+                                    {/* Promissory Note */}
                                     <button onClick={() => {
                                       const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id);
-                                      if (agreement) openDocPopup('summary', agreement);
+                                      if (agreement) openDocPopup('promissory', agreement);
                                     }} className="flex flex-col items-center gap-1.5 group cursor-pointer">
-                                      <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
+                                      <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow relative">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                           <polyline points="14 2 14 8 20 8"></polyline>
@@ -1723,35 +1723,41 @@ export default function Borrowing() {
                                           <line x1="16" y1="17" x2="8" y2="17"></line>
                                           <polyline points="10 9 9 9 8 9"></polyline>
                                         </svg>
+                                        <div className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#00A86B] flex items-center justify-center">
+                                          <span className="text-[9px] font-bold text-white leading-none">i</span>
+                                        </div>
                                       </div>
-                                      <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">View<br/>Documents</p>
+                                      <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">Promissory<br/>Note</p>
                                     </button>
-                                    {/* View Schedule */}
+                                    {/* Amortization Schedule */}
                                     <button onClick={() => {
                                       const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id);
                                       if (agreement) openDocPopup('amortization', agreement);
                                     }} className="flex flex-col items-center gap-1.5 group cursor-pointer">
-                                      <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
+                                      <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow relative">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                           <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                                           <line x1="16" y1="2" x2="16" y2="6"></line>
                                           <line x1="8" y1="2" x2="8" y2="6"></line>
                                           <line x1="3" y1="10" x2="21" y2="10"></line>
                                         </svg>
+                                        <div className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#00A86B] flex items-center justify-center">
+                                          <span className="text-[9px] font-bold text-white leading-none">i</span>
+                                        </div>
                                       </div>
-                                      <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">View<br/>Schedule</p>
+                                      <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">Amortization<br/>Schedule</p>
                                     </button>
-                                    {/* View Agreement */}
+                                    {/* Loan Summary */}
                                     <button onClick={() => {
                                       const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id);
-                                      if (agreement) openDocPopup('promissory', agreement);
+                                      if (agreement) openDocPopup('summary', agreement);
                                     }} className="flex flex-col items-center gap-1.5 group cursor-pointer">
                                       <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                                         </svg>
                                       </div>
-                                      <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">View<br/>Agreement</p>
+                                      <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">Loan<br/>Summary</p>
                                     </button>
                                   </div>
                                   )}
