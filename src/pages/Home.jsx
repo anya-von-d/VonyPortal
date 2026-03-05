@@ -420,9 +420,9 @@ export default function Home() {
     const hasBorrowingLoans = borrowedLoans.length > 0;
 
     return (
-        <div className="min-h-screen" style={{backgroundColor: '#CDE7F8'}}>
+        <div className="min-h-screen" style={{backgroundColor: '#F5F5F5'}}>
           {/* Hero Section */}
-          <div className="px-4 pt-10 pb-8 sm:px-8 md:px-24 md:pt-14 md:pb-10 lg:px-36" style={{backgroundColor: '#CDE7F8'}}>
+          <div className="px-4 pt-10 pb-8 sm:px-8 md:px-24 md:pt-14 md:pb-10 lg:px-36" style={{backgroundColor: '#F5F5F5'}}>
             <div className="max-w-6xl mx-auto">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -718,7 +718,7 @@ export default function Home() {
                       const canSubmit = quickPayAmount && (quickPayFromPerson || quickPayToPerson);
 
                       return (
-                        <div className="rounded-xl px-4 py-3 shadow-sm mt-2 mb-2 lg:mt-0 lg:mb-0" style={{ backgroundColor: '#4C7FC4' }}>
+                        <div className="rounded-xl px-4 py-3 shadow-sm mt-2 mb-2 lg:mt-0 lg:mb-0" style={{ backgroundColor: '#213B75' }}>
                           <p className="text-sm font-bold text-white mb-2 tracking-tight font-sans">
                             Record Payment
                           </p>
@@ -782,7 +782,7 @@ export default function Home() {
                               className={`h-7 px-3 rounded-md text-xs font-semibold border-0 transition-all ${
                                 !canSubmit
                                   ? 'bg-white/30 text-white/70 cursor-not-allowed'
-                                  : 'bg-white text-[#4C7FC4] hover:bg-white/90'
+                                  : 'bg-white text-[#213B75] hover:bg-white/90'
                               }`}
                             >
                               Submit
@@ -1041,7 +1041,7 @@ export default function Home() {
                       // Fallback: no items at all
                       if (allItems.length === 0) {
                         return (
-                          <div className="rounded-xl px-4 py-3 shadow-sm flex items-center gap-3" style={{ backgroundColor: '#4C7FC4' }}>
+                          <div className="rounded-xl px-4 py-3 shadow-sm flex items-center gap-3" style={{ backgroundColor: '#213B75' }}>
                             <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
                               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -1059,7 +1059,7 @@ export default function Home() {
                       const current = allItems[safeIdx];
 
                       return (
-                        <div className="rounded-xl px-4 py-3 shadow-sm flex items-center gap-3" style={{ backgroundColor: '#4C7FC4' }}>
+                        <div className="rounded-xl px-4 py-3 shadow-sm flex items-center gap-3" style={{ backgroundColor: '#213B75' }}>
                           <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
                             {current.icon === 'bell' ? (
                               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -1415,7 +1415,7 @@ export default function Home() {
           </div>
 
           {/* Bottom Section: Carousel (if has loans) or Find Friends (if has friends but shown regardless as fallback) */}
-          <div className="px-4 pt-4 pb-8 sm:px-8 md:px-24 md:pt-4 md:pb-10 lg:px-36" style={{backgroundColor: '#CDE7F8'}}>
+          <div className="px-4 pt-4 pb-8 sm:px-8 md:px-24 md:pt-4 md:pb-10 lg:px-36" style={{backgroundColor: '#F5F5F5'}}>
             <div className="max-w-6xl mx-auto">
               {hasLoans ? (
                 <LoanCarousel
