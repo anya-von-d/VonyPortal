@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion";
-import { format, startOfMonth, endOfMonth, addMonths, isBefore, isAfter, differenceInDays } from "date-fns";
+import { format, startOfMonth, endOfMonth, addMonths, addDays, isBefore, isAfter, differenceInDays } from "date-fns";
 import { formatMoney } from "@/components/utils/formatMoney";
 import RecordPaymentModal from "@/components/loans/RecordPaymentModal";
 import { AnimatePresence } from "framer-motion";
@@ -184,6 +184,15 @@ export default function Home() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedLoan, setSelectedLoan] = useState(null);
   const [candidateLoans, setCandidateLoans] = useState([]);
+  const [notifIndex, setNotifIndex] = useState(0);
+
+  // Auto-carousel notifications every 5 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNotifIndex(prev => prev + 1);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Use profile from context
   const user = userProfile ? { ...userProfile, id: authUser?.id, email: authUser?.email } : null;
@@ -433,23 +442,22 @@ export default function Home() {
 
                   {/* Quick Action Circles */}
                   <div className="flex items-start gap-5 sm:gap-6 flex-shrink-0">
-                    <Link to={createPageUrl("Lending")} className="flex flex-col items-center gap-1.5 group">
+                    <Link to={createPageUrl("CreateOffer")} className="flex flex-col items-center gap-1.5 group">
                       <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4C7FC4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                           <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <polyline points="5 12 12 5 19 12"></polyline>
+                          <line x1="5" y1="12" x2="19" y2="12"></line>
                         </svg>
                       </div>
-                      <p className="text-[10px] font-semibold text-[#213B75] text-center leading-tight font-sans">Make<br/>Lending Offer</p>
+                      <p className="text-[10px] font-semibold text-[#213B75] text-center leading-tight font-sans">Create<br/>Loan Offer</p>
                     </Link>
-                    <Link to={createPageUrl("Borrowing")} className="flex flex-col items-center gap-1.5 group">
+                    <Link to={createPageUrl("RecentActivity")} className="flex flex-col items-center gap-1.5 group">
                       <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4C7FC4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                          <line x1="12" y1="19" x2="12" y2="5"></line>
-                          <polyline points="19 12 12 19 5 12"></polyline>
+                          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
                         </svg>
                       </div>
-                      <p className="text-[10px] font-semibold text-[#213B75] text-center leading-tight font-sans">Request<br/>to Borrow</p>
+                      <p className="text-[10px] font-semibold text-[#213B75] text-center leading-tight font-sans">View Recent<br/>Activity</p>
                     </Link>
                     <Link to={createPageUrl("LoanAgreements")} className="flex flex-col items-center gap-1.5 group">
                       <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
@@ -998,6 +1006,125 @@ export default function Home() {
                       )}
                     </div>
 
+                    {/* Notifications Box */}
+                    {(() => {
+                      const today = new Date();
+                      const nextWeek = addDays(today, 7);
+                      const activeNotifLoans = myLoans.filter(l => l && l.status === 'active' && l.next_payment_date);
+                      const notifications = [];
+
+                      // Count overdue payments you owe
+                      const overdueYouOwe = activeNotifLoans.filter(l => {
+                        const d = new Date(l.next_payment_date);
+                        return l.borrower_id === user.id && d < today;
+                      });
+                      if (overdueYouOwe.length > 0) {
+                        notifications.push({
+                          text: `You have ${overdueYouOwe.length} overdue payment${overdueYouOwe.length !== 1 ? 's' : ''}`,
+                          link: 'Borrowing'
+                        });
+                      }
+
+                      // Specific overdue loan messages (you owe)
+                      overdueYouOwe.forEach(loan => {
+                        const lenderProfile = safeAllProfiles.find(p => p.user_id === loan.lender_id);
+                        notifications.push({
+                          text: `Your payment to @${lenderProfile?.username || 'user'} is overdue — if you made a payment make sure to record it`,
+                          link: 'Borrowing'
+                        });
+                      });
+
+                      // Payments coming up this week (you owe)
+                      const upcomingYouOwe = activeNotifLoans.filter(l => {
+                        const d = new Date(l.next_payment_date);
+                        return l.borrower_id === user.id && d >= today && d <= nextWeek;
+                      });
+                      if (upcomingYouOwe.length > 0) {
+                        notifications.push({
+                          text: `You have ${upcomingYouOwe.length} payment${upcomingYouOwe.length !== 1 ? 's' : ''} coming up this week`,
+                          link: 'Borrowing'
+                        });
+                      }
+
+                      // Payments you're due to receive this week
+                      const upcomingReceive = activeNotifLoans.filter(l => {
+                        const d = new Date(l.next_payment_date);
+                        return l.lender_id === user.id && d >= today && d <= nextWeek;
+                      });
+                      if (upcomingReceive.length > 0) {
+                        notifications.push({
+                          text: `You are due to receive ${upcomingReceive.length} payment${upcomingReceive.length !== 1 ? 's' : ''} this week`,
+                          link: 'Lending'
+                        });
+                      }
+
+                      // Overdue payments from borrowers (you are the lender)
+                      const overdueFromOthers = activeNotifLoans.filter(l => {
+                        const d = new Date(l.next_payment_date);
+                        return l.lender_id === user.id && d < today;
+                      });
+                      overdueFromOthers.forEach(loan => {
+                        const borrowerProfile = safeAllProfiles.find(p => p.user_id === loan.borrower_id);
+                        notifications.push({
+                          text: `@${borrowerProfile?.username || 'user'}'s payment to you is overdue — if they made a payment make sure to record it`,
+                          link: 'Lending'
+                        });
+                      });
+
+                      if (notifications.length === 0) return null;
+
+                      // Ensure notifIndex is valid
+                      const safeIdx = notifIndex % notifications.length;
+                      const current = notifications[safeIdx];
+
+                      return (
+                        <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
+                          <p className="text-sm font-bold text-[#213B75] mb-2 tracking-tight font-sans">
+                            Notifications
+                          </p>
+                          <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-[#CDE7F8]">
+                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
+                              <span className="text-base">🕐</span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <AnimatePresence mode="wait">
+                                <motion.p
+                                  key={safeIdx}
+                                  initial={{ opacity: 0, y: 8 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -8 }}
+                                  transition={{ duration: 0.25 }}
+                                  className="text-[11px] text-[#213B75] leading-snug"
+                                >
+                                  {current.text}
+                                </motion.p>
+                              </AnimatePresence>
+                            </div>
+                            <Link
+                              to={createPageUrl(current.link)}
+                              className="flex-shrink-0 text-[9px] font-semibold px-2 py-1 rounded-md whitespace-nowrap"
+                              style={{ backgroundColor: '#213B75', color: '#FFFFFF' }}
+                            >
+                              Go to {current.link}
+                            </Link>
+                          </div>
+                          {notifications.length > 1 && (
+                            <div className="flex items-center justify-center gap-1.5 mt-2">
+                              {notifications.map((_, i) => (
+                                <button
+                                  key={i}
+                                  onClick={() => setNotifIndex(i)}
+                                  className={`rounded-full transition-all cursor-pointer ${
+                                    i === safeIdx ? 'w-4 h-1.5 bg-[#213B75]' : 'w-1.5 h-1.5 bg-[#4C7FC4]/40'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
+
                     {/* Upcoming & Overdue Payments — shared data computation */}
                     {(() => {
                       const safePaymentsUp = Array.isArray(payments) ? payments : [];
@@ -1078,7 +1205,16 @@ export default function Home() {
                                   const loanPage = event.isLender ? 'Lending' : 'Borrowing';
 
                                   return (
-                                    <div key={idx} className="flex items-start gap-2.5 p-2.5 rounded-lg bg-[#CDE7F8]">
+                                    <div key={idx} className="flex items-center gap-2.5 p-2.5 rounded-lg bg-[#CDE7F8]">
+                                      {/* White circle with days */}
+                                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
+                                        <p className="text-[10px] font-bold text-[#213B75] text-center leading-tight">
+                                          {event.days}
+                                          <span className="block text-[7px] font-medium text-[#4C7FC4]">
+                                            {event.days === 1 ? 'day' : 'days'}
+                                          </span>
+                                        </p>
+                                      </div>
                                       <div className="flex-1 min-w-0">
                                         <p className="text-[11px] text-[#213B75]">
                                           {event.isLender
@@ -1086,17 +1222,17 @@ export default function Home() {
                                             : <>Send payment of <span className="font-semibold">${amountStr}</span> to <span className="font-semibold">@{event.username}</span></>
                                           }
                                         </p>
-                                        <div className="flex items-center justify-between mt-0.5">
+                                        <div className="flex items-center gap-2 mt-0.5">
                                           <p className="text-[10px] text-[#4C7FC4]">{dueDateStr}</p>
+                                          <Link
+                                            to={createPageUrl(loanPage)}
+                                            className="text-[9px] font-semibold px-2 py-0.5 rounded-md"
+                                            style={{ backgroundColor: '#213B75', color: '#FFFFFF' }}
+                                          >
+                                            View Loan
+                                          </Link>
                                         </div>
                                       </div>
-                                      <Link
-                                        to={createPageUrl(loanPage)}
-                                        className="flex-shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-lg mt-0.5"
-                                        style={{ backgroundColor: '#213B75', color: '#FFFFFF' }}
-                                      >
-                                        View Loan
-                                      </Link>
                                     </div>
                                   );
                                 })}
@@ -1163,7 +1299,7 @@ export default function Home() {
                       {(() => {
                         const safePaymentsRecent = Array.isArray(payments) ? payments : [];
 
-                        // Build activity items from loans and payments
+                        // Build activity items matching Recent Activity page format
                         const activityItems = [];
 
                         // Payment events
@@ -1172,19 +1308,17 @@ export default function Home() {
                           .forEach(p => {
                             const loan = myLoans.find(l => l.id === p.loan_id);
                             if (!loan) return;
-                            const isLender = loan.lender_id === user.id;
-                            const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
+                            const isBorrower = loan.borrower_id === user.id;
+                            const otherUserId = isBorrower ? loan.lender_id : loan.borrower_id;
                             const otherProfile = safeAllProfiles.find(pr => pr.user_id === otherUserId);
+                            const amount = `$${(p.amount || 0).toLocaleString()}`;
+                            const username = `@${otherProfile?.username || 'user'}`;
                             activityItems.push({
                               type: 'payment',
                               date: new Date(p.payment_date || p.created_at),
-                              amount: p.amount || 0,
-                              status: p.status,
-                              isLender,
-                              username: otherProfile?.username || 'user',
-                              description: isLender
-                                ? `Payment received from @${otherProfile?.username || 'user'}`
-                                : `Payment sent to @${otherProfile?.username || 'user'}`
+                              description: isBorrower
+                                ? `You made a ${amount} payment to ${username}`
+                                : `Received ${amount} payment from ${username}`
                             });
                           });
 
@@ -1194,16 +1328,27 @@ export default function Home() {
                           const isLender = loan.lender_id === user.id;
                           const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
                           const otherProfile = safeAllProfiles.find(pr => pr.user_id === otherUserId);
+                          const amount = `$${(loan.amount || 0).toLocaleString()}`;
+                          const username = `@${otherProfile?.username || 'user'}`;
+                          const reason = loan.purpose || 'loan';
+                          let desc = '';
+                          if (loan.status === 'pending' || !loan.status) {
+                            desc = isLender ? `Sent ${amount} loan offer to ${username} for ${reason}` : `Received ${amount} loan offer from ${username} for ${reason}`;
+                          } else if (loan.status === 'active') {
+                            desc = isLender ? `${username} accepted your ${amount} loan for ${reason}` : `You accepted ${amount} loan from ${username} for ${reason}`;
+                          } else if (loan.status === 'declined') {
+                            desc = isLender ? `${username} declined your ${amount} loan for ${reason}` : `You declined ${amount} loan from ${username} for ${reason}`;
+                          } else if (loan.status === 'cancelled') {
+                            desc = isLender ? `You cancelled ${amount} loan offer to ${username}` : `${username} cancelled their ${amount} loan offer`;
+                          } else if (loan.status === 'completed') {
+                            desc = isLender ? `${username} fully repaid your ${amount} loan` : `You fully repaid ${amount} loan to ${username}`;
+                          } else {
+                            desc = isLender ? `${amount} loan to ${username}` : `${amount} loan from ${username}`;
+                          }
                           activityItems.push({
                             type: 'loan',
                             date: new Date(loan.created_at),
-                            amount: loan.amount || 0,
-                            status: loan.status,
-                            isLender,
-                            username: otherProfile?.username || 'user',
-                            description: isLender
-                              ? `Loan offer to @${otherProfile?.username || 'user'}`
-                              : `Loan from @${otherProfile?.username || 'user'}`
+                            description: desc
                           });
                         });
 
@@ -1227,16 +1372,11 @@ export default function Home() {
                           <div className="space-y-1.5">
                             {recent.map((item, idx) => {
                               const isPayment = item.type === 'payment';
-                              const iconBg = item.isLender ? '#D1FAE5' : '#DBEAFE';
-                              const iconColor = item.isLender ? '#00A86B' : '#4C7FC4';
-                              const amountStr = item.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                              const iconColor = '#4C7FC4';
 
                               return (
                                 <div key={idx} className="flex items-center gap-2.5 p-2 rounded-lg bg-[#CDE7F8]">
-                                  <div
-                                    className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
-                                    style={{ backgroundColor: iconBg }}
-                                  >
+                                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
                                     {isPayment ? (
                                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                         <line x1="12" y1="1" x2="12" y2="23"></line>
@@ -1253,9 +1393,6 @@ export default function Home() {
                                     <p className="text-[11px] text-[#213B75] truncate">{item.description}</p>
                                     <p className="text-[9px] text-[#4C7FC4]">{format(item.date, 'MMM d, yyyy')}</p>
                                   </div>
-                                  <p className={`text-[11px] font-bold flex-shrink-0 ${item.isLender ? 'text-[#00A86B]' : 'text-[#213B75]'}`}>
-                                    ${amountStr}
-                                  </p>
                                 </div>
                               );
                             })}
