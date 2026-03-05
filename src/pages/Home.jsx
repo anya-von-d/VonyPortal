@@ -387,28 +387,32 @@ export default function Home() {
                       <div className="border-t border-[#CDE7F8] pt-2 grid grid-cols-2 gap-3">
                         <div>
                           <p className="text-[11px] text-[#4C7FC4] mb-0.5">Next Payment Date</p>
-                          <p className="text-sm font-bold text-[#213B75]">
-                            {nextLenderPayment ? format(nextLenderPayment.date, 'EEE, MMM d') : 'N/A'}
-                          </p>
-                          {nextLenderPayment && (
-                            <p className="text-[11px] text-[#4C7FC4]">
-                              {(() => {
-                                const days = Math.ceil((nextLenderPayment.date - new Date()) / (1000 * 60 * 60 * 24));
-                                return days > 0 ? `${days} day${days !== 1 ? 's' : ''} away` : days === 0 ? 'Due today' : `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`;
-                              })()}
+                          <div className="flex items-baseline gap-1.5">
+                            <p className="text-base font-bold text-[#213B75]">
+                              {nextLenderPayment ? format(nextLenderPayment.date, 'EEE, MMM d') : 'N/A'}
                             </p>
-                          )}
+                            {nextLenderPayment && (
+                              <p className="text-[11px] text-[#4C7FC4]">
+                                {(() => {
+                                  const days = Math.ceil((nextLenderPayment.date - new Date()) / (1000 * 60 * 60 * 24));
+                                  return days > 0 ? `${days}d away` : days === 0 ? 'Due today' : `${Math.abs(days)}d overdue`;
+                                })()}
+                              </p>
+                            )}
+                          </div>
                         </div>
                         <div>
                           <p className="text-[11px] text-[#4C7FC4] mb-0.5">Next Payment Amount</p>
-                          <p className="text-sm font-bold text-[#213B75]">
-                            {nextLenderPayment ? formatMoney(nextLenderPayment.payment_amount || 0) : 'N/A'}
-                          </p>
-                          {nextLenderPayment && (
-                            <p className="text-[11px] text-[#4C7FC4]">
-                              from @{nextLenderPayment.username}
+                          <div className="flex items-baseline gap-1.5">
+                            <p className="text-base font-bold text-[#213B75]">
+                              {nextLenderPayment ? formatMoney(nextLenderPayment.payment_amount || 0) : 'N/A'}
                             </p>
-                          )}
+                            {nextLenderPayment && (
+                              <p className="text-[11px] text-[#4C7FC4]">
+                                from @{nextLenderPayment.username}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -444,39 +448,43 @@ export default function Home() {
                       <div className="border-t border-[#CDE7F8] pt-2 grid grid-cols-2 gap-3">
                         <div>
                           <p className="text-[11px] text-[#4C7FC4] mb-0.5">Next Payment Date</p>
-                          <p className="text-sm font-bold text-[#213B75]">
-                            {nextBorrowerPayment ? format(nextBorrowerPayment.date, 'EEE, MMM d') : 'N/A'}
-                          </p>
-                          {nextBorrowerPayment && (
-                            <p className="text-[11px] text-[#4C7FC4]">
-                              {(() => {
-                                const days = Math.ceil((nextBorrowerPayment.date - new Date()) / (1000 * 60 * 60 * 24));
-                                return days > 0 ? `${days} day${days !== 1 ? 's' : ''} away` : days === 0 ? 'Due today' : `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`;
-                              })()}
+                          <div className="flex items-baseline gap-1.5">
+                            <p className="text-base font-bold text-[#213B75]">
+                              {nextBorrowerPayment ? format(nextBorrowerPayment.date, 'EEE, MMM d') : 'N/A'}
                             </p>
-                          )}
+                            {nextBorrowerPayment && (
+                              <p className="text-[11px] text-[#4C7FC4]">
+                                {(() => {
+                                  const days = Math.ceil((nextBorrowerPayment.date - new Date()) / (1000 * 60 * 60 * 24));
+                                  return days > 0 ? `${days}d away` : days === 0 ? 'Due today' : `${Math.abs(days)}d overdue`;
+                                })()}
+                              </p>
+                            )}
+                          </div>
                         </div>
                         <div>
                           <p className="text-[11px] text-[#4C7FC4] mb-0.5">Next Payment Amount</p>
-                          <p className="text-sm font-bold text-[#213B75]">
-                            {nextBorrowerPayment ? formatMoney(nextBorrowerPayment.payment_amount || 0) : 'N/A'}
-                          </p>
-                          {nextBorrowerPayment && (
-                            <p className="text-[11px] text-[#4C7FC4]">
-                              to @{nextBorrowerPayment.username}
+                          <div className="flex items-baseline gap-1.5">
+                            <p className="text-base font-bold text-[#213B75]">
+                              {nextBorrowerPayment ? formatMoney(nextBorrowerPayment.payment_amount || 0) : 'N/A'}
                             </p>
-                          )}
+                            {nextBorrowerPayment && (
+                              <p className="text-[11px] text-[#4C7FC4]">
+                                to @{nextBorrowerPayment.username}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
 
                     {/* Record Payment Box */}
                     {myLoans.filter(l => l && l.status === 'active').length > 0 && (
-                      <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
-                        <p className="text-sm font-bold text-[#213B75] mb-2 tracking-tight font-sans">
+                      <div className="rounded-xl px-4 py-3 shadow-sm" style={{ backgroundColor: '#4C7FC4' }}>
+                        <p className="text-sm font-bold text-white mb-2 tracking-tight font-sans">
                           Record Payment
                         </p>
-                        <div className="flex flex-wrap items-center gap-2 text-xs text-[#213B75]">
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-white">
                           <span>Record payment of</span>
                           <span className="font-medium">$</span>
                           <Input
@@ -486,12 +494,12 @@ export default function Home() {
                             placeholder=""
                             value={quickPayAmount}
                             onChange={(e) => setQuickPayAmount(e.target.value)}
-                            className="w-20 h-7 px-2 bg-[#CDE7F8] border-0 text-xs inline-flex rounded-md"
+                            className="w-20 h-7 px-2 bg-white/20 border-0 text-xs inline-flex rounded-md text-white placeholder:text-white/50"
                             style={{ MozAppearance: 'textfield' }}
                           />
                           <span>via</span>
                           <Select value={quickPayMethod} onValueChange={setQuickPayMethod}>
-                            <SelectTrigger className="w-auto h-7 px-2 bg-[#CDE7F8] border-0 text-xs inline-flex rounded-md">
+                            <SelectTrigger className="w-auto h-7 px-2 bg-white/20 border-0 text-xs inline-flex rounded-md text-white">
                               <SelectValue placeholder="select method" />
                             </SelectTrigger>
                             <SelectContent>
@@ -505,7 +513,7 @@ export default function Home() {
                           </Select>
                           <span>for</span>
                           <Select value={quickPayLoanId} onValueChange={setQuickPayLoanId}>
-                            <SelectTrigger className="w-auto h-7 px-2 bg-[#CDE7F8] border-0 text-xs inline-flex min-w-[120px] rounded-md">
+                            <SelectTrigger className="w-auto h-7 px-2 bg-white/20 border-0 text-xs inline-flex min-w-[120px] rounded-md text-white">
                               <SelectValue placeholder="select loan" />
                             </SelectTrigger>
                             <SelectContent>
@@ -537,8 +545,8 @@ export default function Home() {
                             disabled={!quickPayLoanId || !quickPayAmount}
                             className={`h-7 px-3 rounded-md text-xs font-semibold border-0 transition-all ${
                               !quickPayLoanId || !quickPayAmount
-                                ? 'bg-[#4C7FC4]/50 text-white/70 cursor-not-allowed'
-                                : 'bg-[#4C7FC4] text-white hover:bg-[#3a6bb0]'
+                                ? 'bg-white/30 text-white/70 cursor-not-allowed'
+                                : 'bg-white text-[#4C7FC4] hover:bg-white/90'
                             }`}
                           >
                             Submit
@@ -575,7 +583,7 @@ export default function Home() {
                     </div>
 
                     {/* Monthly Overview Box */}
-                    <div className="rounded-xl px-4 py-3 shadow-sm bg-white flex-1">
+                    <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
                       <div className="flex items-center justify-between mb-3">
                         <button
                           onClick={() => setCalendarMonth(subMonths(calendarMonth, 1))}
@@ -744,60 +752,61 @@ export default function Home() {
                         })()}
                       </div>
 
-                      {/* Month Balance */}
-                      {(() => {
-                        const monthEnd = endOfMonth(calendarMonth);
-                        const activeLoansForBalance = myLoans.filter(l => l && l.status === 'active');
-                        let totalReceive = 0;
-                        let totalSend = 0;
-
-                        activeLoansForBalance.forEach(loan => {
-                          if (!loan.next_payment_date) return;
-                          const paymentDate = new Date(loan.next_payment_date);
-                          const isLender = loan.lender_id === user.id;
-                          const paymentAmount = loan.payment_amount || 0;
-
-                          const addAmountIfInMonth = (date) => {
-                            if (isSameMonth(date, calendarMonth)) {
-                              if (isLender) totalReceive += paymentAmount;
-                              else totalSend += paymentAmount;
-                            }
-                          };
-
-                          addAmountIfInMonth(paymentDate);
-
-                          const frequency = loan.payment_frequency;
-                          if (frequency && frequency !== 'none') {
-                            let currentDate = new Date(loan.next_payment_date);
-                            let iterations = 0;
-                            while (iterations < 10) {
-                              if (frequency === 'weekly') currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
-                              else if (frequency === 'biweekly') currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
-                              else if (frequency === 'monthly') currentDate = addMonths(currentDate, 1);
-                              else if (frequency === 'daily') currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
-                              else break;
-                              if (currentDate > monthEnd) break;
-                              addAmountIfInMonth(currentDate);
-                              iterations++;
-                            }
-                          }
-                        });
-
-                        const netBalance = totalReceive - totalSend;
-                        const isPositive = netBalance >= 0;
-
-                        return (
-                          <div className="mt-3 rounded-lg p-2.5 flex items-center justify-between bg-[#CDE7F8]">
-                            <p className="text-xs font-semibold text-[#213B75]">
-                              {format(calendarMonth, 'MMMM')} Balance
-                            </p>
-                            <p className="text-xs font-bold text-[#213B75]">
-                              {isPositive ? '+' : '-'}${Math.abs(netBalance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                            </p>
-                          </div>
-                        );
-                      })()}
                     </div>
+
+                    {/* Month Balance - outside overview box, darker blue */}
+                    {(() => {
+                      const monthEnd = endOfMonth(calendarMonth);
+                      const activeLoansForBalance = myLoans.filter(l => l && l.status === 'active');
+                      let totalReceive = 0;
+                      let totalSend = 0;
+
+                      activeLoansForBalance.forEach(loan => {
+                        if (!loan.next_payment_date) return;
+                        const paymentDate = new Date(loan.next_payment_date);
+                        const isLender = loan.lender_id === user.id;
+                        const paymentAmount = loan.payment_amount || 0;
+
+                        const addAmountIfInMonth = (date) => {
+                          if (isSameMonth(date, calendarMonth)) {
+                            if (isLender) totalReceive += paymentAmount;
+                            else totalSend += paymentAmount;
+                          }
+                        };
+
+                        addAmountIfInMonth(paymentDate);
+
+                        const frequency = loan.payment_frequency;
+                        if (frequency && frequency !== 'none') {
+                          let currentDate = new Date(loan.next_payment_date);
+                          let iterations = 0;
+                          while (iterations < 10) {
+                            if (frequency === 'weekly') currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
+                            else if (frequency === 'biweekly') currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
+                            else if (frequency === 'monthly') currentDate = addMonths(currentDate, 1);
+                            else if (frequency === 'daily') currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+                            else break;
+                            if (currentDate > monthEnd) break;
+                            addAmountIfInMonth(currentDate);
+                            iterations++;
+                          }
+                        }
+                      });
+
+                      const netBalance = totalReceive - totalSend;
+                      const isPositive = netBalance >= 0;
+
+                      return (
+                        <div className="rounded-xl px-4 py-2.5 flex items-center justify-between shadow-sm" style={{ backgroundColor: '#213B75' }}>
+                          <p className="text-xs font-semibold text-white font-sans">
+                            {format(calendarMonth, 'MMMM')} Balance
+                          </p>
+                          <p className="text-xs font-bold text-white font-sans">
+                            {isPositive ? '+' : '-'}${Math.abs(netBalance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </p>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
 
