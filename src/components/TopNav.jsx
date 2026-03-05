@@ -4,8 +4,12 @@ import { createPageUrl } from "@/utils";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Top bar items (dark blue bar - includes Vony logo + secondary links)
+// Top bar items (dark blue #213B75 bar - secondary links)
 const topBarItems = [
+  {
+    title: "Friends",
+    url: createPageUrl("Friends"),
+  },
   {
     title: "My Loan Documents",
     url: createPageUrl("LoanAgreements"),
@@ -20,8 +24,8 @@ const topBarItems = [
   },
 ];
 
-// Bottom bar items (white bar - primary navigation, left-aligned)
-const bottomBarItems = [
+// Bottom bar items (left of logo)
+const bottomLeftItems = [
   {
     title: "Dashboard",
     url: createPageUrl("Home"),
@@ -30,6 +34,10 @@ const bottomBarItems = [
     title: "Lending",
     url: createPageUrl("Lending"),
   },
+];
+
+// Bottom bar items (right of logo)
+const bottomRightItems = [
   {
     title: "Borrowing",
     url: createPageUrl("Borrowing"),
@@ -38,13 +46,9 @@ const bottomBarItems = [
     title: "Updates",
     url: createPageUrl("Requests"),
   },
-  {
-    title: "Friends",
-    url: createPageUrl("Friends"),
-  },
 ];
 
-const allNavItems = [...bottomBarItems, ...topBarItems];
+const allNavItems = [...bottomLeftItems, ...bottomRightItems, ...topBarItems];
 
 export default function TopNav({ location }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -110,7 +114,7 @@ export default function TopNav({ location }) {
     <>
       {/* Fixed Double Navigation Bar */}
       <nav className="fixed top-0 left-0 right-0 z-50 shadow-sm shadow-black/5">
-        {/* Top Bar - Dark Blue with Vony logo + secondary links */}
+        {/* Top Bar - Dark Blue (#213B75) secondary navigation */}
         <div className="h-10" style={{backgroundColor: '#213B75'}}>
           <div className="h-full px-6 md:px-10 flex items-center justify-between">
             {/* Hamburger Menu Button - Mobile only */}
@@ -145,15 +149,7 @@ export default function TopNav({ location }) {
               </AnimatePresence>
             </button>
 
-            {/* Desktop: Vony logo left + links right */}
-            <Link
-              to={createPageUrl("Home")}
-              onClick={() => handleNavClick(createPageUrl("Home"))}
-              className="hidden md:block font-display italic text-2xl text-white tracking-wide"
-            >
-              Vony
-            </Link>
-
+            {/* Desktop: Top bar links right-aligned */}
             <div className="hidden md:flex items-center gap-8 ml-auto">
               {topBarItems.map((item) => (
                 <Link
@@ -171,7 +167,7 @@ export default function TopNav({ location }) {
               ))}
             </div>
 
-            {/* Mobile: Logo centered on top bar */}
+            {/* Mobile: Logo on top bar */}
             <Link
               to={createPageUrl("Home")}
               onClick={() => handleNavClick(createPageUrl("Home"))}
@@ -191,20 +187,20 @@ export default function TopNav({ location }) {
           </div>
         </div>
 
-        {/* Bottom Bar - White, left-aligned primary navigation */}
-        <div className="h-12 bg-white">
-          <div className="h-full px-6 md:px-10 flex items-center">
-            {/* Mobile: Main nav links left-aligned */}
-            <div className="flex md:hidden items-center gap-5 overflow-x-auto">
-              {bottomBarItems.map((item) => (
+        {/* Bottom Bar - Medium Blue (#4C7FC4) primary navigation with centered Vony logo */}
+        <div className="h-12" style={{backgroundColor: '#4C7FC4'}}>
+          <div className="h-full px-6 md:px-10 flex items-center justify-center">
+            {/* Mobile: Main nav links */}
+            <div className="flex md:hidden items-center gap-6">
+              {[...bottomLeftItems, ...bottomRightItems].map((item) => (
                 <Link
                   key={item.title}
                   to={item.url}
                   onClick={() => handleNavClick(item.url)}
-                  className={`font-sans text-sm font-medium transition-colors duration-200 whitespace-nowrap ${
+                  className={`font-sans text-sm font-medium transition-colors duration-200 ${
                     location.pathname === item.url
-                      ? "text-[#213B75] font-semibold"
-                      : "text-[#213B75]/40 hover:text-[#213B75]"
+                      ? "text-white"
+                      : "text-white/50 hover:text-white"
                   }`}
                 >
                   {item.title}
@@ -212,17 +208,43 @@ export default function TopNav({ location }) {
               ))}
             </div>
 
-            {/* Desktop: Left-aligned nav links */}
-            <div className="hidden md:flex items-center gap-8">
-              {bottomBarItems.map((item) => (
+            {/* Desktop: Centered Nav Group (Links + Logo) */}
+            <div className="hidden md:flex items-center gap-10">
+              {/* Left Nav Links */}
+              {bottomLeftItems.map((item) => (
                 <Link
                   key={item.title}
                   to={item.url}
                   onClick={() => handleNavClick(item.url)}
                   className={`font-sans text-sm font-semibold transition-colors duration-200 ${
                     location.pathname === item.url
-                      ? "text-[#213B75]"
-                      : "text-[#213B75]/40 hover:text-[#213B75]"
+                      ? "text-white"
+                      : "text-white/50 hover:text-white"
+                  }`}
+                >
+                  {item.title}
+                </Link>
+              ))}
+
+              {/* Center: Logo */}
+              <Link
+                to={createPageUrl("Home")}
+                onClick={() => handleNavClick(createPageUrl("Home"))}
+                className="font-display italic text-3xl text-white tracking-wide mx-2"
+              >
+                Vony
+              </Link>
+
+              {/* Right Nav Links */}
+              {bottomRightItems.map((item) => (
+                <Link
+                  key={item.title}
+                  to={item.url}
+                  onClick={() => handleNavClick(item.url)}
+                  className={`font-sans text-sm font-semibold transition-colors duration-200 ${
+                    location.pathname === item.url
+                      ? "text-white"
+                      : "text-white/50 hover:text-white"
                   }`}
                 >
                   {item.title}
@@ -241,8 +263,8 @@ export default function TopNav({ location }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 bg-white flex flex-col"
-            style={{ top: '88px' }}
+            className="fixed inset-0 z-40 flex flex-col"
+            style={{ top: '88px', backgroundColor: '#4C7FC4' }}
           >
             {/* Navigation Links */}
             <motion.nav
@@ -260,14 +282,14 @@ export default function TopNav({ location }) {
                       onClick={() => handleNavClick(item.url)}
                       className={`block py-2 text-2xl md:text-3xl font-bold tracking-tight transition-colors duration-200 ${
                         location.pathname === item.url
-                          ? "text-[#213B75]"
-                          : "text-[#213B75]/50 hover:text-[#213B75]"
+                          ? "text-white"
+                          : "text-white/60 hover:text-white"
                       }`}
                     >
                       {item.title}
                     </Link>
                     {item.comingSoon && (
-                      <p className="text-xs text-[#213B75]/40 -mt-1 mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                      <p className="text-xs text-white/40 -mt-1 mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                         Coming Soon
                       </p>
                     )}
@@ -284,7 +306,7 @@ export default function TopNav({ location }) {
               transition={{ delay: 0.4, duration: 0.3 }}
               className="py-6 text-center"
             >
-              <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#213B75]/40">
+              <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-white/40">
                 Vony · Lending Made Simple
               </p>
             </motion.div>
