@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion";
-import { format, startOfMonth, addMonths } from "date-fns";
+import { format, startOfMonth, endOfMonth, addMonths, isBefore, isAfter } from "date-fns";
 import { formatMoney } from "@/components/utils/formatMoney";
 import RecordPaymentModal from "@/components/loans/RecordPaymentModal";
 import { AnimatePresence } from "framer-motion";
@@ -806,9 +806,170 @@ export default function Home() {
                         </div>
                       );
                     })()}
+
+                    {/* Loans Over Time Bar Chart */}
+                    {myLoans.filter(l => l && (l.status === 'active' || l.status === 'completed')).length > 0 && (() => {
+                      const allRelevantLoans = myLoans.filter(l => l && (l.status === 'active' || l.status === 'completed'));
+                      const safePayments = Array.isArray(payments) ? payments : [];
+
+                      // Find the earliest loan creation month
+                      const loanDates = allRelevantLoans
+                        .map(l => new Date(l.created_at))
+                        .filter(d => !isNaN(d.getTime()));
+                      if (loanDates.length === 0) return null;
+
+                      const earliestDate = loanDates.reduce((min, d) => d < min ? d : min, loanDates[0]);
+                      const chartStartMonth = startOfMonth(earliestDate);
+                      const now = new Date();
+                      const currentMonth = startOfMonth(now);
+                      const isCurrentMonth = (m) => m.getFullYear() === currentMonth.getFullYear() && m.getMonth() === currentMonth.getMonth();
+
+                      // Build exactly 6 months starting from earliest loan month
+                      const months = [];
+                      for (let i = 0; i < 6; i++) {
+                        months.push(addMonths(chartStartMonth, i));
+                      }
+
+                      // For each month, compute end-of-month values using actual payment data
+                      // For past months: value at the last day of that month
+                      // For current month: current live value
+                      const chartData = months.map(monthDate => {
+                        const monthEnd = endOfMonth(monthDate);
+                        const isCurrent = isCurrentMonth(monthDate);
+                        const isFuture = isAfter(monthDate, currentMonth);
+                        const snapshotDate = isCurrent ? now : (isFuture ? now : monthEnd);
+
+                        let owedToYou = 0;
+                        let youOwe = 0;
+
+                        allRelevantLoans.forEach(loan => {
+                          const loanCreated = new Date(loan.created_at);
+                          // Only count if loan existed by this snapshot date
+                          if (isAfter(loanCreated, snapshotDate)) return;
+
+                          const totalAmount = loan.total_amount || loan.amount || 0;
+                          const isLender = loan.lender_id === user.id;
+
+                          // Sum all completed payments for this loan up to the snapshot date
+                          const loanPayments = safePayments.filter(p =>
+                            p && p.loan_id === loan.id &&
+                            (p.status === 'completed' || p.status === 'pending_confirmation') &&
+                            !isAfter(new Date(p.payment_date || p.created_at), snapshotDate)
+                          );
+                          const totalPaid = loanPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
+
+                          // Also use amount_paid from the loan for current values (covers all historical payments)
+                          const effectivePaid = isCurrent ? (loan.amount_paid || 0) : totalPaid;
+                          const remaining = Math.max(0, totalAmount - effectivePaid);
+
+                          // For future months, use current values
+                          if (isFuture) {
+                            const currentRemaining = Math.max(0, totalAmount - (loan.amount_paid || 0));
+                            if (isLender) owedToYou += currentRemaining;
+                            else youOwe += currentRemaining;
+                            return;
+                          }
+
+                          if (isLender) {
+                            owedToYou += remaining;
+                          } else {
+                            youOwe += remaining;
+                          }
+                        });
+
+                        return {
+                          month: monthDate,
+                          owedToYou,
+                          youOwe,
+                          label: format(monthDate, 'MMM'),
+                          isCurrent,
+                          isFuture
+                        };
+                      });
+
+                      // Find max for scaling (both bars go up now)
+                      const maxVal = Math.max(
+                        ...chartData.map(d => d.owedToYou),
+                        ...chartData.map(d => d.youOwe),
+                        1
+                      );
+
+                      const chartHeight = 120;
+                      const barWidth = 14;
+                      const pairGap = 3; // gap between the two bars in a pair
+                      const groupGap = 12; // gap between month groups
+
+                      return (
+                        <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
+                          <p className="text-sm font-bold text-[#213B75] mb-3 tracking-tight font-sans">
+                            Loans Over Time
+                          </p>
+
+                          {/* Bar Chart — both bars go up, side by side */}
+                          <div className="overflow-x-auto">
+                            <div className="flex items-end justify-center" style={{ minHeight: chartHeight + 28 }}>
+                              <div className="flex items-end" style={{ gap: groupGap }}>
+                                {chartData.map((data, i) => {
+                                  const owedHeight = maxVal > 0 ? (data.owedToYou / maxVal) * chartHeight : 0;
+                                  const oweHeight = maxVal > 0 ? (data.youOwe / maxVal) * chartHeight : 0;
+
+                                  return (
+                                    <div key={i} className="flex flex-col items-center">
+                                      {/* Bar pair */}
+                                      <div className="flex items-end" style={{ gap: pairGap, height: chartHeight }}>
+                                        {/* Owed to you bar */}
+                                        <div
+                                          className="rounded-t-sm transition-all duration-300"
+                                          style={{
+                                            width: barWidth,
+                                            height: Math.max(owedHeight, owedHeight > 0 ? 2 : 0),
+                                            backgroundColor: '#4C7FC4',
+                                            opacity: data.isFuture ? 0.35 : 1
+                                          }}
+                                          title={`${data.label}: $${data.owedToYou.toLocaleString(undefined, { maximumFractionDigits: 0 })} owed to you`}
+                                        />
+                                        {/* You owe bar */}
+                                        <div
+                                          className="rounded-t-sm transition-all duration-300"
+                                          style={{
+                                            width: barWidth,
+                                            height: Math.max(oweHeight, oweHeight > 0 ? 2 : 0),
+                                            backgroundColor: '#213B75',
+                                            opacity: data.isFuture ? 0.35 : 1
+                                          }}
+                                          title={`${data.label}: $${data.youOwe.toLocaleString(undefined, { maximumFractionDigits: 0 })} you owe`}
+                                        />
+                                      </div>
+                                      {/* Month label */}
+                                      <p className={`text-[10px] mt-1.5 text-center ${data.isCurrent ? 'font-bold text-[#213B75]' : 'text-[#4C7FC4]'}`}
+                                        style={{ width: barWidth * 2 + pairGap }}
+                                      >
+                                        {data.label}
+                                      </p>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Key / Legend */}
+                          <div className="flex items-center gap-4 mt-3 pt-2.5 border-t border-[#CDE7F8]">
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#4C7FC4' }} />
+                              <p className="text-[11px] text-[#213B75]">Owed to you</p>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#213B75' }} />
+                              <p className="text-[11px] text-[#213B75]">You owe</p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
 
-                  {/* Right Column: Updates + Monthly Overview */}
+                  {/* Right Column: Updates */}
                   <div className="flex flex-col gap-3 md:gap-4">
                     {/* Updates Box - Desktop only (mobile version is at top) */}
                     <div className="hidden lg:flex rounded-xl px-4 py-3 shadow-sm items-center gap-3" style={{ backgroundColor: '#4C7FC4' }}>
@@ -834,191 +995,6 @@ export default function Home() {
                       )}
                     </div>
 
-                    {/* Loans Over Time Bar Chart */}
-                    <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
-                      <p className="text-sm font-bold text-[#213B75] mb-3 tracking-tight font-sans">
-                        Loans Over Time
-                      </p>
-
-                      {(() => {
-                        const allActiveAndCompleted = myLoans.filter(l => l && (l.status === 'active' || l.status === 'completed'));
-                        if (allActiveAndCompleted.length === 0) {
-                          return (
-                            <div className="flex flex-col items-center justify-center py-8 text-[#4C7FC4]">
-                              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40 mb-2">
-                                <path d="M18 20V10"></path>
-                                <path d="M12 20V4"></path>
-                                <path d="M6 20v-6"></path>
-                              </svg>
-                              <p className="text-sm">No loan data yet</p>
-                            </div>
-                          );
-                        }
-
-                        // Find the earliest loan creation month
-                        const loanDates = allActiveAndCompleted
-                          .map(l => new Date(l.created_at))
-                          .filter(d => !isNaN(d.getTime()));
-                        if (loanDates.length === 0) {
-                          return <p className="text-xs text-slate-400 text-center py-4">No loan dates available</p>;
-                        }
-                        const earliestDate = loanDates.reduce((min, d) => d < min ? d : min, loanDates[0]);
-                        const chartStartMonth = startOfMonth(earliestDate);
-                        const now = new Date();
-                        const currentMonth = startOfMonth(now);
-
-                        // Build array of months from earliest to current
-                        const months = [];
-                        let m = new Date(chartStartMonth);
-                        while (m <= currentMonth) {
-                          months.push(new Date(m));
-                          m = addMonths(m, 1);
-                        }
-                        // Ensure at least current month
-                        if (months.length === 0) months.push(currentMonth);
-
-                        // For each month, calculate total owed to you (lending) and total you owe (borrowing)
-                        // Based on remaining balance of active loans at each month point
-                        const chartData = months.map(monthDate => {
-                          let owedToYou = 0; // lending: what others owe you
-                          let youOwe = 0; // borrowing: what you owe others
-
-                          allActiveAndCompleted.forEach(loan => {
-                            const loanCreated = startOfMonth(new Date(loan.created_at));
-                            // Only count loan if it was created on or before this month
-                            if (loanCreated > monthDate) return;
-
-                            const totalAmount = loan.total_amount || loan.amount || 0;
-                            const paymentAmount = loan.payment_amount || 0;
-                            const isLender = loan.lender_id === user.id;
-
-                            // Calculate how many payments would have been made by this month
-                            const frequency = loan.payment_frequency || 'monthly';
-                            let monthsBetween = 0;
-                            const tempStart = new Date(loanCreated);
-                            let tempDate = new Date(tempStart);
-                            while (tempDate < monthDate) {
-                              tempDate = addMonths(tempDate, 1);
-                              monthsBetween++;
-                            }
-
-                            let paymentsPerMonth = 1;
-                            if (frequency === 'weekly') paymentsPerMonth = 4.33;
-                            else if (frequency === 'biweekly') paymentsPerMonth = 2.17;
-                            else if (frequency === 'daily') paymentsPerMonth = 30;
-
-                            const totalPaymentsMade = Math.floor(monthsBetween * paymentsPerMonth);
-                            const totalPaid = Math.min(totalPaymentsMade * paymentAmount, totalAmount);
-                            const remaining = Math.max(0, totalAmount - totalPaid);
-
-                            if (isLender) {
-                              owedToYou += remaining;
-                            } else {
-                              youOwe += remaining;
-                            }
-                          });
-
-                          return {
-                            month: monthDate,
-                            owedToYou,
-                            youOwe,
-                            label: format(monthDate, 'MMM')
-                          };
-                        });
-
-                        // Find max value for scaling
-                        const maxOwed = Math.max(...chartData.map(d => d.owedToYou), 1);
-                        const maxOwe = Math.max(...chartData.map(d => d.youOwe), 1);
-                        const maxVal = Math.max(maxOwed, maxOwe);
-
-                        // Chart dimensions
-                        const chartHeight = 140;
-                        const halfHeight = chartHeight / 2;
-                        const barWidth = Math.max(12, Math.min(28, Math.floor(240 / Math.max(chartData.length, 1))));
-                        const barGap = Math.max(2, Math.min(6, Math.floor(60 / Math.max(chartData.length, 1))));
-
-                        return (
-                          <div>
-                            {/* Bar Chart */}
-                            <div className="relative overflow-x-auto pb-1">
-                              <div className="flex items-end justify-center" style={{ minHeight: chartHeight + 24 }}>
-                                <div className="relative flex items-center" style={{ height: chartHeight }}>
-                                  {/* Y=0 line */}
-                                  <div
-                                    className="absolute left-0 right-0 border-t border-[#213B75]/20"
-                                    style={{ top: halfHeight }}
-                                  />
-
-                                  <div className="flex items-center" style={{ height: chartHeight, gap: barGap }}>
-                                    {chartData.map((data, i) => {
-                                      const upHeight = maxVal > 0 ? (data.owedToYou / maxVal) * (halfHeight - 4) : 0;
-                                      const downHeight = maxVal > 0 ? (data.youOwe / maxVal) * (halfHeight - 4) : 0;
-
-                                      return (
-                                        <div key={i} className="flex flex-col items-center relative" style={{ height: chartHeight }}>
-                                          {/* Upper bar (owed to you) — grows upward from center */}
-                                          <div className="flex flex-col justify-end" style={{ height: halfHeight }}>
-                                            {upHeight > 0 && (
-                                              <div
-                                                className="rounded-t-sm transition-all duration-300"
-                                                style={{
-                                                  width: barWidth,
-                                                  height: Math.max(upHeight, 2),
-                                                  backgroundColor: '#4C7FC4'
-                                                }}
-                                                title={`${data.label}: $${data.owedToYou.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} owed to you`}
-                                              />
-                                            )}
-                                          </div>
-                                          {/* Lower bar (you owe) — grows downward from center */}
-                                          <div className="flex flex-col justify-start" style={{ height: halfHeight }}>
-                                            {downHeight > 0 && (
-                                              <div
-                                                className="rounded-b-sm transition-all duration-300"
-                                                style={{
-                                                  width: barWidth,
-                                                  height: Math.max(downHeight, 2),
-                                                  backgroundColor: '#213B75'
-                                                }}
-                                                title={`${data.label}: $${data.youOwe.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} you owe`}
-                                              />
-                                            )}
-                                          </div>
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
-                                </div>
-                              </div>
-                              {/* Month labels */}
-                              <div className="flex justify-center" style={{ gap: barGap }}>
-                                {chartData.map((data, i) => (
-                                  <p
-                                    key={i}
-                                    className="text-[9px] text-[#4C7FC4] text-center"
-                                    style={{ width: barWidth }}
-                                  >
-                                    {data.label}
-                                  </p>
-                                ))}
-                              </div>
-                            </div>
-
-                            {/* Key / Legend */}
-                            <div className="flex items-center gap-4 mt-3 pt-2.5 border-t border-[#CDE7F8]">
-                              <div className="flex items-center gap-1.5">
-                                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#4C7FC4' }} />
-                                <p className="text-[11px] text-[#213B75]">Owed to you</p>
-                              </div>
-                              <div className="flex items-center gap-1.5">
-                                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#213B75' }} />
-                                <p className="text-[11px] text-[#213B75]">You owe</p>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })()}
-                    </div>
                   </div>
                 </div>
 
