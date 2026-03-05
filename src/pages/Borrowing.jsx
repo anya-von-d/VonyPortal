@@ -784,37 +784,44 @@ export default function Borrowing() {
               >
 
                 {/* Loan Progress + Upcoming Payments | Next Payment + Overdue */}
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid md:grid-cols-2 gap-3 md:gap-4">
                   {/* Left: Loan Progress + Upcoming Payments */}
-                  <div className="flex flex-col gap-4">
-                  <div className="rounded-2xl p-4 sm:p-5 border-0" style={{backgroundColor: '#83F384'}}>
-                    <p className="text-lg font-bold text-slate-800 mb-4 tracking-tight font-serif">
+                  <div className="flex flex-col gap-3 md:gap-4">
+                  <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
+                    <p className="text-sm font-bold text-[#1C4332] mb-2 tracking-tight font-sans">
                       Loan Progress
                     </p>
                     {activeLoans.length === 0 ? (
-                      <p className="text-slate-500 text-sm">No active loans to track</p>
+                      <p className="text-[#00A86B] text-sm">No active loans to track</p>
                     ) : (
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         {/* Summary Bar — all loans combined */}
                         {(() => {
                           const totalAll = activeLoans.reduce((s, l) => s + (l.total_amount || l.amount || 0), 0);
                           const paidAll = activeLoans.reduce((s, l) => s + (l.amount_paid || 0), 0);
                           const pctAll = totalAll > 0 ? Math.round((paidAll / totalAll) * 100) : 0;
                           return (
-                            <div className="space-y-1">
-                              <div className="flex items-center justify-between">
-                                <span className="text-sm font-bold text-slate-800">All Loans</span>
-                                <span className="text-xs font-semibold text-slate-600">{pctAll}%</span>
+                            <div className="mb-3">
+                              <div className="flex items-center justify-between mb-0.5">
+                                <p className="text-[11px] font-medium text-[#00A86B]">Paid Back</p>
+                                <p className="text-[11px] font-bold text-[#1C4332]">
+                                  {formatMoney(paidAll)} / {formatMoney(totalAll)}
+                                </p>
                               </div>
-                              <div className="w-full h-6 rounded-md overflow-hidden" style={{ backgroundColor: '#DBFFEB' }}>
+                              <div className="w-full h-5 bg-[#C2FFDC] rounded-md overflow-hidden">
                                 <div
-                                  className="h-full rounded-md transition-all duration-500"
-                                  style={{ width: `${Math.max(pctAll, 2)}%`, backgroundColor: '#00A86B' }}
-                                />
-                              </div>
-                              <div className="flex justify-between text-xs text-slate-500">
-                                <span>${paidAll.toLocaleString()} paid</span>
-                                <span>${totalAll.toLocaleString()} total</span>
+                                  className="h-full rounded-md transition-all duration-500 flex items-center justify-end pr-2"
+                                  style={{
+                                    width: `${Math.max(pctAll, 2)}%`,
+                                    backgroundColor: '#00A86B'
+                                  }}
+                                >
+                                  {paidAll > 0 && (
+                                    <span className="text-[10px] font-bold text-white">
+                                      {pctAll}%
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           );
@@ -839,19 +846,19 @@ export default function Borrowing() {
                                       {lender?.full_name?.charAt(0) || '?'}
                                     </span>
                                   </div>
-                                  <span className="text-sm font-medium text-slate-700">@{lender?.username || 'user'}</span>
-                                  <span className="text-xs text-slate-400 truncate max-w-[100px]">· {loan.purpose || 'Reason'}</span>
+                                  <span className="text-[11px] font-medium text-[#1C4332]">@{lender?.username || 'user'}</span>
+                                  <span className="text-[10px] text-[#00A86B] truncate max-w-[100px]">· {loan.purpose || 'Reason'}</span>
                                 </div>
-                                <span className="text-xs text-slate-500">{percentPaid}%</span>
+                                <span className="text-[11px] font-bold text-[#1C4332]">{percentPaid}%</span>
                               </div>
-                              <div className="w-full h-5 rounded-md overflow-hidden" style={{ backgroundColor: '#DBFFEB' }}>
+                              <div className="w-full h-5 bg-[#C2FFDC] rounded-md overflow-hidden">
                                 <div
                                   className="h-full rounded-md transition-all duration-500"
                                   style={{ width: `${Math.max(percentPaid, 2)}%`, backgroundColor: '#1C4332' }}
                                 />
                               </div>
-                              <div className="flex justify-between text-xs text-slate-500">
-                                <span>${amountPaid.toLocaleString()} paid {loan.next_payment_date && <span>· Next Payment on {format(new Date(loan.next_payment_date), 'MMM d')}</span>}</span>
+                              <div className="flex justify-between text-[10px] text-[#00A86B]">
+                                <span>${amountPaid.toLocaleString()} paid {loan.next_payment_date && <span>· Next on {format(new Date(loan.next_payment_date), 'MMM d')}</span>}</span>
                                 <span>${loanTotalOwed.toLocaleString()} total</span>
                               </div>
                             </div>
@@ -877,78 +884,96 @@ export default function Borrowing() {
                       .sort((a, b) => a.payDate - b.payDate)
                       .slice(0, 5);
 
-                    if (upcomingLoans.length === 0) return null;
-
                     return (
-                      <div className="rounded-2xl p-4 sm:p-5 border-0 bg-[#C2FFDC]">
-                        <p className="text-lg font-bold text-slate-800 mb-4 tracking-tight font-serif">
+                      <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
+                        <p className="text-sm font-bold text-[#1C4332] mb-2.5 tracking-tight font-sans">
                           Upcoming Payments
                         </p>
-                        <div className="space-y-2">
-                          {upcomingLoans.map(loan => (
-                            <div key={loan.id} className="flex items-center gap-3 p-3 rounded-xl" style={{ backgroundColor: '#83F384' }}>
-                              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#C2FFDC] flex items-center justify-center">
-                                <p className="text-[10px] font-bold text-[#1C4332] text-center leading-tight">
-                                  {loan.days}
-                                  <span className="block text-[7px] font-medium text-[#1C4332]/60">
-                                    {loan.days === 1 ? 'day' : 'days'}
-                                  </span>
-                                </p>
+                        {upcomingLoans.length === 0 ? (
+                          <div className="flex flex-col items-center justify-center py-6 text-[#00A86B]">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40 mb-1.5">
+                              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                              <line x1="16" y1="2" x2="16" y2="6"></line>
+                              <line x1="8" y1="2" x2="8" y2="6"></line>
+                              <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            <p className="text-xs">No upcoming payments</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-1.5">
+                            {upcomingLoans.map(loan => (
+                              <div key={loan.id} className="flex items-center gap-2.5 p-2.5 rounded-lg bg-[#C2FFDC]">
+                                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
+                                  <p className="text-[10px] font-bold text-[#1C4332] text-center leading-tight">
+                                    {loan.days}
+                                    <span className="block text-[7px] font-medium text-[#00A86B]">
+                                      {loan.days === 1 ? 'day' : 'days'}
+                                    </span>
+                                  </p>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-[11px] text-[#1C4332]">
+                                    Send <span className="font-semibold">${(loan.payment_amount || 0).toLocaleString()}</span> to <span className="font-semibold">@{loan.lenderUsername}</span>
+                                  </p>
+                                  <p className="text-[10px] text-[#00A86B] mt-0.5">{format(loan.payDate, 'MMM d, yyyy')}</p>
+                                </div>
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm text-slate-800">
-                                  Send <span className="font-semibold">${(loan.payment_amount || 0).toLocaleString()}</span> to <span className="font-semibold">@{loan.lenderUsername}</span>
-                                </p>
-                                <p className="text-xs text-slate-500 mt-0.5">{format(loan.payDate, 'MMM d, yyyy')}</p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     );
                   })()}
                   </div>
 
-                  {/* Right: Next Payment + Overdue Notifications */}
-                  <div className="flex flex-col gap-4">
+                  {/* Right: Next Payment + Overdue + Record Payment + Loans Ranked By */}
+                  <div className="flex flex-col gap-3 md:gap-4">
                     {/* Next Payment Box */}
-                    {nextPaymentLoan ? (
-                      <div className="bg-[#C2FFDC] rounded-2xl p-5 border-0">
-                        <p className="text-lg font-bold text-slate-800 mb-4 tracking-tight font-serif">
-                          Next Payment
-                        </p>
-                        <div className="flex items-center gap-3 p-3 rounded-xl" style={{ backgroundColor: '#83F384' }}>
-                          {/* Month icon */}
-                          <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-[#C2FFDC] flex flex-col items-center justify-center overflow-hidden">
-                            <span className="text-[8px] font-bold text-[#1C4332] uppercase leading-none bg-[#1C4332] text-[#C2FFDC] w-full text-center py-0.5">{format(new Date(nextPaymentLoan.next_payment_date), 'MMM')}</span>
-                            <span className="text-base font-bold text-[#1C4332] leading-tight">{format(new Date(nextPaymentLoan.next_payment_date), 'd')}</span>
+                    <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
+                      <p className="text-sm font-bold text-[#1C4332] mb-2 tracking-tight font-sans">
+                        Next Payment
+                      </p>
+                      {nextPaymentLoan ? (
+                        <div className="border-t border-[#C2FFDC] pt-2 grid grid-cols-2 gap-3">
+                          <div>
+                            <p className="text-[11px] text-[#00A86B] mb-0.5">Next Payment Date</p>
+                            <div className="flex items-baseline gap-1.5">
+                              <p className="text-base font-bold text-[#1C4332]">
+                                {format(new Date(nextPaymentLoan.next_payment_date), 'EEE, MMM d')}
+                              </p>
+                              {nextPaymentDays !== null && (
+                                <p className="text-[11px] text-[#00A86B]">
+                                  {nextPaymentDays > 0 ? `${nextPaymentDays}d away` : nextPaymentDays === 0 ? 'Due today' : `${Math.abs(nextPaymentDays)}d overdue`}
+                                </p>
+                              )}
+                            </div>
                           </div>
-                          {/* Info */}
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-slate-800 text-sm">
-                              ${nextPaymentAmount.toLocaleString()} due to @{nextPaymentLenderUsername}
-                            </p>
-                            <p className="text-xs text-slate-600 mt-0.5 truncate">
-                              for {nextPaymentLoan.purpose || 'loan'}
-                            </p>
-                          </div>
-                          {/* Days badge */}
-                          <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-[#C2FFDC] flex flex-col items-center justify-center">
-                            <span className="text-lg font-bold text-[#1C4332] leading-none">{nextPaymentDays !== null ? Math.abs(nextPaymentDays) : '?'}</span>
-                            <span className="text-[8px] text-[#1C4332] font-medium">{nextPaymentDays !== null && Math.abs(nextPaymentDays) === 1 ? 'day' : 'days'}</span>
+                          <div>
+                            <p className="text-[11px] text-[#00A86B] mb-0.5">Next Payment Amount</p>
+                            <div className="flex items-baseline gap-1.5">
+                              <p className="text-base font-bold text-[#1C4332]">
+                                {formatMoney(nextPaymentAmount)}
+                              </p>
+                              <p className="text-[11px] text-[#00A86B]">
+                                to @{nextPaymentLenderUsername}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="bg-[#C2FFDC] rounded-2xl p-5 border-0">
-                        <p className="text-lg font-bold text-slate-800 mb-4 tracking-tight font-serif">
-                          Next Payment
-                        </p>
-                        <p className="text-slate-500 text-sm">No upcoming payments</p>
-                      </div>
-                    )}
+                      ) : (
+                        <div className="flex flex-col items-center justify-center py-6 text-[#00A86B]">
+                          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40 mb-1.5">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                          </svg>
+                          <p className="text-xs">No upcoming payments</p>
+                        </div>
+                      )}
+                    </div>
 
-                    {/* Overdue Notifications */}
+                    {/* Overdue Payments */}
                     {(() => {
                       const overdueLoans = activeLoans.filter(l => {
                         if (!l.next_payment_date) return false;
@@ -956,27 +981,34 @@ export default function Borrowing() {
                       });
                       if (overdueLoans.length === 0) return null;
                       return (
-                        <div className="bg-[#C2FFDC] rounded-2xl p-5 border-0 border-l-4" style={{ borderLeftColor: '#EF4444' }}>
-                          <p className="text-lg font-bold text-red-600 mb-3 tracking-tight font-serif">
-                            Overdue
+                        <div className="rounded-xl px-4 py-3 shadow-sm bg-white border border-red-200">
+                          <p className="text-sm font-bold text-red-500 mb-2.5 tracking-tight font-sans">
+                            Overdue Payments
                           </p>
-                          <div className="space-y-2">
+                          <div className="space-y-1.5">
                             {overdueLoans.map(loan => {
                               const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
                               const daysOverdue = Math.ceil((new Date() - new Date(loan.next_payment_date)) / (1000 * 60 * 60 * 24));
                               return (
-                                <div key={loan.id} className="flex items-center gap-3 p-3 rounded-xl" style={{ backgroundColor: '#FEF2F2' }}>
-                                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white flex items-center justify-center">
-                                    <span className="text-base">🕐</span>
-                                  </div>
+                                <div key={loan.id} className="flex items-start gap-2.5 p-2.5 rounded-lg" style={{ backgroundColor: '#FEF2F2' }}>
                                   <div className="flex-1 min-w-0">
-                                    <p className="text-sm text-slate-800">
-                                      Your payment to <span className="font-semibold">@{lender?.username || 'user'}</span> is overdue
+                                    <p className="text-[11px] text-[#1C4332]">
+                                      Send payment to <span className="font-semibold">@{lender?.username || 'user'}</span>
                                     </p>
-                                    <p className="text-xs text-red-500 mt-0.5">
-                                      {daysOverdue} {daysOverdue === 1 ? 'day' : 'days'} overdue · if you made a payment make sure to record it
+                                    <p className="text-[10px] text-red-500 mt-0.5">
+                                      {daysOverdue} {daysOverdue === 1 ? 'day' : 'days'} overdue · record it if already paid
                                     </p>
                                   </div>
+                                  <button
+                                    onClick={() => {
+                                      setSelectedLoan({ ...loan });
+                                      setShowPaymentModal(true);
+                                    }}
+                                    className="flex-shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-lg mt-0.5 cursor-pointer"
+                                    style={{ backgroundColor: '#EF4444', color: '#FFFFFF' }}
+                                  >
+                                    Record Payment
+                                  </button>
                                 </div>
                               );
                             })}
@@ -984,30 +1016,24 @@ export default function Borrowing() {
                         </div>
                       );
                     })()}
-                  </div>
-                </div>
 
-                {/* Record Payment + Loans Ranked By — right half */}
-                {activeLoans.length > 0 && (
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>{/* spacer for left half */}</div>
-                    <div className="flex flex-col gap-4">
-                      {/* Record Payment */}
-                      <div className="rounded-2xl p-5 border-0 bg-[#C2FFDC]">
-                        <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                    {/* Record Payment */}
+                    {activeLoans.length > 0 && (
+                      <div className="rounded-xl px-4 py-3 shadow-sm" style={{ backgroundColor: '#00A86B' }}>
+                        <p className="text-sm font-bold text-white mb-2 tracking-tight font-sans">
                           Record Payment
                         </p>
-                        <div className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-white">
                           <span>Record payment of</span>
                           <span className="font-medium">$</span>
                           <Input
                             type="number"
                             step="0.01"
                             min="0.01"
-                            placeholder="______"
+                            placeholder=""
                             value={quickPayAmount}
                             onChange={(e) => setQuickPayAmount(e.target.value)}
-                            className="w-24 h-8 px-1 inline-flex border-0 bg-transparent text-[#1C4332] placeholder:text-[#1C4332] focus-visible:ring-0 focus-visible:ring-offset-0"
+                            className="w-20 h-7 px-2 bg-white/20 border-0 text-xs inline-flex rounded-md text-white placeholder:text-white/50"
                             style={{ MozAppearance: 'textfield' }}
                           />
                           <span>to</span>
@@ -1018,7 +1044,7 @@ export default function Borrowing() {
                               setQuickPayLoanId('');
                             }}
                           >
-                            <SelectTrigger className="w-auto h-8 px-2 inline-flex border-0 bg-transparent focus:ring-0 focus:ring-offset-0">
+                            <SelectTrigger className="w-auto h-7 px-2 bg-white/20 border-0 text-xs inline-flex rounded-md text-white">
                               <SelectValue placeholder="select person" />
                             </SelectTrigger>
                             <SelectContent>
@@ -1051,25 +1077,27 @@ export default function Borrowing() {
                               }
                             }}
                             disabled={!quickPayPerson || !quickPayAmount}
-                            className={`h-8 px-4 rounded-lg text-sm font-medium border-0 transition-all ${
+                            className={`h-7 px-3 rounded-md text-xs font-semibold border-0 transition-all ${
                               !quickPayPerson || !quickPayAmount
-                                ? 'bg-[#00A86B]/50 text-white/70 cursor-not-allowed'
-                                : 'bg-[#00A86B] text-white hover:bg-[#0D9B76]'
+                                ? 'bg-white/30 text-white/70 cursor-not-allowed'
+                                : 'bg-white text-[#00A86B] hover:bg-white/90'
                             }`}
                           >
                             Submit
                           </Button>
                         </div>
                       </div>
+                    )}
 
-                      {/* Loans Ranked By */}
-                      <div className="rounded-2xl p-5 border-0 bg-[#C2FFDC]">
-                        <div className="flex items-center justify-between mb-4">
-                          <p className="text-lg font-bold text-slate-800 tracking-tight font-serif">
+                    {/* Loans Ranked By */}
+                    {activeLoans.length > 0 && (
+                      <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
+                        <div className="flex items-center justify-between mb-2.5">
+                          <p className="text-sm font-bold text-[#1C4332] tracking-tight font-sans">
                             Loans Ranked By
                           </p>
                           <Select value={rankingFilter} onValueChange={setRankingFilter}>
-                            <SelectTrigger className="w-auto h-7 px-2 border-0 bg-[#83F384] text-xs font-medium rounded-lg">
+                            <SelectTrigger className="w-auto h-7 px-2 border-0 bg-[#C2FFDC] text-xs font-medium rounded-lg">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -1079,7 +1107,7 @@ export default function Borrowing() {
                             </SelectContent>
                           </Select>
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-1.5">
                           {(() => {
                             const sorted = [...activeLoans].sort((a, b) => {
                               if (rankingFilter === 'highest_interest') return (b.interest_rate || 0) - (a.interest_rate || 0);
@@ -1100,35 +1128,35 @@ export default function Borrowing() {
                                   : loan.next_payment_date ? format(new Date(loan.next_payment_date), 'MMM d') : 'N/A';
 
                               return (
-                                <div key={loan.id} className="flex items-center gap-3 p-3 rounded-xl" style={{ backgroundColor: '#83F384' }}>
-                                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[#C2FFDC] flex items-center justify-center">
+                                <div key={loan.id} className="flex items-center gap-2.5 p-2.5 rounded-lg bg-[#C2FFDC]">
+                                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-sm">
                                     <span className="text-xs font-bold text-[#1C4332]">{idx + 1}</span>
                                   </div>
                                   <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-slate-800 truncate">
+                                    <p className="text-[11px] font-medium text-[#1C4332] truncate">
                                       @{lender?.username || 'user'} · {loan.purpose || 'Loan'}
                                     </p>
                                   </div>
-                                  <span className="text-sm font-bold text-[#1C4332] flex-shrink-0">{rankValue}</span>
+                                  <span className="text-[11px] font-bold text-[#1C4332] flex-shrink-0">{rankValue}</span>
                                 </div>
                               );
                             });
                           })()}
                         </div>
                       </div>
-                    </div>
+                    )}
                   </div>
-                )}
+                </div>
 
                     {/* Manage Loans Section — inline at bottom of All tab */}
                     {!isLoading && manageableLoans.length > 0 && (
-                      <div className="space-y-4 mt-6">
-                        <p className="text-lg font-bold text-[#C2FFDC] tracking-tight font-serif">
+                      <div className="space-y-3 md:space-y-4 mt-4">
+                        <p className="text-sm font-bold text-[#C2FFDC] tracking-tight font-sans">
                           Manage Loans
                         </p>
                         {/* Loan Selector Dropdown */}
-                        <div className="bg-[#C2FFDC] rounded-2xl p-5 border-0">
-                          <p className="text-base font-bold text-slate-800 mb-4 tracking-tight font-serif">
+                        <div className="bg-white rounded-xl px-4 py-3 shadow-sm">
+                          <p className="text-sm font-bold text-[#1C4332] mb-2.5 tracking-tight font-sans">
                             Your Loans
                           </p>
                             <Select
@@ -1193,32 +1221,32 @@ export default function Borrowing() {
                         {manageLoanSelected && (
                           <>
                             {/* Loan Information Box */}
-                            <div className="bg-[#C2FFDC] rounded-2xl p-5">
-                              <p className="text-base font-bold text-slate-800 mb-4 tracking-tight font-serif">
+                            <div className="bg-white rounded-xl px-4 py-3 shadow-sm">
+                              <p className="text-sm font-bold text-[#1C4332] mb-2.5 tracking-tight font-sans">
                                 Loan Information
                               </p>
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                <div className="bg-[#83F384] rounded-xl p-4">
-                                  <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Amount</p>
-                                  <p className="text-xl font-bold text-slate-800">
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                <div className="bg-[#C2FFDC] rounded-lg p-3">
+                                  <p className="text-[10px] text-[#00A86B] uppercase tracking-[0.12em] font-medium mb-0.5" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Amount</p>
+                                  <p className="text-lg font-bold text-[#1C4332]">
                                     ${(manageLoanSelected.amount || 0).toLocaleString()}
                                   </p>
                                 </div>
-                                <div className="bg-[#83F384] rounded-xl p-4">
-                                  <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Interest</p>
-                                  <p className="text-xl font-bold text-slate-800">
+                                <div className="bg-[#C2FFDC] rounded-lg p-3">
+                                  <p className="text-[10px] text-[#00A86B] uppercase tracking-[0.12em] font-medium mb-0.5" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Interest</p>
+                                  <p className="text-lg font-bold text-[#1C4332]">
                                     {manageLoanSelected.interest_rate || 0}%
                                   </p>
                                 </div>
-                                <div className="bg-[#83F384] rounded-xl p-4">
-                                  <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Term</p>
-                                  <p className="text-xl font-bold text-slate-800">
+                                <div className="bg-[#C2FFDC] rounded-lg p-3">
+                                  <p className="text-[10px] text-[#00A86B] uppercase tracking-[0.12em] font-medium mb-0.5" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Term</p>
+                                  <p className="text-lg font-bold text-[#1C4332]">
                                     {manageLoanSelected.repayment_period || 0} {manageLoanSelected.repayment_unit || 'months'}
                                   </p>
                                 </div>
-                                <div className="bg-[#83F384] rounded-xl p-4">
-                                  <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Payment</p>
-                                  <p className="text-xl font-bold text-slate-800">
+                                <div className="bg-[#C2FFDC] rounded-lg p-3">
+                                  <p className="text-[10px] text-[#00A86B] uppercase tracking-[0.12em] font-medium mb-0.5" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Payment</p>
+                                  <p className="text-lg font-bold text-[#1C4332]">
                                     ${(manageLoanSelected.payment_amount || 0).toLocaleString()}
                                   </p>
                                 </div>
@@ -1227,42 +1255,42 @@ export default function Borrowing() {
 
                             {/* Actions Box - only show for active loans */}
                             {manageLoanSelected.status !== 'cancelled' && (
-                            <div className="bg-[#C2FFDC] rounded-2xl p-5">
-                              <p className="text-base font-bold text-slate-800 mb-4 tracking-tight font-serif">
+                            <div className="bg-white rounded-xl px-4 py-3 shadow-sm">
+                              <p className="text-sm font-bold text-[#1C4332] mb-2.5 tracking-tight font-sans">
                                 Actions
                               </p>
-                              <div className="flex flex-col sm:flex-row gap-3">
+                              <div className="flex flex-col sm:flex-row gap-2">
                                 <button
                                   onClick={() => handleMakePayment(manageLoanSelected)}
-                                  className="bg-[#83F384] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
+                                  className="bg-[#C2FFDC] rounded-lg p-2.5 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-2.5 flex-1"
                                 >
-                                  <div className="w-9 h-9 rounded-full bg-[#C2FFDC] flex items-center justify-center flex-shrink-0">
-                                    <DollarSign className="w-4 h-4 text-[#0A1A10]" />
+                                  <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                                    <DollarSign className="w-3.5 h-3.5 text-[#1C4332]" />
                                   </div>
-                                  <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
+                                  <p className="font-semibold text-[#1C4332] text-[12px] group-hover:text-[#00A86B] transition-colors">
                                     Record Payment
                                   </p>
                                 </button>
                                 <button
                                   onClick={() => handleEditLoan(manageLoanSelected)}
-                                  className="bg-[#83F384] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
+                                  className="bg-[#C2FFDC] rounded-lg p-2.5 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-2.5 flex-1"
                                 >
-                                  <div className="w-9 h-9 rounded-full bg-[#C2FFDC] flex items-center justify-center flex-shrink-0">
-                                    <Pencil className="w-4 h-4 text-[#0A1A10]" />
+                                  <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                                    <Pencil className="w-3.5 h-3.5 text-[#1C4332]" />
                                   </div>
-                                  <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
+                                  <p className="font-semibold text-[#1C4332] text-[12px] group-hover:text-[#00A86B] transition-colors">
                                     Request Loan Edit
                                   </p>
                                 </button>
                                 <button
                                   onClick={() => handleCancelLoan(manageLoanSelected)}
-                                  className="bg-[#83F384] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
+                                  className="bg-[#C2FFDC] rounded-lg p-2.5 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-2.5 flex-1"
                                 >
-                                  <div className="w-9 h-9 rounded-full bg-[#C2FFDC] flex items-center justify-center flex-shrink-0">
-                                    <X className="w-4 h-4 text-[#0A1A10]" />
+                                  <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                                    <X className="w-3.5 h-3.5 text-[#1C4332]" />
                                   </div>
-                                  <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
-                                    Request Loan Cancellation
+                                  <p className="font-semibold text-[#1C4332] text-[12px] group-hover:text-[#00A86B] transition-colors">
+                                    Request Cancellation
                                   </p>
                                 </button>
                               </div>
@@ -1271,7 +1299,7 @@ export default function Borrowing() {
 
                             {/* Cancelled notice */}
                             {manageLoanSelected.status === 'cancelled' && (
-                              <div className="bg-red-50 rounded-2xl p-5 border border-red-200">
+                              <div className="bg-red-50 rounded-xl px-4 py-3 shadow-sm border border-red-200">
                                 <p className="text-sm text-red-600 font-medium">This loan has been cancelled. Documentation is still available above.</p>
                               </div>
                             )}

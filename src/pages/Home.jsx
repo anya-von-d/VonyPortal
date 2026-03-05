@@ -474,30 +474,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Updates Box - Mobile: below action buttons, Desktop: hidden here (shown in right column) */}
-                <div className="lg:hidden rounded-xl px-4 py-3 shadow-sm w-full flex items-center gap-3" style={{ backgroundColor: '#4C7FC4' }}>
-                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                      <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                    </svg>
-                  </div>
-                  <p className="text-sm font-bold text-white tracking-tight font-sans flex-1">
-                    {pendingOffers.length > 0
-                      ? `You have ${pendingOffers.length} new update${pendingOffers.length !== 1 ? 's' : ''}`
-                      : 'You have no new requests'
-                    }
-                  </p>
-                  {pendingOffers.length > 0 && (
-                    <Link
-                      to={createPageUrl("Requests")}
-                      className="flex-shrink-0 px-4 py-1.5 rounded-lg bg-white text-xs font-semibold text-[#213B75] hover:bg-white/90 transition-colors font-sans"
-                    >
-                      View Updates
-                    </Link>
-                  )}
-                </div>
-
                 {/* Find Friends - shown above grid if user has no friends */}
                 {!hasFriends && (
                   <div className="rounded-2xl px-6 py-8 sm:px-10 sm:py-10 text-center" style={{ backgroundColor: '#213B75' }}>
@@ -983,36 +959,21 @@ export default function Home() {
 
                   {/* Right Column: Updates */}
                   <div className="flex flex-col gap-3 md:gap-4">
-                    {/* Updates Box - Desktop only (mobile version is at top) */}
-                    <div className="hidden lg:flex rounded-xl px-4 py-3 shadow-sm items-center gap-3" style={{ backgroundColor: '#4C7FC4' }}>
-                      <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                        </svg>
-                      </div>
-                      <p className="text-sm font-bold text-white tracking-tight font-sans flex-1">
-                        {pendingOffers.length > 0
-                          ? `You have ${pendingOffers.length} new update${pendingOffers.length !== 1 ? 's' : ''}`
-                          : 'You have no new requests'
-                        }
-                      </p>
-                      {pendingOffers.length > 0 && (
-                        <Link
-                          to={createPageUrl("Requests")}
-                          className="flex-shrink-0 px-4 py-1.5 rounded-lg bg-white text-xs font-semibold text-[#213B75] hover:bg-white/90 transition-colors font-sans"
-                        >
-                          View Updates
-                        </Link>
-                      )}
-                    </div>
-
-                    {/* Notifications Box */}
+                    {/* Combined Requests + Notifications Carousel */}
                     {(() => {
                       const today = new Date();
                       const nextWeek = addDays(today, 7);
                       const activeNotifLoans = myLoans.filter(l => l && l.status === 'active' && l.next_payment_date);
-                      const notifications = [];
+                      const allItems = [];
+
+                      // Add request items first
+                      if (pendingOffers.length > 0) {
+                        allItems.push({
+                          text: `You have ${pendingOffers.length} new update${pendingOffers.length !== 1 ? 's' : ''}`,
+                          link: 'Requests',
+                          icon: 'bell'
+                        });
+                      }
 
                       // Count overdue payments you owe
                       const overdueYouOwe = activeNotifLoans.filter(l => {
@@ -1020,18 +981,20 @@ export default function Home() {
                         return l.borrower_id === user.id && d < today;
                       });
                       if (overdueYouOwe.length >= 2) {
-                        notifications.push({
+                        allItems.push({
                           text: `You have ${overdueYouOwe.length} overdue payments`,
-                          link: 'Borrowing'
+                          link: 'Borrowing',
+                          icon: 'clock'
                         });
                       }
 
                       // Specific overdue loan messages (you owe)
                       overdueYouOwe.forEach(loan => {
                         const lenderProfile = safeAllProfiles.find(p => p.user_id === loan.lender_id);
-                        notifications.push({
+                        allItems.push({
                           text: `Your payment to @${lenderProfile?.username || 'user'} is overdue — if you made a payment make sure to record it`,
-                          link: 'Borrowing'
+                          link: 'Borrowing',
+                          icon: 'clock'
                         });
                       });
 
@@ -1041,9 +1004,10 @@ export default function Home() {
                         return l.borrower_id === user.id && d >= today && d <= nextWeek;
                       });
                       if (upcomingYouOwe.length > 0) {
-                        notifications.push({
+                        allItems.push({
                           text: `You have ${upcomingYouOwe.length} payment${upcomingYouOwe.length !== 1 ? 's' : ''} coming up this week`,
-                          link: 'Borrowing'
+                          link: 'Borrowing',
+                          icon: 'clock'
                         });
                       }
 
@@ -1053,9 +1017,10 @@ export default function Home() {
                         return l.lender_id === user.id && d >= today && d <= nextWeek;
                       });
                       if (upcomingReceive.length > 0) {
-                        notifications.push({
+                        allItems.push({
                           text: `You are due to receive ${upcomingReceive.length} payment${upcomingReceive.length !== 1 ? 's' : ''} this week`,
-                          link: 'Lending'
+                          link: 'Lending',
+                          icon: 'clock'
                         });
                       }
 
@@ -1066,25 +1031,47 @@ export default function Home() {
                       });
                       overdueFromOthers.forEach(loan => {
                         const borrowerProfile = safeAllProfiles.find(p => p.user_id === loan.borrower_id);
-                        notifications.push({
+                        allItems.push({
                           text: `@${borrowerProfile?.username || 'user'}'s payment to you is overdue — if they made a payment make sure to record it`,
-                          link: 'Lending'
+                          link: 'Lending',
+                          icon: 'clock'
                         });
                       });
 
-                      if (notifications.length === 0) return null;
+                      // Fallback: no items at all
+                      if (allItems.length === 0) {
+                        return (
+                          <div className="rounded-xl px-4 py-3 shadow-sm flex items-center gap-3" style={{ backgroundColor: '#4C7FC4' }}>
+                            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                              </svg>
+                            </div>
+                            <p className="text-sm font-bold text-white tracking-tight font-sans flex-1">
+                              You have no new notifications
+                            </p>
+                          </div>
+                        );
+                      }
 
-                      // Ensure notifIndex is valid
-                      const safeIdx = notifIndex % notifications.length;
-                      const current = notifications[safeIdx];
+                      const safeIdx = notifIndex % allItems.length;
+                      const current = allItems[safeIdx];
 
                       return (
                         <div className="rounded-xl px-4 py-3 shadow-sm flex items-center gap-3" style={{ backgroundColor: '#4C7FC4' }}>
                           <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                              <circle cx="12" cy="12" r="10"></circle>
-                              <polyline points="12 6 12 12 16 14"></polyline>
-                            </svg>
+                            {current.icon === 'bell' ? (
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                              </svg>
+                            ) : (
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                              </svg>
+                            )}
                           </div>
                           <div className="flex-1 min-w-0">
                             <AnimatePresence mode="wait">
@@ -1104,11 +1091,11 @@ export default function Home() {
                             to={createPageUrl(current.link)}
                             className="flex-shrink-0 px-4 py-1.5 rounded-lg bg-white text-xs font-semibold text-[#213B75] hover:bg-white/90 transition-colors font-sans whitespace-nowrap"
                           >
-                            Go to {current.link}
+                            {current.icon === 'bell' ? 'View Updates' : `Go to ${current.link}`}
                           </Link>
-                          {notifications.length > 1 && (
+                          {allItems.length > 1 && (
                             <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                              {notifications.map((_, i) => (
+                              {allItems.map((_, i) => (
                                 <button
                                   key={i}
                                   onClick={() => setNotifIndex(i)}
@@ -1122,6 +1109,28 @@ export default function Home() {
                         </div>
                       );
                     })()}
+
+                    {/* View Lending / Borrowing Page */}
+                    <div className="flex items-center justify-center gap-8 py-2">
+                      <Link to={createPageUrl("Lending")} className="flex flex-col items-center gap-1.5 group">
+                        <div className="w-11 h-11 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C7FC4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                          </svg>
+                        </div>
+                        <p className="text-[10px] font-semibold text-[#213B75] text-center leading-tight font-sans">View Lending<br/>Page</p>
+                      </Link>
+                      <Link to={createPageUrl("Borrowing")} className="flex flex-col items-center gap-1.5 group">
+                        <div className="w-11 h-11 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C7FC4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                          </svg>
+                        </div>
+                        <p className="text-[10px] font-semibold text-[#213B75] text-center leading-tight font-sans">View Borrowing<br/>Page</p>
+                      </Link>
+                    </div>
 
                     {/* Upcoming & Overdue Payments — shared data computation */}
                     {(() => {
@@ -1281,28 +1290,6 @@ export default function Home() {
                         </>
                       );
                     })()}
-
-                    {/* View Lending / Borrowing Details */}
-                    <div className="flex items-center justify-center gap-8 py-2">
-                      <Link to={createPageUrl("Lending")} className="flex flex-col items-center gap-1.5 group">
-                        <div className="w-11 h-11 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C7FC4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="12" y1="1" x2="12" y2="23"></line>
-                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                          </svg>
-                        </div>
-                        <p className="text-[10px] font-semibold text-[#213B75] text-center leading-tight font-sans">View Lending<br/>Details</p>
-                      </Link>
-                      <Link to={createPageUrl("Borrowing")} className="flex flex-col items-center gap-1.5 group">
-                        <div className="w-11 h-11 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C7FC4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                          </svg>
-                        </div>
-                        <p className="text-[10px] font-semibold text-[#213B75] text-center leading-tight font-sans">View Borrowing<br/>Details</p>
-                      </Link>
-                    </div>
 
                     {/* Recent Activity Box */}
                     <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
