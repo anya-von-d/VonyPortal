@@ -455,8 +455,24 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Right Column: Activity */}
+                  {/* Right Column: Requests + Activity */}
                   <div className="flex flex-col gap-3 md:gap-4">
+                    {/* Pending Requests Box */}
+                    <div className="rounded-xl px-4 py-3 shadow-sm" style={{ backgroundColor: '#4C7FC4' }}>
+                      <p className="text-sm font-bold text-white mb-1 tracking-tight font-sans">
+                        {pendingOffers.length > 0
+                          ? `You have ${pendingOffers.length} pending request${pendingOffers.length !== 1 ? 's' : ''}`
+                          : 'You have no new requests'
+                        }
+                      </p>
+                      <Link
+                        to={createPageUrl("Requests")}
+                        className="inline-block mt-2 px-4 py-1.5 rounded-lg bg-white text-xs font-semibold text-[#213B75] hover:bg-white/90 transition-colors font-sans"
+                      >
+                        View Requests
+                      </Link>
+                    </div>
+
                     {/* Activity Box - matching overview style */}
                     <div className="rounded-xl px-4 py-3 shadow-sm bg-white flex-1">
                       <p className="text-sm font-bold text-[#213B75] mb-2 tracking-tight font-sans">
