@@ -713,22 +713,19 @@ export default function Borrowing() {
         )}
       </AnimatePresence>
 
-      <div className="min-h-screen" style={{backgroundColor: '#C2FFDC'}}>
+      <div className="min-h-screen" style={{backgroundColor: '#0F2B1F'}}>
         {/* Full page background */}
-        <div className="px-4 pt-8 pb-6 sm:px-8 md:px-24 md:pt-12 md:pb-6 lg:px-36">
-          <div className="max-w-6xl mx-auto space-y-8 md:space-y-10">
-            {/* Hero - Title + Overview Box */}
+        <div className="px-4 pt-20 pb-20 sm:px-8 md:px-24 md:pt-28 md:pb-28 lg:px-36">
+          <div className="max-w-6xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 md:gap-10"
+              className="flex flex-col gap-8 md:gap-10 w-full"
             >
-              {/* Left Side - Title */}
-              <div className="flex-shrink-0">
-                <p className="text-4xl md:text-6xl font-bold text-[#1C4332] tracking-tight leading-tight font-serif">Borrowing</p>
-              </div>
-
-            </motion.div>
+            {/* Hero - Title */}
+            <div className="flex-shrink-0">
+              <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#C2FFDC] tracking-tight leading-tight font-serif">Borrowing</p>
+            </div>
 
             {/* Next Payment Banner */}
             {nextPaymentLoan && nextPaymentDays !== null && (
@@ -762,7 +759,7 @@ export default function Borrowing() {
                   className={`whitespace-nowrap ${
                     activeSection === tab.id
                       ? 'bg-[#1C4332] hover:bg-[#163a2a] text-[#C2FFDC] font-bold'
-                      : 'bg-[#1C4332]/20 border-0 text-[#1C4332] hover:bg-[#1C4332]/30'
+                      : 'bg-[#1C4332]/40 border-0 text-[#C2FFDC]/60 hover:bg-[#1C4332]/60 hover:text-[#C2FFDC]'
                   }`}
                 >
                   <span className="hidden sm:inline">{tab.label}</span>
@@ -771,9 +768,8 @@ export default function Borrowing() {
               ))}
             </div>
 
-            {/* Dark Green Content Box */}
-            <div className="rounded-2xl p-4 sm:p-6 md:p-10" style={{backgroundColor: '#1C4332'}}>
-              <div className="space-y-6 sm:space-y-8 md:space-y-10">
+            {/* Content Sections */}
+            <div>
 
           {/* Content Sections */}
           <AnimatePresence mode="wait">
@@ -787,11 +783,11 @@ export default function Borrowing() {
               >
 
                 {/* Loan Progress + Upcoming Payments | Next Payment + Overdue */}
-                <div className="grid md:grid-cols-2 gap-3 md:gap-4">
+                <div className="grid md:grid-cols-2 gap-6 md:gap-8">
                   {/* Left: Loan Progress + Upcoming Payments */}
-                  <div className="flex flex-col gap-3 md:gap-4">
-                  <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
-                    <p className="text-sm font-bold text-[#1C4332] mb-2 tracking-tight font-sans">
+                  <div className="flex flex-col gap-6 md:gap-8">
+                  <div className="rounded-xl px-4 py-3 shadow-sm bg-[#1C4332]">
+                    <p className="text-sm font-bold text-[#C2FFDC] mb-2 tracking-tight font-serif">
                       Loan Progress
                     </p>
                     {activeLoans.length === 0 ? (
@@ -807,11 +803,11 @@ export default function Borrowing() {
                             <div className="mb-3">
                               <div className="flex items-center justify-between mb-0.5">
                                 <p className="text-[11px] font-medium text-[#00A86B]">Paid Back</p>
-                                <p className="text-[11px] font-bold text-[#1C4332]">
+                                <p className="text-[11px] font-bold text-[#C2FFDC]">
                                   {formatMoney(paidAll)} / {formatMoney(totalAll)}
                                 </p>
                               </div>
-                              <div className="w-full h-5 bg-[#C2FFDC] rounded-md overflow-hidden">
+                              <div className="w-full h-5 bg-[#0F2B1F] rounded-md overflow-hidden">
                                 <div
                                   className="h-full rounded-md transition-all duration-500 flex items-center justify-end pr-2"
                                   style={{
@@ -831,7 +827,7 @@ export default function Borrowing() {
                         })()}
 
                         {/* Divider */}
-                        <div className="border-t border-[#C2FFDC]" />
+                        <div className="border-t border-[#00A86B]/20" />
 
                         {/* Individual Loan Bars */}
                         {activeLoans.slice(0, 5).map(loan => {
@@ -849,12 +845,12 @@ export default function Borrowing() {
                                       {lender?.full_name?.charAt(0) || '?'}
                                     </span>
                                   </div>
-                                  <span className="text-[11px] font-medium text-[#1C4332]">@{lender?.username || 'user'}</span>
+                                  <span className="text-[11px] font-medium text-[#C2FFDC]">@{lender?.username || 'user'}</span>
                                   <span className="text-[10px] text-[#00A86B] truncate max-w-[100px]">· {loan.purpose || 'Reason'}</span>
                                 </div>
-                                <span className="text-[11px] font-bold text-[#1C4332]">{percentPaid}%</span>
+                                <span className="text-[11px] font-bold text-[#C2FFDC]">{percentPaid}%</span>
                               </div>
-                              <div className="w-full h-5 bg-[#C2FFDC] rounded-md overflow-hidden">
+                              <div className="w-full h-5 bg-[#0F2B1F] rounded-md overflow-hidden">
                                 <div
                                   className="h-full rounded-md transition-all duration-500"
                                   style={{ width: `${Math.max(percentPaid, 2)}%`, backgroundColor: '#1C4332' }}
@@ -888,8 +884,8 @@ export default function Borrowing() {
                       .slice(0, 5);
 
                     return (
-                      <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
-                        <p className="text-sm font-bold text-[#1C4332] mb-2.5 tracking-tight font-sans">
+                      <div className="rounded-xl px-4 py-3 shadow-sm bg-[#1C4332]">
+                        <p className="text-sm font-bold text-[#C2FFDC] mb-2.5 tracking-tight font-serif">
                           Upcoming Payments
                         </p>
                         {upcomingLoans.length === 0 ? (
@@ -905,9 +901,9 @@ export default function Borrowing() {
                         ) : (
                           <div className="space-y-1.5">
                             {upcomingLoans.map(loan => (
-                              <div key={loan.id} className="flex items-center gap-2.5 p-2.5 rounded-lg bg-[#C2FFDC]">
-                                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
-                                  <p className="text-[10px] font-bold text-[#1C4332] text-center leading-tight">
+                              <div key={loan.id} className="flex items-center gap-2.5 p-2.5 rounded-lg bg-[#0F2B1F]">
+                                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#6AD478] flex items-center justify-center shadow-sm">
+                                  <p className="text-[10px] font-bold text-[#C2FFDC] text-center leading-tight">
                                     {loan.days}
                                     <span className="block text-[7px] font-medium text-[#00A86B]">
                                       {loan.days === 1 ? 'day' : 'days'}
@@ -915,7 +911,7 @@ export default function Borrowing() {
                                   </p>
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-[11px] text-[#1C4332]">
+                                  <p className="text-[11px] text-[#C2FFDC]">
                                     Send <span className="font-semibold">${(loan.payment_amount || 0).toLocaleString()}</span> to <span className="font-semibold">@{loan.lenderUsername}</span>
                                   </p>
                                   <p className="text-[10px] text-[#00A86B] mt-0.5">{format(loan.payDate, 'MMM d, yyyy')}</p>
@@ -930,18 +926,18 @@ export default function Borrowing() {
                   </div>
 
                   {/* Right: Next Payment + Overdue + Record Payment + Loans Ranked By */}
-                  <div className="flex flex-col gap-3 md:gap-4">
+                  <div className="flex flex-col gap-6 md:gap-8">
                     {/* Next Payment Box */}
-                    <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
-                      <p className="text-sm font-bold text-[#1C4332] mb-2 tracking-tight font-sans">
+                    <div className="rounded-xl px-4 py-3 shadow-sm bg-[#1C4332]">
+                      <p className="text-sm font-bold text-[#C2FFDC] mb-2 tracking-tight font-serif">
                         Next Payment
                       </p>
                       {nextPaymentLoan ? (
-                        <div className="border-t border-[#C2FFDC] pt-2 grid grid-cols-2 gap-3">
+                        <div className="border-t border-[#00A86B]/20 pt-2 grid grid-cols-2 gap-3">
                           <div>
                             <p className="text-[11px] text-[#00A86B] mb-0.5">Next Payment Date</p>
                             <div className="flex items-baseline gap-1.5">
-                              <p className="text-base font-bold text-[#1C4332]">
+                              <p className="text-base font-bold text-[#C2FFDC]">
                                 {format(new Date(nextPaymentLoan.next_payment_date), 'EEE, MMM d')}
                               </p>
                               {nextPaymentDays !== null && (
@@ -954,7 +950,7 @@ export default function Borrowing() {
                           <div>
                             <p className="text-[11px] text-[#00A86B] mb-0.5">Next Payment Amount</p>
                             <div className="flex items-baseline gap-1.5">
-                              <p className="text-base font-bold text-[#1C4332]">
+                              <p className="text-base font-bold text-[#C2FFDC]">
                                 {formatMoney(nextPaymentAmount)}
                               </p>
                               <p className="text-[11px] text-[#00A86B]">
@@ -984,7 +980,7 @@ export default function Borrowing() {
                       });
                       if (overdueLoans.length === 0) return null;
                       return (
-                        <div className="rounded-xl px-4 py-3 shadow-sm bg-white border border-red-200">
+                        <div className="rounded-xl px-4 py-3 shadow-sm bg-[#1C4332] border border-red-200">
                           <p className="text-sm font-bold text-red-500 mb-2.5 tracking-tight font-sans">
                             Overdue Payments
                           </p>
@@ -995,7 +991,7 @@ export default function Borrowing() {
                               return (
                                 <div key={loan.id} className="flex items-start gap-2.5 p-2.5 rounded-lg" style={{ backgroundColor: '#FEF2F2' }}>
                                   <div className="flex-1 min-w-0">
-                                    <p className="text-[11px] text-[#1C4332]">
+                                    <p className="text-[11px] text-[#C2FFDC]">
                                       Send payment to <span className="font-semibold">@{lender?.username || 'user'}</span>
                                     </p>
                                     <p className="text-[10px] text-red-500 mt-0.5">
@@ -1094,9 +1090,9 @@ export default function Borrowing() {
 
                     {/* Loans Ranked By */}
                     {activeLoans.length > 0 && (
-                      <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
+                      <div className="rounded-xl px-4 py-3 shadow-sm bg-[#1C4332]">
                         <div className="flex items-center justify-between mb-2.5">
-                          <p className="text-sm font-bold text-[#1C4332] tracking-tight font-sans">
+                          <p className="text-sm font-bold text-[#C2FFDC] tracking-tight font-serif">
                             Loans Ranked By
                           </p>
                           <Select value={rankingFilter} onValueChange={setRankingFilter}>
@@ -1131,16 +1127,16 @@ export default function Borrowing() {
                                   : loan.next_payment_date ? format(new Date(loan.next_payment_date), 'MMM d') : 'N/A';
 
                               return (
-                                <div key={loan.id} className="flex items-center gap-2.5 p-2.5 rounded-lg bg-[#C2FFDC]">
-                                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-sm">
+                                <div key={loan.id} className="flex items-center gap-2.5 p-2.5 rounded-lg bg-[#0F2B1F]">
+                                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[#6AD478]/20 flex items-center justify-center shadow-sm">
                                     <span className="text-xs font-bold text-[#1C4332]">{idx + 1}</span>
                                   </div>
                                   <div className="flex-1 min-w-0">
-                                    <p className="text-[11px] font-medium text-[#1C4332] truncate">
+                                    <p className="text-[11px] font-medium text-[#C2FFDC] truncate">
                                       @{lender?.username || 'user'} · {loan.purpose || 'Loan'}
                                     </p>
                                   </div>
-                                  <span className="text-[11px] font-bold text-[#1C4332] flex-shrink-0">{rankValue}</span>
+                                  <span className="text-[11px] font-bold text-[#C2FFDC] flex-shrink-0">{rankValue}</span>
                                 </div>
                               );
                             });
@@ -1201,7 +1197,7 @@ export default function Borrowing() {
 
                           {/* Select a Loan — bright green bar with centered title + dropdown */}
                           <div className="rounded-xl px-4 py-3 shadow-sm mb-4" style={{ backgroundColor: '#6AD478' }}>
-                            <p className="text-sm font-bold text-[#1C4332] text-center tracking-tight font-sans mb-2">
+                            <p className="text-sm font-bold text-[#1C4332] text-center tracking-tight font-serif mb-2">
                               Select a Loan to Learn More
                             </p>
                             <div className="relative">
@@ -1211,7 +1207,7 @@ export default function Borrowing() {
                                   const selected = manageableLoans.find(l => l.id === e.target.value);
                                   if (selected) setManageLoanSelected(selected);
                                 }}
-                                className="w-full appearance-none rounded-lg px-3 py-2 text-[12px] font-semibold text-[#1C4332] font-sans bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#1C4332]/20"
+                                className="w-full appearance-none rounded-lg px-3 py-2 text-[12px] font-semibold text-[#C2FFDC] font-sans bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#1C4332]/20"
                               >
                                 {manageableLoans.map((loan) => {
                                   const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
@@ -1231,9 +1227,9 @@ export default function Borrowing() {
                           </div>
 
                           {/* Two-column grid: Left = Payment History, Right = Loan Information */}
-                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5">
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
                             {/* Left: Payment Bar Chart */}
-                            <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-6 md:gap-8">
                               {/* Summary bar — only over chart + info columns */}
                               {manageLoanSelected && (() => {
                                 const selLender = publicProfiles.find(p => p.user_id === manageLoanSelected.lender_id);
@@ -1288,8 +1284,8 @@ export default function Borrowing() {
                                 const largeArc = paidAngle > 180 ? 1 : 0;
 
                                 return (
-                                  <div className="bg-white rounded-xl px-4 py-3 shadow-sm">
-                                    <p className="text-sm font-bold text-[#1C4332] mb-2.5 tracking-tight font-sans">
+                                  <div className="bg-[#1C4332] rounded-xl px-4 py-3 shadow-sm">
+                                    <p className="text-sm font-bold text-[#C2FFDC] mb-2.5 tracking-tight font-serif">
                                       Payment Progress
                                     </p>
                                     <div className="flex items-center gap-4">
@@ -1313,7 +1309,7 @@ export default function Borrowing() {
                                             {Math.round(paidPct)}%
                                           </text>
                                         </svg>
-                                        <p className="text-[12px] font-semibold text-[#1C4332] font-sans mt-1.5">
+                                        <p className="text-[12px] font-semibold text-[#C2FFDC] font-sans mt-1.5">
                                           ${paidAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                           <span className="text-[#00A86B]/60 font-normal"> / ${loanAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                         </p>
@@ -1323,7 +1319,7 @@ export default function Borrowing() {
                                         <p className="text-[10px] text-[#00A86B] font-medium font-sans mb-1">Next Payment</p>
                                         {nextPmtDate ? (
                                           <>
-                                            <p className="text-[13px] font-bold text-[#1C4332] font-sans">{format(nextPmtDate, 'MMM d, yyyy')}</p>
+                                            <p className="text-[13px] font-bold text-[#C2FFDC] font-sans">{format(nextPmtDate, 'MMM d, yyyy')}</p>
                                             <p className="text-[10px] text-[#00A86B] font-sans mb-3">
                                               {daysUntil > 0
                                                 ? `Due in ${daysUntil} ${daysUntil === 1 ? 'day' : 'days'}`
@@ -1334,10 +1330,10 @@ export default function Borrowing() {
                                             </p>
                                           </>
                                         ) : (
-                                          <p className="text-[12px] text-[#1C4332]/40 font-sans mb-3">No upcoming payment</p>
+                                          <p className="text-[12px] text-[#C2FFDC]/40 font-sans mb-3">No upcoming payment</p>
                                         )}
                                         <p className="text-[10px] text-[#00A86B] font-medium font-sans mb-1">Amount</p>
-                                        <p className="text-[13px] font-bold text-[#1C4332] font-sans">
+                                        <p className="text-[13px] font-bold text-[#C2FFDC] font-sans">
                                           ${nextPmtAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                         </p>
                                         <p className="text-[10px] text-[#00A86B] font-sans">to @{lenderUsername}</p>
@@ -1351,38 +1347,38 @@ export default function Borrowing() {
                               {manageLoanSelected && manageLoanSelected.status !== 'cancelled' && (
                                 <div className="flex items-start justify-center gap-5 py-1">
                                   <button onClick={() => handleMakePayment(manageLoanSelected)} className="flex flex-col items-center gap-1.5 group cursor-pointer">
-                                    <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
+                                    <div className="w-12 h-12 rounded-full bg-[#0F2B1F] shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
                                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                         <line x1="12" y1="1" x2="12" y2="23"></line>
                                         <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                                       </svg>
                                     </div>
-                                    <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">Record<br/>Payment</p>
+                                    <p className="text-[10px] font-semibold text-[#C2FFDC] text-center leading-tight font-sans">Record<br/>Payment</p>
                                   </button>
                                   <button onClick={() => handleEditLoan(manageLoanSelected)} className="flex flex-col items-center gap-1.5 group cursor-pointer">
-                                    <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
+                                    <div className="w-12 h-12 rounded-full bg-[#0F2B1F] shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
                                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                                       </svg>
                                     </div>
-                                    <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">Request<br/>Loan Edit</p>
+                                    <p className="text-[10px] font-semibold text-[#C2FFDC] text-center leading-tight font-sans">Request<br/>Loan Edit</p>
                                   </button>
                                   <button onClick={() => handleCancelLoan(manageLoanSelected)} className="flex flex-col items-center gap-1.5 group cursor-pointer">
-                                    <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
+                                    <div className="w-12 h-12 rounded-full bg-[#0F2B1F] shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
                                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                         <circle cx="12" cy="12" r="10"></circle>
                                         <line x1="15" y1="9" x2="9" y2="15"></line>
                                         <line x1="9" y1="9" x2="15" y2="15"></line>
                                       </svg>
                                     </div>
-                                    <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">Request<br/>Cancellation</p>
+                                    <p className="text-[10px] font-semibold text-[#C2FFDC] text-center leading-tight font-sans">Request<br/>Cancellation</p>
                                   </button>
                                 </div>
                               )}
 
-                              <div className="bg-white rounded-xl px-4 py-3 shadow-sm">
-                                <p className="text-sm font-bold text-[#1C4332] mb-2.5 tracking-tight font-sans">
+                              <div className="bg-[#1C4332] rounded-xl px-4 py-3 shadow-sm">
+                                <p className="text-sm font-bold text-[#C2FFDC] mb-2.5 tracking-tight font-serif">
                                   Payment History
                                 </p>
                                 {!manageLoanSelected ? (
@@ -1408,10 +1404,10 @@ export default function Borrowing() {
                                         {/* Dashed line at planned payment amount */}
                                         {plannedPaymentAmount > 0 && (
                                           <div
-                                            className="absolute left-0 right-0 border-t-2 border-dashed border-[#1C4332]/40 z-10"
+                                            className="absolute left-0 right-0 border-t-2 border-dashed border-[#C2FFDC]/40 z-10"
                                             style={{ bottom: `${(plannedPaymentAmount / maxChartVal) * 100}%` }}
                                           >
-                                            <span className="absolute -top-3.5 right-0 text-[8px] font-semibold text-[#1C4332]/60 font-mono bg-white px-1">
+                                            <span className="absolute -top-3.5 right-0 text-[8px] font-semibold text-[#C2FFDC]/60 font-mono bg-[#1C4332] px-1">
                                               ${plannedPaymentAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                             </span>
                                           </div>
@@ -1438,21 +1434,21 @@ export default function Borrowing() {
                                                   title={`${d.label}: $${d.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
                                                 />
                                               </div>
-                                              <p className="text-[8px] text-[#1C4332]/50 font-sans mt-1 leading-none">{d.label}</p>
+                                              <p className="text-[8px] text-[#00A86B] font-sans mt-1 leading-none">{d.label}</p>
                                             </div>
                                           );
                                         })}
                                       </div>
                                     </div>
                                     {/* Legend */}
-                                    <div className="flex items-center gap-3 mt-2 pt-2 border-t border-[#C2FFDC]">
+                                    <div className="flex items-center gap-3 mt-2 pt-2 border-t border-[#00A86B]/20">
                                       <div className="flex items-center gap-1">
                                         <div className="w-2.5 h-2.5 rounded-sm bg-[#00A86B]" />
-                                        <span className="text-[9px] text-[#1C4332]/60 font-sans">Paid</span>
+                                        <span className="text-[9px] text-[#00A86B] font-sans">Paid</span>
                                       </div>
                                       <div className="flex items-center gap-1">
-                                        <div className="w-4 h-0 border-t-2 border-dashed border-[#1C4332]/40" />
-                                        <span className="text-[9px] text-[#1C4332]/60 font-sans">Plan Amount</span>
+                                        <div className="w-4 h-0 border-t-2 border-dashed border-[#C2FFDC]/40" />
+                                        <span className="text-[9px] text-[#00A86B] font-sans">Plan Amount</span>
                                       </div>
                                     </div>
                                   </div>
@@ -1461,9 +1457,9 @@ export default function Borrowing() {
                             </div>
 
                             {/* Right: Loan Information + Actions */}
-                            <div className="flex flex-col gap-3">
+                            <div className="flex flex-col gap-6 md:gap-8">
                               {!manageLoanSelected ? (
-                                <div className="bg-white rounded-xl px-4 py-3 shadow-sm flex items-center justify-center min-h-[200px]">
+                                <div className="bg-[#1C4332] rounded-xl px-4 py-3 shadow-sm flex items-center justify-center min-h-[200px]">
                                   <div className="text-center">
                                     <ClipboardList className="w-10 h-10 mx-auto mb-2 text-[#00A86B]/30" />
                                     <p className="text-sm text-[#00A86B]/60 font-sans">Select a loan to view details</p>
@@ -1472,8 +1468,8 @@ export default function Borrowing() {
                               ) : (
                                 <>
                                   {/* Your Loan Box — top 4 items in a row */}
-                                  <div className="bg-white rounded-xl px-4 py-3 shadow-sm relative">
-                                    <p className="text-sm font-bold text-[#1C4332] mb-2.5 tracking-tight font-sans">
+                                  <div className="bg-[#1C4332] rounded-xl px-4 py-3 shadow-sm relative">
+                                    <p className="text-sm font-bold text-[#C2FFDC] mb-2.5 tracking-tight font-serif">
                                       Loan Terms
                                     </p>
                                     {(() => {
@@ -1495,7 +1491,7 @@ export default function Borrowing() {
                                           {items.map((item, idx) => (
                                             <div key={idx} className="text-center">
                                               <p className="text-[10px] text-[#00A86B] font-medium font-sans mb-0.5">{item.label}</p>
-                                              <p className="text-[13px] font-bold text-[#1C4332] font-sans">{item.value}</p>
+                                              <p className="text-[13px] font-bold text-[#C2FFDC] font-sans">{item.value}</p>
                                             </div>
                                           ))}
                                         </div>
@@ -1510,7 +1506,7 @@ export default function Borrowing() {
                                       const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id);
                                       if (agreement) openDocPopup('promissory', agreement);
                                     }} className="flex flex-col items-center gap-1.5 group cursor-pointer">
-                                      <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow relative">
+                                      <div className="w-12 h-12 rounded-full bg-[#0F2B1F] shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow relative">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                           <polyline points="14 2 14 8 20 8"></polyline>
@@ -1529,14 +1525,14 @@ export default function Borrowing() {
                                           </div>
                                         </div>
                                       </div>
-                                      <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">Promissory<br/>Note</p>
+                                      <p className="text-[10px] font-semibold text-[#C2FFDC] text-center leading-tight font-sans">Promissory<br/>Note</p>
                                     </button>
                                     {/* Amortization Schedule */}
                                     <button onClick={() => {
                                       const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id);
                                       if (agreement) openDocPopup('amortization', agreement);
                                     }} className="flex flex-col items-center gap-1.5 group cursor-pointer">
-                                      <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow relative">
+                                      <div className="w-12 h-12 rounded-full bg-[#0F2B1F] shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow relative">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                           <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                                           <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -1554,25 +1550,25 @@ export default function Borrowing() {
                                           </div>
                                         </div>
                                       </div>
-                                      <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">Amortization<br/>Schedule</p>
+                                      <p className="text-[10px] font-semibold text-[#C2FFDC] text-center leading-tight font-sans">Amortization<br/>Schedule</p>
                                     </button>
                                     {/* Loan Summary */}
                                     <button onClick={() => {
                                       const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id);
                                       if (agreement) openDocPopup('summary', agreement);
                                     }} className="flex flex-col items-center gap-1.5 group cursor-pointer">
-                                      <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
+                                      <div className="w-12 h-12 rounded-full bg-[#0F2B1F] shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                                         </svg>
                                       </div>
-                                      <p className="text-[10px] font-semibold text-white text-center leading-tight font-sans">Loan<br/>Summary</p>
+                                      <p className="text-[10px] font-semibold text-[#C2FFDC] text-center leading-tight font-sans">Loan<br/>Summary</p>
                                     </button>
                                   </div>
 
                                   {/* Loan Progress Box — horizontal row style */}
-                                  <div className="bg-white rounded-xl px-4 py-3 shadow-sm relative">
-                                    <p className="text-sm font-bold text-[#1C4332] mb-2.5 tracking-tight font-sans">
+                                  <div className="bg-[#1C4332] rounded-xl px-4 py-3 shadow-sm relative">
+                                    <p className="text-sm font-bold text-[#C2FFDC] mb-2.5 tracking-tight font-serif">
                                       Loan Progress
                                     </p>
                                     {(() => {
@@ -1604,7 +1600,7 @@ export default function Borrowing() {
                                           {items.map((item, idx) => (
                                             <div key={idx} className="text-center">
                                               <p className="text-[10px] text-[#00A86B] font-medium font-sans mb-0.5">{item.label}</p>
-                                              <p className="text-[13px] font-bold text-[#1C4332] font-sans">{item.value}</p>
+                                              <p className="text-[13px] font-bold text-[#C2FFDC] font-sans">{item.value}</p>
                                               {item.sub && (
                                                 <p className="text-[9px] text-[#00A86B]/70 font-sans mt-0.5">{item.sub}</p>
                                               )}
@@ -1616,8 +1612,8 @@ export default function Borrowing() {
                                   </div>
 
                                   {/* Payments Box */}
-                                  <div className="bg-white rounded-xl px-4 py-3 shadow-sm">
-                                    <p className="text-sm font-bold text-[#1C4332] mb-2.5 tracking-tight font-sans">
+                                  <div className="bg-[#1C4332] rounded-xl px-4 py-3 shadow-sm">
+                                    <p className="text-sm font-bold text-[#C2FFDC] mb-2.5 tracking-tight font-serif">
                                       Payments
                                     </p>
                                     {(() => {
@@ -1678,10 +1674,10 @@ export default function Borrowing() {
                                       });
 
                                       const statusConfig = {
-                                        completed: { label: 'Completed', bg: 'bg-[#C2FFDC]', text: 'text-[#1C4332]', ringColor: 'border-[#00A86B]' },
-                                        pending: { label: 'Pending', bg: 'bg-[#FEF3C7]', text: 'text-[#92400E]', ringColor: 'border-[#F59E0B]' },
+                                        completed: { label: 'Completed', bg: 'bg-[#00A86B]/20', text: 'text-[#6AD478]', ringColor: 'border-[#00A86B]' },
+                                        pending: { label: 'Pending', bg: 'bg-[#F59E0B]/20', text: 'text-[#F59E0B]', ringColor: 'border-[#F59E0B]' },
                                         record: { label: 'Record Payment', bg: 'bg-[#00A86B]', text: 'text-white', ringColor: 'border-[#00A86B]' },
-                                        upcoming: { label: 'Upcoming', bg: 'bg-[#C2FFDC]/50', text: 'text-[#00A86B]', ringColor: 'border-[#C2FFDC]' },
+                                        upcoming: { label: 'Upcoming', bg: 'bg-[#C2FFDC]/10', text: 'text-[#00A86B]', ringColor: 'border-[#00A86B]/30' },
                                       };
 
                                       return (
@@ -1689,14 +1685,14 @@ export default function Borrowing() {
                                           {paymentRows.map((row) => {
                                             const cfg = statusConfig[row.status];
                                             return (
-                                              <div key={row.number} className="flex items-center gap-2.5 p-2 rounded-lg bg-[#F8FBF9]">
+                                              <div key={row.number} className="flex items-center gap-2.5 p-2 rounded-lg bg-[#0F2B1F]">
                                                 {/* Payment number circle */}
-                                                <div className={`w-8 h-8 rounded-full border-2 ${cfg.ringColor} flex items-center justify-center flex-shrink-0 bg-white`}>
-                                                  <span className="text-[11px] font-bold text-[#1C4332]">{row.number}</span>
+                                                <div className={`w-8 h-8 rounded-full border-2 ${cfg.ringColor} flex items-center justify-center flex-shrink-0 bg-[#0F2B1F]`}>
+                                                  <span className="text-[11px] font-bold text-[#C2FFDC]">{row.number}</span>
                                                 </div>
                                                 {/* Amount + Due date */}
                                                 <div className="flex-1 min-w-0">
-                                                  <p className="text-[12px] font-semibold text-[#1C4332] font-sans">
+                                                  <p className="text-[12px] font-semibold text-[#C2FFDC] font-sans">
                                                     ${row.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                   </p>
                                                   <p className="text-[10px] text-[#00A86B]/70 font-sans">
@@ -1725,8 +1721,8 @@ export default function Borrowing() {
                                   </div>
 
                                   {/* Activity Box */}
-                                  <div className="bg-white rounded-xl px-4 py-3 shadow-sm">
-                                    <p className="text-sm font-bold text-[#1C4332] mb-2.5 tracking-tight font-sans">
+                                  <div className="bg-[#1C4332] rounded-xl px-4 py-3 shadow-sm">
+                                    <p className="text-sm font-bold text-[#C2FFDC] mb-2.5 tracking-tight font-serif">
                                       Activity
                                     </p>
                                     {(() => {
@@ -1865,7 +1861,7 @@ export default function Borrowing() {
                                               </div>
                                               {/* Content */}
                                               <div className="flex-1 min-w-0 pb-3">
-                                                <p className="text-[11px] text-[#1C4332] font-sans leading-snug">
+                                                <p className="text-[11px] text-[#C2FFDC] font-sans leading-snug">
                                                   {activity.description}
                                                 </p>
                                                 <p className="text-[9px] text-[#00A86B]/60 font-sans mt-0.5">
@@ -1896,8 +1892,9 @@ export default function Borrowing() {
               </motion.div>
             )}
           </AnimatePresence>
-              </div>
             </div>
+
+            </motion.div>
           </div>
         </div>
       </div>
