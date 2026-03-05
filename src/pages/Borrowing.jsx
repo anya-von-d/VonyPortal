@@ -1450,33 +1450,55 @@ export default function Borrowing() {
                                 </div>
                               ) : (
                                 <>
-                                  {/* Loan Information Box — row-based */}
+                                  {/* Loan Terms Box */}
                                   <div className="bg-white rounded-xl px-4 py-3 shadow-sm relative">
                                     <p className="text-sm font-bold text-[#1C4332] mb-2.5 tracking-tight font-sans">
-                                      Loan Information
+                                      Loan Terms
                                     </p>
                                     {(() => {
-                                      const lender = publicProfiles.find(p => p.user_id === manageLoanSelected.lender_id);
-                                      const lenderUsername = lender?.username || 'user';
                                       const amount = manageLoanSelected.amount || 0;
                                       const interestRate = manageLoanSelected.interest_rate || 0;
-                                      const purpose = manageLoanSelected.purpose || 'personal use';
                                       const repaymentPeriod = manageLoanSelected.repayment_period || 0;
                                       const repaymentUnit = manageLoanSelected.repayment_unit || 'months';
                                       const paymentFrequency = manageLoanSelected.payment_frequency || 'monthly';
                                       const paymentAmount = manageLoanSelected.payment_amount || 0;
-                                      const totalAmount = manageLoanSelected.total_amount || amount;
-                                      const amountPaid = manageLoanSelected.amount_paid || 0;
-                                      const remainingBal = totalAmount - amountPaid;
-                                      const status = manageLoanSelected.status || 'active';
 
-                                      const rows = [
+                                      const termRows = [
                                         { label: 'Loan Amount', value: `$${amount.toLocaleString()}` },
                                         { label: 'Interest Rate', value: `${interestRate}%` },
                                         { label: 'Term', value: `${repaymentPeriod} ${repaymentUnit}` },
                                         { label: 'Payment Frequency', value: paymentFrequency.charAt(0).toUpperCase() + paymentFrequency.slice(1) },
                                         { label: 'Payment Amount', value: `$${paymentAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
                                         { label: 'Number of Payments', value: `${repaymentPeriod}` },
+                                      ];
+
+                                      return (
+                                        <div className="divide-y divide-[#C2FFDC]">
+                                          {termRows.map((row, idx) => (
+                                            <div key={idx} className="flex items-center justify-between py-2 first:pt-0 last:pb-0">
+                                              <p className="text-[11px] text-[#00A86B] font-medium font-sans">{row.label}</p>
+                                              <p className="text-[12px] font-semibold text-[#1C4332] font-sans text-right">{row.value}</p>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      );
+                                    })()}
+                                  </div>
+
+                                  {/* Loan Information Box */}
+                                  <div className="bg-white rounded-xl px-4 py-3 shadow-sm relative">
+                                    <p className="text-sm font-bold text-[#1C4332] mb-2.5 tracking-tight font-sans">
+                                      Loan Information
+                                    </p>
+                                    {(() => {
+                                      const amount = manageLoanSelected.amount || 0;
+                                      const purpose = manageLoanSelected.purpose || 'personal use';
+                                      const totalAmount = manageLoanSelected.total_amount || amount;
+                                      const amountPaid = manageLoanSelected.amount_paid || 0;
+                                      const remainingBal = totalAmount - amountPaid;
+                                      const status = manageLoanSelected.status || 'active';
+
+                                      const infoRows = [
                                         { label: 'Total Owed', value: `$${totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
                                         { label: 'Amount Paid', value: `$${amountPaid.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
                                         { label: 'Remaining Balance', value: `$${remainingBal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
@@ -1486,7 +1508,7 @@ export default function Borrowing() {
 
                                       return (
                                         <div className="divide-y divide-[#C2FFDC]">
-                                          {rows.map((row, idx) => (
+                                          {infoRows.map((row, idx) => (
                                             <div key={idx} className="flex items-center justify-between py-2 first:pt-0 last:pb-0">
                                               <p className="text-[11px] text-[#00A86B] font-medium font-sans">{row.label}</p>
                                               <p className="text-[12px] font-semibold text-[#1C4332] font-sans text-right">{row.value}</p>
