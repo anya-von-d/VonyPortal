@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion";
-import { format, startOfMonth, endOfMonth, isSameMonth, addMonths, subMonths } from "date-fns";
+import { format, startOfMonth, endOfMonth, isSameMonth, addMonths, subMonths, differenceInDays } from "date-fns";
 import { formatMoney } from "@/components/utils/formatMoney";
 import RecordPaymentModal from "@/components/loans/RecordPaymentModal";
 
@@ -586,23 +586,23 @@ export default function Home() {
 
                     {/* Monthly Overview Box */}
                     <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
-                      <div className="flex items-center justify-between mb-3">
-                        <button
-                          onClick={() => setCalendarMonth(subMonths(calendarMonth, 1))}
-                          className="w-7 h-7 rounded-full flex items-center justify-center transition-colors duration-200 bg-[#CDE7F8] hover:bg-[#b8d9f0]"
-                        >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#213B75" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="15 18 9 12 15 6"></polyline>
-                          </svg>
-                        </button>
+                      <div className="flex items-center gap-2 mb-3">
                         <p className="text-sm font-bold text-[#213B75] tracking-tight font-sans">
                           {format(calendarMonth, 'MMMM')} Overview
                         </p>
                         <button
-                          onClick={() => setCalendarMonth(addMonths(calendarMonth, 1))}
-                          className="w-7 h-7 rounded-full flex items-center justify-center transition-colors duration-200 bg-[#CDE7F8] hover:bg-[#b8d9f0]"
+                          onClick={() => setCalendarMonth(subMonths(calendarMonth, 1))}
+                          className="w-6 h-6 rounded-full flex items-center justify-center transition-colors duration-200 bg-[#CDE7F8] hover:bg-[#b8d9f0]"
                         >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#213B75" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#213B75" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => setCalendarMonth(addMonths(calendarMonth, 1))}
+                          className="w-6 h-6 rounded-full flex items-center justify-center transition-colors duration-200 bg-[#CDE7F8] hover:bg-[#b8d9f0]"
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#213B75" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <polyline points="9 18 15 12 9 6"></polyline>
                           </svg>
                         </button>
@@ -700,57 +700,60 @@ export default function Home() {
                             );
                           }
 
-                          return events.map((event, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center gap-2.5 p-2.5 rounded-lg bg-[#CDE7F8]"
-                            >
-                              <div className="bg-white rounded-md px-2 py-1 flex-shrink-0 text-center min-w-[40px]">
-                                <p className="text-[10px] text-[#4C7FC4] uppercase font-sans">
-                                  {format(event.date, 'MMM')}
-                                </p>
-                                <p className="text-base font-bold text-[#213B75]">
-                                  {format(event.date, 'd')}
-                                </p>
-                              </div>
+                          return events.map((event, index) => {
+                            const daysUntil = differenceInDays(event.date, new Date());
+                            let dueText = '';
+                            if (daysUntil > 0) dueText = `due in ${daysUntil} day${daysUntil !== 1 ? 's' : ''}`;
+                            else if (daysUntil === 0) dueText = 'due today';
+                            else dueText = `${Math.abs(daysUntil)} day${Math.abs(daysUntil) !== 1 ? 's' : ''} overdue`;
 
-                              <div className="flex-1 min-w-0">
-                                <p className="text-xs font-medium text-[#213B75]">
-                                  <span className={event.type === 'send' ? 'text-red-500 font-semibold' : 'text-[#00A86B] font-semibold'}>
-                                    {event.type === 'send' ? 'Send' : 'Receive'} Payment
-                                  </span>
-                                  {' of '}
-                                  <span className="font-bold">${event.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                  {' '}
-                                  <span className="text-[#4C7FC4]">{event.type === 'send' ? 'to' : 'from'}</span>
-                                  {' '}
-                                  <span className="font-semibold">@{event.username}</span>
-                                </p>
-                              </div>
+                            return (
+                              <div
+                                key={index}
+                                className="flex items-center gap-2.5 p-2.5 rounded-lg bg-[#CDE7F8]"
+                              >
+                                <div className="bg-white rounded-md px-2 py-1.5 flex-shrink-0 text-center min-w-[48px]">
+                                  <p className="text-xs font-bold text-[#213B75] whitespace-nowrap">
+                                    {format(event.date, 'MMM d')}
+                                  </p>
+                                </div>
 
-                              <div className="flex-shrink-0">
-                                {event.paymentStatus === 'completed' ? (
-                                  <span className="px-2.5 py-1 rounded-md bg-[#00A86B] text-[10px] font-semibold text-white whitespace-nowrap">
-                                    Payment Complete
-                                  </span>
-                                ) : event.paymentStatus === 'pending' ? (
-                                  <span className="px-2.5 py-1 rounded-md bg-[#F59E0B] text-[10px] font-semibold text-white whitespace-nowrap">
-                                    Pending Confirmation
-                                  </span>
-                                ) : (
-                                  <button
-                                    onClick={() => {
-                                      setSelectedLoan(event.loan);
-                                      setShowPaymentModal(true);
-                                    }}
-                                    className="px-2.5 py-1 rounded-md bg-[#4C7FC4] text-[10px] font-semibold text-white hover:bg-[#3a6bb0] transition-colors whitespace-nowrap"
-                                  >
-                                    Record Payment
-                                  </button>
-                                )}
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs font-semibold text-[#213B75]">
+                                    {event.type === 'send'
+                                      ? <>Send payment of <span className="font-bold">${event.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></>
+                                      : <>Due to receive payment of <span className="font-bold">${event.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></>
+                                    }
+                                  </p>
+                                  <p className="text-[11px] text-[#4C7FC4]">
+                                    Payment {event.type === 'send' ? 'to' : 'from'} @{event.username} {dueText}
+                                  </p>
+                                </div>
+
+                                <div className="flex-shrink-0">
+                                  {event.paymentStatus === 'completed' ? (
+                                    <span className="px-2.5 py-1 rounded-md bg-[#00A86B] text-[10px] font-semibold text-white whitespace-nowrap">
+                                      Payment Complete
+                                    </span>
+                                  ) : event.paymentStatus === 'pending' ? (
+                                    <span className="px-2.5 py-1 rounded-md bg-[#F59E0B] text-[10px] font-semibold text-white whitespace-nowrap">
+                                      Pending Confirmation
+                                    </span>
+                                  ) : (
+                                    <button
+                                      onClick={() => {
+                                        setSelectedLoan(event.loan);
+                                        setShowPaymentModal(true);
+                                      }}
+                                      className="px-2.5 py-1 rounded-md bg-[#4C7FC4] text-[10px] font-semibold text-white hover:bg-[#3a6bb0] transition-colors whitespace-nowrap"
+                                    >
+                                      Record Payment
+                                    </button>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          ));
+                            );
+                          });
                         })()}
                       </div>
 
