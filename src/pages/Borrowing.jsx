@@ -663,7 +663,6 @@ export default function Borrowing() {
 
   const tabs = [
     { id: 'overview', label: 'All' },
-    { id: 'active', label: 'Manage Loans' },
   ];
 
   return (
@@ -727,6 +726,28 @@ export default function Borrowing() {
               </div>
 
             </motion.div>
+
+            {/* Next Payment Banner */}
+            {nextPaymentLoan && nextPaymentDays !== null && (
+              <div className="rounded-xl px-4 py-3 flex items-center justify-between" style={{ backgroundColor: '#1C4332' }}>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: '#83F384' }}>
+                    <Clock className="w-4 h-4 text-[#1C4332]" />
+                  </div>
+                  <p className="text-sm text-[#C2FFDC] font-sans">
+                    {nextPaymentDays > 0
+                      ? <>Your next payment is due in <span className="font-bold text-white">{nextPaymentDays} {nextPaymentDays === 1 ? 'day' : 'days'}</span></>
+                      : nextPaymentDays === 0
+                        ? <span className="font-bold text-[#F59E0B]">Your next payment is due today</span>
+                        : <span className="font-bold text-red-400">Your payment is {Math.abs(nextPaymentDays)} {Math.abs(nextPaymentDays) === 1 ? 'day' : 'days'} overdue</span>
+                    }
+                  </p>
+                </div>
+                <p className="text-sm font-bold text-white font-sans">
+                  ${nextPaymentAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+              </div>
+            )}
 
             {/* Tab Navigation */}
             <div className="flex gap-2 overflow-x-auto pb-2">
@@ -1051,475 +1072,170 @@ export default function Borrowing() {
                               </div>
                             );
                           })}
-                          {activeLoans.length > 5 && (
-                            <Button
-                              variant="ghost"
-                              className="w-full text-[#00A86B] hover:bg-transparent"
-                              onClick={() => setActiveSection('active')}
-                            >
-                              View all {activeLoans.length} loans
-                            </Button>
-                          )}
                         </div>
                       )}
                     </div>
 
-                  </div>
-                )}
-              </motion.div>
-            )}
-
-            {activeSection === 'active' && (
-              <motion.div
-                key="active"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-              >
-                {isLoading ? (
-                  <div className="text-center py-8">
-                    <div className="w-8 h-8 border-2 border-green-600 border-t-transparent rounded-full animate-spin mx-auto" />
-                  </div>
-                ) : manageableLoans.length === 0 ? (
-                  <div className="bg-[#C2FFDC] rounded-2xl p-8 border-0">
-                    <div className="flex flex-col items-center text-center">
-                      <div className="w-16 h-16 bg-[#83F384] rounded-full flex items-center justify-center mb-4">
-                        <CheckCircle className="w-8 h-8 text-[#00A86B]" />
-                      </div>
-                      <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-2">All Clear</p>
-                      <p className="text-lg font-semibold text-slate-800 mb-1">No loans to manage</p>
-                      <p className="text-sm text-slate-500">You're all caught up!</p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {/* Loan Selector Dropdown */}
-                    <div className="bg-[#C2FFDC] rounded-2xl p-5 border-0">
-                      <p className="text-lg font-bold text-slate-800 mb-4 tracking-tight font-serif">
-                        Your Loans
-                      </p>
-                        <Select
-                          value={manageLoanSelected?.id || ''}
-                          onValueChange={(value) => {
-                            const loan = manageableLoans.find(l => l.id === value);
-                            setManageLoanSelected(loan || null);
-                          }}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select a loan to manage...">
-                              {manageLoanSelected && (() => {
-                                const lender = publicProfiles.find(p => p.user_id === manageLoanSelected.lender_id);
-                                return (
-                                  <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 rounded-full bg-[#C2FFDC] flex items-center justify-center">
-                                      <span className="text-xs font-medium text-[#00A86B]">
-                                        {lender?.full_name?.charAt(0) || '?'}
-                                      </span>
-                                    </div>
-                                    <span>@{lender?.username || 'user'}</span>
-                                    <span className="text-slate-400">•</span>
-                                    <span className="text-slate-500 truncate max-w-[120px]">{manageLoanSelected.purpose || 'Reason'}</span>
-                                    <span className="text-slate-400">•</span>
-                                    <span className="text-[#00A86B] font-medium">${manageLoanSelected.amount?.toLocaleString()}</span>
-                                    {manageLoanSelected.status === 'cancelled' && (
-                                      <span className="text-red-500 text-xs font-medium">(Cancelled)</span>
-                                    )}
-                                  </div>
-                                );
-                              })()}
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent>
-                            {manageableLoans.map((loan) => {
-                              const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
-                              return (
-                                <SelectItem key={loan.id} value={loan.id}>
-                                  <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 rounded-full bg-[#C2FFDC] flex items-center justify-center">
-                                      <span className="text-xs font-medium text-[#00A86B]">
-                                        {lender?.full_name?.charAt(0) || '?'}
-                                      </span>
-                                    </div>
-                                    <span>@{lender?.username || 'user'}</span>
-                                    <span className="text-slate-400">•</span>
-                                    <span className="text-slate-500 truncate max-w-[120px]">{loan.purpose || 'Reason'}</span>
-                                    <span className="text-slate-400">•</span>
-                                    <span className="text-[#00A86B] font-medium">${loan.amount?.toLocaleString()}</span>
-                                    {loan.status === 'cancelled' && (
-                                      <span className="text-red-500 text-xs font-medium">(Cancelled)</span>
-                                    )}
-                                  </div>
-                                </SelectItem>
-                              );
-                            })}
-                          </SelectContent>
-                        </Select>
-                    </div>
-
-                    {/* Loan Details - Below Dropdown */}
-                    {!manageLoanSelected ? null : (
-                      <>
-                        {/* Loan Information Box */}
-                        <div className="bg-[#C2FFDC] rounded-2xl p-5">
+                    {/* Manage Loans Section — inline at bottom of All tab */}
+                    {!isLoading && manageableLoans.length > 0 && (
+                      <div className="space-y-4 mt-6">
+                        <p className="text-lg font-bold text-[#C2FFDC] tracking-tight font-serif">
+                          Manage Loans
+                        </p>
+                        {/* Loan Selector Dropdown */}
+                        <div className="bg-[#C2FFDC] rounded-2xl p-5 border-0">
                           <p className="text-base font-bold text-slate-800 mb-4 tracking-tight font-serif">
-                            Loan Information
+                            Your Loans
                           </p>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <div className="bg-[#83F384] rounded-xl p-4">
-                              <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Amount</p>
-                              <p className="text-xl font-bold text-slate-800">
-                                ${(manageLoanSelected.amount || 0).toLocaleString()}
-                              </p>
-                            </div>
-                            <div className="bg-[#83F384] rounded-xl p-4">
-                              <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Interest</p>
-                              <p className="text-xl font-bold text-slate-800">
-                                {manageLoanSelected.interest_rate || 0}%
-                              </p>
-                            </div>
-                            <div className="bg-[#83F384] rounded-xl p-4">
-                              <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Term</p>
-                              <p className="text-xl font-bold text-slate-800">
-                                {manageLoanSelected.repayment_period || 0} {manageLoanSelected.repayment_unit || 'months'}
-                              </p>
-                            </div>
-                            <div className="bg-[#83F384] rounded-xl p-4">
-                              <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Payment</p>
-                              <p className="text-xl font-bold text-slate-800">
-                                ${(manageLoanSelected.payment_amount || 0).toLocaleString()}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Payment Progress + Payments Schedule */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {/* Payment Progress - Left */}
-                          <div className="rounded-2xl p-4 sm:p-5 border-0 flex flex-col" style={{backgroundColor: '#83F384'}}>
-                            <p className="text-lg font-bold text-slate-800 mb-4 tracking-tight font-serif whitespace-nowrap">
-                              Payment Progress
-                            </p>
-                            <div className="flex items-center gap-4 flex-1">
-                              <div className="flex-shrink-0 ml-2">
-                                {(() => {
-                                  const totalOwed = manageLoanSelected.total_amount || manageLoanSelected.amount || 0;
-                                  const amountPaid = manageLoanSelected.amount_paid || 0;
-                                  const percentPaid = totalOwed > 0 ? Math.round((amountPaid / totalOwed) * 100) : 0;
-                                  return (
-                                    <div className="relative w-24 h-24">
-                                      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                                        <circle cx="60" cy="60" r="52" fill="none" stroke="#DBFFEB" strokeWidth="8" />
-                                        <circle
-                                          cx="60"
-                                          cy="60"
-                                          r="52"
-                                          fill="none"
-                                          stroke="#1C4332"
-                                          strokeWidth="8"
-                                          strokeLinecap="round"
-                                          strokeDasharray={2 * Math.PI * 52}
-                                          strokeDashoffset={2 * Math.PI * 52 - (percentPaid / 100) * 2 * Math.PI * 52}
-                                          className="transition-all duration-500"
-                                        />
-                                      </svg>
-                                      <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                        <span className="text-lg font-bold text-gray-700">{percentPaid}%</span>
-                                        <span className="text-[8px] text-gray-500 uppercase tracking-wider">Paid</span>
-                                      </div>
-                                    </div>
-                                  );
-                                })()}
-                              </div>
-                              <div className="flex flex-col justify-center gap-3 text-left">
-                                <div>
-                                  <p className="text-xs text-gray-600 mb-0.5">Next Payment</p>
-                                  <p className="text-sm font-bold text-gray-700">
-                                    {manageLoanSelected.next_payment_date
-                                      ? format(new Date(manageLoanSelected.next_payment_date), 'MMM d, yyyy')
-                                      : 'N/A'}
-                                  </p>
-                                </div>
-                                <div>
-                                  <p className="text-xs text-gray-600 mb-0.5">Amount</p>
-                                  <p className="text-sm font-bold text-gray-700">
-                                    ${(manageLoanSelected.payment_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                    <span className="text-xs font-medium text-gray-600 capitalize"> · {manageLoanSelected.payment_frequency || 'One-time'}</span>
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Payments Schedule - Right */}
-                          <div className="bg-[#C2FFDC] rounded-2xl p-4 sm:p-5 border-0">
-                            <p className="text-lg font-bold text-slate-800 mb-3 tracking-tight font-serif">
-                              Payments
-                            </p>
-                            <div className="max-h-[200px] overflow-y-auto space-y-2 pr-1">
-                              {(() => {
-                                const agreement = getAgreementForLoan(manageLoanSelected.id);
-                                if (!agreement) {
-                                  // Fallback: generate simple schedule from loan data
-                                  const totalOwed = manageLoanSelected.total_amount || manageLoanSelected.amount || 0;
-                                  const paymentAmt = manageLoanSelected.payment_amount || 0;
-                                  const totalPayments = paymentAmt > 0 ? Math.ceil(totalOwed / paymentAmt) : 0;
-                                  const amountPaid = manageLoanSelected.amount_paid || 0;
-                                  const completedPayments = paymentAmt > 0 ? Math.floor(amountPaid / paymentAmt) : 0;
-
-                                  if (totalPayments === 0) return <p className="text-sm text-slate-500">No payment schedule available</p>;
-
-                                  let currentDate = manageLoanSelected.next_payment_date ? new Date(manageLoanSelected.next_payment_date) : new Date();
-                                  const freq = manageLoanSelected.payment_frequency || 'monthly';
-
-                                  return Array.from({ length: totalPayments }, (_, i) => {
-                                    const isPaid = i < completedPayments;
-                                    let payDate;
-                                    if (i === completedPayments && manageLoanSelected.next_payment_date) {
-                                      payDate = new Date(manageLoanSelected.next_payment_date);
-                                    } else if (i < completedPayments) {
-                                      payDate = null;
-                                    } else {
-                                      const offset = i - completedPayments;
-                                      if (freq === 'weekly') payDate = addWeeks(currentDate, offset);
-                                      else if (freq === 'biweekly') payDate = addWeeks(currentDate, offset * 2);
-                                      else payDate = addMonths(currentDate, offset);
-                                    }
-                                    const isLast = i === totalPayments - 1;
-                                    const displayAmt = isLast ? (totalOwed - paymentAmt * (totalPayments - 1)) : paymentAmt;
-
+                            <Select
+                              value={manageLoanSelected?.id || ''}
+                              onValueChange={(value) => {
+                                const loan = manageableLoans.find(l => l.id === value);
+                                setManageLoanSelected(loan || null);
+                              }}
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select a loan to manage...">
+                                  {manageLoanSelected && (() => {
+                                    const lender = publicProfiles.find(p => p.user_id === manageLoanSelected.lender_id);
                                     return (
-                                      <div key={i} className={`flex items-center justify-between p-2 rounded-lg ${isPaid ? 'opacity-50' : ''}`} style={{ backgroundColor: '#83F384' }}>
-                                        <div className="flex items-center gap-2">
-                                          <span className="text-xs font-bold text-slate-700 w-5">#{i + 1}</span>
-                                          <span className="text-sm font-medium text-slate-800">${displayAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-6 h-6 rounded-full bg-[#C2FFDC] flex items-center justify-center">
+                                          <span className="text-xs font-medium text-[#00A86B]">
+                                            {lender?.full_name?.charAt(0) || '?'}
+                                          </span>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                          <span className="text-xs text-slate-600">{payDate ? format(payDate, 'MMM d, yyyy') : 'Paid'}</span>
-                                          {isPaid && <span className="text-[10px] font-bold text-[#1C4332]">✓</span>}
-                                        </div>
+                                        <span>@{lender?.username || 'user'}</span>
+                                        <span className="text-slate-400">·</span>
+                                        <span className="text-slate-500 truncate max-w-[120px]">{manageLoanSelected.purpose || 'Reason'}</span>
+                                        <span className="text-slate-400">·</span>
+                                        <span className="text-[#00A86B] font-medium">${manageLoanSelected.amount?.toLocaleString()}</span>
+                                        {manageLoanSelected.status === 'cancelled' && (
+                                          <span className="text-red-500 text-xs font-medium">(Cancelled)</span>
+                                        )}
                                       </div>
                                     );
-                                  });
-                                }
-
-                                const schedule = generateAmortizationSchedule(agreement);
-                                const amountPaid = manageLoanSelected.amount_paid || 0;
-                                const paymentAmt = manageLoanSelected.payment_amount || 0;
-                                const completedPayments = paymentAmt > 0 ? Math.floor(amountPaid / paymentAmt) : 0;
-
-                                return schedule.map((entry, i) => {
-                                  const isPaid = i < completedPayments;
-                                  const totalPayment = Math.round((entry.principal + entry.interest) * 100) / 100;
+                                  })()}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {manageableLoans.map((loan) => {
+                                  const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
                                   return (
-                                    <div key={i} className={`flex items-center justify-between p-2 rounded-lg ${isPaid ? 'opacity-50' : ''}`} style={{ backgroundColor: '#83F384' }}>
+                                    <SelectItem key={loan.id} value={loan.id}>
                                       <div className="flex items-center gap-2">
-                                        <span className="text-xs font-bold text-slate-700 w-5">#{entry.number}</span>
-                                        <span className="text-sm font-medium text-slate-800">${totalPayment.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                        <div className="w-6 h-6 rounded-full bg-[#C2FFDC] flex items-center justify-center">
+                                          <span className="text-xs font-medium text-[#00A86B]">
+                                            {lender?.full_name?.charAt(0) || '?'}
+                                          </span>
+                                        </div>
+                                        <span>@{lender?.username || 'user'}</span>
+                                        <span className="text-slate-400">·</span>
+                                        <span className="text-slate-500 truncate max-w-[120px]">{loan.purpose || 'Reason'}</span>
+                                        <span className="text-slate-400">·</span>
+                                        <span className="text-[#00A86B] font-medium">${loan.amount?.toLocaleString()}</span>
+                                        {loan.status === 'cancelled' && (
+                                          <span className="text-red-500 text-xs font-medium">(Cancelled)</span>
+                                        )}
                                       </div>
-                                      <div className="flex items-center gap-2">
-                                        <span className="text-xs text-slate-600">{format(entry.date, 'MMM d, yyyy')}</span>
-                                        {isPaid && <span className="text-[10px] font-bold text-[#1C4332]">✓</span>}
-                                      </div>
-                                    </div>
+                                    </SelectItem>
                                   );
-                                });
-                              })()}
-                            </div>
-                          </div>
+                                })}
+                              </SelectContent>
+                            </Select>
                         </div>
 
-                        {/* Interest + Document Center Row */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {/* Interest Box + Loan Progress - Left */}
-                          <div className="space-y-4">
+                        {/* Loan Details - Below Dropdown */}
+                        {manageLoanSelected && (
+                          <>
+                            {/* Loan Information Box */}
                             <div className="bg-[#C2FFDC] rounded-2xl p-5">
                               <p className="text-base font-bold text-slate-800 mb-4 tracking-tight font-serif">
-                                Interest
+                                Loan Information
                               </p>
-                              <div className="grid grid-cols-2 gap-3">
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                 <div className="bg-[#83F384] rounded-xl p-4">
-                                  <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Interest Accrued</p>
+                                  <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Amount</p>
                                   <p className="text-xl font-bold text-slate-800">
-                                    ${(() => {
-                                      const principal = manageLoanSelected.amount || 0;
-                                      const total = manageLoanSelected.total_amount || principal;
-                                      return (total - principal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                                    })()}
+                                    ${(manageLoanSelected.amount || 0).toLocaleString()}
                                   </p>
                                 </div>
                                 <div className="bg-[#83F384] rounded-xl p-4">
-                                  <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Predicted Interest</p>
+                                  <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Interest</p>
                                   <p className="text-xl font-bold text-slate-800">
-                                    ${(() => {
-                                      const principal = manageLoanSelected.amount || 0;
-                                      const rate = (manageLoanSelected.interest_rate || 0) / 100;
-                                      const period = manageLoanSelected.repayment_period || 12;
-                                      const unit = manageLoanSelected.repayment_unit || 'months';
-                                      const years = unit === 'months' ? period / 12 : period / 52;
-                                      return (principal * rate * years).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                                    })()}
+                                    {manageLoanSelected.interest_rate || 0}%
+                                  </p>
+                                </div>
+                                <div className="bg-[#83F384] rounded-xl p-4">
+                                  <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Term</p>
+                                  <p className="text-xl font-bold text-slate-800">
+                                    {manageLoanSelected.repayment_period || 0} {manageLoanSelected.repayment_unit || 'months'}
+                                  </p>
+                                </div>
+                                <div className="bg-[#83F384] rounded-xl p-4">
+                                  <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Payment</p>
+                                  <p className="text-xl font-bold text-slate-800">
+                                    ${(manageLoanSelected.payment_amount || 0).toLocaleString()}
                                   </p>
                                 </div>
                               </div>
                             </div>
-                            {/* Loan Progress Box */}
+
+                            {/* Actions Box - only show for active loans */}
+                            {manageLoanSelected.status !== 'cancelled' && (
                             <div className="bg-[#C2FFDC] rounded-2xl p-5">
                               <p className="text-base font-bold text-slate-800 mb-4 tracking-tight font-serif">
-                                Loan Progress
+                                Actions
                               </p>
-                              <div className="grid grid-cols-2 gap-3">
-                                <div className="bg-[#83F384] rounded-xl p-4">
-                                  <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Amount Paid</p>
-                                  <p className="text-xl font-bold text-black">
-                                    ${(manageLoanSelected.amount_paid || 0).toLocaleString()}
+                              <div className="flex flex-col sm:flex-row gap-3">
+                                <button
+                                  onClick={() => handleMakePayment(manageLoanSelected)}
+                                  className="bg-[#83F384] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
+                                >
+                                  <div className="w-9 h-9 rounded-full bg-[#C2FFDC] flex items-center justify-center flex-shrink-0">
+                                    <DollarSign className="w-4 h-4 text-[#0A1A10]" />
+                                  </div>
+                                  <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
+                                    Record Payment
                                   </p>
-                                </div>
-                                <div className="bg-[#83F384] rounded-xl p-4">
-                                  <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Completed Payments</p>
-                                  <p className="text-xl font-bold text-slate-800">
-                                    {(() => {
-                                      const paymentAmt = manageLoanSelected.payment_amount || 0;
-                                      const totalAmt = manageLoanSelected.total_amount || manageLoanSelected.amount || 0;
-                                      const amtPaid = manageLoanSelected.amount_paid || 0;
-                                      const completed = paymentAmt > 0 ? Math.floor(amtPaid / paymentAmt) : 0;
-                                      const totalPayments = paymentAmt > 0 ? Math.ceil(totalAmt / paymentAmt) : 0;
-                                      return `${completed}/${totalPayments}`;
-                                    })()}
+                                </button>
+                                <button
+                                  onClick={() => handleEditLoan(manageLoanSelected)}
+                                  className="bg-[#83F384] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
+                                >
+                                  <div className="w-9 h-9 rounded-full bg-[#C2FFDC] flex items-center justify-center flex-shrink-0">
+                                    <Pencil className="w-4 h-4 text-[#0A1A10]" />
+                                  </div>
+                                  <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
+                                    Request Loan Edit
                                   </p>
-                                </div>
+                                </button>
+                                <button
+                                  onClick={() => handleCancelLoan(manageLoanSelected)}
+                                  className="bg-[#83F384] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
+                                >
+                                  <div className="w-9 h-9 rounded-full bg-[#C2FFDC] flex items-center justify-center flex-shrink-0">
+                                    <X className="w-4 h-4 text-[#0A1A10]" />
+                                  </div>
+                                  <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
+                                    Request Loan Cancellation
+                                  </p>
+                                </button>
                               </div>
                             </div>
-                          </div>
+                            )}
 
-                          {/* Document Buttons - Right */}
-                          <div className="flex flex-col gap-3 justify-center">
-                            {(() => {
-                              const agreement = getAgreementForLoan(manageLoanSelected.id);
-                              if (!agreement) {
-                                return (
-                                  <div className="text-center py-6 text-slate-500">
-                                    <p className="text-sm">No signed agreement found for this loan</p>
-                                  </div>
-                                );
-                              }
-
-                              return (
-                                <>
-                                  <button
-                                    onClick={() => openDocPopup('summary', agreement)}
-                                    className="py-2.5 rounded-full text-sm font-semibold text-[#1C4332] text-center transition-colors duration-200 hover:opacity-90 whitespace-nowrap flex items-center justify-center gap-2"
-                                    style={{ backgroundColor: '#83F384' }}
-                                  >
-                                    Loan Summary
-                                  </button>
-                                  <div className="relative flex items-center">
-                                    <button
-                                      onClick={() => openDocPopup('promissory', agreement)}
-                                      className="py-2.5 rounded-full text-sm font-semibold text-[#1C4332] text-center transition-colors duration-200 hover:opacity-90 whitespace-nowrap flex-1"
-                                      style={{ backgroundColor: '#83F384' }}
-                                    >
-                                      Promissory Note
-                                    </button>
-                                    <div
-                                      className="relative ml-2 flex-shrink-0"
-                                      onMouseEnter={(e) => { e.stopPropagation(); setActiveInfoTooltip('promissory'); }}
-                                      onMouseLeave={() => setActiveInfoTooltip(null)}
-                                      onClick={(e) => { e.stopPropagation(); setActiveInfoTooltip(activeInfoTooltip === 'promissory' ? null : 'promissory'); }}
-                                    >
-                                      <div className="w-4 h-4 rounded-full bg-slate-900 flex items-center justify-center cursor-help shadow-sm">
-                                        <span className="text-[10px] font-bold text-white">i</span>
-                                      </div>
-                                      {activeInfoTooltip === 'promissory' && (
-                                        <div className="absolute bottom-full right-0 mb-2 z-[9999] w-56 bg-slate-800 text-white text-xs rounded-lg p-3 shadow-lg">
-                                          A promissory note is a legal document where the borrower promises to repay the loan amount plus any interest by a specific date. It serves as written proof of the debt.
-                                          <div className="absolute top-full right-2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-slate-800" />
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                  <div className="relative flex items-center">
-                                    <button
-                                      onClick={() => openDocPopup('amortization', agreement)}
-                                      className="py-2.5 rounded-full text-sm font-semibold text-[#1C4332] text-center transition-colors duration-200 hover:opacity-90 whitespace-nowrap flex-1"
-                                      style={{ backgroundColor: '#83F384' }}
-                                    >
-                                      Amortization Schedule
-                                    </button>
-                                    <div
-                                      className="relative ml-2 flex-shrink-0"
-                                      onMouseEnter={(e) => { e.stopPropagation(); setActiveInfoTooltip('amortization'); }}
-                                      onMouseLeave={() => setActiveInfoTooltip(null)}
-                                      onClick={(e) => { e.stopPropagation(); setActiveInfoTooltip(activeInfoTooltip === 'amortization' ? null : 'amortization'); }}
-                                    >
-                                      <div className="w-4 h-4 rounded-full bg-slate-900 flex items-center justify-center cursor-help shadow-sm">
-                                        <span className="text-[10px] font-bold text-white">i</span>
-                                      </div>
-                                      {activeInfoTooltip === 'amortization' && (
-                                        <div className="absolute bottom-full right-0 mb-2 z-[9999] w-56 bg-slate-800 text-white text-xs rounded-lg p-3 shadow-lg">
-                                          An amortization schedule shows the breakdown of each payment over the life of the loan, including how much goes toward principal vs. interest.
-                                          <div className="absolute top-full right-2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-slate-800" />
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                </>
-                              );
-                            })()}
-                          </div>
-                        </div>
-
-                        {/* Actions Box - only show for active loans */}
-                        {manageLoanSelected.status !== 'cancelled' && (
-                        <div className="bg-[#C2FFDC] rounded-2xl p-5">
-                          <p className="text-base font-bold text-slate-800 mb-4 tracking-tight font-serif">
-                            Actions
-                          </p>
-                          <div className="flex flex-col sm:flex-row gap-3">
-                            <button
-                              onClick={() => handleMakePayment(manageLoanSelected)}
-                              className="bg-[#83F384] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
-                            >
-                              <div className="w-9 h-9 rounded-full bg-[#C2FFDC] flex items-center justify-center flex-shrink-0">
-                                <DollarSign className="w-4 h-4 text-[#0A1A10]" />
+                            {/* Cancelled notice */}
+                            {manageLoanSelected.status === 'cancelled' && (
+                              <div className="bg-red-50 rounded-2xl p-5 border border-red-200">
+                                <p className="text-sm text-red-600 font-medium">This loan has been cancelled. Documentation is still available above.</p>
                               </div>
-                              <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
-                                Record Payment
-                              </p>
-                            </button>
-                            <button
-                              onClick={() => handleEditLoan(manageLoanSelected)}
-                              className="bg-[#83F384] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
-                            >
-                              <div className="w-9 h-9 rounded-full bg-[#C2FFDC] flex items-center justify-center flex-shrink-0">
-                                <Pencil className="w-4 h-4 text-[#0A1A10]" />
-                              </div>
-                              <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
-                                Request Loan Edit
-                              </p>
-                            </button>
-                            <button
-                              onClick={() => handleCancelLoan(manageLoanSelected)}
-                              className="bg-[#83F384] rounded-xl p-3 md:p-4 text-left hover:opacity-90 transition-all duration-200 cursor-pointer group flex items-center gap-3 flex-1"
-                            >
-                              <div className="w-9 h-9 rounded-full bg-[#C2FFDC] flex items-center justify-center flex-shrink-0">
-                                <X className="w-4 h-4 text-[#0A1A10]" />
-                              </div>
-                              <p className="font-semibold text-[#0A1A10] text-[14px] group-hover:text-[#00A86B] transition-colors">
-                                Request Loan Cancellation
-                              </p>
-                            </button>
-                          </div>
-                        </div>
+                            )}
+                          </>
                         )}
-
-                        {/* Cancelled notice */}
-                        {manageLoanSelected.status === 'cancelled' && (
-                          <div className="bg-red-50 rounded-2xl p-5 border border-red-200">
-                            <p className="text-sm text-red-600 font-medium">This loan has been cancelled. Documentation is still available above.</p>
-                          </div>
-                        )}
-                      </>
+                      </div>
                     )}
+
                   </div>
                 )}
               </motion.div>

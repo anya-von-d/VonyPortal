@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion";
-import { format, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, isAfter, differenceInDays, eachDayOfInterval, getDay, isSameDay, isSameMonth } from "date-fns";
+import { format, startOfMonth, endOfMonth, addMonths, isBefore, isAfter, differenceInDays } from "date-fns";
 import { formatMoney } from "@/components/utils/formatMoney";
 import RecordPaymentModal from "@/components/loans/RecordPaymentModal";
 import { AnimatePresence } from "framer-motion";
@@ -184,7 +184,6 @@ export default function Home() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedLoan, setSelectedLoan] = useState(null);
   const [candidateLoans, setCandidateLoans] = useState([]);
-  const [calendarMonth, setCalendarMonth] = useState(new Date());
 
   // Use profile from context
   const user = userProfile ? { ...userProfile, id: authUser?.id, email: authUser?.email } : null;
@@ -1151,131 +1150,116 @@ export default function Home() {
                       );
                     })()}
 
-                    {/* Monthly Overview Calendar */}
+                    {/* Recent Activity Box */}
                     <div className="rounded-xl px-4 py-3 shadow-sm bg-white">
-                      <div className="flex items-center justify-between mb-3">
-                        <button
-                          onClick={() => setCalendarMonth(prev => subMonths(prev, 1))}
-                          className="p-1 rounded-lg hover:bg-[#CDE7F8] transition-colors cursor-pointer"
-                        >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#213B75" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="15 18 9 12 15 6"></polyline>
-                          </svg>
-                        </button>
+                      <div className="flex items-center justify-between mb-2.5">
                         <p className="text-sm font-bold text-[#213B75] tracking-tight font-sans">
-                          Monthly Overview · {format(calendarMonth, 'MMMM yyyy')}
+                          Recent Activity
                         </p>
-                        <button
-                          onClick={() => setCalendarMonth(prev => addMonths(prev, 1))}
-                          className="p-1 rounded-lg hover:bg-[#CDE7F8] transition-colors cursor-pointer"
-                        >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#213B75" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                          </svg>
-                        </button>
+                        <Link to={createPageUrl("RecentActivity")} className="text-[10px] font-semibold text-[#4C7FC4] hover:underline">
+                          View All
+                        </Link>
                       </div>
-
-                      {/* Calendar */}
                       {(() => {
-                        const monthStart = startOfMonth(calendarMonth);
-                        const monthEnd = endOfMonth(calendarMonth);
-                        const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
-                        const startDayOfWeek = getDay(monthStart); // 0=Sun
+                        const safePaymentsRecent = Array.isArray(payments) ? payments : [];
 
-                        // Build payment map for this month
-                        const activeCalLoans = myLoans.filter(l => l && l.status === 'active' && l.next_payment_date);
-                        const paymentDayMap = {}; // date key -> { send: bool, receive: bool }
+                        // Build activity items from loans and payments
+                        const activityItems = [];
 
-                        activeCalLoans.forEach(loan => {
+                        // Payment events
+                        safePaymentsRecent
+                          .filter(p => p && myLoans.some(l => l.id === p.loan_id))
+                          .forEach(p => {
+                            const loan = myLoans.find(l => l.id === p.loan_id);
+                            if (!loan) return;
+                            const isLender = loan.lender_id === user.id;
+                            const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
+                            const otherProfile = safeAllProfiles.find(pr => pr.user_id === otherUserId);
+                            activityItems.push({
+                              type: 'payment',
+                              date: new Date(p.payment_date || p.created_at),
+                              amount: p.amount || 0,
+                              status: p.status,
+                              isLender,
+                              username: otherProfile?.username || 'user',
+                              description: isLender
+                                ? `Payment received from @${otherProfile?.username || 'user'}`
+                                : `Payment sent to @${otherProfile?.username || 'user'}`
+                            });
+                          });
+
+                        // Loan creation events
+                        myLoans.forEach(loan => {
+                          if (!loan) return;
                           const isLender = loan.lender_id === user.id;
-                          const payDate = new Date(loan.next_payment_date);
-                          // Check if this payment falls in the calendar month
-                          if (isSameMonth(payDate, calendarMonth)) {
-                            const key = format(payDate, 'yyyy-MM-dd');
-                            if (!paymentDayMap[key]) paymentDayMap[key] = { send: false, receive: false };
-                            if (isLender) paymentDayMap[key].receive = true;
-                            else paymentDayMap[key].send = true;
-                          }
+                          const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
+                          const otherProfile = safeAllProfiles.find(pr => pr.user_id === otherUserId);
+                          activityItems.push({
+                            type: 'loan',
+                            date: new Date(loan.created_at),
+                            amount: loan.amount || 0,
+                            status: loan.status,
+                            isLender,
+                            username: otherProfile?.username || 'user',
+                            description: isLender
+                              ? `Loan offer to @${otherProfile?.username || 'user'}`
+                              : `Loan from @${otherProfile?.username || 'user'}`
+                          });
                         });
 
-                        const today = new Date();
-                        const dayLabels = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+                        // Sort by date descending, take 4
+                        const recent = activityItems
+                          .sort((a, b) => b.date - a.date)
+                          .slice(0, 4);
+
+                        if (recent.length === 0) {
+                          return (
+                            <div className="flex flex-col items-center justify-center py-6 text-[#4C7FC4]">
+                              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40 mb-1.5">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                              </svg>
+                              <p className="text-xs">No recent activity</p>
+                            </div>
+                          );
+                        }
 
                         return (
-                          <>
-                            {/* Day headers */}
-                            <div className="grid grid-cols-7 gap-0.5 mb-1">
-                              {dayLabels.map(d => (
-                                <div key={d} className="text-center">
-                                  <p className="text-[9px] font-semibold text-[#4C7FC4]">{d}</p>
-                                </div>
-                              ))}
-                            </div>
-                            {/* Calendar grid */}
-                            <div className="grid grid-cols-7 gap-0.5">
-                              {/* Empty cells for offset */}
-                              {Array.from({ length: startDayOfWeek }).map((_, i) => (
-                                <div key={`empty-${i}`} className="h-8" />
-                              ))}
-                              {daysInMonth.map(day => {
-                                const key = format(day, 'yyyy-MM-dd');
-                                const info = paymentDayMap[key];
-                                const isToday = isSameDay(day, today);
-                                const hasSend = info?.send;
-                                const hasReceive = info?.receive;
-                                const hasBoth = hasSend && hasReceive;
+                          <div className="space-y-1.5">
+                            {recent.map((item, idx) => {
+                              const isPayment = item.type === 'payment';
+                              const iconBg = item.isLender ? '#D1FAE5' : '#DBEAFE';
+                              const iconColor = item.isLender ? '#00A86B' : '#4C7FC4';
+                              const amountStr = item.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-                                let bgColor = 'transparent';
-                                let dotColor = null;
-                                if (hasBoth) {
-                                  bgColor = '#E8D5F5'; // purple tint for both
-                                  dotColor = '#8B5CF6';
-                                } else if (hasSend) {
-                                  bgColor = '#DBEAFE'; // blue tint for send
-                                  dotColor = '#4C7FC4';
-                                } else if (hasReceive) {
-                                  bgColor = '#D1FAE5'; // green tint for receive
-                                  dotColor = '#00A86B';
-                                }
-
-                                return (
+                              return (
+                                <div key={idx} className="flex items-center gap-2.5 p-2 rounded-lg bg-[#CDE7F8]">
                                   <div
-                                    key={key}
-                                    className="h-8 flex flex-col items-center justify-center rounded-md relative"
-                                    style={{ backgroundColor: bgColor }}
+                                    className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
+                                    style={{ backgroundColor: iconBg }}
                                   >
-                                    <p className={`text-[10px] leading-none ${isToday ? 'font-bold text-[#4C7FC4]' : 'text-[#213B75]'}`}>
-                                      {format(day, 'd')}
-                                    </p>
-                                    {dotColor && (
-                                      <div
-                                        className="rounded-full mt-0.5"
-                                        style={{ width: 4, height: 4, backgroundColor: dotColor }}
-                                      />
-                                    )}
-                                    {isToday && (
-                                      <div className="absolute inset-0 rounded-md border-2 border-[#4C7FC4] pointer-events-none" />
+                                    {isPayment ? (
+                                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                      </svg>
+                                    ) : (
+                                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                      </svg>
                                     )}
                                   </div>
-                                );
-                              })}
-                            </div>
-                            {/* Key */}
-                            <div className="flex items-center justify-center gap-4 mt-3 pt-2.5 border-t border-[#CDE7F8]">
-                              <div className="flex items-center gap-1.5">
-                                <div className="rounded-full" style={{ width: 8, height: 8, backgroundColor: '#4C7FC4' }} />
-                                <p className="text-[9px] text-[#213B75]">Send Payment</p>
-                              </div>
-                              <div className="flex items-center gap-1.5">
-                                <div className="rounded-full" style={{ width: 8, height: 8, backgroundColor: '#00A86B' }} />
-                                <p className="text-[9px] text-[#213B75]">Receive Payment</p>
-                              </div>
-                              <div className="flex items-center gap-1.5">
-                                <div className="rounded-full" style={{ width: 8, height: 8, backgroundColor: '#8B5CF6' }} />
-                                <p className="text-[9px] text-[#213B75]">Both</p>
-                              </div>
-                            </div>
-                          </>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-[11px] text-[#213B75] truncate">{item.description}</p>
+                                    <p className="text-[9px] text-[#4C7FC4]">{format(item.date, 'MMM d, yyyy')}</p>
+                                  </div>
+                                  <p className={`text-[11px] font-bold flex-shrink-0 ${item.isLender ? 'text-[#00A86B]' : 'text-[#213B75]'}`}>
+                                    ${amountStr}
+                                  </p>
+                                </div>
+                              );
+                            })}
+                          </div>
                         );
                       })()}
                     </div>

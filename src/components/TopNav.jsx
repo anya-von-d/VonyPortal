@@ -7,6 +7,10 @@ import { motion, AnimatePresence } from "framer-motion";
 // Top bar items (dark blue #213B75 bar - secondary links)
 const topBarItems = [
   {
+    title: "Updates",
+    url: createPageUrl("Requests"),
+  },
+  {
     title: "Friends",
     url: createPageUrl("Friends"),
   },
@@ -43,8 +47,8 @@ const bottomRightItems = [
     url: createPageUrl("Borrowing"),
   },
   {
-    title: "Updates",
-    url: createPageUrl("Requests"),
+    title: "Create Loan",
+    url: createPageUrl("CreateOffer"),
   },
 ];
 

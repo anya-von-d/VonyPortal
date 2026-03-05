@@ -22,7 +22,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import {
   DollarSign, Calendar, Percent, FileText, User as UserIcon,
@@ -37,6 +37,7 @@ import { formatMoney } from "@/components/utils/formatMoney";
 
 export default function Lending() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [users, setUsers] = useState([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
@@ -53,7 +54,10 @@ export default function Lending() {
   const [selectedLoanDetails, setSelectedLoanDetails] = useState(null);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [loanToCancel, setLoanToCancel] = useState(null);
-  const [activeSection, setActiveSection] = useState('lending'); // 'lending', 'create', 'active', 'offers', 'history'
+  const [activeSection, setActiveSection] = useState(() => {
+    const tab = searchParams.get('tab');
+    return ['lending', 'create', 'active'].includes(tab) ? tab : 'lending';
+  }); // 'lending', 'create', 'active'
   const [showCreateForm, setShowCreateForm] = useState(true);
   const [manageLoanSelected, setManageLoanSelected] = useState(null);
   const [showEditLoanModal, setShowEditLoanModal] = useState(false);
@@ -1159,7 +1163,6 @@ export default function Lending() {
 
   const tabs = [
     { id: 'lending', label: 'All' },
-    { id: 'create', label: 'Create Offer' },
     { id: 'active', label: 'Manage Loans' },
   ];
 
