@@ -23,7 +23,7 @@ function LoanCarousel({ hasLendingLoans, hasBorrowingLoans }) {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide(prev => (prev + 1) % totalSlides);
-    }, 5000);
+    }, 8000);
     return () => clearInterval(timer);
   }, []);
 
@@ -38,15 +38,10 @@ function LoanCarousel({ hasLendingLoans, hasBorrowingLoans }) {
   const slides = [
     // Slide 1: Track loan progress
     <div key="progress" className="text-center px-4">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-4 opacity-60">
-        <line x1="12" y1="20" x2="12" y2="10"></line>
-        <line x1="18" y1="20" x2="18" y2="4"></line>
-        <line x1="6" y1="20" x2="6" y2="16"></line>
-      </svg>
       <p className="text-lg sm:text-xl font-bold text-white font-sans mb-1.5 tracking-tight">
         Stay on top of your loans
       </p>
-      <p className="text-sm text-white/60 font-sans mb-6 max-w-sm mx-auto">
+      <p className="text-sm text-white/60 font-sans mb-6 whitespace-nowrap">
         Check in on your payment progress and keep track of upcoming due dates
       </p>
       <div className="flex items-center justify-center gap-3">
@@ -74,16 +69,10 @@ function LoanCarousel({ hasLendingLoans, hasBorrowingLoans }) {
     </div>,
     // Slide 2: View agreements
     <div key="agreements" className="text-center px-4">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-4 opacity-60">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-        <polyline points="14 2 14 8 20 8"></polyline>
-        <line x1="16" y1="13" x2="8" y2="13"></line>
-        <line x1="16" y1="17" x2="8" y2="17"></line>
-      </svg>
       <p className="text-lg sm:text-xl font-bold text-white font-sans mb-1.5 tracking-tight">
         Review your loan agreements
       </p>
-      <p className="text-sm text-white/60 font-sans mb-6 max-w-sm mx-auto">
+      <p className="text-sm text-white/60 font-sans mb-6 whitespace-nowrap">
         View and download your loan documents anytime to stay informed
       </p>
       <Link
