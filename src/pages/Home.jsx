@@ -1354,11 +1354,11 @@ export default function Home() {
                           <div className="space-y-1.5">
                             {recent.map((item, idx) => {
                               const isPayment = item.type === 'payment';
-                              const iconColor = '#6AD478';
+                              const iconColor = '#1C4332';
 
                               return (
                                 <div key={idx} className="flex items-center gap-2.5 p-2 rounded-lg bg-[#0F2B1F]">
-                                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#6AD478]/20 flex items-center justify-center shadow-sm">
+                                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#00A86B] flex items-center justify-center shadow-sm">
                                     {isPayment ? (
                                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                         <line x1="12" y1="1" x2="12" y2="23"></line>
