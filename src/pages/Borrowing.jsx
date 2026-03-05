@@ -1407,6 +1407,115 @@ export default function Borrowing() {
                                     })()}
                                   </div>
 
+                                  {/* Payments Box */}
+                                  <div className="bg-white rounded-xl px-4 py-3 shadow-sm">
+                                    <p className="text-sm font-bold text-[#1C4332] mb-2.5 tracking-tight font-sans">
+                                      Payments
+                                    </p>
+                                    {(() => {
+                                      const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id);
+                                      const loanPmts = allPayments.filter(p => p.loan_id === manageLoanSelected.id);
+                                      const confirmedPmts = loanPmts.filter(p => p.status === 'confirmed');
+                                      const pendingPmts = loanPmts.filter(p => p.status === 'pending_confirmation');
+
+                                      /* Build schedule from agreement or from loan fields */
+                                      let schedule = [];
+                                      if (agreement) {
+                                        schedule = generateAmortizationSchedule(agreement);
+                                      } else {
+                                        /* Fallback: generate dates from loan data */
+                                        const freq = manageLoanSelected.payment_frequency || 'monthly';
+                                        const numP = manageLoanSelected.repayment_period || 1;
+                                        let dt = new Date(manageLoanSelected.created_at);
+                                        for (let i = 1; i <= numP; i++) {
+                                          if (freq === 'weekly') dt = addWeeks(new Date(dt), 1);
+                                          else if (freq === 'biweekly') dt = addWeeks(new Date(dt), 2);
+                                          else if (freq === 'daily') dt = addDays(new Date(dt), 1);
+                                          else dt = addMonths(new Date(dt), 1);
+                                          schedule.push({ number: i, date: new Date(dt) });
+                                        }
+                                      }
+
+                                      /* Sort actual payments by date to match against schedule */
+                                      const sortedConfirmed = [...confirmedPmts].sort((a, b) => new Date(a.payment_date) - new Date(b.payment_date));
+                                      const sortedPending = [...pendingPmts].sort((a, b) => new Date(a.payment_date) - new Date(b.payment_date));
+
+                                      /* Determine status for each scheduled payment */
+                                      const paymentAmt = manageLoanSelected.payment_amount || 0;
+                                      let firstUnpaidFound = false;
+
+                                      const paymentRows = schedule.map((s, idx) => {
+                                        const matchedConfirmed = sortedConfirmed[idx] || null;
+                                        const matchedPending = sortedPending.find(p => !matchedConfirmed && idx < sortedConfirmed.length + sortedPending.length);
+
+                                        let status;
+                                        if (idx < sortedConfirmed.length) {
+                                          status = 'completed';
+                                        } else if (idx < sortedConfirmed.length + sortedPending.length) {
+                                          status = 'pending';
+                                        } else if (!firstUnpaidFound) {
+                                          status = 'record';
+                                          firstUnpaidFound = true;
+                                        } else {
+                                          status = 'upcoming';
+                                        }
+
+                                        const displayAmount = status === 'completed'
+                                          ? sortedConfirmed[idx]?.amount || paymentAmt
+                                          : status === 'pending'
+                                            ? sortedPending[idx - sortedConfirmed.length]?.amount || paymentAmt
+                                            : paymentAmt;
+
+                                        return { number: s.number, date: s.date, amount: displayAmount, status };
+                                      });
+
+                                      const statusConfig = {
+                                        completed: { label: 'Completed', bg: 'bg-[#C2FFDC]', text: 'text-[#1C4332]', ringColor: 'border-[#00A86B]' },
+                                        pending: { label: 'Pending', bg: 'bg-[#FEF3C7]', text: 'text-[#92400E]', ringColor: 'border-[#F59E0B]' },
+                                        record: { label: 'Record Payment', bg: 'bg-[#00A86B]', text: 'text-white', ringColor: 'border-[#00A86B]' },
+                                        upcoming: { label: 'Upcoming', bg: 'bg-[#C2FFDC]/50', text: 'text-[#00A86B]', ringColor: 'border-[#C2FFDC]' },
+                                      };
+
+                                      return (
+                                        <div className="space-y-1.5 max-h-[240px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                                          {paymentRows.map((row) => {
+                                            const cfg = statusConfig[row.status];
+                                            return (
+                                              <div key={row.number} className="flex items-center gap-2.5 p-2 rounded-lg bg-[#F8FBF9]">
+                                                {/* Payment number circle */}
+                                                <div className={`w-8 h-8 rounded-full border-2 ${cfg.ringColor} flex items-center justify-center flex-shrink-0 bg-white`}>
+                                                  <span className="text-[11px] font-bold text-[#1C4332]">{row.number}</span>
+                                                </div>
+                                                {/* Amount + Due date */}
+                                                <div className="flex-1 min-w-0">
+                                                  <p className="text-[12px] font-semibold text-[#1C4332] font-sans">
+                                                    ${row.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                  </p>
+                                                  <p className="text-[10px] text-[#00A86B]/70 font-sans">
+                                                    {format(row.date, 'MMM d, yyyy')}
+                                                  </p>
+                                                </div>
+                                                {/* Status button */}
+                                                {row.status === 'record' ? (
+                                                  <button
+                                                    onClick={() => handleMakePayment(manageLoanSelected)}
+                                                    className={`flex-shrink-0 px-2.5 py-1 rounded-lg text-[10px] font-semibold ${cfg.bg} ${cfg.text} cursor-pointer hover:opacity-90 transition-opacity`}
+                                                  >
+                                                    {cfg.label}
+                                                  </button>
+                                                ) : (
+                                                  <span className={`flex-shrink-0 px-2.5 py-1 rounded-lg text-[10px] font-semibold ${cfg.bg} ${cfg.text}`}>
+                                                    {cfg.label}
+                                                  </span>
+                                                )}
+                                              </div>
+                                            );
+                                          })}
+                                        </div>
+                                      );
+                                    })()}
+                                  </div>
+
                                   {/* Action Circles - only show for active loans */}
                                   {manageLoanSelected.status !== 'cancelled' && (
                                   <div className="flex items-start justify-center gap-5 py-2">
