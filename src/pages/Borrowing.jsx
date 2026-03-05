@@ -60,6 +60,7 @@ export default function Borrowing() {
   const [isQuickSuccess, setIsQuickSuccess] = useState(false);
   const [quickPayTransactionId, setQuickPayTransactionId] = useState('');
   const [allPayments, setAllPayments] = useState([]);
+  const [activeLoanTooltip, setActiveLoanTooltip] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -1248,7 +1249,7 @@ export default function Borrowing() {
                                     return (
                                       <button
                                         key={loan.id}
-                                        onClick={() => setManageLoanSelected(loan)}
+                                        onClick={() => { setManageLoanSelected(loan); setActiveLoanTooltip(null); }}
                                         className={`w-full p-2 rounded-lg text-left transition-all cursor-pointer ${
                                           isSelected
                                             ? 'bg-[#1C4332] ring-2 ring-[#00A86B]'
@@ -1370,36 +1371,76 @@ export default function Borrowing() {
                               ) : (
                                 <>
                                   {/* Loan Information Box */}
-                                  <div className="bg-white rounded-xl px-4 py-3 shadow-sm">
+                                  <div className="bg-white rounded-xl px-4 py-3 shadow-sm relative">
                                     <p className="text-sm font-bold text-[#1C4332] mb-2.5 tracking-tight font-sans">
                                       Loan Information
                                     </p>
-                                    <div className="grid grid-cols-2 gap-2">
-                                      <div className="bg-[#C2FFDC] rounded-lg p-2.5">
-                                        <p className="text-[10px] text-[#00A86B] uppercase tracking-[0.12em] font-medium mb-0.5" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Amount</p>
-                                        <p className="text-base font-bold text-[#1C4332]">
-                                          ${(manageLoanSelected.amount || 0).toLocaleString()}
-                                        </p>
-                                      </div>
-                                      <div className="bg-[#C2FFDC] rounded-lg p-2.5">
-                                        <p className="text-[10px] text-[#00A86B] uppercase tracking-[0.12em] font-medium mb-0.5" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Interest</p>
-                                        <p className="text-base font-bold text-[#1C4332]">
-                                          {manageLoanSelected.interest_rate || 0}%
-                                        </p>
-                                      </div>
-                                      <div className="bg-[#C2FFDC] rounded-lg p-2.5">
-                                        <p className="text-[10px] text-[#00A86B] uppercase tracking-[0.12em] font-medium mb-0.5" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Term</p>
-                                        <p className="text-base font-bold text-[#1C4332]">
-                                          {manageLoanSelected.repayment_period || 0} {manageLoanSelected.repayment_unit || 'mo'}
-                                        </p>
-                                      </div>
-                                      <div className="bg-[#C2FFDC] rounded-lg p-2.5">
-                                        <p className="text-[10px] text-[#00A86B] uppercase tracking-[0.12em] font-medium mb-0.5" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Payment</p>
-                                        <p className="text-base font-bold text-[#1C4332]">
-                                          ${(manageLoanSelected.payment_amount || 0).toLocaleString()}
-                                        </p>
-                                      </div>
-                                    </div>
+                                    {(() => {
+                                      const lender = publicProfiles.find(p => p.user_id === manageLoanSelected.lender_id);
+                                      const lenderUsername = lender?.username || 'user';
+                                      const amount = manageLoanSelected.amount || 0;
+                                      const interestRate = manageLoanSelected.interest_rate || 0;
+                                      const purpose = manageLoanSelected.purpose || 'personal use';
+                                      const repaymentPeriod = manageLoanSelected.repayment_period || 0;
+                                      const repaymentUnit = manageLoanSelected.repayment_unit || 'months';
+                                      const paymentFrequency = manageLoanSelected.payment_frequency || 'monthly';
+                                      const paymentAmount = manageLoanSelected.payment_amount || 0;
+
+                                      const tooltips = {
+                                        amount: { title: 'Loan Amount', desc: 'The total principal sum borrowed from the lender.' },
+                                        interest: { title: 'Interest Rate', desc: 'The annual percentage charged on the borrowed amount.' },
+                                        term: { title: 'Loan Term', desc: 'The total length of time you have to repay the loan.' },
+                                        frequency: { title: 'Payment Frequency', desc: 'How often you are required to make a payment.' },
+                                        payment: { title: 'Payment Amount', desc: 'The fixed amount due each payment period.' },
+                                      };
+
+                                      const GreenTerm = ({ id, children }) => (
+                                        <span className="relative inline-block">
+                                          <button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              setActiveLoanTooltip(activeLoanTooltip === id ? null : id);
+                                            }}
+                                            className="text-[#00A86B] font-bold cursor-pointer hover:underline decoration-[#00A86B]/40 underline-offset-2 transition-all"
+                                          >
+                                            {children}
+                                          </button>
+                                          <AnimatePresence>
+                                            {activeLoanTooltip === id && (
+                                              <motion.div
+                                                initial={{ opacity: 0, y: 6, scale: 0.95 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                exit={{ opacity: 0, y: 6, scale: 0.95 }}
+                                                transition={{ duration: 0.15 }}
+                                                className="absolute z-50 left-1/2 -translate-x-1/2 mt-1.5 w-48 bg-[#1C4332] rounded-lg shadow-lg px-3 py-2.5"
+                                                onClick={(e) => e.stopPropagation()}
+                                              >
+                                                <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#1C4332] rotate-45 rounded-sm" />
+                                                <p className="text-xs font-bold text-[#6AD478] mb-0.5 relative">{tooltips[id].title}</p>
+                                                <p className="text-[11px] text-[#C2FFDC]/80 leading-relaxed relative">{tooltips[id].desc}</p>
+                                              </motion.div>
+                                            )}
+                                          </AnimatePresence>
+                                        </span>
+                                      );
+
+                                      return (
+                                        <div onClick={() => setActiveLoanTooltip(null)}>
+                                          <p className="text-[13px] text-[#1C4332] leading-relaxed font-sans">
+                                            @{lenderUsername} lent you{' '}
+                                            <GreenTerm id="amount">${amount.toLocaleString()}</GreenTerm>{' '}
+                                            at{' '}
+                                            <GreenTerm id="interest">{interestRate}% interest</GreenTerm>{' '}
+                                            for {purpose}. You agreed to pay back the loan over{' '}
+                                            <GreenTerm id="term">{repaymentPeriod} {repaymentUnit}</GreenTerm>{' '}
+                                            in{' '}
+                                            <GreenTerm id="frequency">{paymentFrequency}</GreenTerm>{' '}
+                                            payments of{' '}
+                                            <GreenTerm id="payment">${paymentAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</GreenTerm>.
+                                          </p>
+                                        </div>
+                                      );
+                                    })()}
                                   </div>
 
                                   {/* Action Circles - only show for active loans */}
