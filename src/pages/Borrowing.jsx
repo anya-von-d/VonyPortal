@@ -346,8 +346,8 @@ export default function Borrowing() {
     }
   }, [quickPayPerson, filteredLoansForQuickPay.length]);
 
-  // Generate amortization schedule
-  const generateAmortizationSchedule = (agreement) => {
+  // Generate amortization schedule (function declaration for hoisting)
+  function generateAmortizationSchedule(agreement) {
     const schedule = [];
     const loanAmount = agreement.amount || 0;
     const frequency = agreement.payment_frequency || 'monthly';
@@ -430,7 +430,7 @@ export default function Borrowing() {
     }
 
     return schedule;
-  };
+  }
 
   /**
    * Analyze loan payments period-by-period with:
@@ -439,7 +439,7 @@ export default function Borrowing() {
    * - Overpayment: reduces future monthly amounts (remaining balance / remaining periods)
    * - Underpayment rollover: deficit rolls into next period only, then back to normal
    */
-  const analyzeLoanPayments = (loan, payments, agreement) => {
+  function analyzeLoanPayments(loan, payments, agreement) {
     if (!loan) return null;
 
     const principal = loan.amount || 0;
@@ -626,7 +626,7 @@ export default function Borrowing() {
         ? Math.min(100, (totalPaid / (principal + totalInterestAccrued)) * 100)
         : 0
     };
-  };
+  }
 
   // Promissory Note Popup Content
   const PromissoryNotePopup = ({ agreement }) => {
