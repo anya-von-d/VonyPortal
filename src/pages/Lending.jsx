@@ -34,6 +34,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { addMonths, addWeeks, addDays, format, startOfMonth, endOfMonth, isSameMonth } from "date-fns";
 import { jsPDF } from "jspdf";
 import { formatMoney } from "@/components/utils/formatMoney";
+import { toLocalDate, getLocalToday, daysUntil as daysUntilDate, daysBetween } from "@/components/utils/dateUtils";
 
 export default function Lending({ initialTab }) {
   const navigate = useNavigate();
@@ -74,6 +75,9 @@ export default function Lending({ initialTab }) {
   const [quickPayAmount, setQuickPayAmount] = useState('');
   const [quickPayMethod, setQuickPayMethod] = useState('');
   const [quickPayLoanId, setQuickPayLoanId] = useState('');
+  const [quickPayFromPerson, setQuickPayFromPerson] = useState('');
+  const [quickPayToPerson, setQuickPayToPerson] = useState('');
+  const [allUserLoans, setAllUserLoans] = useState([]);
 
   // Typing animation for purpose placeholder
   const [purposePlaceholder, setPurposePlaceholder] = useState('');
@@ -167,6 +171,11 @@ export default function Lending({ initialTab }) {
       ]);
 
       setLoans(allLoans || []);
+      // Store all user loans (lending + borrowing) for record payment dropdowns
+      const allMyLoans = (allLoans || []).filter(loan =>
+        loan.borrower_id === user.id || loan.lender_id === user.id
+      );
+      setAllUserLoans(allMyLoans);
       setPublicProfiles(profiles || []);
       setLoanAgreements(agreements || []);
       setFriendships(allFriendships || []);
@@ -222,10 +231,7 @@ export default function Lending({ initialTab }) {
     } else if (formData.repayment_unit === 'weeks') {
       periodInMonths = period / 4.33;
     } else if (formData.repayment_unit === 'custom' && formData.custom_due_date) {
-      const today = new Date();
-      const dueDate = new Date(formData.custom_due_date);
-      const diffTime = Math.abs(dueDate - today);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const diffDays = Math.abs(daysUntilDate(formData.custom_due_date));
       periodInMonths = diffDays / 30;
     }
 
@@ -341,7 +347,9 @@ export default function Lending({ initialTab }) {
   const handleSign = async (signature) => {
     setIsSubmitting(true);
     try {
-      const createdLoan = await Loan.create(pendingLoanData);
+      // Strip repayment_unit — not a column in loans table
+      const { repayment_unit, ...loanPayload } = pendingLoanData;
+      const createdLoan = await Loan.create(loanPayload);
 
       await LoanAgreement.create({
         loan_id: createdLoan.id,
@@ -352,6 +360,7 @@ export default function Lending({ initialTab }) {
         amount: pendingLoanData.amount,
         interest_rate: pendingLoanData.interest_rate,
         repayment_period: pendingLoanData.repayment_period,
+        repayment_unit: formData.repayment_unit,
         payment_frequency: pendingLoanData.payment_frequency,
         purpose: pendingLoanData.purpose || '',
         due_date: pendingLoanData.due_date,
@@ -581,6 +590,132 @@ export default function Lending({ initialTab }) {
   const getUserById = (userId) => {
     const profile = publicProfiles.find(p => p.user_id === userId);
     return profile || { username: 'user', full_name: 'Unknown User' };
+  };
+
+  // Record Payment box renderer (shared across all sections)
+  const renderRecordPaymentBox = (extraClassName = '') => {
+    if (activeLoans.length === 0) return null;
+    const allActiveLoans = allUserLoans.filter(l => l.status === 'active');
+    // "From" options: people who owe you money (borrowers in your lending loans)
+    const lendingLoans = allActiveLoans.filter(l => l.lender_id === currentUser?.id);
+    const fromBorrowerIds = [...new Set(lendingLoans.map(l => l.borrower_id))];
+    const fromOptions = fromBorrowerIds.map(bId => {
+      const profile = getUserById(bId);
+      return { userId: bId, username: profile?.username || 'user', fullName: profile?.full_name || 'Unknown' };
+    });
+    // "To" options: people you owe money to (lenders in your borrowing loans)
+    const borrowingLoans = allActiveLoans.filter(l => l.borrower_id === currentUser?.id);
+    const toLenderIds = [...new Set(borrowingLoans.map(l => l.lender_id))];
+    const toOptions = toLenderIds.map(lId => {
+      const profile = getUserById(lId);
+      return { userId: lId, username: profile?.username || 'user', fullName: profile?.full_name || 'Unknown' };
+    });
+    // Add self to both lists (at top)
+    const selfProfile = getUserById(currentUser?.id);
+    const selfOption = { userId: currentUser?.id, username: selfProfile?.username || 'you', fullName: selfProfile?.full_name || 'You' };
+    const fromListWithSelf = [selfOption, ...fromOptions.filter(o => o.userId !== currentUser?.id)];
+    const toListWithSelf = [selfOption, ...toOptions.filter(o => o.userId !== currentUser?.id)];
+    // Filter out selected person from the other dropdown
+    const filteredFromOptions = quickPayToPerson ? fromListWithSelf.filter(o => o.userId !== quickPayToPerson) : fromListWithSelf;
+    const filteredToOptions = quickPayFromPerson ? toListWithSelf.filter(o => o.userId !== quickPayFromPerson) : toListWithSelf;
+
+    const handleRecordSubmit = () => {
+      let matchingLoans = [];
+      if (quickPayFromPerson && quickPayToPerson) {
+        matchingLoans = allActiveLoans.filter(l =>
+          (l.borrower_id === quickPayFromPerson && l.lender_id === quickPayToPerson) ||
+          (l.borrower_id === quickPayToPerson && l.lender_id === quickPayFromPerson)
+        );
+      } else if (quickPayFromPerson) {
+        matchingLoans = allActiveLoans.filter(l =>
+          l.borrower_id === quickPayFromPerson || l.lender_id === quickPayFromPerson
+        );
+      } else if (quickPayToPerson) {
+        matchingLoans = allActiveLoans.filter(l =>
+          l.borrower_id === quickPayToPerson || l.lender_id === quickPayToPerson
+        );
+      }
+      if (matchingLoans.length === 1) {
+        setSelectedLoan({ ...matchingLoans[0], _prefillAmount: quickPayAmount });
+        setShowPaymentModal(true);
+      } else if (matchingLoans.length > 1) {
+        setSelectedLoan({ ...matchingLoans[0], _prefillAmount: quickPayAmount, _candidateLoans: matchingLoans });
+        setShowPaymentModal(true);
+      }
+    };
+    const canSubmit = quickPayAmount && (quickPayFromPerson || quickPayToPerson);
+
+    return (
+      <div className={`bg-[#96FFD0] rounded-2xl p-5 border-0 ${extraClassName}`}>
+        <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+          Record Payment
+        </p>
+        <div className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
+          <span>Record payment of</span>
+          <span className="font-medium">$</span>
+          <Input
+            type="number"
+            step="0.01"
+            min="0.01"
+            placeholder=""
+            value={quickPayAmount}
+            onChange={(e) => setQuickPayAmount(e.target.value)}
+            className="w-24 h-8 px-3 bg-white inline-flex"
+            style={{ MozAppearance: 'textfield' }}
+          />
+          <span>from</span>
+          <Select
+            value={quickPayFromPerson}
+            onValueChange={(val) => {
+              setQuickPayFromPerson(val);
+              if (val === quickPayToPerson) setQuickPayToPerson('');
+            }}
+          >
+            <SelectTrigger className="w-auto h-8 px-3 bg-white inline-flex">
+              <SelectValue placeholder="select person" />
+            </SelectTrigger>
+            <SelectContent>
+              {filteredFromOptions.map((person) => (
+                <SelectItem key={person.userId} value={person.userId}>
+                  @{person.username}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <span>to</span>
+          <Select
+            value={quickPayToPerson}
+            onValueChange={(val) => {
+              setQuickPayToPerson(val);
+              if (val === quickPayFromPerson) setQuickPayFromPerson('');
+            }}
+          >
+            <SelectTrigger className="w-auto h-8 px-3 bg-white inline-flex">
+              <SelectValue placeholder="select person" />
+            </SelectTrigger>
+            <SelectContent>
+              {filteredToOptions.map((person) => (
+                <SelectItem key={person.userId} value={person.userId}>
+                  @{person.username}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            type="button"
+            onClick={handleRecordSubmit}
+            disabled={!canSubmit}
+            className={`h-8 px-4 rounded-lg text-sm font-medium border-0 transition-all ${
+              !canSubmit
+                ? 'bg-[#00A86B]/50 text-white/70 cursor-not-allowed'
+                : 'bg-[#00A86B] text-white hover:bg-[#0D9B76]'
+            }`}
+          >
+            Submit
+          </Button>
+        </div>
+      </div>
+    );
   };
 
   // Generate amortization schedule
@@ -1336,88 +1471,7 @@ export default function Lending({ initialTab }) {
                 </div>
 
                 {/* Quick Record Payment - only show when there are active loans */}
-                {activeLoans.length > 0 && (
-                <div className="bg-[#96FFD0] rounded-2xl p-5 border-0">
-                  <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                    Record Payment
-                  </p>
-                  <div className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
-                    <span>Record payment of</span>
-                    <span className="font-medium">$</span>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0.01"
-                      placeholder=""
-                      value={quickPayAmount}
-                      onChange={(e) => setQuickPayAmount(e.target.value)}
-                      className="w-24 h-8 px-3 bg-white inline-flex"
-                      style={{ MozAppearance: 'textfield' }}
-                    />
-                    <span>from</span>
-                    <span className="text-[#00A86B] font-medium">
-                      {quickPayLoanId
-                        ? `@${getUserById(activeLoans.find(l => l.id === quickPayLoanId)?.borrower_id)?.username || 'user'}`
-                        : '@_'}
-                    </span>
-                    <span>via</span>
-                    <Select value={quickPayMethod} onValueChange={setQuickPayMethod}>
-                      <SelectTrigger className="w-auto h-8 px-3 bg-white inline-flex">
-                        <SelectValue placeholder="select method" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="venmo">Venmo</SelectItem>
-                        <SelectItem value="zelle">Zelle</SelectItem>
-                        <SelectItem value="cashapp">Cash App</SelectItem>
-                        <SelectItem value="paypal">PayPal</SelectItem>
-                        <SelectItem value="cash">Cash</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <span>for</span>
-                    <Select value={quickPayLoanId} onValueChange={setQuickPayLoanId}>
-                      <SelectTrigger className="w-auto h-8 px-3 bg-white inline-flex min-w-[140px]">
-                        <SelectValue placeholder="select loan" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {activeLoans.map((loan) => {
-                          const borrower = getUserById(loan.borrower_id);
-                          return (
-                            <SelectItem key={loan.id} value={loan.id}>
-                              @{borrower?.username || 'user'} - {loan.purpose || `$${loan.amount}`}
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectContent>
-                    </Select>
-                    {quickPayLoanId && activeLoans.find(l => l.id === quickPayLoanId)?.purpose && (
-                      <span className="text-slate-500">({activeLoans.find(l => l.id === quickPayLoanId).purpose})</span>
-                    )}
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        const loan = activeLoans.find(l => l.id === quickPayLoanId);
-                        if (loan) {
-                          setSelectedLoan({
-                            ...loan,
-                            _prefillAmount: quickPayAmount,
-                            _prefillMethod: quickPayMethod,
-                          });
-                          setShowPaymentModal(true);
-                        }
-                      }}
-                      disabled={!quickPayLoanId || !quickPayAmount}
-                      className={`h-8 px-4 rounded-lg text-sm font-medium border-0 transition-all ${
-                        !quickPayLoanId || !quickPayAmount
-                          ? 'bg-[#00A86B]/50 text-white/70 cursor-not-allowed'
-                          : 'bg-[#00A86B] text-white hover:bg-[#0D9B76]'
-                      }`}
-                    >
-                      Submit
-                    </Button>
-                  </div>
-                </div>
-                )}
+                {renderRecordPaymentBox()}
 
                 {/* Upcoming Payments + Individual Loan Progress */}
                 <div className="grid md:grid-cols-2 gap-4">
@@ -1449,7 +1503,7 @@ export default function Lending({ initialTab }) {
                                 </div>
                                 <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
                                   <span className="text-xs font-bold text-slate-800">
-                                    {Math.ceil((new Date(loan.next_payment_date) - new Date()) / (1000 * 60 * 60 * 24))}d
+                                    {daysUntilDate(loan.next_payment_date)}d
                                   </span>
                                 </div>
                               </div>
@@ -2329,88 +2383,7 @@ export default function Lending({ initialTab }) {
                 </div>
 
                 {/* Quick Record Payment - only show when there are active loans */}
-                {activeLoans.length > 0 && (
-                <div className="lg:col-span-3 bg-[#96FFD0] rounded-2xl p-5 border-0">
-                  <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                    Record Payment
-                  </p>
-                  <div className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
-                    <span>Record payment of</span>
-                    <span className="font-medium">$</span>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0.01"
-                      placeholder=""
-                      value={quickPayAmount}
-                      onChange={(e) => setQuickPayAmount(e.target.value)}
-                      className="w-24 h-8 px-3 bg-white inline-flex"
-                      style={{ MozAppearance: 'textfield' }}
-                    />
-                    <span>from</span>
-                    <span className="text-[#00A86B] font-medium">
-                      {quickPayLoanId
-                        ? `@${getUserById(activeLoans.find(l => l.id === quickPayLoanId)?.borrower_id)?.username || 'user'}`
-                        : '@_'}
-                    </span>
-                    <span>via</span>
-                    <Select value={quickPayMethod} onValueChange={setQuickPayMethod}>
-                      <SelectTrigger className="w-auto h-8 px-3 bg-white inline-flex">
-                        <SelectValue placeholder="select method" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="venmo">Venmo</SelectItem>
-                        <SelectItem value="zelle">Zelle</SelectItem>
-                        <SelectItem value="cashapp">Cash App</SelectItem>
-                        <SelectItem value="paypal">PayPal</SelectItem>
-                        <SelectItem value="cash">Cash</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <span>for</span>
-                    <Select value={quickPayLoanId} onValueChange={setQuickPayLoanId}>
-                      <SelectTrigger className="w-auto h-8 px-3 bg-white inline-flex min-w-[140px]">
-                        <SelectValue placeholder="select loan" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {activeLoans.map((loan) => {
-                          const borrower = getUserById(loan.borrower_id);
-                          return (
-                            <SelectItem key={loan.id} value={loan.id}>
-                              @{borrower?.username || 'user'} - {loan.purpose || `$${loan.amount}`}
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectContent>
-                    </Select>
-                    {quickPayLoanId && activeLoans.find(l => l.id === quickPayLoanId)?.purpose && (
-                      <span className="text-slate-500">({activeLoans.find(l => l.id === quickPayLoanId).purpose})</span>
-                    )}
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        const loan = activeLoans.find(l => l.id === quickPayLoanId);
-                        if (loan) {
-                          setSelectedLoan({
-                            ...loan,
-                            _prefillAmount: quickPayAmount,
-                            _prefillMethod: quickPayMethod,
-                          });
-                          setShowPaymentModal(true);
-                        }
-                      }}
-                      disabled={!quickPayLoanId || !quickPayAmount}
-                      className={`h-8 px-4 rounded-lg text-sm font-medium border-0 transition-all ${
-                        !quickPayLoanId || !quickPayAmount
-                          ? 'bg-[#00A86B]/50 text-white/70 cursor-not-allowed'
-                          : 'bg-[#00A86B] text-white hover:bg-[#0D9B76]'
-                      }`}
-                    >
-                      Submit
-                    </Button>
-                  </div>
-                </div>
-                )}
+                {renderRecordPaymentBox('lg:col-span-3')}
               </motion.div>
             )}
 
@@ -2616,7 +2589,7 @@ export default function Lending({ initialTab }) {
                                   <div className="mt-2 px-3 py-1 bg-white rounded-full">
                                     <p className="text-sm font-semibold text-[#00A86B]">
                                       {(() => {
-                                        const days = Math.ceil((new Date(manageLoanSelected.next_payment_date) - new Date()) / (1000 * 60 * 60 * 24));
+                                        const days = daysUntilDate(manageLoanSelected.next_payment_date);
                                         return days > 0 ? `${days} day${days !== 1 ? 's' : ''} away` : days === 0 ? 'Due today' : `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue`;
                                       })()}
                                     </p>
@@ -2854,88 +2827,7 @@ export default function Lending({ initialTab }) {
                 )}
 
                 {/* Quick Record Payment - only show when there are active loans */}
-                {activeLoans.length > 0 && (
-                <div className="bg-[#96FFD0] rounded-2xl p-5 border-0 mt-4">
-                  <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                    Record Payment
-                  </p>
-                  <div className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
-                    <span>Record payment of</span>
-                    <span className="font-medium">$</span>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0.01"
-                      placeholder=""
-                      value={quickPayAmount}
-                      onChange={(e) => setQuickPayAmount(e.target.value)}
-                      className="w-24 h-8 px-3 bg-white inline-flex"
-                      style={{ MozAppearance: 'textfield' }}
-                    />
-                    <span>from</span>
-                    <span className="text-[#00A86B] font-medium">
-                      {quickPayLoanId
-                        ? `@${getUserById(activeLoans.find(l => l.id === quickPayLoanId)?.borrower_id)?.username || 'user'}`
-                        : '@_'}
-                    </span>
-                    <span>via</span>
-                    <Select value={quickPayMethod} onValueChange={setQuickPayMethod}>
-                      <SelectTrigger className="w-auto h-8 px-3 bg-white inline-flex">
-                        <SelectValue placeholder="select method" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="venmo">Venmo</SelectItem>
-                        <SelectItem value="zelle">Zelle</SelectItem>
-                        <SelectItem value="cashapp">Cash App</SelectItem>
-                        <SelectItem value="paypal">PayPal</SelectItem>
-                        <SelectItem value="cash">Cash</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <span>for</span>
-                    <Select value={quickPayLoanId} onValueChange={setQuickPayLoanId}>
-                      <SelectTrigger className="w-auto h-8 px-3 bg-white inline-flex min-w-[140px]">
-                        <SelectValue placeholder="select loan" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {activeLoans.map((loan) => {
-                          const borrower = getUserById(loan.borrower_id);
-                          return (
-                            <SelectItem key={loan.id} value={loan.id}>
-                              @{borrower?.username || 'user'} - {loan.purpose || `$${loan.amount}`}
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectContent>
-                    </Select>
-                    {quickPayLoanId && activeLoans.find(l => l.id === quickPayLoanId)?.purpose && (
-                      <span className="text-slate-500">({activeLoans.find(l => l.id === quickPayLoanId).purpose})</span>
-                    )}
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        const loan = activeLoans.find(l => l.id === quickPayLoanId);
-                        if (loan) {
-                          setSelectedLoan({
-                            ...loan,
-                            _prefillAmount: quickPayAmount,
-                            _prefillMethod: quickPayMethod,
-                          });
-                          setShowPaymentModal(true);
-                        }
-                      }}
-                      disabled={!quickPayLoanId || !quickPayAmount}
-                      className={`h-8 px-4 rounded-lg text-sm font-medium border-0 transition-all ${
-                        !quickPayLoanId || !quickPayAmount
-                          ? 'bg-[#00A86B]/50 text-white/70 cursor-not-allowed'
-                          : 'bg-[#00A86B] text-white hover:bg-[#0D9B76]'
-                      }`}
-                    >
-                      Submit
-                    </Button>
-                  </div>
-                </div>
-                )}
+                {renderRecordPaymentBox('mt-4')}
               </motion.div>
             )}
 

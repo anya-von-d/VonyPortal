@@ -259,7 +259,7 @@ export default function RecordPaymentModal({ loan: initialLoan, candidateLoans =
             <SuccessAnimation
               show={true}
               title="Payment Recorded!"
-              subtitle={`Waiting for ${isLender ? 'the Borrower' : 'the Lender'} to confirm`}
+              subtitle={`Sent to @${otherPersonUsername} for confirmation`}
             />
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -279,7 +279,7 @@ export default function RecordPaymentModal({ loan: initialLoan, candidateLoans =
                 <TransactionId id={transactionId} />
               )}
               <p className="text-xs text-slate-400 text-center max-w-xs">
-                The loan balance will update once both parties confirm this payment.
+                The loan balance will update once @{otherPersonUsername} confirms this payment.
               </p>
             </motion.div>
           </div>
@@ -350,7 +350,7 @@ export default function RecordPaymentModal({ loan: initialLoan, candidateLoans =
               >
                 <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
                 <p className="text-xs text-slate-600">
-                  {isLender ? 'The Borrower' : 'The Lender'} will need to confirm this payment. Make sure the details are correct.
+                  @{otherPersonUsername} will need to confirm this payment before it impacts the loan balance.
                 </p>
               </motion.div>
 

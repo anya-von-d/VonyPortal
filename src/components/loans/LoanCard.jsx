@@ -5,7 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Calendar, DollarSign, Percent, Clock, Send, CircleDollarSign } from "lucide-react";
 import { PublicProfile } from "@/entities/all";
-import { format, differenceInDays } from "date-fns";
+import { format } from "date-fns";
+import { daysUntil as daysUntilDate } from "@/components/utils/dateUtils";
 
 const statusColors = {
   pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
@@ -49,13 +50,7 @@ export default function LoanCard({ loan, type, onMakePayment, onDetails }) {
     ? ((loan.amount_paid || 0) / loan.total_amount) * 100 
     : 0;
 
-  const getDaysUntilPayment = () => {
-    if (!loan.next_payment_date) return null;
-    const daysUntil = differenceInDays(new Date(loan.next_payment_date), new Date());
-    return daysUntil;
-  };
-
-  const daysUntil = getDaysUntilPayment();
+  const daysUntil = loan.next_payment_date ? daysUntilDate(loan.next_payment_date) : null;
   const isOverdue = daysUntil !== null && daysUntil < 0;
 
   return (

@@ -61,14 +61,14 @@ export default function PendingPaymentConfirmations({ userId, onUpdate }) {
       const userLoanIds = userLoans.map(l => l.id);
 
       // Filter payments where the current user needs to confirm
-      // Only the LENDER should confirm payments (borrower records, lender confirms)
+      // You can't confirm your own payment — confirmation goes to the other party
       const toConfirm = allPayments.filter(payment => {
         if (!userLoanIds.includes(payment.loan_id)) return false;
-        // Find the loan and check if current user is the lender
-        const loan = userLoans.find(l => l.id === payment.loan_id);
-        if (!loan || loan.lender_id !== userId) return false;
-        // Also make sure they didn't record it themselves
+        // Must not be the person who recorded it
         if (payment.recorded_by === userId) return false;
+        // Must be on a loan the user is part of
+        const loan = userLoans.find(l => l.id === payment.loan_id);
+        if (!loan) return false;
         return true;
       });
 

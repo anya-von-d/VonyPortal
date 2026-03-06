@@ -16,6 +16,7 @@ import { CreditCard, ArrowUpRight, ArrowDownRight, Clock, Calendar } from "lucid
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
+import { daysUntil as daysUntilDate } from "@/components/utils/dateUtils";
 
 import LoanCard from "../components/loans/LoanCard";
 import RecordPaymentModal from "../components/loans/RecordPaymentModal";
@@ -167,11 +168,7 @@ export default function MyLoans() {
 
   const getNextPaymentDays = () => {
     if (!nextPaymentLoan) return null;
-    const today = new Date();
-    const paymentDate = new Date(nextPaymentLoan.date);
-    const diffTime = paymentDate - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
+    return daysUntilDate(nextPaymentLoan.next_payment_date);
   };
 
   const nextPaymentDays = getNextPaymentDays();

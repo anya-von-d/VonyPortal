@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { motion } from "framer-motion";
 import { format, startOfMonth, endOfMonth, addMonths, addDays, isBefore, isAfter, differenceInDays } from "date-fns";
 import { formatMoney } from "@/components/utils/formatMoney";
+import { toLocalDate, getLocalToday, daysUntil as daysUntilDate } from "@/components/utils/dateUtils";
 import RecordPaymentModal from "@/components/loans/RecordPaymentModal";
 import { AnimatePresence } from "framer-motion";
 
@@ -370,10 +371,7 @@ export default function Home() {
 
     const getPaymentStatus = () => {
       if (!nextPayment) return 'None';
-      const today = new Date();
-      const paymentDate = new Date(nextPayment.date);
-      const diffTime = paymentDate - today;
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const diffDays = daysUntilDate(nextPayment.date);
       if (diffDays < 0) return 'Overdue';
       return `${diffDays} day${diffDays !== 1 ? 's' : ''}`;
     };
@@ -552,7 +550,7 @@ export default function Home() {
                             {nextLenderPayment && (
                               <p className="text-[11px] text-[#00A86B]">
                                 {(() => {
-                                  const days = Math.ceil((nextLenderPayment.date - new Date()) / (1000 * 60 * 60 * 24));
+                                  const days = daysUntilDate(nextLenderPayment.date);
                                   return days > 0 ? `${days}d away` : days === 0 ? 'Due today' : `${Math.abs(days)}d overdue`;
                                 })()}
                               </p>
@@ -613,7 +611,7 @@ export default function Home() {
                             {nextBorrowerPayment && (
                               <p className="text-[11px] text-[#00A86B]">
                                 {(() => {
-                                  const days = Math.ceil((nextBorrowerPayment.date - new Date()) / (1000 * 60 * 60 * 24));
+                                  const days = daysUntilDate(nextBorrowerPayment.date);
                                   return days > 0 ? `${days}d away` : days === 0 ? 'Due today' : `${Math.abs(days)}d overdue`;
                                 })()}
                               </p>
@@ -641,55 +639,59 @@ export default function Home() {
                       const activeLoansAll = myLoans.filter(l => l && l.status === 'active');
 
                       // "From" options: everyone who owes you money (borrowers in your lending loans)
-                      const fromOptions = [];
+                      const fromOptionsBase = [];
                       const lendingLoansActive = activeLoansAll.filter(l => l.lender_id === user.id);
                       const borrowerIds = [...new Set(lendingLoansActive.map(l => l.borrower_id))];
                       borrowerIds.forEach(bId => {
                         const profile = safeAllProfiles.find(p => p.user_id === bId);
-                        fromOptions.push({ userId: bId, username: profile?.username || 'user', fullName: profile?.full_name || 'Unknown' });
+                        fromOptionsBase.push({ userId: bId, username: profile?.username || 'user', fullName: profile?.full_name || 'Unknown' });
                       });
 
                       // "To" options: everyone you owe money to (lenders in your borrowing loans)
-                      const toOptions = [];
+                      const toOptionsBase = [];
                       const borrowingLoansActive = activeLoansAll.filter(l => l.borrower_id === user.id);
                       const lenderIds = [...new Set(borrowingLoansActive.map(l => l.lender_id))];
                       lenderIds.forEach(lId => {
                         const profile = safeAllProfiles.find(p => p.user_id === lId);
-                        toOptions.push({ userId: lId, username: profile?.username || 'user', fullName: profile?.full_name || 'Unknown' });
+                        toOptionsBase.push({ userId: lId, username: profile?.username || 'user', fullName: profile?.full_name || 'Unknown' });
                       });
 
-                      // Self-filtering: if "from" selected, check if that person also appears as someone you owe (unlikely but handle)
-                      // If "to" selected, check if that person also appears as someone who owes you
-                      // The dropdowns auto-fill each other if there's a unique match through a shared loan
+                      // Add self to top of both lists
+                      const selfProfile = safeAllProfiles.find(p => p.user_id === user.id);
+                      const selfOption = { userId: user.id, username: selfProfile?.username || 'you', fullName: selfProfile?.full_name || 'You' };
+                      const fromListWithSelf = [selfOption, ...fromOptionsBase.filter(o => o.userId !== user.id)];
+                      const toListWithSelf = [selfOption, ...toOptionsBase.filter(o => o.userId !== user.id)];
+
+                      // Mutual exclusion: selected from one dropdown can't appear in the other
+                      const fromOptions = quickPayToPerson ? fromListWithSelf.filter(o => o.userId !== quickPayToPerson) : fromListWithSelf;
+                      const toOptions = quickPayFromPerson ? toListWithSelf.filter(o => o.userId !== quickPayFromPerson) : toListWithSelf;
 
                       const handleFromChange = (val) => {
                         setQuickPayFromPerson(val);
-                        // Check if this person has a loan where they also appear in the "to" direction
-                        // Find loans where this person owes you
-                        const loansFromPerson = lendingLoansActive.filter(l => l.borrower_id === val);
-                        // If only one "to" person matches across those loans, auto-fill
-                        if (!quickPayToPerson) {
-                          // No auto-fill needed for "to" from "from" - they are independent directions
-                        }
+                        if (val === quickPayToPerson) setQuickPayToPerson('');
                       };
 
                       const handleToChange = (val) => {
                         setQuickPayToPerson(val);
+                        if (val === quickPayFromPerson) setQuickPayFromPerson('');
                       };
 
                       // Determine which loans match the current selection for the modal
                       const getMatchingLoans = () => {
-                        if (quickPayFromPerson && !quickPayToPerson) {
-                          // Recording a payment FROM someone who owes you (lending loan)
-                          return lendingLoansActive.filter(l => l.borrower_id === quickPayFromPerson);
-                        } else if (quickPayToPerson && !quickPayFromPerson) {
-                          // Recording a payment TO someone you owe (borrowing loan)
-                          return borrowingLoansActive.filter(l => l.lender_id === quickPayToPerson);
-                        } else if (quickPayFromPerson && quickPayToPerson) {
-                          // Both selected — find loans matching either direction
-                          const fromLoans = lendingLoansActive.filter(l => l.borrower_id === quickPayFromPerson);
-                          const toLoans = borrowingLoansActive.filter(l => l.lender_id === quickPayToPerson);
-                          return [...fromLoans, ...toLoans];
+                        if (quickPayFromPerson && quickPayToPerson) {
+                          // Both selected — find loans between these two people
+                          return activeLoansAll.filter(l =>
+                            (l.borrower_id === quickPayFromPerson && l.lender_id === quickPayToPerson) ||
+                            (l.borrower_id === quickPayToPerson && l.lender_id === quickPayFromPerson)
+                          );
+                        } else if (quickPayFromPerson) {
+                          return activeLoansAll.filter(l =>
+                            l.borrower_id === quickPayFromPerson || l.lender_id === quickPayFromPerson
+                          );
+                        } else if (quickPayToPerson) {
+                          return activeLoansAll.filter(l =>
+                            l.borrower_id === quickPayToPerson || l.lender_id === quickPayToPerson
+                          );
                         }
                         return activeLoansAll;
                       };
@@ -735,46 +737,38 @@ export default function Home() {
                               className="w-20 h-7 px-2 bg-[#C2FFDC] border-0 text-xs inline-flex rounded-md text-[#1C4332] placeholder:text-[#1C4332]/50"
                               style={{ MozAppearance: 'textfield' }}
                             />
-                            {fromOptions.length > 0 && (
-                              <>
-                                <span>from</span>
-                                <Select
-                                  value={quickPayFromPerson}
-                                  onValueChange={handleFromChange}
-                                >
-                                  <SelectTrigger className="w-auto h-7 px-2 bg-[#C2FFDC] border-0 text-xs inline-flex rounded-md text-[#1C4332]">
-                                    <SelectValue placeholder="select person" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {fromOptions.map((person) => (
-                                      <SelectItem key={person.userId} value={person.userId}>
-                                        @{person.username}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </>
-                            )}
-                            {toOptions.length > 0 && (
-                              <>
-                                <span>to</span>
-                                <Select
-                                  value={quickPayToPerson}
-                                  onValueChange={handleToChange}
-                                >
-                                  <SelectTrigger className="w-auto h-7 px-2 bg-[#C2FFDC] border-0 text-xs inline-flex rounded-md text-[#1C4332]">
-                                    <SelectValue placeholder="select person" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {toOptions.map((person) => (
-                                      <SelectItem key={person.userId} value={person.userId}>
-                                        @{person.username}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </>
-                            )}
+                            <span>from</span>
+                            <Select
+                              value={quickPayFromPerson}
+                              onValueChange={handleFromChange}
+                            >
+                              <SelectTrigger className="w-auto h-7 px-2 bg-[#C2FFDC] border-0 text-xs inline-flex rounded-md text-[#1C4332]">
+                                <SelectValue placeholder="select person" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {fromOptions.map((person) => (
+                                  <SelectItem key={person.userId} value={person.userId}>
+                                    @{person.username}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <span>to</span>
+                            <Select
+                              value={quickPayToPerson}
+                              onValueChange={handleToChange}
+                            >
+                              <SelectTrigger className="w-auto h-7 px-2 bg-[#C2FFDC] border-0 text-xs inline-flex rounded-md text-[#1C4332]">
+                                <SelectValue placeholder="select person" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {toOptions.map((person) => (
+                                  <SelectItem key={person.userId} value={person.userId}>
+                                    @{person.username}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                             <Button
                               type="button"
                               onClick={handleSubmit}
@@ -1121,12 +1115,7 @@ export default function Home() {
                           const isLender = loan.lender_id === user.id;
                           const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
                           const otherProfile = safeAllProfiles.find(p => p.user_id === otherUserId);
-                          const paymentDate = new Date(loan.next_payment_date);
-                          const today = new Date();
-                          today.setHours(0, 0, 0, 0);
-                          const payDateClean = new Date(paymentDate);
-                          payDateClean.setHours(0, 0, 0, 0);
-                          const days = differenceInDays(payDateClean, today);
+                          const days = daysUntilDate(loan.next_payment_date);
 
                           // Remaining amount for this payment period
                           const loanPayments = safePaymentsUp.filter(p => p && p.loan_id === loan.id);

@@ -13,6 +13,7 @@ import { createPageUrl } from "@/utils";
 import { PlusCircle, DollarSign, Calendar, Percent, FileText, User as UserIcon, AlertCircle, Zap, ClipboardList, Users, Send } from "lucide-react";
 import { motion } from "framer-motion";
 import { addMonths, format } from "date-fns";
+import { daysUntil as daysUntilDate } from "@/components/utils/dateUtils";
 
 export default function CreateLoan() {
   const navigate = useNavigate();
@@ -130,10 +131,7 @@ export default function CreateLoan() {
     } else if (formData.repayment_unit === 'weeks') {
       periodInMonths = period / 4.33;
     } else if (formData.repayment_unit === 'custom' && formData.custom_due_date) {
-      const today = new Date();
-      const dueDate = new Date(formData.custom_due_date);
-      const diffTime = Math.abs(dueDate - today);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const diffDays = Math.abs(daysUntilDate(formData.custom_due_date));
       periodInMonths = diffDays / 30;
     }
 
@@ -278,8 +276,9 @@ export default function CreateLoan() {
   const handleSign = async (signature) => {
     setIsSubmitting(true);
     try {
-      // Create the loan
-      const createdLoan = await Loan.create(pendingLoanData);
+      // Create the loan (strip repayment_unit — not a column in loans table)
+      const { repayment_unit, ...loanPayload } = pendingLoanData;
+      const createdLoan = await Loan.create(loanPayload);
 
       // Create the agreement with signer's signature
       const agreementData = {
@@ -289,6 +288,7 @@ export default function CreateLoan() {
         amount: pendingLoanData.amount,
         interest_rate: pendingLoanData.interest_rate,
         repayment_period: pendingLoanData.repayment_period,
+        repayment_unit: formData.repayment_unit,
         payment_frequency: pendingLoanData.payment_frequency,
         purpose: pendingLoanData.purpose || '',
         due_date: pendingLoanData.due_date,

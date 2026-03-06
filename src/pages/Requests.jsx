@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { format, addMonths, differenceInDays, parseISO } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
+import { toLocalDate, daysUntil as daysUntilDate } from "@/components/utils/dateUtils";
 import BorrowerSignatureModal from "@/components/loans/BorrowerSignatureModal";
 import RecordPaymentModal from "@/components/loans/RecordPaymentModal";
 import {
@@ -101,7 +102,8 @@ export default function Requests() {
       const toConfirm = pendingPayments.filter(payment => {
         if (!userLoanIds.includes(payment.loan_id)) return false;
         const loan = userLoans.find(l => l.id === payment.loan_id);
-        if (!loan || loan.lender_id !== user.id) return false;
+        if (!loan) return false;
+        // You can't confirm your own payment — confirmation goes to the other party
         if (payment.recorded_by === user.id) return false;
         return true;
       });
@@ -153,8 +155,6 @@ export default function Requests() {
   const buildReminders = () => {
     if (!user?.id) return [];
     const reminders = [];
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
 
     const activeLoans = loans.filter(l =>
       l.status === 'active' &&
@@ -163,9 +163,7 @@ export default function Requests() {
     );
 
     activeLoans.forEach(loan => {
-      const paymentDate = parseISO(loan.next_payment_date);
-      paymentDate.setHours(0, 0, 0, 0);
-      const daysUntil = differenceInDays(paymentDate, today);
+      const daysUntil = daysUntilDate(loan.next_payment_date);
 
       // Only show reminders for payments within 5 days or overdue
       if (daysUntil > 5) return;

@@ -23,6 +23,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { format, addDays, addMonths, addWeeks } from "date-fns";
 import { formatMoney } from "@/components/utils/formatMoney";
+import { toLocalDate, getLocalToday, daysUntil as daysUntilDate } from "@/components/utils/dateUtils";
 
 import LoanCard from "@/components/loans/LoanCard";
 import RecordPaymentModal from "@/components/loans/RecordPaymentModal";
@@ -55,6 +56,9 @@ export default function Borrowing() {
   const [quickPayMethod, setQuickPayMethod] = useState('');
   const [quickPayLoanId, setQuickPayLoanId] = useState('');
   const [quickPayPerson, setQuickPayPerson] = useState('');
+  const [quickPayFromPerson, setQuickPayFromPerson] = useState('');
+  const [quickPayToPerson, setQuickPayToPerson] = useState('');
+  const [allUserLoans, setAllUserLoans] = useState([]);
   const [showQuickConfirm, setShowQuickConfirm] = useState(false);
   const [isQuickProcessing, setIsQuickProcessing] = useState(false);
   const [isQuickSuccess, setIsQuickSuccess] = useState(false);
@@ -90,6 +94,11 @@ export default function Borrowing() {
       );
 
       setLoans(userLoans);
+      // Store all user loans (both lending and borrowing) for record payment dropdowns
+      const allMyLoans = (allLoans || []).filter(loan =>
+        loan.borrower_id === currentUser.id || loan.lender_id === currentUser.id
+      );
+      setAllUserLoans(allMyLoans);
       setPublicProfiles(allProfiles || []);
       setLoanAgreements(allAgreements || []);
       setAllPayments(allPmts || []);
@@ -291,15 +300,18 @@ export default function Borrowing() {
 
   const getNextPaymentDays = () => {
     if (!nextPaymentLoan) return null;
-    const today = new Date();
-    const paymentDate = new Date(nextPaymentLoan.date);
-    const diffTime = paymentDate - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
+    return daysUntilDate(nextPaymentLoan.next_payment_date);
   };
 
   const nextPaymentDays = getNextPaymentDays();
-  const nextPaymentAmount = nextPaymentLoan?.payment_amount || 0;
+  // Calculate next payment amount including overdue rollover
+  const nextPaymentAmount = (() => {
+    if (!nextPaymentLoan) return 0;
+    const agreement = loanAgreements.find(a => a.loan_id === nextPaymentLoan.id);
+    const analysis = analyzeLoanPayments(nextPaymentLoan, allPayments, agreement);
+    if (analysis && analysis.nextPaymentAmount > 0) return analysis.nextPaymentAmount;
+    return nextPaymentLoan.payment_amount || 0;
+  })();
   const nextPaymentLenderUsername = nextPaymentLoan
     ? publicProfiles.find(p => p.user_id === nextPaymentLoan.lender_id)?.username || 'user'
     : null;
@@ -418,6 +430,200 @@ export default function Borrowing() {
     }
 
     return schedule;
+  };
+
+  /**
+   * Analyze loan payments period-by-period with:
+   * - Dynamic interest accrual (Total Owed = unpaid principal + accrued interest to date)
+   * - Full payment counting (only periods where cumulative payments >= scheduled amount count)
+   * - Overpayment: reduces future monthly amounts (remaining balance / remaining periods)
+   * - Underpayment rollover: deficit rolls into next period only, then back to normal
+   */
+  const analyzeLoanPayments = (loan, payments, agreement) => {
+    if (!loan) return null;
+
+    const principal = loan.amount || 0;
+    const annualRate = loan.interest_rate || 0;
+    const totalPeriods = loan.repayment_period || 1;
+    const frequency = loan.payment_frequency || 'monthly';
+    const originalPaymentAmount = loan.payment_amount || 0;
+
+    // Periodic interest rate
+    let periodsPerYear = 12;
+    if (frequency === 'weekly') periodsPerYear = 52;
+    else if (frequency === 'biweekly') periodsPerYear = 26;
+    else if (frequency === 'daily') periodsPerYear = 365;
+    const r = annualRate > 0 ? (annualRate / 100) / periodsPerYear : 0;
+
+    // Only confirmed payments impact the loan balance
+    const confirmedPayments = payments
+      .filter(p => p.loan_id === loan.id && p.status === 'confirmed')
+      .sort((a, b) => new Date(a.payment_date) - new Date(b.payment_date));
+
+    // All payments (confirmed + pending) for chart display
+    const allLoanPayments = payments
+      .filter(p => p.loan_id === loan.id && (p.status === 'confirmed' || p.status === 'pending_confirmation'))
+      .sort((a, b) => new Date(a.payment_date) - new Date(b.payment_date));
+
+    // Generate schedule dates
+    let scheduleDates = [];
+    if (agreement) {
+      const sched = generateAmortizationSchedule(agreement);
+      scheduleDates = sched.map(s => s.date);
+    } else {
+      let dt = new Date(loan.created_at);
+      for (let i = 0; i < totalPeriods; i++) {
+        if (frequency === 'weekly') dt = addWeeks(new Date(dt), 1);
+        else if (frequency === 'biweekly') dt = addWeeks(new Date(dt), 2);
+        else if (frequency === 'daily') dt = addDays(new Date(dt), 1);
+        else dt = addMonths(new Date(dt), 1);
+        scheduleDates.push(new Date(dt));
+      }
+    }
+
+    // Assign confirmed payments to periods (these impact the loan balance)
+    // Period i covers from scheduleDates[i-1] (or loan start) to scheduleDates[i]
+    const loanStart = new Date(loan.created_at);
+    const periodConfirmedPayments = [];
+    const periodAllPayments = []; // For chart display (confirmed + pending)
+    for (let i = 0; i < totalPeriods; i++) {
+      const periodStart = i === 0 ? loanStart : scheduleDates[i - 1];
+      const periodEnd = scheduleDates[i];
+      const confirmedInPeriod = confirmedPayments.filter(p => {
+        const pDate = new Date(p.payment_date);
+        return pDate > periodStart && pDate <= periodEnd;
+      });
+      const allInPeriod = allLoanPayments.filter(p => {
+        const pDate = new Date(p.payment_date);
+        return pDate > periodStart && pDate <= periodEnd;
+      });
+      periodConfirmedPayments.push(confirmedInPeriod);
+      periodAllPayments.push(allInPeriod);
+    }
+
+    // Also capture any payments after the last scheduled date
+    if (scheduleDates.length > 0) {
+      const lastDate = scheduleDates[scheduleDates.length - 1];
+      const lateConfirmed = confirmedPayments.filter(p => new Date(p.payment_date) > lastDate);
+      const lateAll = allLoanPayments.filter(p => new Date(p.payment_date) > lastDate);
+      if (lateConfirmed.length > 0) {
+        periodConfirmedPayments[totalPeriods - 1] = [...periodConfirmedPayments[totalPeriods - 1], ...lateConfirmed];
+      }
+      if (lateAll.length > 0) {
+        periodAllPayments[totalPeriods - 1] = [...periodAllPayments[totalPeriods - 1], ...lateAll];
+      }
+    }
+
+    // Walk through periods calculating balance, interest, payments made, rollover
+    let remainingPrincipal = principal;
+    let totalInterestAccrued = 0;
+    let totalPaid = 0;
+    let fullPaymentCount = 0;
+    let deficit = 0; // rollover from previous period
+    const periodResults = [];
+
+    for (let i = 0; i < totalPeriods; i++) {
+      // Interest accrued this period on remaining principal
+      const periodInterest = Math.round(remainingPrincipal * r * 100) / 100;
+      totalInterestAccrued += periodInterest;
+
+      // Scheduled amount for this period (original + any deficit from last period)
+      const scheduledAmount = originalPaymentAmount + deficit;
+
+      // Only confirmed payments impact the balance
+      const confirmedPaidSum = periodConfirmedPayments[i].reduce((sum, p) => sum + (p.amount || 0), 0);
+      totalPaid += confirmedPaidSum;
+
+      // All payments in this period (for chart display)
+      const allPaidSum = periodAllPayments[i].reduce((sum, p) => sum + (p.amount || 0), 0);
+      const pendingPaidSum = allPaidSum - confirmedPaidSum;
+
+      // Is this a full payment? Only confirmed payments count
+      const isFullPayment = confirmedPaidSum >= scheduledAmount && scheduledAmount > 0;
+      if (isFullPayment) fullPaymentCount++;
+
+      // Calculate new deficit or overpayment (based on confirmed only)
+      let periodDeficit = 0;
+      let periodOverpayment = 0;
+      if (confirmedPaidSum < scheduledAmount) {
+        periodDeficit = Math.round((scheduledAmount - confirmedPaidSum) * 100) / 100;
+      } else if (confirmedPaidSum > scheduledAmount) {
+        periodOverpayment = Math.round((confirmedPaidSum - scheduledAmount) * 100) / 100;
+      }
+
+      // Apply confirmed payment to principal: payment goes to interest first, then principal
+      let paymentToInterest = Math.min(confirmedPaidSum, periodInterest);
+      let paymentToPrincipal = Math.max(0, confirmedPaidSum - paymentToInterest);
+      remainingPrincipal = Math.max(0, Math.round((remainingPrincipal - paymentToPrincipal) * 100) / 100);
+
+      const isPast = toLocalDate(scheduleDates[i]) <= getLocalToday();
+
+      periodResults.push({
+        period: i + 1,
+        date: scheduleDates[i],
+        scheduledAmount: Math.round(scheduledAmount * 100) / 100,
+        confirmedPaid: Math.round(confirmedPaidSum * 100) / 100,
+        pendingPaid: Math.round(pendingPaidSum * 100) / 100,
+        actualPaid: Math.round(allPaidSum * 100) / 100,
+        isFullPayment,
+        isPast,
+        hasConfirmedPayments: periodConfirmedPayments[i].length > 0,
+        hasPendingPayments: periodAllPayments[i].length > periodConfirmedPayments[i].length,
+        hasAnyPayments: periodAllPayments[i].length > 0,
+        deficit: periodDeficit,
+        overpayment: periodOverpayment,
+        interestThisPeriod: periodInterest,
+        remainingPrincipal,
+        confirmedPayments: periodConfirmedPayments[i],
+        allPayments: periodAllPayments[i]
+      });
+
+      // Set deficit for next period: only carries for one period, then resets
+      deficit = periodDeficit;
+    }
+
+    // Calculate remaining balance and recalculated payment
+    const totalOwed = Math.round((remainingPrincipal + (remainingPrincipal > 0 ? remainingPrincipal * r * (totalPeriods - fullPaymentCount) : 0)) * 100) / 100;
+
+    // Simpler total owed: remaining principal + interest that will accrue on it
+    const remainingPeriodsCount = Math.max(1, totalPeriods - periodResults.filter(p => p.isPast && p.hasConfirmedPayments).length);
+    const futureInterest = Math.round(remainingPrincipal * r * remainingPeriodsCount * 100) / 100;
+    const dynamicTotalOwed = Math.round((remainingPrincipal + futureInterest) * 100) / 100;
+
+    // Current total owed = unpaid principal + interest accrued so far
+    const currentTotalOwed = Math.round((remainingPrincipal + totalInterestAccrued - (totalPaid - (principal - remainingPrincipal))) * 100) / 100;
+
+    // Simplest: total owed right now = principal + all interest accrued to date - all payments made
+    const totalOwedNow = Math.max(0, Math.round((principal + totalInterestAccrued - totalPaid) * 100) / 100);
+
+    // Recalculated monthly payment based on remaining balance
+    const unpaidPeriods = totalPeriods - fullPaymentCount;
+    const recalcPayment = unpaidPeriods > 0 && totalOwedNow > 0
+      ? Math.round((totalOwedNow / unpaidPeriods) * 100) / 100
+      : 0;
+
+    // Next period's payment amount (includes any current deficit rollover)
+    const currentPeriodIdx = periodResults.findIndex(p => !p.isPast || (p.isPast && !p.hasConfirmedPayments));
+    const nextPeriodDeficit = currentPeriodIdx > 0 ? periodResults[currentPeriodIdx - 1]?.deficit || 0 : 0;
+    const nextPaymentAmount = recalcPayment > 0 ? Math.round((recalcPayment + nextPeriodDeficit) * 100) / 100 : originalPaymentAmount;
+
+    return {
+      principal,
+      totalOwedNow, // unpaid principal + accrued interest - payments
+      totalPaid,
+      totalInterestAccrued,
+      remainingPrincipal,
+      fullPaymentCount,
+      totalPeriods,
+      recalcPayment, // recalculated regular payment (remaining / unpaid periods)
+      nextPaymentAmount, // next payment including any rollover
+      originalPaymentAmount,
+      periodResults,
+      deficit: periodResults.length > 0 ? periodResults[periodResults.length - 1].deficit : 0,
+      paidPercentage: (principal + totalInterestAccrued) > 0
+        ? Math.min(100, (totalPaid / (principal + totalInterestAccrued)) * 100)
+        : 0
+    };
   };
 
   // Promissory Note Popup Content
@@ -674,9 +880,7 @@ export default function Borrowing() {
     );
   };
 
-  const tabs = [
-    { id: 'overview', label: 'All' },
-  ];
+  const tabs = [];
 
   return (
     <>
@@ -739,44 +943,27 @@ export default function Borrowing() {
 
             {/* Next Payment Banner */}
             {nextPaymentLoan && nextPaymentDays !== null && (
-              <div className="rounded-xl px-4 py-3 flex items-center justify-between" style={{ backgroundColor: '#1C4332' }}>
+              <div className="rounded-xl px-4 py-3 flex items-center justify-between" style={{ backgroundColor: '#6AD478' }}>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: '#83F384' }}>
-                    <Clock className="w-4 h-4 text-[#1C4332]" />
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: '#1C4332' }}>
+                    <Clock className="w-4 h-4 text-[#6AD478]" />
                   </div>
-                  <p className="text-sm text-[#C2FFDC] font-sans">
+                  <p className="text-sm text-[#0A1A10] font-sans">
                     {nextPaymentDays > 0
-                      ? <>Your next payment is due in <span className="font-bold text-white">{nextPaymentDays} {nextPaymentDays === 1 ? 'day' : 'days'}</span></>
+                      ? <>Your next payment is due in <span className="font-bold text-[#0A1A10]">{nextPaymentDays} {nextPaymentDays === 1 ? 'day' : 'days'}</span></>
                       : nextPaymentDays === 0
-                        ? <span className="font-bold text-[#F59E0B]">Your next payment is due today</span>
-                        : <span className="font-bold text-red-400">Your payment is {Math.abs(nextPaymentDays)} {Math.abs(nextPaymentDays) === 1 ? 'day' : 'days'} overdue</span>
+                        ? <span className="font-bold text-[#0A1A10]">Your next payment is due today</span>
+                        : <span className="font-bold text-red-700">Your payment is {Math.abs(nextPaymentDays)} {Math.abs(nextPaymentDays) === 1 ? 'day' : 'days'} overdue</span>
                     }
                   </p>
                 </div>
-                <p className="text-sm font-bold text-white font-sans">
+                <p className="text-sm font-bold text-[#0A1A10] font-sans">
                   ${nextPaymentAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
               </div>
             )}
 
-            {/* Tab Navigation */}
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {tabs.map(tab => (
-                <Button
-                  key={tab.id}
-                  onClick={() => setActiveSection(tab.id)}
-                  variant={activeSection === tab.id ? 'default' : 'outline'}
-                  className={`whitespace-nowrap ${
-                    activeSection === tab.id
-                      ? 'bg-[#1C4332] hover:bg-[#163a2a] text-[#C2FFDC] font-bold'
-                      : 'bg-[#1C4332]/40 border-0 text-[#C2FFDC]/60 hover:bg-[#1C4332]/60 hover:text-[#C2FFDC]'
-                  }`}
-                >
-                  <span className="hidden sm:inline">{tab.label}</span>
-                  <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
-                </Button>
-              ))}
-            </div>
+            {/* Content below */}
 
             {/* Content Sections */}
             <div>
@@ -812,7 +999,7 @@ export default function Borrowing() {
                           return (
                             <div className="mb-3">
                               <div className="flex items-center justify-between mb-0.5">
-                                <p className="text-[11px] font-medium text-[#00A86B]">Paid Back</p>
+                                <p className="text-[11px] font-medium text-[#00A86B]">Total Amount Loaned</p>
                                 <p className="text-[11px] font-bold text-[#C2FFDC]">
                                   {formatMoney(paidAll)} / {formatMoney(totalAll)}
                                 </p>
@@ -822,7 +1009,7 @@ export default function Borrowing() {
                                   className="h-full rounded-md transition-all duration-500 flex items-center justify-end pr-2"
                                   style={{
                                     width: `${Math.max(pctAll, 2)}%`,
-                                    backgroundColor: '#00A86B'
+                                    backgroundColor: '#6AD478'
                                   }}
                                 >
                                   {paidAll > 0 && (
@@ -863,7 +1050,7 @@ export default function Borrowing() {
                               <div className="w-full h-5 bg-[#0F2B1F] rounded-md overflow-hidden">
                                 <div
                                   className="h-full rounded-md transition-all duration-500"
-                                  style={{ width: `${Math.max(percentPaid, 2)}%`, backgroundColor: '#1C4332' }}
+                                  style={{ width: `${Math.max(percentPaid, 2)}%`, backgroundColor: '#00A86B' }}
                                 />
                               </div>
                               <div className="flex justify-between text-[10px] text-[#00A86B]">
@@ -883,11 +1070,8 @@ export default function Borrowing() {
                       .filter(l => l.next_payment_date)
                       .map(l => {
                         const lender = publicProfiles.find(p => p.user_id === l.lender_id);
-                        const today = new Date();
-                        today.setHours(0, 0, 0, 0);
-                        const payDate = new Date(l.next_payment_date);
-                        payDate.setHours(0, 0, 0, 0);
-                        const days = Math.ceil((payDate - today) / (1000 * 60 * 60 * 24));
+                        const days = daysUntilDate(l.next_payment_date);
+                        const payDate = toLocalDate(l.next_payment_date);
                         return { ...l, lenderUsername: lender?.username || 'user', days, payDate };
                       })
                       .sort((a, b) => a.payDate - b.payDate);
@@ -932,11 +1116,6 @@ export default function Borrowing() {
                                     </p>
                                     <p className={`text-[10px] mt-0.5 ${isOverdue ? 'text-red-400' : 'text-[#00A86B]'}`}>{format(loan.payDate, 'MMM d, yyyy')}</p>
                                   </div>
-                                  {isOverdue && (
-                                    <span className="flex-shrink-0 text-[9px] font-semibold px-2.5 py-1 rounded-md bg-red-500 text-white">
-                                      Overdue
-                                    </span>
-                                  )}
                                 </div>
                               );
                             })}
@@ -994,8 +1173,110 @@ export default function Borrowing() {
                       )}
                     </div>
 
+                    {/* Overdue Payment Box */}
+                    {(() => {
+                      const overdueLoans = activeLoans.filter(loan => {
+                        if (!loan.next_payment_date) return false;
+                        return daysUntilDate(loan.next_payment_date) < 0;
+                      });
+                      if (overdueLoans.length === 0) return null;
+                      return overdueLoans.map(loan => {
+                        const lender = getUserById(loan.lender_id);
+                        const daysOverdue = Math.abs(daysUntilDate(loan.next_payment_date));
+                        const agreement = loanAgreements.find(a => a.loan_id === loan.id);
+                        const analysis = analyzeLoanPayments(loan, allPayments, agreement);
+                        const overdueAmount = analysis ? analysis.nextPaymentAmount : (loan.payment_amount || 0);
+                        return (
+                          <div key={`overdue-${loan.id}`} className="rounded-xl px-4 py-3 shadow-sm" style={{ backgroundColor: '#FF6B6B' }}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <AlertCircle className="w-4 h-4 text-white" />
+                              <p className="text-sm font-bold text-white tracking-tight font-serif">
+                                Overdue Payment
+                              </p>
+                            </div>
+                            <p className="text-xs text-white/90 mb-2">
+                              Your payment to <span className="font-bold text-white">@{lender?.username || 'user'}</span> is overdue by {daysOverdue} {daysOverdue === 1 ? 'day' : 'days'}. If you made a payment, make sure to record it.
+                            </p>
+                            <div className="flex items-center justify-between">
+                              <p className="text-lg font-bold text-white">{formatMoney(overdueAmount)}</p>
+                              <Button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedLoan(loan);
+                                  setShowPaymentModal(true);
+                                }}
+                                className="h-7 px-3 rounded-md text-xs font-semibold border-0 bg-white text-red-600 hover:bg-white/90"
+                              >
+                                Record Payment
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      });
+                    })()}
+
                     {/* Record Payment */}
-                    {activeLoans.length > 0 && (
+                    {activeLoans.length > 0 && (() => {
+                      const allActiveLoans = allUserLoans.filter(l => l.status === 'active');
+                      // "From" options: people who owe you money (borrowers in your lending loans) + yourself
+                      const lendingLoans = allActiveLoans.filter(l => l.lender_id === user.id);
+                      const fromBorrowerIds = [...new Set(lendingLoans.map(l => l.borrower_id))];
+                      const fromOptions = fromBorrowerIds.map(bId => {
+                        const profile = getUserById(bId);
+                        return { userId: bId, username: profile?.username || 'user', fullName: profile?.full_name || 'Unknown' };
+                      });
+
+                      // "To" options: people you owe money to (lenders in your borrowing loans) + yourself
+                      const borrowingLoans = allActiveLoans.filter(l => l.borrower_id === user.id);
+                      const toLenderIds = [...new Set(borrowingLoans.map(l => l.lender_id))];
+                      const toOptions = toLenderIds.map(lId => {
+                        const profile = getUserById(lId);
+                        return { userId: lId, username: profile?.username || 'user', fullName: profile?.full_name || 'Unknown' };
+                      });
+
+                      // Add self to both lists (at top)
+                      const selfProfile = getUserById(user.id);
+                      const selfOption = { userId: user.id, username: selfProfile?.username || 'you', fullName: selfProfile?.full_name || 'You' };
+
+                      const fromListWithSelf = [selfOption, ...fromOptions.filter(o => o.userId !== user.id)];
+                      const toListWithSelf = [selfOption, ...toOptions.filter(o => o.userId !== user.id)];
+
+                      // Filter out the selected person from the other dropdown
+                      const filteredFromOptions = quickPayToPerson
+                        ? fromListWithSelf.filter(o => o.userId !== quickPayToPerson)
+                        : fromListWithSelf;
+                      const filteredToOptions = quickPayFromPerson
+                        ? toListWithSelf.filter(o => o.userId !== quickPayFromPerson)
+                        : toListWithSelf;
+
+                      const handleRecordSubmit = () => {
+                        let matchingLoans = [];
+                        if (quickPayFromPerson && quickPayToPerson) {
+                          matchingLoans = allActiveLoans.filter(l =>
+                            (l.borrower_id === quickPayFromPerson && l.lender_id === quickPayToPerson) ||
+                            (l.borrower_id === quickPayToPerson && l.lender_id === quickPayFromPerson)
+                          );
+                        } else if (quickPayFromPerson) {
+                          matchingLoans = allActiveLoans.filter(l =>
+                            l.borrower_id === quickPayFromPerson || l.lender_id === quickPayFromPerson
+                          );
+                        } else if (quickPayToPerson) {
+                          matchingLoans = allActiveLoans.filter(l =>
+                            l.borrower_id === quickPayToPerson || l.lender_id === quickPayToPerson
+                          );
+                        }
+                        if (matchingLoans.length === 1) {
+                          setSelectedLoan({ ...matchingLoans[0], _prefillAmount: quickPayAmount });
+                          setShowPaymentModal(true);
+                        } else if (matchingLoans.length > 1) {
+                          setSelectedLoan({ ...matchingLoans[0], _prefillAmount: quickPayAmount, _candidateLoans: matchingLoans });
+                          setShowPaymentModal(true);
+                        }
+                      };
+
+                      const canSubmit = quickPayAmount && (quickPayFromPerson || quickPayToPerson);
+
+                      return (
                       <div className="rounded-xl px-4 py-3 shadow-sm" style={{ backgroundColor: '#6AD478' }}>
                         <p className="text-sm font-bold text-[#1C4332] mb-2 tracking-tight font-serif">
                           Record Payment
@@ -1013,49 +1294,50 @@ export default function Borrowing() {
                             className="w-20 h-7 px-2 bg-white/20 border-0 text-xs inline-flex rounded-md text-white placeholder:text-white/50"
                             style={{ MozAppearance: 'textfield' }}
                           />
-                          <span>to</span>
+                          <span>from</span>
                           <Select
-                            value={quickPayPerson}
+                            value={quickPayFromPerson}
                             onValueChange={(val) => {
-                              setQuickPayPerson(val);
-                              setQuickPayLoanId('');
+                              setQuickPayFromPerson(val);
+                              if (val === quickPayToPerson) setQuickPayToPerson('');
                             }}
                           >
                             <SelectTrigger className="w-auto h-7 px-2 bg-white/20 border-0 text-xs inline-flex rounded-md text-white">
                               <SelectValue placeholder="select person" />
                             </SelectTrigger>
                             <SelectContent>
-                              {uniqueLenders.map((lender) => (
-                                <SelectItem key={lender.userId} value={lender.userId}>
-                                  @{lender.username || 'user'}
+                              {filteredFromOptions.map((person) => (
+                                <SelectItem key={person.userId} value={person.userId}>
+                                  @{person.username}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <span>to</span>
+                          <Select
+                            value={quickPayToPerson}
+                            onValueChange={(val) => {
+                              setQuickPayToPerson(val);
+                              if (val === quickPayFromPerson) setQuickPayFromPerson('');
+                            }}
+                          >
+                            <SelectTrigger className="w-auto h-7 px-2 bg-white/20 border-0 text-xs inline-flex rounded-md text-white">
+                              <SelectValue placeholder="select person" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {filteredToOptions.map((person) => (
+                                <SelectItem key={person.userId} value={person.userId}>
+                                  @{person.username}
                                 </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
                           <Button
                             type="button"
-                            onClick={() => {
-                              const matchingLoans = quickPayPerson
-                                ? activeLoans.filter(l => l.lender_id === quickPayPerson)
-                                : activeLoans;
-                              if (matchingLoans.length === 1) {
-                                setSelectedLoan({
-                                  ...matchingLoans[0],
-                                  _prefillAmount: quickPayAmount,
-                                });
-                                setShowPaymentModal(true);
-                              } else if (matchingLoans.length > 1) {
-                                setSelectedLoan({
-                                  ...matchingLoans[0],
-                                  _prefillAmount: quickPayAmount,
-                                  _candidateLoans: matchingLoans,
-                                });
-                                setShowPaymentModal(true);
-                              }
-                            }}
-                            disabled={!quickPayPerson || !quickPayAmount}
+                            onClick={handleRecordSubmit}
+                            disabled={!canSubmit}
                             className={`h-7 px-3 rounded-md text-xs font-semibold border-0 transition-all ${
-                              !quickPayPerson || !quickPayAmount
+                              !canSubmit
                                 ? 'bg-white/30 text-white/70 cursor-not-allowed'
                                 : 'bg-white text-[#00A86B] hover:bg-white/90'
                             }`}
@@ -1064,7 +1346,8 @@ export default function Borrowing() {
                           </Button>
                         </div>
                       </div>
-                    )}
+                      );
+                    })()}
 
                     {/* Loans Ranked By */}
                     {activeLoans.length > 0 && (
@@ -1106,8 +1389,8 @@ export default function Borrowing() {
 
                               return (
                                 <div key={loan.id} className="flex items-center gap-2.5 p-2.5 rounded-lg bg-[#0F2B1F]">
-                                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[#6AD478]/20 flex items-center justify-center shadow-sm">
-                                    <span className="text-xs font-bold text-[#1C4332]">{idx + 1}</span>
+                                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[#C2FFDC] flex items-center justify-center shadow-sm">
+                                    <span className="text-xs font-bold text-[#00A86B]">{idx + 1}</span>
                                   </div>
                                   <div className="flex-1 min-w-0">
                                     <p className="text-[11px] font-medium text-[#C2FFDC] truncate">
@@ -1128,63 +1411,62 @@ export default function Borrowing() {
                     {/* Your Loans Section — thin list + chart + details */}
                     {!isLoading && manageableLoans.length > 0 && (() => {
 
-                      // Build payment chart data for selected loan
+                      // Build payment chart data for selected loan using new financial logic
                       let chartData = [];
                       let plannedPaymentAmount = 0;
                       let recalculatedPayment = 0;
+                      let loanAnalysis = null;
                       if (manageLoanSelected) {
                         const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id);
                         plannedPaymentAmount = manageLoanSelected.payment_amount || 0;
 
-                        // Get schedule from agreement or generate one
-                        const totalPayments = manageLoanSelected.repayment_period || 1;
-                        const loanPayments = allPayments.filter(p => p.loan_id === manageLoanSelected.id && (p.status === 'confirmed' || p.status === 'pending_confirmation'));
+                        // Run full period-based analysis
+                        loanAnalysis = analyzeLoanPayments(manageLoanSelected, allPayments, agreement);
+                        recalculatedPayment = loanAnalysis ? loanAnalysis.recalcPayment : 0;
 
-                        // Sort payments by date
-                        const sortedPayments = [...loanPayments].sort((a, b) => new Date(a.payment_date) - new Date(b.payment_date));
-
-                        // Calculate total paid so far and remaining balance
-                        const totalOwedForLoan = manageLoanSelected.total_amount || manageLoanSelected.amount || 0;
-                        const totalPaidForLoan = sortedPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
-                        const remainingBalance = Math.max(0, totalOwedForLoan - totalPaidForLoan);
-                        const remainingPeriods = Math.max(1, totalPayments - sortedPayments.length);
-
-                        // Recalculated payment = remaining balance / remaining periods
-                        recalculatedPayment = remainingPeriods > 0 && remainingBalance > 0
-                          ? Math.round((remainingBalance / remainingPeriods) * 100) / 100
-                          : 0;
-
-                        // Generate chart: each payment period gets a bar
-                        for (let i = 0; i < totalPayments; i++) {
-                          const payment = sortedPayments[i];
-                          if (payment) {
-                            chartData.push({
-                              label: `P${i + 1}`,
-                              amount: payment.amount,
-                              isPaid: true,
-                              isProjected: false
-                            });
-                          } else {
-                            // Unpaid future period — show projected recalculated amount
-                            chartData.push({
-                              label: `P${i + 1}`,
-                              amount: recalculatedPayment,
-                              isPaid: false,
-                              isProjected: true
-                            });
-                          }
-                        }
-
-                        // If there are more actual payments than periods, add them
-                        if (sortedPayments.length > totalPayments) {
-                          for (let i = totalPayments; i < sortedPayments.length; i++) {
-                            chartData.push({
-                              label: `P${i + 1}`,
-                              amount: sortedPayments[i].amount,
-                              isPaid: true,
-                              isProjected: false
-                            });
-                          }
+                        if (loanAnalysis) {
+                          // Generate chart from period results — show ALL payments including in-progress
+                          loanAnalysis.periodResults.forEach((pr, i) => {
+                            const scheduledAmt = pr.scheduledAmount || (recalculatedPayment > 0 ? recalculatedPayment : plannedPaymentAmount);
+                            if (pr.hasAnyPayments) {
+                              // Period has payments — show actual total paid (confirmed + pending)
+                              // Use scheduled amount as bar height so partial payments show proportionally
+                              chartData.push({
+                                label: `P${i + 1}`,
+                                amount: pr.actualPaid,
+                                scheduledAmount: scheduledAmt,
+                                confirmedAmount: pr.confirmedPaid,
+                                pendingAmount: pr.pendingPaid,
+                                isPaid: true,
+                                isProjected: false,
+                                isFullPayment: pr.isFullPayment,
+                                isInProgress: !pr.isPast && pr.hasAnyPayments,
+                                hasPendingOnly: !pr.hasConfirmedPayments && pr.hasPendingPayments
+                              });
+                            } else if (pr.isPast) {
+                              // Past period with no payment — missed
+                              chartData.push({
+                                label: `P${i + 1}`,
+                                amount: 0,
+                                scheduledAmount: scheduledAmt,
+                                isPaid: false,
+                                isProjected: false,
+                                isMissed: true
+                              });
+                            } else {
+                              // Future period — show projected amount (recalculated + any rollover)
+                              const projectedAmount = i > 0 && loanAnalysis.periodResults[i - 1].deficit > 0
+                                ? recalculatedPayment + loanAnalysis.periodResults[i - 1].deficit
+                                : recalculatedPayment;
+                              chartData.push({
+                                label: `P${i + 1}`,
+                                amount: projectedAmount,
+                                scheduledAmount: scheduledAmt,
+                                isPaid: false,
+                                isProjected: true
+                              });
+                            }
+                          });
                         }
                       }
 
@@ -1247,24 +1529,22 @@ export default function Borrowing() {
 
                               {/* Payment Progress Box — Donut Chart left, Next Payment right */}
                               {manageLoanSelected && (() => {
-                                const loanAmount = manageLoanSelected.amount || 0;
-                                const totalAmt = manageLoanSelected.total_amount || loanAmount;
-                                const paidAmt = manageLoanSelected.amount_paid || 0;
-                                const paidPct = totalAmt > 0 ? (paidAmt / totalAmt) * 100 : 0;
+                                // Use loanAnalysis for dynamic values
+                                const totalOwedNow = loanAnalysis ? loanAnalysis.totalOwedNow : (manageLoanSelected.total_amount || manageLoanSelected.amount || 0);
+                                const totalPaidAmt = loanAnalysis ? loanAnalysis.totalPaid : (manageLoanSelected.amount_paid || 0);
+                                const loanPrincipal = manageLoanSelected.amount || 0;
+                                const totalWithInterest = loanAnalysis ? (loanAnalysis.principal + loanAnalysis.totalInterestAccrued) : (manageLoanSelected.total_amount || loanPrincipal);
+                                const paidPct = loanAnalysis ? loanAnalysis.paidPercentage : (totalWithInterest > 0 ? (totalPaidAmt / totalWithInterest) * 100 : 0);
 
                                 const selLender = publicProfiles.find(p => p.user_id === manageLoanSelected.lender_id);
                                 const lenderUsername = selLender?.username || 'user';
-                                const nextPmtAmt = recalculatedPayment > 0 ? recalculatedPayment : (manageLoanSelected.payment_amount || 0);
+                                const nextPmtAmt = loanAnalysis ? loanAnalysis.nextPaymentAmount : (recalculatedPayment > 0 ? recalculatedPayment : (manageLoanSelected.payment_amount || 0));
 
                                 let nextPmtDate = null;
                                 let daysUntil = null;
                                 if (manageLoanSelected.next_payment_date) {
-                                  nextPmtDate = new Date(manageLoanSelected.next_payment_date);
-                                  const today = new Date();
-                                  today.setHours(0, 0, 0, 0);
-                                  const pmtDay = new Date(nextPmtDate);
-                                  pmtDay.setHours(0, 0, 0, 0);
-                                  daysUntil = Math.ceil((pmtDay - today) / (1000 * 60 * 60 * 24));
+                                  nextPmtDate = toLocalDate(manageLoanSelected.next_payment_date);
+                                  daysUntil = daysUntilDate(manageLoanSelected.next_payment_date);
                                 }
 
                                 /* Donut chart — bigger & thinner */
@@ -1311,8 +1591,8 @@ export default function Borrowing() {
                                           </text>
                                         </svg>
                                         <p className="text-[12px] font-semibold text-[#C2FFDC] font-sans mt-1.5">
-                                          ${paidAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                          <span className="text-[#00A86B]/60 font-normal"> / ${loanAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                          ${totalPaidAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                          <span className="text-[#00A86B]/60 font-normal"> / ${totalOwedNow.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                         </p>
                                       </div>
                                       {/* Right — Next Payment info */}
@@ -1415,39 +1695,67 @@ export default function Borrowing() {
                                         )}
                                         {chartData.map((d, i) => {
                                           const barHeight = maxChartVal > 0 ? (d.amount / maxChartVal) * chartHeight : 0;
-                                          const isOver = d.isPaid && d.amount >= plannedPaymentAmount && plannedPaymentAmount > 0;
+                                          const scheduledBarHeight = maxChartVal > 0 && d.scheduledAmount ? (d.scheduledAmount / maxChartVal) * chartHeight : barHeight;
+                                          const isFullPmt = d.isPaid && d.isFullPayment;
+                                          const isPartialPmt = d.isPaid && !d.isFullPayment && !d.hasPendingOnly;
+                                          const isPendingOnly = d.hasPendingOnly;
+                                          const isInProgress = d.isInProgress;
                                           return (
                                             <div key={i} className="flex flex-col items-center flex-1" style={{ maxWidth: 40 }}>
                                               <div className="w-full flex justify-center">
+                                                {isInProgress && !isFullPmt ? (
+                                                  /* In-progress: show scheduled height outline with filled portion */
+                                                  <div className="relative" style={{ height: Math.max(scheduledBarHeight, 4), width: '70%', minWidth: 8 }}>
+                                                    {/* Background (scheduled) */}
+                                                    <div className="absolute bottom-0 left-0 right-0 rounded-t-sm bg-[#C2FFDC]/15 border border-dashed border-[#00A86B]/30" style={{ height: '100%' }} />
+                                                    {/* Filled portion (actual paid) */}
+                                                    <div className="absolute bottom-0 left-0 right-0 rounded-t-sm bg-[#00A86B]/70" style={{ height: Math.max(barHeight, 4) }} />
+                                                  </div>
+                                                ) : (
                                                 <div
                                                   className={`rounded-t-sm transition-all ${
                                                     d.isProjected
                                                       ? 'bg-[#C2FFDC]/30 border border-dashed border-[#C2FFDC]/50'
-                                                      : d.amount === 0
-                                                        ? 'bg-[#C2FFDC]/50'
-                                                        : isOver
-                                                          ? 'bg-[#00A86B]'
-                                                          : 'bg-[#00A86B]/60'
+                                                      : d.isMissed
+                                                        ? 'bg-red-500/30 border border-dashed border-red-400/50'
+                                                        : d.amount === 0
+                                                          ? 'bg-[#C2FFDC]/50'
+                                                          : isPendingOnly
+                                                            ? 'bg-[#F59E0B]/40 border border-dashed border-[#F59E0B]/60'
+                                                            : isFullPmt
+                                                              ? 'bg-[#00A86B]'
+                                                              : isPartialPmt
+                                                                ? 'bg-[#F59E0B]/60'
+                                                                : 'bg-[#00A86B]/60'
                                                   }`}
                                                   style={{
                                                     height: Math.max(barHeight, d.amount > 0 ? 4 : 2),
                                                     width: '70%',
                                                     minWidth: 8
                                                   }}
-                                                  title={`${d.label}: $${d.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}${d.isProjected ? ' (projected)' : ''}`}
+                                                  title={`${d.label}: $${d.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}${d.isProjected ? ' (projected)' : d.isMissed ? ' (missed)' : isPendingOnly ? ' (pending confirmation)' : isPartialPmt ? ' (partial)' : ''}`}
                                                 />
+                                                )}
                                               </div>
-                                              <p className={`text-[8px] font-sans mt-1 leading-none ${d.isProjected ? 'text-[#C2FFDC]/40' : 'text-[#00A86B]'}`}>{d.label}</p>
+                                              <p className={`text-[8px] font-sans mt-1 leading-none ${isInProgress ? 'text-[#6AD478]' : d.isProjected ? 'text-[#C2FFDC]/40' : d.isMissed ? 'text-red-400/60' : isPendingOnly ? 'text-[#F59E0B]/60' : 'text-[#00A86B]'}`}>{d.label}</p>
                                             </div>
                                           );
                                         })}
                                       </div>
                                     </div>
                                     {/* Legend */}
-                                    <div className="flex items-center gap-3 mt-2 pt-2 border-t border-[#00A86B]/20">
+                                    <div className="flex items-center gap-2.5 mt-2 pt-2 border-t border-[#00A86B]/20 flex-wrap">
                                       <div className="flex items-center gap-1">
                                         <div className="w-2.5 h-2.5 rounded-sm bg-[#00A86B]" />
-                                        <span className="text-[9px] text-[#00A86B] font-sans">Paid</span>
+                                        <span className="text-[9px] text-[#00A86B] font-sans">Completed</span>
+                                      </div>
+                                      <div className="flex items-center gap-1">
+                                        <div className="w-2.5 h-2.5 rounded-sm bg-[#00A86B]/70 border border-[#00A86B]/30" style={{ background: 'linear-gradient(to top, rgba(0,168,107,0.7) 50%, rgba(194,255,220,0.15) 50%)' }} />
+                                        <span className="text-[9px] text-[#6AD478] font-sans">In Progress</span>
+                                      </div>
+                                      <div className="flex items-center gap-1">
+                                        <div className="w-2.5 h-2.5 rounded-sm bg-[#F59E0B]/40 border border-dashed border-[#F59E0B]/60" />
+                                        <span className="text-[9px] text-[#F59E0B]/80 font-sans">Pending</span>
                                       </div>
                                       <div className="flex items-center gap-1">
                                         <div className="w-2.5 h-2.5 rounded-sm bg-[#C2FFDC]/30 border border-dashed border-[#C2FFDC]/50" />
@@ -1455,7 +1763,7 @@ export default function Borrowing() {
                                       </div>
                                       <div className="flex items-center gap-1">
                                         <div className="w-4 h-0 border-t-2 border-dashed border-[#C2FFDC]/40" />
-                                        <span className="text-[9px] text-[#00A86B] font-sans">Plan Amount</span>
+                                        <span className="text-[9px] text-[#00A86B] font-sans">Plan</span>
                                       </div>
                                     </div>
                                   </div>
@@ -1579,27 +1887,27 @@ export default function Borrowing() {
                                       Loan Progress
                                     </p>
                                     {(() => {
-                                      const amount = manageLoanSelected.amount || 0;
-                                      const totalAmount = manageLoanSelected.total_amount || amount;
-                                      const amountPaid = manageLoanSelected.amount_paid || 0;
-                                      const paymentAmount = recalculatedPayment > 0 ? recalculatedPayment : (manageLoanSelected.payment_amount || 0);
                                       const repaymentPeriod = manageLoanSelected.repayment_period || 0;
                                       const paymentFrequency = manageLoanSelected.payment_frequency || 'monthly';
                                       const lender = publicProfiles.find(p => p.user_id === manageLoanSelected.lender_id);
                                       const lenderUsername = lender?.username || 'user';
 
-                                      /* Calculate payments made */
-                                      const loanPmts = allPayments.filter(p => p.loan_id === manageLoanSelected.id && (p.status === 'confirmed' || p.status === 'pending_confirmation'));
-                                      const paymentsMade = loanPmts.length;
+                                      /* Use loanAnalysis for accurate values */
+                                      const totalOwedDisplay = loanAnalysis ? loanAnalysis.totalOwedNow : (manageLoanSelected.total_amount || manageLoanSelected.amount || 0);
+                                      const amountPaidDisplay = loanAnalysis ? loanAnalysis.totalPaid : (manageLoanSelected.amount_paid || 0);
+                                      const fullPayments = loanAnalysis ? loanAnalysis.fullPaymentCount : 0;
+                                      const paymentAmountDisplay = loanAnalysis
+                                        ? loanAnalysis.nextPaymentAmount
+                                        : (recalculatedPayment > 0 ? recalculatedPayment : (manageLoanSelected.payment_amount || 0));
 
                                       /* Frequency label */
                                       const freqLabel = paymentFrequency.charAt(0).toUpperCase() + paymentFrequency.slice(1);
 
                                       const items = [
-                                        { label: 'Total Owed', value: `$${totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: 'with interest' },
-                                        { label: 'Amount Paid', value: `$${amountPaid.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: null },
-                                        { label: 'Payments Made', value: `${paymentsMade}/${repaymentPeriod}`, sub: 'payments' },
-                                        { label: `${freqLabel} Payments`, value: `$${paymentAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: `to @${lenderUsername}` },
+                                        { label: 'Total Owed', value: `$${totalOwedDisplay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: 'with interest' },
+                                        { label: 'Amount Paid', value: `$${amountPaidDisplay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: null },
+                                        { label: 'Payments Made', value: `${fullPayments}/${repaymentPeriod}`, sub: 'full payments' },
+                                        { label: `${freqLabel} Payments`, value: `$${paymentAmountDisplay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: `to @${lenderUsername}` },
                                       ];
 
                                       return (
@@ -1624,68 +1932,82 @@ export default function Borrowing() {
                                       Payments
                                     </p>
                                     {(() => {
-                                      const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id);
-                                      const loanPmts = allPayments.filter(p => p.loan_id === manageLoanSelected.id);
-                                      const confirmedPmts = loanPmts.filter(p => p.status === 'confirmed');
-                                      const pendingPmts = loanPmts.filter(p => p.status === 'pending_confirmation');
-
-                                      /* Build schedule from agreement or from loan fields */
-                                      let schedule = [];
-                                      if (agreement) {
-                                        schedule = generateAmortizationSchedule(agreement);
-                                      } else {
-                                        /* Fallback: generate dates from loan data */
-                                        const freq = manageLoanSelected.payment_frequency || 'monthly';
-                                        const numP = manageLoanSelected.repayment_period || 1;
-                                        let dt = new Date(manageLoanSelected.created_at);
-                                        for (let i = 1; i <= numP; i++) {
-                                          if (freq === 'weekly') dt = addWeeks(new Date(dt), 1);
-                                          else if (freq === 'biweekly') dt = addWeeks(new Date(dt), 2);
-                                          else if (freq === 'daily') dt = addDays(new Date(dt), 1);
-                                          else dt = addMonths(new Date(dt), 1);
-                                          schedule.push({ number: i, date: new Date(dt) });
-                                        }
-                                      }
-
-                                      /* Sort actual payments by date to match against schedule */
-                                      const sortedConfirmed = [...confirmedPmts].sort((a, b) => new Date(a.payment_date) - new Date(b.payment_date));
-                                      const sortedPending = [...pendingPmts].sort((a, b) => new Date(a.payment_date) - new Date(b.payment_date));
-
-                                      /* Determine status for each scheduled payment */
+                                      /* Use loanAnalysis period results for payment rows */
                                       const paymentAmt = manageLoanSelected.payment_amount || 0;
-                                      const upcomingAmt = recalculatedPayment > 0 ? recalculatedPayment : paymentAmt;
-                                      let firstUnpaidFound = false;
+                                      let firstRecordFound = false;
 
-                                      const paymentRows = schedule.map((s, idx) => {
-                                        const matchedConfirmed = sortedConfirmed[idx] || null;
-                                        const matchedPending = sortedPending.find(p => !matchedConfirmed && idx < sortedConfirmed.length + sortedPending.length);
-
+                                      const paymentRows = loanAnalysis ? loanAnalysis.periodResults.map((pr) => {
                                         let status;
-                                        if (idx < sortedConfirmed.length) {
+                                        if (pr.hasConfirmedPayments && pr.isFullPayment) {
                                           status = 'completed';
-                                        } else if (idx < sortedConfirmed.length + sortedPending.length) {
+                                        } else if (pr.hasAnyPayments && !pr.isPast) {
+                                          // Has some payments but period not over — in progress
+                                          status = 'in_progress';
+                                        } else if (pr.hasConfirmedPayments && !pr.isFullPayment) {
+                                          // Confirmed but didn't meet full amount (past)
+                                          status = 'partial';
+                                        } else if (pr.hasPendingPayments && !pr.hasConfirmedPayments) {
+                                          // Only pending payments — awaiting confirmation
                                           status = 'pending';
-                                        } else if (!firstUnpaidFound) {
+                                        } else if (pr.isPast && !pr.hasAnyPayments) {
+                                          // Missed past payment
+                                          status = 'missed';
+                                        } else if (!firstRecordFound) {
                                           status = 'record';
-                                          firstUnpaidFound = true;
+                                          firstRecordFound = true;
                                         } else {
                                           status = 'upcoming';
                                         }
 
-                                        const displayAmount = status === 'completed'
-                                          ? sortedConfirmed[idx]?.amount || paymentAmt
-                                          : status === 'pending'
-                                            ? sortedPending[idx - sortedConfirmed.length]?.amount || paymentAmt
-                                            : upcomingAmt;
+                                        // Always show the scheduled monthly payment amount
+                                        const scheduledAmount = pr.scheduledAmount || (loanAnalysis.recalcPayment > 0 ? loanAnalysis.recalcPayment : paymentAmt);
+                                        // How much has been paid toward this period
+                                        const paidAmount = pr.actualPaid || 0;
+                                        const paidPercentage = scheduledAmount > 0 ? Math.min(100, (paidAmount / scheduledAmount) * 100) : 0;
 
-                                        return { number: s.number, date: s.date, amount: displayAmount, status };
-                                      });
+                                        return { number: pr.period, date: pr.date, amount: scheduledAmount, paidAmount, paidPercentage, status, isFullPayment: pr.isFullPayment, deficit: pr.deficit };
+                                      }) : [];
 
                                       const statusConfig = {
-                                        completed: { label: 'Completed', bg: 'bg-[#00A86B]/20', text: 'text-[#6AD478]', ringColor: 'border-[#00A86B]' },
-                                        pending: { label: 'Pending', bg: 'bg-[#F59E0B]/20', text: 'text-[#F59E0B]', ringColor: 'border-[#F59E0B]' },
-                                        record: { label: 'Record Payment', bg: 'bg-[#00A86B]', text: 'text-white', ringColor: 'border-[#00A86B]' },
-                                        upcoming: { label: 'Upcoming', bg: 'bg-[#C2FFDC]/10', text: 'text-[#00A86B]', ringColor: 'border-[#00A86B]/30' },
+                                        completed: { label: 'Completed', bg: 'bg-[#00A86B]/20', text: 'text-[#6AD478]', ringColor: '#00A86B', fillColor: '#00A86B' },
+                                        in_progress: { label: 'In Progress', bg: 'bg-[#DBFFEB]', text: 'text-[#00A86B]', ringColor: '#00A86B', fillColor: '#00A86B' },
+                                        partial: { label: 'Partial', bg: 'bg-[#F59E0B]/20', text: 'text-[#F59E0B]', ringColor: '#F59E0B', fillColor: '#F59E0B' },
+                                        pending: { label: 'Pending', bg: 'bg-[#F59E0B]/20', text: 'text-[#F59E0B]', ringColor: '#F59E0B', fillColor: '#F59E0B' },
+                                        missed: { label: 'Missed', bg: 'bg-red-500/20', text: 'text-red-400', ringColor: '#EF4444', fillColor: '#EF4444' },
+                                        record: { label: 'Record Payment', bg: 'bg-[#00A86B]', text: 'text-white', ringColor: '#00A86B', fillColor: '#00A86B' },
+                                        upcoming: { label: 'Upcoming', bg: 'bg-[#C2FFDC]/10', text: 'text-[#00A86B]', ringColor: 'rgba(0,168,107,0.3)', fillColor: 'rgba(0,168,107,0.3)' },
+                                      };
+
+                                      // Pie chart icon SVG for payment circle
+                                      const PieCircle = ({ percentage, ringColor, fillColor, number, size = 32 }) => {
+                                        const r = (size / 2) - 2;
+                                        const cx = size / 2;
+                                        const cy = size / 2;
+                                        const circumference = 2 * Math.PI * r;
+                                        const filled = (percentage / 100) * circumference;
+                                        return (
+                                          <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="flex-shrink-0">
+                                            {/* Background ring */}
+                                            <circle cx={cx} cy={cy} r={r} fill="#0F2B1F" stroke={ringColor} strokeWidth="2" strokeOpacity="0.3" />
+                                            {/* Filled arc */}
+                                            {percentage > 0 && (
+                                              <circle
+                                                cx={cx} cy={cy} r={r}
+                                                fill="none"
+                                                stroke={fillColor}
+                                                strokeWidth="2"
+                                                strokeDasharray={`${filled} ${circumference - filled}`}
+                                                strokeDashoffset={circumference * 0.25}
+                                                strokeLinecap="round"
+                                                transform={`rotate(-90 ${cx} ${cy})`}
+                                              />
+                                            )}
+                                            {/* Number text */}
+                                            <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central" fill="#C2FFDC" fontSize="11" fontWeight="bold" fontFamily="sans-serif">
+                                              {number}
+                                            </text>
+                                          </svg>
+                                        );
                                       };
 
                                       return (
@@ -1694,10 +2016,13 @@ export default function Borrowing() {
                                             const cfg = statusConfig[row.status];
                                             return (
                                               <div key={row.number} className="flex items-center gap-2.5 p-2 rounded-lg bg-[#0F2B1F]">
-                                                {/* Payment number circle */}
-                                                <div className={`w-8 h-8 rounded-full border-2 ${cfg.ringColor} flex items-center justify-center flex-shrink-0 bg-[#0F2B1F]`}>
-                                                  <span className="text-[11px] font-bold text-[#C2FFDC]">{row.number}</span>
-                                                </div>
+                                                {/* Payment number pie circle */}
+                                                <PieCircle
+                                                  percentage={row.paidPercentage}
+                                                  ringColor={cfg.ringColor}
+                                                  fillColor={cfg.fillColor}
+                                                  number={row.number}
+                                                />
                                                 {/* Amount + Due date */}
                                                 <div className="flex-1 min-w-0">
                                                   <p className="text-[12px] font-semibold text-[#C2FFDC] font-sans">
@@ -1772,11 +2097,24 @@ export default function Borrowing() {
 
                                       // Payments
                                       loanPmts.forEach(payment => {
-                                        const pmtStatus = payment.status === 'confirmed' ? 'confirmed' : 'recorded';
+                                        const isConfirmed = payment.status === 'confirmed';
+                                        const isRecordedByUser = payment.recorded_by === user?.id;
+                                        const otherPartyProfile = publicProfiles.find(p => p.user_id === (isRecordedByUser
+                                          ? (manageLoanSelected.lender_id === user?.id ? manageLoanSelected.borrower_id : manageLoanSelected.lender_id)
+                                          : payment.recorded_by));
+                                        const otherPartyUsername = otherPartyProfile?.username || 'user';
+                                        const pmtAmount = `$${(payment.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                                        let desc;
+                                        if (isRecordedByUser) {
+                                          desc = `You ${isConfirmed ? 'made' : 'recorded'} a ${pmtAmount} payment to @${lenderName}`;
+                                        } else {
+                                          desc = `@${otherPartyUsername} recorded a ${pmtAmount} payment from @${borrowerName}`;
+                                        }
                                         activities.push({
                                           timestamp: new Date(payment.payment_date || payment.created_at),
                                           type: 'payment',
-                                          description: `Payment of $${(payment.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${pmtStatus}`,
+                                          description: desc,
+                                          isAwaitingConfirmation: !isConfirmed,
                                         });
                                       });
 
@@ -1798,8 +2136,8 @@ export default function Borrowing() {
                                         });
                                       }
 
-                                      // Sort newest first
-                                      activities.sort((a, b) => b.timestamp - a.timestamp);
+                                      // Sort oldest first (chronological order)
+                                      activities.sort((a, b) => a.timestamp - b.timestamp);
 
                                       const getIcon = (type) => {
                                         const strokeColor = type === 'cancellation' ? '#EF4444' : '#00A86B';
@@ -1866,9 +2204,16 @@ export default function Borrowing() {
                                               </div>
                                               {/* Content */}
                                               <div className="flex-1 min-w-0 pb-3">
-                                                <p className="text-[11px] text-[#C2FFDC] font-sans leading-snug">
-                                                  {activity.description}
-                                                </p>
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                  <p className="text-[11px] text-[#C2FFDC] font-sans leading-snug">
+                                                    {activity.description}
+                                                  </p>
+                                                  {activity.isAwaitingConfirmation && (
+                                                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-semibold bg-[#F59E0B]/20 text-[#F59E0B] border border-[#F59E0B]/30 whitespace-nowrap">
+                                                      Awaiting Confirmation
+                                                    </span>
+                                                  )}
+                                                </div>
                                                 <p className="text-[9px] text-[#00A86B]/60 font-sans mt-0.5">
                                                   {format(activity.timestamp, 'MMM d, yyyy · h:mm a')}
                                                 </p>

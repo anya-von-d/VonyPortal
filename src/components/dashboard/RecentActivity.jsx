@@ -7,21 +7,15 @@ import { Activity, ArrowUpRight, ArrowDownRight, Send, Check, X, Ban } from "luc
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { SkeletonShimmer } from "@/components/ui/animations";
+import { toLocalDate } from "@/components/utils/dateUtils";
 
 // Background colors that cycle through cards
 const cardBgColors = ['#83F384', '#83F384', '#83F384'];
 // Hover accent colors that cycle through cards
 const hoverAccentColors = ['#00A86B', '#50C878', '#0D9B76', '#00BF7A'];
 
-// Helper to parse date strings without timezone shifting
-const parseLocalDate = (dateStr) => {
-  if (!dateStr) return null;
-  if (typeof dateStr === 'string' && dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
-    const [year, month, day] = dateStr.split('-').map(Number);
-    return new Date(year, month - 1, day);
-  }
-  return new Date(dateStr);
-};
+// Use shared local date parser
+const parseLocalDate = toLocalDate;
 
 export default function RecentActivity({ loans, payments, isLoading, user, allUsers }) {
   const [hoveredIndex, setHoveredIndex] = useState(null);
