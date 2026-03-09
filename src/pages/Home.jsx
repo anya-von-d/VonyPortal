@@ -171,30 +171,14 @@ export default function Home() {
   const [selectedLoan, setSelectedLoan] = useState(null);
   const [candidateLoans, setCandidateLoans] = useState([]);
 
-  // Scroll state for top bar / nav behavior
+  // Scroll state for top bar behavior
   const [topBarHidden, setTopBarHidden] = useState(false);
-  const [navUp, setNavUp] = useState(false);
-  const [navHidden, setNavHidden] = useState(false);
   const lastScrollY = useRef(0);
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      const scrollingDown = currentScrollY > lastScrollY.current;
-
-      if (currentScrollY > 60) {
-        setTopBarHidden(true);
-        setNavUp(true);
-        if (scrollingDown && currentScrollY > 200) {
-          setNavHidden(true);
-        } else {
-          setNavHidden(false);
-        }
-      } else {
-        setTopBarHidden(false);
-        setNavUp(false);
-        setNavHidden(false);
-      }
+      setTopBarHidden(currentScrollY > 60);
       lastScrollY.current = currentScrollY;
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -608,15 +592,21 @@ export default function Home() {
   // User avatar initial
   const avatarInitial = (user.full_name || 'U').charAt(0).toUpperCase();
 
-  // Most urgent overdue for hero alert
-  const mostUrgentOverdue = overdueYouOwe.length > 0 ? (() => {
-    const sorted = overdueYouOwe.map(loan => {
-      const lenderProfile = safeAllProfiles.find(p => p.user_id === loan.lender_id);
-      const days = Math.abs(daysUntilDate(loan.next_payment_date));
-      return { loan, days, username: lenderProfile?.username || 'user', amount: loan.payment_amount || 0 };
-    }).sort((a, b) => b.days - a.days);
-    return sorted[0];
-  })() : null;
+  // All overdue reminders for hero alert carousel
+  const overdueReminders = overdueYouOwe.map(loan => {
+    const lenderProfile = safeAllProfiles.find(p => p.user_id === loan.lender_id);
+    const days = Math.abs(daysUntilDate(loan.next_payment_date));
+    return { loan, days, username: lenderProfile?.username || 'user', amount: loan.payment_amount || 0 };
+  }).sort((a, b) => b.days - a.days);
+
+  const [alertSlide, setAlertSlide] = useState(0);
+  const alertTotal = overdueReminders.length;
+
+  useEffect(() => {
+    if (alertTotal <= 1) return;
+    const timer = setInterval(() => setAlertSlide(prev => (prev + 1) % alertTotal), 6000);
+    return () => clearInterval(timer);
+  }, [alertTotal]);
 
   return (
     <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 240 }}>
@@ -660,10 +650,8 @@ export default function Home() {
         <div style={{ maxWidth: 1080, margin: '0 auto', padding: '14px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Link to="/" style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 400, fontStyle: 'italic', fontSize: '1.4rem', letterSpacing: '-0.02em', color: 'white', textDecoration: 'none' }}>Vony</Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Link to={createPageUrl("Friends")} className="top-bar-link-home" style={{ padding: '7px 14px', borderRadius: 50, fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', transition: 'color 0.15s' }}>Friends</Link>
-            <Link to={createPageUrl("Lending")} className="top-bar-link-home" style={{ padding: '7px 14px', borderRadius: 50, fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', transition: 'color 0.15s' }}>My Loans</Link>
-            <Link to={createPageUrl("LoanAgreements")} className="top-bar-link-home" style={{ padding: '7px 14px', borderRadius: 50, fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', transition: 'color 0.15s' }}>Documents</Link>
             <Link to={createPageUrl("RecentActivity")} className="top-bar-link-home" style={{ padding: '7px 14px', borderRadius: 50, fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', transition: 'color 0.15s' }}>Recent Activity</Link>
+            <Link to={createPageUrl("LoanAgreements")} className="top-bar-link-home" style={{ padding: '7px 14px', borderRadius: 50, fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', transition: 'color 0.15s' }}>Loan Documents</Link>
             {/* Notification bell */}
             <Link to={createPageUrl("Requests")} style={{ width: 32, height: 32, borderRadius: '50%', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', marginLeft: 4 }}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
@@ -676,23 +664,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-
-      {/* ── Floating nav pill ── */}
-      <nav className="home-nav-pill" style={{
-        position: 'fixed', top: navUp ? 16 : 72, left: 'calc(50% + 120px)', transform: navHidden ? 'translateX(-50%) translateY(-120%)' : 'translateX(-50%)',
-        zIndex: 50, width: 'auto',
-        transition: 'top 0.35s ease, transform 0.35s ease, opacity 0.25s ease',
-        opacity: navHidden ? 0 : 1, pointerEvents: navHidden ? 'none' : 'auto'
-      }}>
-        <div className="glass-nav" style={{ position: 'relative', background: 'transparent', borderRadius: 16, padding: '6px 24px', display: 'flex', alignItems: 'center', gap: 2, height: 48 }}>
-          <div style={{ display: 'flex', gap: 2 }}>
-            <Link to="/" style={{ padding: '7px 14px', borderRadius: 50, fontSize: 13, fontWeight: 600, color: '#1A1918', background: 'rgba(0,0,0,0.06)', textDecoration: 'none' }}>Home</Link>
-            <Link to={createPageUrl("Lending")} style={{ padding: '7px 14px', borderRadius: 50, fontSize: 13, fontWeight: 500, color: '#787776', textDecoration: 'none', transition: 'color 0.15s, background 0.15s' }}>Lending</Link>
-            <Link to={createPageUrl("Borrowing")} style={{ padding: '7px 14px', borderRadius: 50, fontSize: 13, fontWeight: 500, color: '#787776', textDecoration: 'none', transition: 'color 0.15s, background 0.15s' }}>Borrowing</Link>
-            <Link to={createPageUrl("CreateOffer")} style={{ padding: '7px 14px', borderRadius: 50, fontSize: 13, fontWeight: 500, color: '#787776', textDecoration: 'none', transition: 'color 0.15s, background 0.15s' }}>New Loan</Link>
-          </div>
-        </div>
-      </nav>
 
       {/* ── Hero ── */}
       <div style={{ background: 'transparent', position: 'relative', zIndex: 2 }}>
@@ -707,20 +678,36 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Hero alert (overdue) */}
-        {mostUrgentOverdue && (
-          <div className="glass-hero-alert" style={{ maxWidth: 1080, margin: '0 auto' }}>
-            <div style={{ maxWidth: 1080, margin: '0 auto', padding: '14px 28px', display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#E8726E', flexShrink: 0 }} />
-              <div style={{ flex: 1, fontSize: 13, color: '#787776', lineHeight: 1.4 }}>
-                <strong style={{ color: '#1A1918', fontWeight: 600 }}>Just a reminder</strong> you have a {formatMoney(mostUrgentOverdue.amount)} payment to @{mostUrgentOverdue.username} that was due {mostUrgentOverdue.days} day{mostUrgentOverdue.days !== 1 ? 's' : ''} ago.
-              </div>
-              <Link to={createPageUrl("Borrowing")} style={{
-                padding: '7px 18px', borderRadius: 20, background: '#678AFB', color: 'white',
-                fontSize: 12, fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap',
-                fontFamily: "'DM Sans', sans-serif", transition: 'background 0.15s'
-              }}>Pay now</Link>
+        {/* Hero alert (overdue) — carousel if multiple */}
+        {overdueReminders.length > 0 && (
+          <div className="glass-hero-alert" style={{ maxWidth: 1080, margin: '0 auto', overflow: 'hidden', position: 'relative' }}>
+            <div style={{ display: 'flex', transition: 'transform 0.45s cubic-bezier(0.4, 0, 0.2, 1)', transform: `translateX(-${alertSlide * 100}%)` }}>
+              {overdueReminders.map((item, i) => (
+                <div key={i} style={{ minWidth: '100%', padding: '14px 28px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#E8726E', flexShrink: 0 }} />
+                  <div style={{ flex: 1, fontSize: 13, color: '#787776', lineHeight: 1.5 }}>
+                    <strong style={{ color: '#1A1918', fontWeight: 600 }}>Just a reminder</strong> you have a {formatMoney(item.amount)} payment to @{item.username} that was due {item.days} day{item.days !== 1 ? 's' : ''} ago. If you've already paid, make sure to record the payment so it's up to date.
+                  </div>
+                  <Link to={createPageUrl("Borrowing")} style={{
+                    padding: '7px 18px', borderRadius: 20, background: '#678AFB', color: 'white',
+                    fontSize: 12, fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap',
+                    fontFamily: "'DM Sans', sans-serif", transition: 'background 0.15s'
+                  }}>Record Payment</Link>
+                </div>
+              ))}
             </div>
+            {alertTotal > 1 && (
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 6, paddingBottom: 10 }}>
+                {overdueReminders.map((_, i) => (
+                  <button key={i} onClick={() => setAlertSlide(i)} style={{
+                    width: i === alertSlide ? 18 : 6, height: 6, borderRadius: i === alertSlide ? 8 : '50%',
+                    background: i === alertSlide ? '#678AFB' : 'rgba(0,0,0,0.12)',
+                    border: 'none', padding: 0, cursor: 'pointer',
+                    transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)'
+                  }} />
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
