@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Loan, Payment, PublicProfile, Friendship } from "@/entities/all";
@@ -7,144 +7,129 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { format, startOfMonth, endOfMonth, addMonths, addDays, isBefore, isAfter, differenceInDays } from "date-fns";
 import { formatMoney } from "@/components/utils/formatMoney";
 import { toLocalDate, getLocalToday, daysUntil as daysUntilDate } from "@/components/utils/dateUtils";
 import RecordPaymentModal from "@/components/loans/RecordPaymentModal";
-import { AnimatePresence } from "framer-motion";
 
+// SVG star field data — exact positions from mockup
+const STAR_CIRCLES = [
+  {cx:82,cy:45,o:0.7},{cx:195,cy:112,o:0.5},{cx:310,cy:28,o:0.8},{cx:420,cy:198,o:0.4},
+  {cx:530,cy:67,o:0.65},{cx:640,cy:245,o:0.55},{cx:755,cy:88,o:0.75},{cx:860,cy:156,o:0.45},
+  {cx:970,cy:34,o:0.7},{cx:1085,cy:201,o:0.6},{cx:1190,cy:78,o:0.5},{cx:1300,cy:267,o:0.7},
+  {cx:1410,cy:45,o:0.55},{cx:1520,cy:134,o:0.65},{cx:48,cy:189,o:0.4},{cx:158,cy:278,o:0.6},
+  {cx:268,cy:156,o:0.5},{cx:378,cy:89,o:0.7},{cx:488,cy:234,o:0.45},{cx:598,cy:145,o:0.6},
+  {cx:708,cy:312,o:0.35},{cx:818,cy:56,o:0.75},{cx:928,cy:223,o:0.5},{cx:1038,cy:98,o:0.65},
+  {cx:1148,cy:289,o:0.4},{cx:1258,cy:167,o:0.7},{cx:1368,cy:234,o:0.55},{cx:1478,cy:78,o:0.6},
+  {cx:1560,cy:256,o:0.45},{cx:125,cy:312,o:0.5},{cx:345,cy:267,o:0.6},{cx:565,cy:34,o:0.75},
+  {cx:685,cy:178,o:0.4},{cx:905,cy:289,o:0.55},{cx:1125,cy:45,o:0.7},{cx:1345,cy:145,o:0.5},
+  {cx:225,cy:67,o:0.6},{cx:445,cy:312,o:0.45},{cx:665,cy:112,o:0.65},{cx:885,cy:198,o:0.5},
+  {cx:1105,cy:156,o:0.55},{cx:1325,cy:89,o:0.7},{cx:1545,cy:201,o:0.4},{cx:72,cy:134,o:0.6},
+  {cx:292,cy:223,o:0.5},{cx:512,cy:156,o:0.65},{cx:732,cy:45,o:0.55},{cx:952,cy:134,o:0.7},
+  {cx:1172,cy:234,o:0.4},{cx:1392,cy:312,o:0.5},{cx:160,cy:34,o:0.75},{cx:380,cy:178,o:0.45},
+  {cx:600,cy:289,o:0.6},{cx:820,cy:267,o:0.5},{cx:1040,cy:56,o:0.7},{cx:1260,cy:112,o:0.55},
+  {cx:1480,cy:245,o:0.6},{cx:100,cy:256,o:0.45},{cx:450,cy:145,o:0.65},{cx:750,cy:234,o:0.5},
+  {cx:1050,cy:278,o:0.55},{cx:1350,cy:67,o:0.7},{cx:200,cy:198,o:0.4},{cx:500,cy:98,o:0.6},
+  {cx:800,cy:312,o:0.45},{cx:1100,cy:189,o:0.65},{cx:1400,cy:156,o:0.5},{cx:1600,cy:88,o:0.6},
+];
 
 // Loan Carousel component for bottom section
-function LoanCarousel({ hasLendingLoans, hasBorrowingLoans }) {
+function LoanCarousel({ notifications, onRecordPayment }) {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const totalSlides = 2;
+  const totalSlides = notifications.length;
 
-  // Auto-flip through slides
   useEffect(() => {
+    if (totalSlides <= 1) return;
     const timer = setInterval(() => {
       setCurrentSlide(prev => (prev + 1) % totalSlides);
     }, 8000);
     return () => clearInterval(timer);
-  }, []);
+  }, [totalSlides]);
 
-  const goToSlide = (direction) => {
-    if (direction === 'next') {
-      setCurrentSlide(prev => (prev + 1) % totalSlides);
-    } else {
-      setCurrentSlide(prev => (prev - 1 + totalSlides) % totalSlides);
-    }
+  const goTo = (index) => {
+    if (index < 0) index = totalSlides - 1;
+    if (index >= totalSlides) index = 0;
+    setCurrentSlide(index);
   };
 
-  const slides = [
-    // Slide 1: Track loan progress
-    <div key="progress" className="text-center px-4">
-      <p className="text-lg sm:text-xl font-bold text-[#1C4332] font-sans mb-1.5 tracking-tight">
-        Stay on top of your loans
-      </p>
-      <p className="text-sm text-[#1C4332]/60 font-sans mb-6 whitespace-nowrap">
-        Check in on your payment progress and keep track of upcoming due dates
-      </p>
-      <div className="flex items-center justify-center gap-3">
-        {hasBorrowingLoans && (
-          <Link
-            to={createPageUrl("Borrowing")}
-            className="px-5 py-2.5 rounded-xl bg-[#1C4332] text-sm font-semibold text-[#6AD478] hover:bg-[#1C4332]/90 transition-colors font-sans"
-          >
-            Track Payment Progress
-          </Link>
-        )}
-        {hasLendingLoans && (
-          <Link
-            to={createPageUrl("Lending")}
-            className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors font-sans ${
-              hasBorrowingLoans
-                ? 'bg-[#1C4332]/15 text-[#1C4332] hover:bg-[#1C4332]/25'
-                : 'bg-[#1C4332] text-[#6AD478] hover:bg-[#1C4332]/90'
-            }`}
-          >
-            Track Repayment Progress
-          </Link>
-        )}
-      </div>
-    </div>,
-    // Slide 2: View agreements
-    <div key="agreements" className="text-center px-4">
-      <p className="text-lg sm:text-xl font-bold text-[#1C4332] font-sans mb-1.5 tracking-tight">
-        Review your loan agreements
-      </p>
-      <p className="text-sm text-[#1C4332]/60 font-sans mb-6 whitespace-nowrap">
-        View and download your loan documents anytime to stay informed
-      </p>
-      <Link
-        to={createPageUrl("LoanAgreements")}
-        className="inline-block px-5 py-2.5 rounded-xl bg-[#1C4332] text-sm font-semibold text-[#6AD478] hover:bg-[#1C4332]/90 transition-colors font-sans"
-      >
-        My Loan Documents
-      </Link>
-    </div>,
-  ];
+  if (totalSlides === 0) return null;
 
   return (
-    <div className="rounded-2xl relative overflow-hidden" style={{ backgroundColor: '#6AD478' }}>
-      {/* Arrow buttons */}
-      <button
-        onClick={() => goToSlide('prev')}
-        className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-[#1C4332]/10 hover:bg-[#1C4332]/20 flex items-center justify-center transition-colors"
-        aria-label="Previous slide"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
-      </button>
-      <button
-        onClick={() => goToSlide('next')}
-        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-[#1C4332]/10 hover:bg-[#1C4332]/20 flex items-center justify-center transition-colors"
-        aria-label="Next slide"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
-      </button>
-
-      {/* Slide content */}
-      <div className="px-10 sm:px-16 py-10 sm:py-14">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentSlide}
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -30 }}
-            transition={{ duration: 0.3 }}
-          >
-            {slides[currentSlide]}
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      {/* Dot indicators */}
-      <div className="flex items-center justify-center gap-2 pb-5">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentSlide(index)}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              currentSlide === index ? 'bg-[#1C4332] w-5' : 'bg-[#1C4332]/30'
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
+    <div className="glass-carousel-frame" style={{ marginTop: 36 }}>
+      <div className="galaxy-slide" style={{ position: 'relative', overflow: 'hidden', borderRadius: 20 }}>
+        <div style={{ display: 'flex', transition: 'transform 0.45s cubic-bezier(0.4, 0, 0.2, 1)', transform: `translateX(-${currentSlide * 100}%)` }}>
+          {notifications.map((notif, i) => (
+            <div key={i} style={{ minWidth: '100%', padding: '40px 60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 32 }}>
+              <div>
+                <h3 style={{ fontSize: 18, fontWeight: 600, color: 'white', marginBottom: 6, letterSpacing: '-0.02em' }}>
+                  {notif.title}
+                </h3>
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 }}>
+                  {notif.description}
+                </p>
+              </div>
+              {notif.action && (
+                <button
+                  onClick={notif.action.onClick}
+                  style={{
+                    padding: '11px 24px', borderRadius: 20, background: 'white', color: '#1A1918',
+                    fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer',
+                    fontFamily: "'DM Sans', sans-serif", boxShadow: '0 4px 0 rgba(0,0,0,0.1)',
+                    flexShrink: 0, whiteSpace: 'nowrap', transition: 'background 0.15s, transform 0.1s, box-shadow 0.1s'
+                  }}
+                >
+                  {notif.action.label}
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+        {/* Arrows */}
+        {totalSlides > 1 && (
+          <>
+            <button onClick={() => goTo(currentSlide - 1)} style={{
+              position: 'absolute', top: '50%', left: 12, transform: 'translateY(-50%)',
+              width: 32, height: 32, borderRadius: '50%', border: 'none', background: 'white',
+              boxShadow: '0 1px 6px rgba(0,0,0,0.08), 0 2px 12px rgba(0,0,0,0.04)',
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              zIndex: 2, opacity: 0.7
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7792F4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <button onClick={() => goTo(currentSlide + 1)} style={{
+              position: 'absolute', top: '50%', right: 12, transform: 'translateY(-50%)',
+              width: 32, height: 32, borderRadius: '50%', border: 'none', background: 'white',
+              boxShadow: '0 1px 6px rgba(0,0,0,0.08), 0 2px 12px rgba(0,0,0,0.04)',
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              zIndex: 2, opacity: 0.7
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7792F4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+          </>
+        )}
+        {/* Dots */}
+        {totalSlides > 1 && (
+          <div style={{ position: 'absolute', bottom: 16, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 8, zIndex: 2 }}>
+            {notifications.map((_, i) => (
+              <button key={i} onClick={() => setCurrentSlide(i)} style={{
+                width: i === currentSlide ? 22 : 7, height: 7, borderRadius: i === currentSlide ? 10 : '50%',
+                background: i === currentSlide ? 'white' : 'rgba(255,255,255,0.4)',
+                border: 'none', padding: 0, cursor: 'pointer',
+                boxShadow: i === currentSlide ? '0 0 8px rgba(255,255,255,0.4)' : 'none',
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+              }} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-// Helper function to sync public profile, moved here to adhere to file structure rules
+// Helper function to sync public profile
 const syncPublicProfile = async (userData) => {
-  if (!userData || !userData.id || !userData.username || !userData.full_name) {
-    console.log("syncPublicProfile: Not enough data to sync.", userData);
-    return;
-  }
+  if (!userData || !userData.id || !userData.username || !userData.full_name) return;
   try {
     const existingProfiles = await PublicProfile.filter({ user_id: { eq: userData.id } });
     const defaultAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent((userData.full_name || 'User').charAt(0))}&background=22c55e&color=fff&size=128`;
@@ -176,7 +161,6 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
-  const [overviewType, setOverviewType] = useState('lending'); // 'lending' or 'borrowing'
   const [quickPayAmount, setQuickPayAmount] = useState('');
   const [quickPayMethod, setQuickPayMethod] = useState('');
   const [quickPayLoanId, setQuickPayLoanId] = useState('');
@@ -185,14 +169,35 @@ export default function Home() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedLoan, setSelectedLoan] = useState(null);
   const [candidateLoans, setCandidateLoans] = useState([]);
-  const [notifIndex, setNotifIndex] = useState(0);
 
-  // Auto-carousel notifications every 5 seconds
+  // Scroll state for top bar / nav behavior
+  const [topBarHidden, setTopBarHidden] = useState(false);
+  const [navUp, setNavUp] = useState(false);
+  const [navHidden, setNavHidden] = useState(false);
+  const lastScrollY = useRef(0);
+
   useEffect(() => {
-    const timer = setInterval(() => {
-      setNotifIndex(prev => prev + 1);
-    }, 5000);
-    return () => clearInterval(timer);
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const scrollingDown = currentScrollY > lastScrollY.current;
+
+      if (currentScrollY > 60) {
+        setTopBarHidden(true);
+        setNavUp(true);
+        if (scrollingDown && currentScrollY > 200) {
+          setNavHidden(true);
+        } else {
+          setNavHidden(false);
+        }
+      } else {
+        setTopBarHidden(false);
+        setNavUp(false);
+        setNavHidden(false);
+      }
+      lastScrollY.current = currentScrollY;
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Use profile from context
@@ -209,1270 +214,965 @@ export default function Home() {
   };
 
   const loadData = async () => {
-    if (!authUser) {
-      setIsLoading(false);
-      return;
-    }
-
+    if (!authUser) { setIsLoading(false); return; }
     setIsLoading(true);
     try {
-      // Only fetch loan data - user profile comes from context
       const [allLoans, recentPayments, allProfiles, allFriendships] = await Promise.all([
         safeEntityCall(() => Loan.list('-created_at')),
         safeEntityCall(() => Payment.list('-created_at', 10)),
         safeEntityCall(() => PublicProfile.list()),
         safeEntityCall(() => Friendship.list()),
       ]);
-
       setLoans(allLoans);
       setPayments(recentPayments);
       setPublicProfiles(allProfiles);
       setFriendships(allFriendships);
       setDataLoaded(true);
-
-      // Sync profile in background if we have user data
-      if (userProfile) {
-        syncPublicProfile({ ...userProfile, id: authUser.id });
-      }
+      if (userProfile) syncPublicProfile({ ...userProfile, id: authUser.id });
     } catch (error) {
       console.error("Data load error:", error);
-      setLoans([]);
-      setPayments([]);
-      setPublicProfiles([]);
+      setLoans([]); setPayments([]); setPublicProfiles([]);
     }
     setIsLoading(false);
   };
 
   useEffect(() => {
-    // Only load data once when auth is ready and we haven't loaded yet
-    if (!isLoadingAuth && !dataLoaded && authUser) {
-      loadData();
-    } else if (!isLoadingAuth && !authUser) {
-      setIsLoading(false);
-    }
+    if (!isLoadingAuth && !dataLoaded && authUser) loadData();
+    else if (!isLoadingAuth && !authUser) setIsLoading(false);
   }, [isLoadingAuth]);
 
   const handleLogin = async () => {
     setIsAuthenticating(true);
-    try {
-      await navigateToLogin();
-    } catch (error) {
-      console.error("Login failed:", error);
-    } finally {
-      // Reset after a delay in case browser doesn't open
-      setTimeout(() => setIsAuthenticating(false), 3000);
-    }
+    try { await navigateToLogin(); }
+    catch (error) { console.error("Login failed:", error); }
+    finally { setTimeout(() => setIsAuthenticating(false), 3000); }
   };
 
+  // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen p-6" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
-        <div className="max-w-7xl mx-auto flex items-center justify-center min-h-96">
-          <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm p-8">
-            <div className="text-center">
-              <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin mx-auto mb-4" style={{borderColor: `rgb(var(--theme-primary))`}}></div>
-              <p className="text-slate-600">Loading dashboard...</p>
-            </div>
-          </Card>
+      <div style={{ minHeight: '100vh', background: '#F7F7F7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ width: 32, height: 32, border: '2px solid #678AFB', borderTopColor: 'transparent', borderRadius: '50%', margin: '0 auto 16px' }} className="animate-spin" />
+          <p style={{ fontSize: 14, color: '#787776', fontFamily: "'DM Sans', sans-serif" }}>Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
+  // Not logged in state
   if (!user && !isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="max-w-md w-full"
-        >
-          <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm shadow-2xl">
-            <CardContent className="p-8 text-center">
-              <div className="w-24 h-24 mx-auto mb-6 rounded-full overflow-hidden bg-white shadow-md">
-                <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/e492d87a7_Logo.png" alt="Vony Logo" className="w-full h-full object-cover" />
-              </div>
-              <h1 className="text-3xl font-bold text-slate-800 mb-2 tracking-tight">
-                Welcome to <span style={{color: `rgb(var(--theme-primary))`}}>Vony</span>
-              </h1>
-              <p className="mb-6 leading-relaxed" style={{ color: '#475569' }}>
-                Lending money to friends made simple.
-              </p>
-              <Button
-                onClick={handleLogin}
-                disabled={isAuthenticating}
-                className="w-full text-lg py-3 font-semibold shadow-lg text-white hover:opacity-90"
-                style={{backgroundColor: '#00A86B'}}
-                size="lg"
-              >
-                {isAuthenticating ? 'Signing you in...' : 'Sign In to Get Started'}
-              </Button>
-            </CardContent>
-          </Card>
+      <div style={{ minHeight: '100vh', background: '#F7F7F7', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} style={{ maxWidth: 400, width: '100%' }}>
+          <div className="glass-card" style={{ padding: 32, textAlign: 'center' }}>
+            <div style={{ width: 96, height: 96, margin: '0 auto 24px', borderRadius: '50%', overflow: 'hidden', background: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+              <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/e492d87a7_Logo.png" alt="Vony Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+            <h1 style={{ fontSize: '1.8rem', fontWeight: 700, color: '#1A1918', marginBottom: 8, letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>
+              Welcome to <span style={{ color: '#678AFB' }}>Vony</span>
+            </h1>
+            <p style={{ color: '#787776', marginBottom: 24, fontSize: 14, fontFamily: "'DM Sans', sans-serif" }}>
+              Lending money to friends made simple.
+            </p>
+            <button onClick={handleLogin} disabled={isAuthenticating} style={{
+              width: '100%', padding: '12px 24px', fontSize: 16, fontWeight: 600,
+              background: '#678AFB', color: 'white', border: 'none', borderRadius: 12,
+              cursor: isAuthenticating ? 'not-allowed' : 'pointer', opacity: isAuthenticating ? 0.7 : 1,
+              fontFamily: "'DM Sans', sans-serif", transition: 'background 0.15s'
+            }}>
+              {isAuthenticating ? 'Signing you in...' : 'Sign In to Get Started'}
+            </button>
+          </div>
         </motion.div>
       </div>
     );
   }
 
-  if (user) {
-    const safeLoans = Array.isArray(loans) ? loans : [];
-    const safeAllProfiles = Array.isArray(publicProfiles) ? publicProfiles : [];
-    
-    const myLoans = safeLoans.filter(loan => loan && (loan.lender_id === user.id || loan.borrower_id === user.id));
-    const pendingOffers = safeLoans.filter(loan => loan && loan.borrower_id === user.id && loan.status === 'pending');
+  if (!user) return null;
 
-    const totalLent = myLoans.filter(l => l && l.lender_id === user.id && l.status === 'active').reduce((sum, loan) => sum + (loan.amount || 0), 0);
-    const totalBorrowed = myLoans.filter(l => l && l.borrower_id === user.id && l.status === 'active').reduce((sum, loan) => sum + (loan.amount || 0), 0);
-    const activeLoanCount = myLoans.filter(l => l && l.status === 'active').length;
-    
-    const nextPayment = myLoans
-      .filter(loan => loan && loan.borrower_id === user.id && loan.status === 'active' && loan.next_payment_date)
-      .map(loan => ({ ...loan, date: new Date(loan.next_payment_date) }))
-      .sort((a, b) => a.date - b.date)[0];
+  // ── Data computations ──
+  const safeLoans = Array.isArray(loans) ? loans : [];
+  const safeAllProfiles = Array.isArray(publicProfiles) ? publicProfiles : [];
+  const safePayments = Array.isArray(payments) ? payments : [];
 
-    // Calculate remaining payment amount after subtracting payments made in current period
-    const getNextPaymentAmount = () => {
-      if (!nextPayment) return 0;
+  const myLoans = safeLoans.filter(loan => loan && (loan.lender_id === user.id || loan.borrower_id === user.id));
+  const pendingOffers = safeLoans.filter(loan => loan && loan.borrower_id === user.id && loan.status === 'pending');
 
-      const safePayments = Array.isArray(payments) ? payments : [];
-      const loanPayments = safePayments.filter(p => p && p.loan_id === nextPayment.id);
+  const lentLoans = myLoans.filter(l => l && l.lender_id === user.id && l.status === 'active');
+  const borrowedLoans = myLoans.filter(l => l && l.borrower_id === user.id && l.status === 'active');
+  const activeLoanCount = myLoans.filter(l => l && l.status === 'active').length;
 
-      // Determine the start of the current billing period based on payment frequency
-      const now = new Date();
-      const nextPaymentDate = new Date(nextPayment.next_payment_date);
-      let periodStartDate = new Date(nextPaymentDate);
+  const totalLentAmount = lentLoans.reduce((sum, loan) => sum + (loan.total_amount || loan.amount || 0), 0);
+  const totalRepaid = lentLoans.reduce((sum, loan) => sum + (loan.amount_paid || 0), 0);
+  const percentRepaid = totalLentAmount > 0 ? Math.round((totalRepaid / totalLentAmount) * 100) : 0;
+  const lentRemaining = totalLentAmount - totalRepaid;
 
-      // Calculate period start based on payment frequency
-      const frequency = nextPayment.payment_frequency || 'monthly';
-      if (frequency === 'weekly') {
-        periodStartDate.setDate(periodStartDate.getDate() - 7);
-      } else if (frequency === 'bi-weekly') {
-        periodStartDate.setDate(periodStartDate.getDate() - 14);
-      } else {
-        // monthly - go back one month
-        periodStartDate.setMonth(periodStartDate.getMonth() - 1);
-      }
+  const totalBorrowedAmount = borrowedLoans.reduce((sum, loan) => sum + (loan.total_amount || loan.amount || 0), 0);
+  const totalPaidBack = borrowedLoans.reduce((sum, loan) => sum + (loan.amount_paid || 0), 0);
+  const percentPaid = totalBorrowedAmount > 0 ? Math.round((totalPaidBack / totalBorrowedAmount) * 100) : 0;
+  const borrowedRemaining = totalBorrowedAmount - totalPaidBack;
 
-      // Sum payments made in the current billing period (completed payments only)
-      const paymentsInPeriod = loanPayments.filter(p => {
-        const paymentDate = new Date(p.payment_date || p.created_at);
-        return paymentDate >= periodStartDate && paymentDate <= now && p.status === 'completed';
-      });
+  // Pie chart math (circumference = 2*PI*29 ≈ 182.21)
+  const PIE_C = 182.21;
+  const lentPieOffset = PIE_C - (PIE_C * percentRepaid / 100);
+  const borrowedPieOffset = PIE_C - (PIE_C * percentPaid / 100);
 
-      const paidThisPeriod = paymentsInPeriod.reduce((sum, p) => sum + (p.amount || 0), 0);
-      const originalAmount = nextPayment.payment_amount || 0;
+  // Next payment (borrower)
+  const nextBorrowerPayment = myLoans
+    .filter(loan => loan && loan.borrower_id === user.id && loan.status === 'active' && loan.next_payment_date)
+    .map(loan => {
+      const otherUser = safeAllProfiles.find(p => p.user_id === loan.lender_id);
+      return { ...loan, date: new Date(loan.next_payment_date), username: otherUser?.username || 'user' };
+    })
+    .sort((a, b) => a.date - b.date)[0];
+
+  const nextLenderPayment = myLoans
+    .filter(loan => loan && loan.lender_id === user.id && loan.status === 'active' && loan.next_payment_date)
+    .map(loan => {
+      const otherUser = safeAllProfiles.find(p => p.user_id === loan.borrower_id);
+      return { ...loan, date: new Date(loan.next_payment_date), username: otherUser?.username || 'user' };
+    })
+    .sort((a, b) => a.date - b.date)[0];
+
+  // Friends & loans booleans
+  const acceptedFriendships = friendships.filter(f => f && f.status === 'accepted');
+  const hasFriends = acceptedFriendships.length > 0;
+  const hasLoans = activeLoanCount > 0;
+  const hasLendingLoans = lentLoans.length > 0;
+  const hasBorrowingLoans = borrowedLoans.length > 0;
+
+  // Time-based greeting
+  const hour = new Date().getHours();
+  const greeting = hour >= 5 && hour < 12 ? 'Good morning' : hour >= 12 && hour < 18 ? 'Good afternoon' : 'Good night';
+  const firstName = user.full_name?.split(' ')[0] || 'User';
+
+  // Overdue payments (for hero alert)
+  const today = new Date();
+  const overdueYouOwe = myLoans.filter(l =>
+    l && l.borrower_id === user.id && l.status === 'active' && l.next_payment_date && new Date(l.next_payment_date) < today
+  );
+
+  // Upcoming/overdue payment events
+  const activeLoansForPayments = myLoans.filter(l => l && l.status === 'active' && l.next_payment_date);
+  const allPaymentEvents = activeLoansForPayments
+    .map(loan => {
+      const isLender = loan.lender_id === user.id;
+      const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
+      const otherProfile = safeAllProfiles.find(p => p.user_id === otherUserId);
+      const days = daysUntilDate(loan.next_payment_date);
+      const loanPayments = safePayments.filter(p => p && p.loan_id === loan.id);
+      const nextPayDate = new Date(loan.next_payment_date);
+      let periodStart = new Date(nextPayDate);
+      const freq = loan.payment_frequency || 'monthly';
+      if (freq === 'weekly') periodStart.setDate(periodStart.getDate() - 7);
+      else if (freq === 'bi-weekly') periodStart.setDate(periodStart.getDate() - 14);
+      else periodStart.setMonth(periodStart.getMonth() - 1);
+      const paidThisPeriod = loanPayments
+        .filter(p => { const pDate = new Date(p.payment_date || p.created_at); return pDate >= periodStart && pDate <= today && p.status === 'completed'; })
+        .reduce((sum, p) => sum + (p.amount || 0), 0);
+      const originalAmount = loan.payment_amount || 0;
       const remainingAmount = Math.max(0, originalAmount - paidThisPeriod);
-
-      return remainingAmount;
-    };
-
-    const nextPaymentAmount = getNextPaymentAmount();
-
-    const getPaymentStatus = () => {
-      if (!nextPayment) return 'None';
-      const diffDays = daysUntilDate(nextPayment.date);
-      if (diffDays < 0) return 'Overdue';
-      return `${diffDays} day${diffDays !== 1 ? 's' : ''}`;
-    };
-    
-    const paymentStatus = getPaymentStatus();
-
-    // Compute lending/borrowing data for hero section
-    const lentLoans = myLoans.filter(l => l && l.lender_id === user.id && l.status === 'active');
-    const totalLentAmount = lentLoans.reduce((sum, loan) => sum + (loan.total_amount || loan.amount || 0), 0);
-    const totalRepaid = lentLoans.reduce((sum, loan) => sum + (loan.amount_paid || 0), 0);
-    const percentRepaid = totalLentAmount > 0 ? Math.round((totalRepaid / totalLentAmount) * 100) : 0;
-    const totalLentRemaining = totalLentAmount - totalRepaid;
-
-    const nextLenderPayment = myLoans
-      .filter(loan => loan && loan.lender_id === user.id && loan.status === 'active' && loan.next_payment_date)
-      .map(loan => {
-        const otherUser = safeAllProfiles.find(p => p.user_id === loan.borrower_id);
-        return { ...loan, date: new Date(loan.next_payment_date), username: otherUser?.username || 'user' };
-      })
-      .sort((a, b) => a.date - b.date)[0];
-
-    const borrowedLoans = myLoans.filter(l => l && l.borrower_id === user.id && l.status === 'active');
-    const totalBorrowedAmount = borrowedLoans.reduce((sum, loan) => sum + (loan.total_amount || loan.amount || 0), 0);
-    const totalPaidBack = borrowedLoans.reduce((sum, loan) => sum + (loan.amount_paid || 0), 0);
-    const percentPaid = totalBorrowedAmount > 0 ? Math.round((totalPaidBack / totalBorrowedAmount) * 100) : 0;
-    const totalBorrowedRemaining = totalBorrowedAmount - totalPaidBack;
-
-    const nextBorrowerPayment = myLoans
-      .filter(loan => loan && loan.borrower_id === user.id && loan.status === 'active' && loan.next_payment_date)
-      .map(loan => {
-        const otherUser = safeAllProfiles.find(p => p.user_id === loan.lender_id);
-        return { ...loan, date: new Date(loan.next_payment_date), username: otherUser?.username || 'user' };
-      })
-      .sort((a, b) => a.date - b.date)[0];
-
-    // Bar chart max value
-    const barChartMax = Math.max(totalLentAmount, totalBorrowedAmount, 1);
-
-    // Check if user has friends
-    const acceptedFriendships = friendships.filter(f => f && f.status === 'accepted');
-    const hasFriends = acceptedFriendships.length > 0;
-    const hasLoans = myLoans.filter(l => l && l.status === 'active').length > 0;
-    const hasLendingLoans = lentLoans.length > 0;
-    const hasBorrowingLoans = borrowedLoans.length > 0;
-
-    return (
-        <div className="min-h-screen" style={{backgroundColor: '#0F2B1F'}}>
-          {/* Hero Section */}
-          <div className="px-4 pt-20 pb-20 sm:px-8 md:px-24 md:pt-28 md:pb-28 lg:px-36" style={{backgroundColor: '#0F2B1F'}}>
-            <div className="max-w-6xl mx-auto">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col gap-8 md:gap-10 w-full"
-              >
-                {/* Greeting + Quick Action Circles on same row */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
-                  <div>
-                    {(() => {
-                      const firstName = user.full_name?.split(' ')[0] || 'User';
-                      return (
-                        <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#C2FFDC] tracking-tight leading-tight font-serif">Welcome Back, {firstName}</p>
-                      );
-                    })()}
-                  </div>
-
-                  {/* Quick Action Circles */}
-                  <div className="flex items-start gap-5 sm:gap-6 flex-shrink-0">
-                    <Link to={createPageUrl("CreateOffer")} className="flex flex-col items-center gap-1.5 group">
-                      <div className="w-12 h-12 rounded-full bg-[#C2FFDC] shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                      </div>
-                      <p className="text-[10px] font-semibold text-[#C2FFDC] text-center leading-tight font-sans">Create<br/>Loan Offer</p>
-                    </Link>
-                    <Link to={createPageUrl("RecentActivity")} className="flex flex-col items-center gap-1.5 group">
-                      <div className="w-12 h-12 rounded-full bg-[#C2FFDC] shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                          <circle cx="12" cy="12" r="10"></circle>
-                          <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                      </div>
-                      <p className="text-[10px] font-semibold text-[#C2FFDC] text-center leading-tight font-sans">View Recent<br/>Activity</p>
-                    </Link>
-                    <Link to={createPageUrl("Friends")} className="flex flex-col items-center gap-1.5 group">
-                      <div className="w-12 h-12 rounded-full bg-[#C2FFDC] shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                          <circle cx="9" cy="7" r="4"></circle>
-                          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                        </svg>
-                      </div>
-                      <p className="text-[10px] font-semibold text-[#C2FFDC] text-center leading-tight font-sans">View Your<br/>Network</p>
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Find Friends - shown above grid if user has no friends */}
-                {!hasFriends && (
-                  <div className="rounded-2xl px-6 py-8 sm:px-10 sm:py-10 text-center" style={{ backgroundColor: '#6AD478' }}>
-                    <p className="text-lg sm:text-xl font-bold text-[#1C4332] font-sans mb-1.5 tracking-tight">
-                      Find friends to lend with
-                    </p>
-                    <p className="text-sm text-[#1C4332]/60 font-sans mb-6 max-w-md mx-auto">
-                      Connect with people you trust to start lending and borrowing together
-                    </p>
-                    <div className="flex items-center justify-center gap-3 sm:gap-4">
-                      <Link
-                        to={createPageUrl("Friends")}
-                        className="px-6 py-2.5 rounded-xl bg-[#1C4332] text-sm font-semibold text-[#6AD478] hover:bg-[#1C4332]/90 transition-colors font-sans"
-                      >
-                        Search for Friends
-                      </Link>
-                      <button
-                        onClick={() => {
-                          if (navigator.share) {
-                            navigator.share({
-                              title: 'Join me on Vony',
-                              text: 'Lending made simple — join me on Vony!',
-                              url: 'https://lend-with-vony.com',
-                            });
-                          } else {
-                            navigator.clipboard.writeText('https://lend-with-vony.com');
-                          }
-                        }}
-                        className="px-6 py-2.5 rounded-xl bg-[#1C4332]/15 text-sm font-semibold text-[#1C4332] hover:bg-[#1C4332]/25 transition-colors font-sans"
-                      >
-                        Invite Friends
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Two-Column Layout: Left = Overviews stacked, Right = Updates + Activity */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 w-full">
-                  {/* Left Column: Lending Overview + Borrowing Overview stacked */}
-                  <div className="flex flex-col gap-6 md:gap-8">
-                    {/* Lending Overview Box */}
-                    <div className="rounded-xl px-4 py-3 shadow-sm bg-[#1C4332]">
-                      <p className="text-sm font-bold text-[#C2FFDC] mb-2 tracking-tight font-serif">
-                        Lending Overview
-                      </p>
-                      <div className="mb-3">
-                        <div className="flex items-center justify-between mb-0.5">
-                          <p className="text-[11px] font-medium text-[#00A86B]">Repaid</p>
-                          <p className="text-[11px] font-bold text-[#C2FFDC]">
-                            {formatMoney(totalRepaid)} / {formatMoney(totalLentAmount)}
-                          </p>
-                        </div>
-                        <div className="w-full h-5 bg-[#0F2B1F] rounded-md overflow-hidden">
-                          <div
-                            className="h-full rounded-md transition-all duration-500 flex items-center justify-end pr-2"
-                            style={{
-                              width: `${Math.max((totalRepaid / Math.max(totalLentAmount, 1)) * 100, 2)}%`,
-                              backgroundColor: '#00A86B'
-                            }}
-                          >
-                            {totalRepaid > 0 && (
-                              <span className="text-[10px] font-bold text-white">
-                                {percentRepaid}%
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="border-t border-[#00A86B]/20 pt-2 grid grid-cols-2 gap-3">
-                        <div>
-                          <p className="text-[11px] text-[#00A86B] mb-0.5">Next Payment Date</p>
-                          <div className="flex items-baseline gap-1.5">
-                            <p className="text-base font-bold text-[#C2FFDC]">
-                              {nextLenderPayment ? format(nextLenderPayment.date, 'EEE, MMM d') : 'N/A'}
-                            </p>
-                            {nextLenderPayment && (
-                              <p className="text-[11px] text-[#00A86B]">
-                                {(() => {
-                                  const days = daysUntilDate(nextLenderPayment.date);
-                                  return days > 0 ? `${days}d away` : days === 0 ? 'Due today' : `${Math.abs(days)}d overdue`;
-                                })()}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                        <div>
-                          <p className="text-[11px] text-[#00A86B] mb-0.5">Next Payment Amount</p>
-                          <div className="flex items-baseline gap-1.5">
-                            <p className="text-base font-bold text-[#C2FFDC]">
-                              {nextLenderPayment ? formatMoney(nextLenderPayment.payment_amount || 0) : 'N/A'}
-                            </p>
-                            {nextLenderPayment && (
-                              <p className="text-[11px] text-[#00A86B]">
-                                from @{nextLenderPayment.username}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Borrowing Overview Box */}
-                    <div className="rounded-xl px-4 py-3 shadow-sm bg-[#1C4332]">
-                      <p className="text-sm font-bold text-[#C2FFDC] mb-2 tracking-tight font-serif">
-                        Borrowing Overview
-                      </p>
-                      <div className="mb-3">
-                        <div className="flex items-center justify-between mb-0.5">
-                          <p className="text-[11px] font-medium text-[#00A86B]">Paid Back</p>
-                          <p className="text-[11px] font-bold text-[#C2FFDC]">
-                            {formatMoney(totalPaidBack)} / {formatMoney(totalBorrowedAmount)}
-                          </p>
-                        </div>
-                        <div className="w-full h-5 bg-[#0F2B1F] rounded-md overflow-hidden">
-                          <div
-                            className="h-full rounded-md transition-all duration-500 flex items-center justify-end pr-2"
-                            style={{
-                              width: `${Math.max((totalPaidBack / Math.max(totalBorrowedAmount, 1)) * 100, 2)}%`,
-                              backgroundColor: '#00A86B'
-                            }}
-                          >
-                            {totalPaidBack > 0 && (
-                              <span className="text-[10px] font-bold text-white">
-                                {percentPaid}%
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="border-t border-[#00A86B]/20 pt-2 grid grid-cols-2 gap-3">
-                        <div>
-                          <p className="text-[11px] text-[#00A86B] mb-0.5">Next Payment Date</p>
-                          <div className="flex items-baseline gap-1.5">
-                            <p className="text-base font-bold text-[#C2FFDC]">
-                              {nextBorrowerPayment ? format(nextBorrowerPayment.date, 'EEE, MMM d') : 'N/A'}
-                            </p>
-                            {nextBorrowerPayment && (
-                              <p className="text-[11px] text-[#00A86B]">
-                                {(() => {
-                                  const days = daysUntilDate(nextBorrowerPayment.date);
-                                  return days > 0 ? `${days}d away` : days === 0 ? 'Due today' : `${Math.abs(days)}d overdue`;
-                                })()}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                        <div>
-                          <p className="text-[11px] text-[#00A86B] mb-0.5">Next Payment Amount</p>
-                          <div className="flex items-baseline gap-1.5">
-                            <p className="text-base font-bold text-[#C2FFDC]">
-                              {nextBorrowerPayment ? formatMoney(nextBorrowerPayment.payment_amount || 0) : 'N/A'}
-                            </p>
-                            {nextBorrowerPayment && (
-                              <p className="text-[11px] text-[#00A86B]">
-                                to @{nextBorrowerPayment.username}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Record Payment Box */}
-                    {myLoans.filter(l => l && l.status === 'active').length > 0 && (() => {
-                      const activeLoansAll = myLoans.filter(l => l && l.status === 'active');
-
-                      // "From" options: everyone who owes you money (borrowers in your lending loans)
-                      const fromOptionsBase = [];
-                      const lendingLoansActive = activeLoansAll.filter(l => l.lender_id === user.id);
-                      const borrowerIds = [...new Set(lendingLoansActive.map(l => l.borrower_id))];
-                      borrowerIds.forEach(bId => {
-                        const profile = safeAllProfiles.find(p => p.user_id === bId);
-                        fromOptionsBase.push({ userId: bId, username: profile?.username || 'user', fullName: profile?.full_name || 'Unknown' });
-                      });
-
-                      // "To" options: everyone you owe money to (lenders in your borrowing loans)
-                      const toOptionsBase = [];
-                      const borrowingLoansActive = activeLoansAll.filter(l => l.borrower_id === user.id);
-                      const lenderIds = [...new Set(borrowingLoansActive.map(l => l.lender_id))];
-                      lenderIds.forEach(lId => {
-                        const profile = safeAllProfiles.find(p => p.user_id === lId);
-                        toOptionsBase.push({ userId: lId, username: profile?.username || 'user', fullName: profile?.full_name || 'Unknown' });
-                      });
-
-                      // Add self to top of both lists
-                      const selfProfile = safeAllProfiles.find(p => p.user_id === user.id);
-                      const selfOption = { userId: user.id, username: selfProfile?.username || 'you', fullName: selfProfile?.full_name || 'You' };
-                      const fromListWithSelf = [selfOption, ...fromOptionsBase.filter(o => o.userId !== user.id)];
-                      const toListWithSelf = [selfOption, ...toOptionsBase.filter(o => o.userId !== user.id)];
-
-                      // Mutual exclusion: selected from one dropdown can't appear in the other
-                      const fromOptions = quickPayToPerson ? fromListWithSelf.filter(o => o.userId !== quickPayToPerson) : fromListWithSelf;
-                      const toOptions = quickPayFromPerson ? toListWithSelf.filter(o => o.userId !== quickPayFromPerson) : toListWithSelf;
-
-                      const handleFromChange = (val) => {
-                        setQuickPayFromPerson(val);
-                        if (val === quickPayToPerson) setQuickPayToPerson('');
-                      };
-
-                      const handleToChange = (val) => {
-                        setQuickPayToPerson(val);
-                        if (val === quickPayFromPerson) setQuickPayFromPerson('');
-                      };
-
-                      // Determine which loans match the current selection for the modal
-                      const getMatchingLoans = () => {
-                        if (quickPayFromPerson && quickPayToPerson) {
-                          // Both selected — find loans between these two people
-                          return activeLoansAll.filter(l =>
-                            (l.borrower_id === quickPayFromPerson && l.lender_id === quickPayToPerson) ||
-                            (l.borrower_id === quickPayToPerson && l.lender_id === quickPayFromPerson)
-                          );
-                        } else if (quickPayFromPerson) {
-                          return activeLoansAll.filter(l =>
-                            l.borrower_id === quickPayFromPerson || l.lender_id === quickPayFromPerson
-                          );
-                        } else if (quickPayToPerson) {
-                          return activeLoansAll.filter(l =>
-                            l.borrower_id === quickPayToPerson || l.lender_id === quickPayToPerson
-                          );
-                        }
-                        return activeLoansAll;
-                      };
-
-                      const handleSubmit = () => {
-                        const matching = getMatchingLoans();
-                        if (matching.length === 1) {
-                          setSelectedLoan({
-                            ...matching[0],
-                            _prefillAmount: quickPayAmount,
-                            _prefillMethod: quickPayMethod,
-                          });
-                          setCandidateLoans([]);
-                          setShowPaymentModal(true);
-                        } else if (matching.length > 1) {
-                          setCandidateLoans(matching);
-                          setSelectedLoan({
-                            ...matching[0],
-                            _prefillAmount: quickPayAmount,
-                            _prefillMethod: quickPayMethod,
-                          });
-                          setShowPaymentModal(true);
-                        }
-                      };
-
-                      const canSubmit = quickPayAmount && (quickPayFromPerson || quickPayToPerson);
-
-                      return (
-                        <div className="rounded-xl px-4 py-3 shadow-sm mt-2 mb-2 lg:mt-0 lg:mb-0" style={{ backgroundColor: '#6AD478' }}>
-                          <p className="text-sm font-bold text-[#1C4332] mb-2 tracking-tight font-serif">
-                            Record Payment
-                          </p>
-                          <div className="flex flex-wrap items-center gap-2 text-xs text-[#1C4332]">
-                            <span>Record payment of</span>
-                            <span className="font-medium">$</span>
-                            <Input
-                              type="number"
-                              step="0.01"
-                              min="0.01"
-                              placeholder=""
-                              value={quickPayAmount}
-                              onChange={(e) => setQuickPayAmount(e.target.value)}
-                              className="w-20 h-7 px-2 bg-[#C2FFDC] border-0 text-xs inline-flex rounded-md text-[#1C4332] placeholder:text-[#1C4332]/50"
-                              style={{ MozAppearance: 'textfield' }}
-                            />
-                            <span>from</span>
-                            <Select
-                              value={quickPayFromPerson}
-                              onValueChange={handleFromChange}
-                            >
-                              <SelectTrigger className="w-auto h-7 px-2 bg-[#C2FFDC] border-0 text-xs inline-flex rounded-md text-[#1C4332]">
-                                <SelectValue placeholder="select person" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {fromOptions.map((person) => (
-                                  <SelectItem key={person.userId} value={person.userId}>
-                                    @{person.username}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <span>to</span>
-                            <Select
-                              value={quickPayToPerson}
-                              onValueChange={handleToChange}
-                            >
-                              <SelectTrigger className="w-auto h-7 px-2 bg-[#C2FFDC] border-0 text-xs inline-flex rounded-md text-[#1C4332]">
-                                <SelectValue placeholder="select person" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {toOptions.map((person) => (
-                                  <SelectItem key={person.userId} value={person.userId}>
-                                    @{person.username}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <Button
-                              type="button"
-                              onClick={handleSubmit}
-                              disabled={!canSubmit}
-                              className={`h-7 px-3 rounded-md text-xs font-semibold border-0 transition-all ${
-                                !canSubmit
-                                  ? 'bg-[#00A86B]/30 text-[#1C4332]/50 cursor-not-allowed'
-                                  : 'bg-[#00A86B] text-white hover:bg-[#00A86B]/90'
-                              }`}
-                            >
-                              Submit
-                            </Button>
-                          </div>
-                        </div>
-                      );
-                    })()}
-
-                    {/* Loans Over Time Bar Chart */}
-                    {myLoans.filter(l => l && (l.status === 'active' || l.status === 'completed')).length > 0 && (() => {
-                      const allRelevantLoans = myLoans.filter(l => l && (l.status === 'active' || l.status === 'completed'));
-                      const safePayments = Array.isArray(payments) ? payments : [];
-
-                      // Find the earliest loan creation month
-                      const loanDates = allRelevantLoans
-                        .map(l => new Date(l.created_at))
-                        .filter(d => !isNaN(d.getTime()));
-                      if (loanDates.length === 0) return null;
-
-                      const earliestDate = loanDates.reduce((min, d) => d < min ? d : min, loanDates[0]);
-                      const chartStartMonth = startOfMonth(earliestDate);
-                      const now = new Date();
-                      const currentMonth = startOfMonth(now);
-                      const isCurrentMonthFn = (m) => m.getFullYear() === currentMonth.getFullYear() && m.getMonth() === currentMonth.getMonth();
-
-                      // Build exactly 6 months starting from earliest loan month
-                      const months = [];
-                      for (let i = 0; i < 6; i++) {
-                        months.push(addMonths(chartStartMonth, i));
-                      }
-
-                      const chartData = months.map(monthDate => {
-                        const monthEndDate = endOfMonth(monthDate);
-                        const isCurrent = isCurrentMonthFn(monthDate);
-                        const isFuture = isAfter(monthDate, currentMonth);
-                        const snapshotDate = isCurrent ? now : (isFuture ? now : monthEndDate);
-
-                        let owedToYou = 0;
-                        let youOwe = 0;
-
-                        allRelevantLoans.forEach(loan => {
-                          const loanCreated = new Date(loan.created_at);
-                          if (isAfter(loanCreated, snapshotDate)) return;
-
-                          const totalAmount = loan.total_amount || loan.amount || 0;
-                          const isLender = loan.lender_id === user.id;
-
-                          const loanPayments = safePayments.filter(p =>
-                            p && p.loan_id === loan.id &&
-                            (p.status === 'completed' || p.status === 'pending_confirmation') &&
-                            !isAfter(new Date(p.payment_date || p.created_at), snapshotDate)
-                          );
-                          const totalPaid = loanPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
-
-                          const effectivePaid = isCurrent ? (loan.amount_paid || 0) : totalPaid;
-                          const remaining = Math.max(0, totalAmount - effectivePaid);
-
-                          if (isFuture) {
-                            const currentRemaining = Math.max(0, totalAmount - (loan.amount_paid || 0));
-                            if (isLender) owedToYou += currentRemaining;
-                            else youOwe += currentRemaining;
-                            return;
-                          }
-
-                          if (isLender) owedToYou += remaining;
-                          else youOwe += remaining;
-                        });
-
-                        return {
-                          month: monthDate,
-                          owedToYou,
-                          youOwe,
-                          label: format(monthDate, 'MMM'),
-                          isCurrent,
-                          isFuture
-                        };
-                      });
-
-                      const maxVal = Math.max(
-                        ...chartData.map(d => d.owedToYou),
-                        ...chartData.map(d => d.youOwe),
-                        1
-                      );
-
-                      const chartHeight = 120;
-                      const barWidth = 14;
-                      const pairGap = 3;
-
-                      // Y-axis labels: show 3 ticks (0, mid, max)
-                      const yMax = maxVal;
-                      const yMid = Math.round(yMax / 2);
-                      const formatYLabel = (v) => v >= 1000 ? `$${(v / 1000).toFixed(v >= 10000 ? 0 : 1)}k` : `$${v}`;
-
-                      return (
-                        <div className="rounded-xl px-4 py-3 shadow-sm bg-[#1C4332]">
-                          <p className="text-sm font-bold text-[#C2FFDC] mb-3 tracking-tight font-serif">
-                            Loans Over Time
-                          </p>
-
-                          {/* Chart with Y-axis */}
-                          <div className="flex">
-                            {/* Y-axis labels */}
-                            <div className="flex flex-col justify-between pr-2 flex-shrink-0" style={{ height: chartHeight }}>
-                              <p className="text-[9px] text-[#00A86B] text-right leading-none">{formatYLabel(Math.round(yMax))}</p>
-                              <p className="text-[9px] text-[#00A86B] text-right leading-none">{formatYLabel(yMid)}</p>
-                              <p className="text-[9px] text-[#00A86B] text-right leading-none">$0</p>
-                            </div>
-
-                            {/* Bars — spread to fill full width */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-end justify-between w-full" style={{ height: chartHeight }}>
-                                {chartData.map((data, i) => {
-                                  const owedHeight = maxVal > 0 ? (data.owedToYou / maxVal) * chartHeight : 0;
-                                  const oweHeight = maxVal > 0 ? (data.youOwe / maxVal) * chartHeight : 0;
-
-                                  return (
-                                    <div key={i} className="flex flex-col items-center flex-1">
-                                      <div className="flex items-end justify-center" style={{ gap: pairGap, height: chartHeight }}>
-                                        <div
-                                          className="rounded-t-sm transition-all duration-300"
-                                          style={{
-                                            width: barWidth,
-                                            height: Math.max(owedHeight, owedHeight > 0 ? 2 : 0),
-                                            backgroundColor: '#00A86B',
-                                            opacity: data.isFuture ? 0.35 : 1
-                                          }}
-                                          title={`${data.label}: $${data.owedToYou.toLocaleString(undefined, { maximumFractionDigits: 0 })} owed to you`}
-                                        />
-                                        <div
-                                          className="rounded-t-sm transition-all duration-300"
-                                          style={{
-                                            width: barWidth,
-                                            height: Math.max(oweHeight, oweHeight > 0 ? 2 : 0),
-                                            backgroundColor: '#6AD478',
-                                            opacity: data.isFuture ? 0.35 : 1
-                                          }}
-                                          title={`${data.label}: $${data.youOwe.toLocaleString(undefined, { maximumFractionDigits: 0 })} you owe`}
-                                        />
-                                      </div>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                              {/* Month labels — spread to match */}
-                              <div className="flex justify-between w-full mt-1.5">
-                                {chartData.map((data, i) => (
-                                  <p
-                                    key={i}
-                                    className={`text-[10px] text-center flex-1 ${data.isCurrent ? 'font-bold text-[#C2FFDC]' : 'text-[#00A86B]'}`}
-                                  >
-                                    {data.label}
-                                  </p>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Key / Legend — centered */}
-                          <div className="flex items-center justify-center gap-4 mt-3 pt-2.5 border-t border-[#00A86B]/20">
-                            <div className="flex items-center gap-1.5">
-                              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#00A86B' }} />
-                              <p className="text-[11px] text-[#C2FFDC]">Owed to you</p>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#6AD478' }} />
-                              <p className="text-[11px] text-[#C2FFDC]">You owe</p>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })()}
-                  </div>
-
-                  {/* Right Column: Updates */}
-                  <div className="flex flex-col gap-6 md:gap-8">
-                    {/* Combined Requests + Notifications Carousel */}
-                    {(() => {
-                      const today = new Date();
-                      const nextWeek = addDays(today, 7);
-                      const activeNotifLoans = myLoans.filter(l => l && l.status === 'active' && l.next_payment_date);
-                      const allItems = [];
-
-                      // Add request items first
-                      if (pendingOffers.length > 0) {
-                        allItems.push({
-                          text: `You have ${pendingOffers.length} new update${pendingOffers.length !== 1 ? 's' : ''}`,
-                          link: 'Requests',
-                          icon: 'bell'
-                        });
-                      }
-
-                      // Count overdue payments you owe
-                      const overdueYouOwe = activeNotifLoans.filter(l => {
-                        const d = new Date(l.next_payment_date);
-                        return l.borrower_id === user.id && d < today;
-                      });
-                      if (overdueYouOwe.length >= 2) {
-                        allItems.push({
-                          text: `You have ${overdueYouOwe.length} overdue payments`,
-                          link: 'Borrowing',
-                          icon: 'clock'
-                        });
-                      }
-
-                      // Specific overdue loan messages (you owe)
-                      overdueYouOwe.forEach(loan => {
-                        const lenderProfile = safeAllProfiles.find(p => p.user_id === loan.lender_id);
-                        allItems.push({
-                          text: `Your payment to @${lenderProfile?.username || 'user'} is overdue. If you made a payment, make sure to record it.`,
-                          link: 'Borrowing',
-                          icon: 'clock'
-                        });
-                      });
-
-                      // Payments coming up this week (you owe)
-                      const upcomingYouOwe = activeNotifLoans.filter(l => {
-                        const d = new Date(l.next_payment_date);
-                        return l.borrower_id === user.id && d >= today && d <= nextWeek;
-                      });
-                      if (upcomingYouOwe.length > 0) {
-                        allItems.push({
-                          text: `You have ${upcomingYouOwe.length} payment${upcomingYouOwe.length !== 1 ? 's' : ''} coming up this week`,
-                          link: 'Borrowing',
-                          icon: 'clock'
-                        });
-                      }
-
-                      // Payments you're due to receive this week
-                      const upcomingReceive = activeNotifLoans.filter(l => {
-                        const d = new Date(l.next_payment_date);
-                        return l.lender_id === user.id && d >= today && d <= nextWeek;
-                      });
-                      if (upcomingReceive.length > 0) {
-                        allItems.push({
-                          text: `You are due to receive ${upcomingReceive.length} payment${upcomingReceive.length !== 1 ? 's' : ''} this week`,
-                          link: 'Lending',
-                          icon: 'clock'
-                        });
-                      }
-
-                      // Overdue payments from borrowers (you are the lender)
-                      const overdueFromOthers = activeNotifLoans.filter(l => {
-                        const d = new Date(l.next_payment_date);
-                        return l.lender_id === user.id && d < today;
-                      });
-                      overdueFromOthers.forEach(loan => {
-                        const borrowerProfile = safeAllProfiles.find(p => p.user_id === loan.borrower_id);
-                        allItems.push({
-                          text: `@${borrowerProfile?.username || 'user'}'s payment to you is overdue. If they made a payment, make sure to record it.`,
-                          link: 'Lending',
-                          icon: 'clock'
-                        });
-                      });
-
-                      // Fallback: no items at all
-                      if (allItems.length === 0) {
-                        return (
-                          <div className="rounded-xl px-4 py-3 shadow-sm flex items-center gap-3" style={{ backgroundColor: '#6AD478' }}>
-                            <div className="w-10 h-10 rounded-full bg-[#1C4332]/15 flex items-center justify-center flex-shrink-0">
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                              </svg>
-                            </div>
-                            <p className="text-sm font-bold text-[#1C4332] tracking-tight font-sans flex-1">
-                              You have no new notifications
-                            </p>
-                          </div>
-                        );
-                      }
-
-                      const safeIdx = notifIndex % allItems.length;
-                      const current = allItems[safeIdx];
-
-                      return (
-                        <div className="rounded-xl px-4 py-3 shadow-sm flex items-center gap-3" style={{ backgroundColor: '#6AD478' }}>
-                          <div className="w-10 h-10 rounded-full bg-[#1C4332]/15 flex items-center justify-center flex-shrink-0">
-                            {current.icon === 'bell' ? (
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                              </svg>
-                            ) : (
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <polyline points="12 6 12 12 16 14"></polyline>
-                              </svg>
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <AnimatePresence mode="wait">
-                              <motion.p
-                                key={safeIdx}
-                                initial={{ opacity: 0, y: 8 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -8 }}
-                                transition={{ duration: 0.25 }}
-                                className="text-sm font-bold text-[#1C4332] tracking-tight font-sans leading-snug"
-                              >
-                                {current.text}
-                              </motion.p>
-                            </AnimatePresence>
-                          </div>
-                          <Link
-                            to={createPageUrl(current.link)}
-                            className="flex-shrink-0 px-4 py-1.5 rounded-lg bg-[#1C4332] text-xs font-semibold text-[#6AD478] hover:bg-[#1C4332]/90 transition-colors font-sans whitespace-nowrap"
-                          >
-                            {current.icon === 'bell' ? 'View Updates' : `Go to ${current.link}`}
-                          </Link>
-                          {allItems.length > 1 && (
-                            <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                              {allItems.map((_, i) => (
-                                <button
-                                  key={i}
-                                  onClick={() => setNotifIndex(i)}
-                                  className={`rounded-full transition-all cursor-pointer ${
-                                    i === safeIdx ? 'w-1.5 h-3 bg-[#1C4332]' : 'w-1.5 h-1.5 bg-[#1C4332]/30'
-                                  }`}
-                                />
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })()}
-
-                    {/* Upcoming & Overdue Payments — shared data computation */}
-                    {(() => {
-                      const safePaymentsUp = Array.isArray(payments) ? payments : [];
-                      const activeLoansForPayments = myLoans.filter(l => l && l.status === 'active' && l.next_payment_date);
-
-                      // Build all payment events with remaining amounts
-                      const allEvents = activeLoansForPayments
-                        .map(loan => {
-                          const isLender = loan.lender_id === user.id;
-                          const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
-                          const otherProfile = safeAllProfiles.find(p => p.user_id === otherUserId);
-                          const days = daysUntilDate(loan.next_payment_date);
-
-                          // Remaining amount for this payment period
-                          const loanPayments = safePaymentsUp.filter(p => p && p.loan_id === loan.id);
-                          const now = new Date();
-                          const nextPayDate = new Date(loan.next_payment_date);
-                          let periodStart = new Date(nextPayDate);
-                          const freq = loan.payment_frequency || 'monthly';
-                          if (freq === 'weekly') periodStart.setDate(periodStart.getDate() - 7);
-                          else if (freq === 'bi-weekly') periodStart.setDate(periodStart.getDate() - 14);
-                          else periodStart.setMonth(periodStart.getMonth() - 1);
-
-                          const paidThisPeriod = loanPayments
-                            .filter(p => {
-                              const pDate = new Date(p.payment_date || p.created_at);
-                              return pDate >= periodStart && pDate <= now && p.status === 'completed';
-                            })
-                            .reduce((sum, p) => sum + (p.amount || 0), 0);
-
-                          const originalAmount = loan.payment_amount || 0;
-                          const remainingAmount = Math.max(0, originalAmount - paidThisPeriod);
-
-                          return {
-                            loan,
-                            date: nextPayDate,
-                            days,
-                            originalAmount,
-                            remainingAmount,
-                            username: otherProfile?.username || 'user',
-                            isLender,
-                            loanId: loan.id
-                          };
-                        })
-                        .filter(e => e.remainingAmount > 0)
-                        .sort((a, b) => a.date - b.date);
-
-                      // Combine upcoming and overdue into one list, overdue first then upcoming
-                      const overdueEvents = allEvents.filter(e => e.days < 0);
-                      const upcomingEvents = allEvents.filter(e => e.days >= 0).slice(0, 5);
-                      const combinedEvents = [...overdueEvents, ...upcomingEvents];
-
-                      return (
-                          /* Upcoming Payments Box (includes overdue with minus prefix) */
-                          <div className="rounded-xl px-4 py-3 shadow-sm bg-[#1C4332]">
-                            <p className="text-sm font-bold text-[#C2FFDC] mb-2.5 tracking-tight font-serif">
-                              Upcoming Payments
-                            </p>
-                            {combinedEvents.length === 0 ? (
-                              <div className="flex flex-col items-center justify-center py-6 text-[#00A86B]">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40 mb-1.5">
-                                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                  <line x1="16" y1="2" x2="16" y2="6"></line>
-                                  <line x1="8" y1="2" x2="8" y2="6"></line>
-                                  <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
-                                <p className="text-xs">No upcoming payments</p>
-                              </div>
-                            ) : (
-                              <div className="space-y-1.5">
-                                {combinedEvents.map((event, idx) => {
-                                  const amountStr = event.remainingAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                                  const dueDateStr = format(event.date, 'MMM d, yyyy');
-                                  const loanPage = event.isLender ? 'Lending' : 'Borrowing';
-                                  const isOverdue = event.days < 0;
-                                  const displayDays = isOverdue ? `-${Math.abs(event.days)}` : event.days;
-
-                                  return (
-                                    <div key={idx} className="flex items-center gap-2.5 p-2.5 rounded-lg bg-[#0F2B1F]">
-                                      {/* Circle with days (minus prefix for overdue) */}
-                                      <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-sm bg-[#6AD478]">
-                                        <p className="text-[10px] font-bold text-center leading-tight text-[#1C4332]">
-                                          {displayDays}
-                                          <span className="block text-[7px] font-medium text-[#1C4332]/60">
-                                            {Math.abs(event.days) === 1 ? 'day' : 'days'}
-                                          </span>
-                                        </p>
-                                      </div>
-                                      <div className="flex-1 min-w-0">
-                                        <p className="text-[11px] text-[#C2FFDC]">
-                                          {event.isLender
-                                            ? <>Receive payment of <span className="font-semibold">${amountStr}</span> from <span className="font-semibold">@{event.username}</span></>
-                                            : <>Send payment of <span className="font-semibold">${amountStr}</span> to <span className="font-semibold">@{event.username}</span></>
-                                          }
-                                        </p>
-                                        <p className={`text-[10px] mt-0.5 ${isOverdue ? 'text-red-400' : 'text-[#00A86B]'}`}>{dueDateStr}</p>
-                                      </div>
-                                      <div className="flex items-center gap-1.5 flex-shrink-0">
-                                        {isOverdue && (
-                                          <span className="text-[9px] font-semibold px-2.5 py-1 rounded-md bg-red-500 text-white">
-                                            Overdue
-                                          </span>
-                                        )}
-                                        <Link
-                                          to={createPageUrl(loanPage)}
-                                          className="text-[9px] font-semibold px-2.5 py-1 rounded-md"
-                                          style={{ backgroundColor: '#6AD478', color: '#1C4332' }}
-                                        >
-                                          View Loan
-                                        </Link>
-                                      </div>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            )}
-                          </div>
-                      );
-                    })()}
-
-                    {/* View Lending / Borrowing Page */}
-                    <div className="flex items-center justify-center gap-8 py-2">
-                      <Link to={createPageUrl("Lending")} className="flex flex-col items-center gap-1.5 group">
-                        <div className="w-11 h-11 rounded-full bg-[#C2FFDC] shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="12" y1="1" x2="12" y2="23"></line>
-                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                          </svg>
-                        </div>
-                        <p className="text-[10px] font-semibold text-[#C2FFDC] text-center leading-tight font-sans">View Lending<br/>Page</p>
-                      </Link>
-                      <Link to={createPageUrl("Borrowing")} className="flex flex-col items-center gap-1.5 group">
-                        <div className="w-11 h-11 rounded-full bg-[#C2FFDC] shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                          </svg>
-                        </div>
-                        <p className="text-[10px] font-semibold text-[#C2FFDC] text-center leading-tight font-sans">View Borrowing<br/>Page</p>
-                      </Link>
-                      <Link to={createPageUrl("LoanAgreements")} className="flex flex-col items-center gap-1.5 group">
-                        <div className="w-11 h-11 rounded-full bg-[#C2FFDC] shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1C4332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                          </svg>
-                        </div>
-                        <p className="text-[10px] font-semibold text-[#C2FFDC] text-center leading-tight font-sans">View<br/>Documents</p>
-                      </Link>
-                    </div>
-
-                    {/* Recent Activity Box */}
-                    <div className="rounded-xl px-4 py-3 shadow-sm bg-[#1C4332]">
-                      <div className="flex items-center justify-between mb-2.5">
-                        <p className="text-sm font-bold text-[#C2FFDC] tracking-tight font-serif">
-                          Recent Activity
-                        </p>
-                        <Link to={createPageUrl("RecentActivity")} className="text-[10px] font-semibold text-[#00A86B] hover:underline">
-                          View All
-                        </Link>
-                      </div>
-                      {(() => {
-                        const safePaymentsRecent = Array.isArray(payments) ? payments : [];
-
-                        // Build activity items matching Recent Activity page format
-                        const activityItems = [];
-
-                        // Payment events
-                        safePaymentsRecent
-                          .filter(p => p && myLoans.some(l => l.id === p.loan_id))
-                          .forEach(p => {
-                            const loan = myLoans.find(l => l.id === p.loan_id);
-                            if (!loan) return;
-                            const isBorrower = loan.borrower_id === user.id;
-                            const otherUserId = isBorrower ? loan.lender_id : loan.borrower_id;
-                            const otherProfile = safeAllProfiles.find(pr => pr.user_id === otherUserId);
-                            const amount = `$${(p.amount || 0).toLocaleString()}`;
-                            const username = `@${otherProfile?.username || 'user'}`;
-                            activityItems.push({
-                              type: 'payment',
-                              date: new Date(p.payment_date || p.created_at),
-                              description: isBorrower
-                                ? `You made a ${amount} payment to ${username}`
-                                : `Received ${amount} payment from ${username}`
-                            });
-                          });
-
-                        // Loan creation events
-                        myLoans.forEach(loan => {
-                          if (!loan) return;
-                          const isLender = loan.lender_id === user.id;
-                          const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
-                          const otherProfile = safeAllProfiles.find(pr => pr.user_id === otherUserId);
-                          const amount = `$${(loan.amount || 0).toLocaleString()}`;
-                          const username = `@${otherProfile?.username || 'user'}`;
-                          const reason = loan.purpose || 'loan';
-                          let desc = '';
-                          if (loan.status === 'pending' || !loan.status) {
-                            desc = isLender ? `Sent ${amount} loan offer to ${username} for ${reason}` : `Received ${amount} loan offer from ${username} for ${reason}`;
-                          } else if (loan.status === 'active') {
-                            desc = isLender ? `${username} accepted your ${amount} loan for ${reason}` : `You accepted ${amount} loan from ${username} for ${reason}`;
-                          } else if (loan.status === 'declined') {
-                            desc = isLender ? `${username} declined your ${amount} loan for ${reason}` : `You declined ${amount} loan from ${username} for ${reason}`;
-                          } else if (loan.status === 'cancelled') {
-                            desc = isLender ? `You cancelled ${amount} loan offer to ${username}` : `${username} cancelled their ${amount} loan offer`;
-                          } else if (loan.status === 'completed') {
-                            desc = isLender ? `${username} fully repaid your ${amount} loan` : `You fully repaid ${amount} loan to ${username}`;
-                          } else {
-                            desc = isLender ? `${amount} loan to ${username}` : `${amount} loan from ${username}`;
-                          }
-                          activityItems.push({
-                            type: 'loan',
-                            date: new Date(loan.created_at),
-                            description: desc
-                          });
-                        });
-
-                        // Sort by date descending, take 4
-                        const recent = activityItems
-                          .sort((a, b) => b.date - a.date)
-                          .slice(0, 4);
-
-                        if (recent.length === 0) {
-                          return (
-                            <div className="flex flex-col items-center justify-center py-6 text-[#00A86B]">
-                              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="opacity-40 mb-1.5">
-                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                              </svg>
-                              <p className="text-xs">No recent activity</p>
-                            </div>
-                          );
-                        }
-
-                        return (
-                          <div className="space-y-1.5">
-                            {recent.map((item, idx) => {
-                              const isPayment = item.type === 'payment';
-                              const iconColor = '#1C4332';
-
-                              return (
-                                <div key={idx} className="flex items-center gap-2.5 p-2 rounded-lg bg-[#0F2B1F]">
-                                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#00A86B] flex items-center justify-center shadow-sm">
-                                    {isPayment ? (
-                                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <line x1="12" y1="1" x2="12" y2="23"></line>
-                                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                                      </svg>
-                                    ) : (
-                                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                        <polyline points="14 2 14 8 20 8"></polyline>
-                                      </svg>
-                                    )}
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-[11px] text-[#C2FFDC] truncate">{item.description}</p>
-                                    <p className="text-[9px] text-[#00A86B]">{format(item.date, 'MMM d, yyyy')}</p>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        );
-                      })()}
-                    </div>
-
-                  </div>
-                </div>
-
-              </motion.div>
-
-            </div>
-          </div>
-
-          {/* Bottom Section: Carousel (if has loans) or Find Friends (if has friends but shown regardless as fallback) */}
-          <div className="px-4 pt-4 pb-8 sm:px-8 md:px-24 md:pt-4 md:pb-10 lg:px-36" style={{backgroundColor: '#0F2B1F'}}>
-            <div className="max-w-6xl mx-auto">
-              {hasLoans ? (
-                <LoanCarousel
-                  hasLendingLoans={hasLendingLoans}
-                  hasBorrowingLoans={hasBorrowingLoans}
-                />
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.3 }}
-                >
-                  <div className="rounded-2xl px-6 py-10 sm:px-10 sm:py-14 text-center" style={{ backgroundColor: '#6AD478' }}>
-                    <p className="text-xl sm:text-2xl font-bold text-[#1C4332] font-sans mb-2 tracking-tight">
-                      Find friends to lend with
-                    </p>
-                    <p className="text-sm text-[#1C4332]/60 font-sans mb-8 max-w-md mx-auto">
-                      Connect with people you trust to start lending and borrowing together
-                    </p>
-                    <div className="flex items-center justify-center gap-3 sm:gap-4">
-                      <Link
-                        to={createPageUrl("Friends")}
-                        className="px-6 py-2.5 rounded-xl bg-[#1C4332] text-sm font-semibold text-[#6AD478] hover:bg-[#1C4332]/90 transition-colors font-sans"
-                      >
-                        Search for Friends
-                      </Link>
-                      <button
-                        onClick={() => {
-                          if (navigator.share) {
-                            navigator.share({
-                              title: 'Join me on Vony',
-                              text: 'Lending made simple — join me on Vony!',
-                              url: 'https://lend-with-vony.com',
-                            });
-                          } else {
-                            navigator.clipboard.writeText('https://lend-with-vony.com');
-                          }
-                        }}
-                        className="px-6 py-2.5 rounded-xl bg-[#1C4332]/15 text-sm font-semibold text-[#1C4332] hover:bg-[#1C4332]/25 transition-colors font-sans"
-                      >
-                        Invite Friends
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </div>
-          </div>
-
-          {/* Record Payment Modal */}
-          {showPaymentModal && selectedLoan && (
-            <RecordPaymentModal
-              loan={selectedLoan}
-              candidateLoans={candidateLoans}
-              onClose={() => {
-                setShowPaymentModal(false);
-                setSelectedLoan(null);
-                setCandidateLoans([]);
-                setQuickPayAmount('');
-                setQuickPayMethod('');
-                setQuickPayLoanId('');
-                setQuickPayFromPerson('');
-                setQuickPayToPerson('');
-              }}
-              onPaymentComplete={() => {
-                setShowPaymentModal(false);
-                setSelectedLoan(null);
-                setCandidateLoans([]);
-                setQuickPayAmount('');
-                setQuickPayMethod('');
-                setQuickPayLoanId('');
-                setQuickPayFromPerson('');
-                setQuickPayToPerson('');
-                loadData();
-              }}
-              isLender={selectedLoan.lender_id === user.id}
-            />
-          )}
-          </div>
-    );
+      return { loan, date: nextPayDate, days, originalAmount, remainingAmount, username: otherProfile?.username || 'user', isLender, loanId: loan.id, purpose: loan.purpose || '' };
+    })
+    .filter(e => e.remainingAmount > 0)
+    .sort((a, b) => a.date - b.date);
+
+  const overdueEvents = allPaymentEvents.filter(e => e.days < 0);
+  const upcomingEvents = allPaymentEvents.filter(e => e.days >= 0).slice(0, 5);
+  const combinedPaymentEvents = [...overdueEvents, ...upcomingEvents];
+
+  // Monthly stats
+  const currentMonth = startOfMonth(today);
+  const currentMonthEnd = endOfMonth(today);
+  const monthlyReceived = safePayments
+    .filter(p => {
+      if (!p || p.status !== 'completed') return false;
+      const loan = myLoans.find(l => l.id === p.loan_id);
+      if (!loan || loan.lender_id !== user.id) return false;
+      const pDate = new Date(p.payment_date || p.created_at);
+      return pDate >= currentMonth && pDate <= currentMonthEnd;
+    })
+    .reduce((sum, p) => sum + (p.amount || 0), 0);
+
+  const monthlyPaidOut = safePayments
+    .filter(p => {
+      if (!p || p.status !== 'completed') return false;
+      const loan = myLoans.find(l => l.id === p.loan_id);
+      if (!loan || loan.borrower_id !== user.id) return false;
+      const pDate = new Date(p.payment_date || p.created_at);
+      return pDate >= currentMonth && pDate <= currentMonthEnd;
+    })
+    .reduce((sum, p) => sum + (p.amount || 0), 0);
+
+  // Expected monthly amounts
+  const monthlyExpectedReceive = lentLoans.reduce((sum, l) => sum + (l.payment_amount || 0), 0);
+  const monthlyExpectedPay = borrowedLoans.reduce((sum, l) => sum + (l.payment_amount || 0), 0);
+
+  // Overdue count for tags
+  const overdueFromBorrowers = myLoans.filter(l =>
+    l && l.lender_id === user.id && l.status === 'active' && l.next_payment_date && new Date(l.next_payment_date) < today
+  ).length;
+  const lentOnTrack = lentLoans.length - overdueFromBorrowers;
+  const borrowingOverdue = overdueYouOwe.length;
+  const borrowingOnTrack = borrowedLoans.length - borrowingOverdue;
+
+  // Record payment logic
+  const activeLoansAll = myLoans.filter(l => l && l.status === 'active');
+  const fromOptionsBase = [];
+  const lendingLoansActive = activeLoansAll.filter(l => l.lender_id === user.id);
+  const borrowerIds = [...new Set(lendingLoansActive.map(l => l.borrower_id))];
+  borrowerIds.forEach(bId => {
+    const profile = safeAllProfiles.find(p => p.user_id === bId);
+    fromOptionsBase.push({ userId: bId, username: profile?.username || 'user', fullName: profile?.full_name || 'Unknown' });
+  });
+  const toOptionsBase = [];
+  const borrowingLoansActive = activeLoansAll.filter(l => l.borrower_id === user.id);
+  const lenderIds = [...new Set(borrowingLoansActive.map(l => l.lender_id))];
+  lenderIds.forEach(lId => {
+    const profile = safeAllProfiles.find(p => p.user_id === lId);
+    toOptionsBase.push({ userId: lId, username: profile?.username || 'user', fullName: profile?.full_name || 'Unknown' });
+  });
+  const selfProfile = safeAllProfiles.find(p => p.user_id === user.id);
+  const selfOption = { userId: user.id, username: selfProfile?.username || 'you', fullName: selfProfile?.full_name || 'You' };
+  const fromListWithSelf = [selfOption, ...fromOptionsBase.filter(o => o.userId !== user.id)];
+  const toListWithSelf = [selfOption, ...toOptionsBase.filter(o => o.userId !== user.id)];
+  const fromOptions = quickPayToPerson ? fromListWithSelf.filter(o => o.userId !== quickPayToPerson) : fromListWithSelf;
+  const toOptions = quickPayFromPerson ? toListWithSelf.filter(o => o.userId !== quickPayFromPerson) : toListWithSelf;
+
+  const handleFromChange = (val) => { setQuickPayFromPerson(val); if (val === quickPayToPerson) setQuickPayToPerson(''); };
+  const handleToChange = (val) => { setQuickPayToPerson(val); if (val === quickPayFromPerson) setQuickPayFromPerson(''); };
+
+  const getMatchingLoans = () => {
+    if (quickPayFromPerson && quickPayToPerson) {
+      return activeLoansAll.filter(l =>
+        (l.borrower_id === quickPayFromPerson && l.lender_id === quickPayToPerson) ||
+        (l.borrower_id === quickPayToPerson && l.lender_id === quickPayFromPerson)
+      );
+    } else if (quickPayFromPerson) {
+      return activeLoansAll.filter(l => l.borrower_id === quickPayFromPerson || l.lender_id === quickPayFromPerson);
+    } else if (quickPayToPerson) {
+      return activeLoansAll.filter(l => l.borrower_id === quickPayToPerson || l.lender_id === quickPayToPerson);
+    }
+    return activeLoansAll;
+  };
+
+  const handleRecordSubmit = () => {
+    const matching = getMatchingLoans();
+    if (matching.length === 1) {
+      setSelectedLoan({ ...matching[0], _prefillAmount: quickPayAmount, _prefillMethod: quickPayMethod });
+      setCandidateLoans([]);
+      setShowPaymentModal(true);
+    } else if (matching.length > 1) {
+      setCandidateLoans(matching);
+      setSelectedLoan({ ...matching[0], _prefillAmount: quickPayAmount, _prefillMethod: quickPayMethod });
+      setShowPaymentModal(true);
+    }
+  };
+
+  const canSubmitPayment = quickPayAmount && (quickPayFromPerson || quickPayToPerson);
+
+  // Bar chart data
+  const chartData = (() => {
+    const allRelevantLoans = myLoans.filter(l => l && (l.status === 'active' || l.status === 'completed'));
+    if (allRelevantLoans.length === 0) return null;
+    const loanDates = allRelevantLoans.map(l => new Date(l.created_at)).filter(d => !isNaN(d.getTime()));
+    if (loanDates.length === 0) return null;
+    const earliestDate = loanDates.reduce((min, d) => d < min ? d : min, loanDates[0]);
+    const chartStartMonth = startOfMonth(earliestDate);
+    const now = new Date();
+    const curMonth = startOfMonth(now);
+    const isCurrentMonthFn = (m) => m.getFullYear() === curMonth.getFullYear() && m.getMonth() === curMonth.getMonth();
+    const months = [];
+    for (let i = 0; i < 6; i++) months.push(addMonths(chartStartMonth, i));
+
+    const data = months.map(monthDate => {
+      const monthEndDate = endOfMonth(monthDate);
+      const isCurrent = isCurrentMonthFn(monthDate);
+      const isFuture = isAfter(monthDate, curMonth);
+      const snapshotDate = isCurrent ? now : (isFuture ? now : monthEndDate);
+      let owedToYou = 0, youOwe = 0;
+      allRelevantLoans.forEach(loan => {
+        const loanCreated = new Date(loan.created_at);
+        if (isAfter(loanCreated, snapshotDate)) return;
+        const totalAmount = loan.total_amount || loan.amount || 0;
+        const isLender = loan.lender_id === user.id;
+        const loanPayments = safePayments.filter(p =>
+          p && p.loan_id === loan.id && (p.status === 'completed' || p.status === 'pending_confirmation') &&
+          !isAfter(new Date(p.payment_date || p.created_at), snapshotDate)
+        );
+        const totalPaid = loanPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
+        const effectivePaid = isCurrent ? (loan.amount_paid || 0) : totalPaid;
+        const remaining = Math.max(0, totalAmount - effectivePaid);
+        if (isFuture) {
+          const currentRemaining = Math.max(0, totalAmount - (loan.amount_paid || 0));
+          if (isLender) owedToYou += currentRemaining; else youOwe += currentRemaining;
+          return;
+        }
+        if (isLender) owedToYou += remaining; else youOwe += remaining;
+      });
+      return { month: monthDate, owedToYou, youOwe, label: format(monthDate, 'MMM'), isCurrent, isFuture };
+    });
+
+    const maxVal = Math.max(...data.map(d => d.owedToYou), ...data.map(d => d.youOwe), 1);
+    return { data, maxVal };
+  })();
+
+  // Recent activity
+  const recentActivity = (() => {
+    const items = [];
+    safePayments.filter(p => p && myLoans.some(l => l.id === p.loan_id)).forEach(p => {
+      const loan = myLoans.find(l => l.id === p.loan_id);
+      if (!loan) return;
+      const isBorrower = loan.borrower_id === user.id;
+      const otherUserId = isBorrower ? loan.lender_id : loan.borrower_id;
+      const otherProfile = safeAllProfiles.find(pr => pr.user_id === otherUserId);
+      const amount = `$${(p.amount || 0).toLocaleString()}`;
+      const username = `@${otherProfile?.username || 'user'}`;
+      items.push({
+        type: 'payment', isIncoming: !isBorrower, date: new Date(p.payment_date || p.created_at),
+        description: isBorrower ? `You paid ${username}` : `${username} paid you`,
+        detail: format(new Date(p.payment_date || p.created_at), 'MMM d') + (loan.purpose ? ` · ${loan.purpose}` : ''),
+        amount: isBorrower ? `-${amount}` : `+${amount}`
+      });
+    });
+    return items.sort((a, b) => b.date - a.date).slice(0, 4);
+  })();
+
+  // Carousel notifications
+  const carouselNotifications = (() => {
+    const notifs = [];
+    const nextWeek = addDays(today, 7);
+
+    // Upcoming payments from borrowers
+    myLoans.filter(l => l && l.lender_id === user.id && l.status === 'active' && l.next_payment_date).forEach(loan => {
+      const d = new Date(loan.next_payment_date);
+      const days = daysUntilDate(d);
+      const borrowerProfile = safeAllProfiles.find(p => p.user_id === loan.borrower_id);
+      const uname = borrowerProfile?.username || 'user';
+      if (days >= 0 && days <= 7) {
+        notifs.push({
+          title: `@${uname}'s next payment is in ${days} day${days !== 1 ? 's' : ''}`,
+          description: `They've repaid ${formatMoney(loan.amount_paid || 0)} of ${formatMoney(loan.total_amount || loan.amount || 0)} so far. We've sent both of you a notification as a reminder.`
+        });
+      }
+    });
+
+    // Overdue payments you owe
+    overdueYouOwe.forEach(loan => {
+      const lenderProfile = safeAllProfiles.find(p => p.user_id === loan.lender_id);
+      const uname = lenderProfile?.username || 'user';
+      const days = Math.abs(daysUntilDate(loan.next_payment_date));
+      notifs.push({
+        title: `You have a payment due to @${uname}`,
+        description: `This one was due ${days} day${days !== 1 ? 's' : ''} ago. If you've already paid, make sure to record the payment so it's up to date.`,
+        action: { label: 'Record Payment', onClick: () => { /* Will open modal or navigate */ } }
+      });
+    });
+
+    // Overdue from borrowers
+    myLoans.filter(l => l && l.lender_id === user.id && l.status === 'active' && l.next_payment_date && new Date(l.next_payment_date) < today).forEach(loan => {
+      const borrowerProfile = safeAllProfiles.find(p => p.user_id === loan.borrower_id);
+      const uname = borrowerProfile?.username || 'user';
+      const days = Math.abs(daysUntilDate(loan.next_payment_date));
+      notifs.push({
+        title: `@${uname}'s payment is overdue`,
+        description: `Their payment of ${formatMoney(loan.payment_amount || 0)} was due ${days} day${days !== 1 ? 's' : ''} ago. If they've paid, make sure to record it.`,
+        action: { label: 'Record Payment', onClick: () => { } }
+      });
+    });
+
+    // Fallback slides
+    if (hasBorrowingLoans) {
+      notifs.push({
+        title: 'Stay on top of your loans',
+        description: 'Check in on your payment progress and keep track of upcoming due dates.',
+        action: { label: 'Track Progress', onClick: () => window.location.href = createPageUrl("Borrowing") }
+      });
+    }
+    if (hasLendingLoans) {
+      notifs.push({
+        title: 'Review your loan agreements',
+        description: 'View and download your loan documents anytime to stay informed.',
+        action: { label: 'My Documents', onClick: () => window.location.href = createPageUrl("LoanAgreements") }
+      });
     }
 
+    return notifs.length > 0 ? notifs.slice(0, 4) : [{
+      title: 'Welcome to Vony',
+      description: 'Create a loan or add friends to get started with lending between friends.'
+    }];
+  })();
+
+  // User avatar initial
+  const avatarInitial = (user.full_name || 'U').charAt(0).toUpperCase();
+
+  // Most urgent overdue for hero alert
+  const mostUrgentOverdue = overdueYouOwe.length > 0 ? (() => {
+    const sorted = overdueYouOwe.map(loan => {
+      const lenderProfile = safeAllProfiles.find(p => p.user_id === loan.lender_id);
+      const days = Math.abs(daysUntilDate(loan.next_payment_date));
+      return { loan, days, username: lenderProfile?.username || 'user', amount: loan.payment_amount || 0 };
+    }).sort((a, b) => b.days - a.days);
+    return sorted[0];
+  })() : null;
+
   return (
-    <div className="min-h-screen p-6" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
-      <div className="max-w-7xl mx-auto flex items-center justify-center min-h-96">
-        <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`, borderColor: `rgb(var(--theme-border))`}} className="backdrop-blur-sm p-8">
-          <div className="text-center">
-            <p className="text-slate-600">Loading...</p>
-          </div>
-        </Card>
+    <div style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased' }}>
+
+      {/* ── Galaxy gradient background ── */}
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
+        <div style={{
+          position: 'absolute', top: 0, left: '-10%', width: '120%', height: '100%', zIndex: 0,
+          background: 'linear-gradient(180deg, #527DFF 0%, #5580FF 5%, #678AFB 13%, #7792F4 22%, #8C9BEE 32%, #A19EEB 42%, #A79DEA 50%, #BB98E8 58%, #C89CE6 65%, #D4A0E4 72%, #DDA5E2 76%, #F0D8EA 80%, #F7F7F7 84%)'
+        }} />
+        {/* Static star field */}
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 420, zIndex: 1, overflow: 'hidden' }}>
+          <svg width="100%" height="100%" viewBox="0 0 1617 329" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="starGlow">
+                <stop offset="0%" stopColor="#EAF9F3"/>
+                <stop offset="100%" stopColor="#9FEBFB"/>
+              </radialGradient>
+            </defs>
+            {STAR_CIRCLES.map((s, i) => (
+              <circle key={i} cx={s.cx} cy={s.cy} r="1.75" fill="url(#starGlow)" opacity={s.o}/>
+            ))}
+          </svg>
+        </div>
+        {/* Twinkling stars */}
+        <div className="twinkle-star" />
+        <div className="twinkle-star" />
+        <div className="twinkle-star" />
+        <div className="twinkle-star" />
+        <div className="twinkle-star" />
       </div>
+
+      {/* ── Top bar ── */}
+      <div style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 51,
+        transition: 'transform 0.35s ease', background: 'transparent',
+        transform: topBarHidden ? 'translateY(-100%)' : 'translateY(0)'
+      }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '14px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Link to="/" style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 400, fontStyle: 'italic', fontSize: '1.4rem', letterSpacing: '-0.02em', color: 'white', textDecoration: 'none' }}>Vony</Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Link to={createPageUrl("Friends")} className="top-bar-link-home" style={{ padding: '7px 14px', borderRadius: 50, fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', transition: 'color 0.15s' }}>Friends</Link>
+            <Link to={createPageUrl("Lending")} className="top-bar-link-home" style={{ padding: '7px 14px', borderRadius: 50, fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', transition: 'color 0.15s' }}>My Loans</Link>
+            <Link to={createPageUrl("LoanAgreements")} className="top-bar-link-home" style={{ padding: '7px 14px', borderRadius: 50, fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', transition: 'color 0.15s' }}>Documents</Link>
+            <Link to={createPageUrl("RecentActivity")} className="top-bar-link-home" style={{ padding: '7px 14px', borderRadius: 50, fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', transition: 'color 0.15s' }}>Recent Activity</Link>
+            {/* Notification bell */}
+            <Link to={createPageUrl("Requests")} style={{ width: 32, height: 32, borderRadius: '50%', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', marginLeft: 4 }}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+              {pendingOffers.length > 0 && <span style={{ position: 'absolute', top: 0, right: 0, width: 7, height: 7, borderRadius: '50%', background: 'white', border: '1.5px solid rgba(249,248,246,1)' }} />}
+            </Link>
+            {/* Avatar */}
+            <Link to={createPageUrl("Profile")} style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', color: 'white', fontWeight: 600, fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 4, textDecoration: 'none' }}>
+              {avatarInitial}
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Floating nav pill ── */}
+      <nav style={{
+        position: 'fixed', top: navUp ? 16 : 72, left: '50%', transform: navHidden ? 'translateX(-50%) translateY(-120%)' : 'translateX(-50%)',
+        zIndex: 50, width: 'auto',
+        transition: 'top 0.35s ease, transform 0.35s ease, opacity 0.25s ease',
+        opacity: navHidden ? 0 : 1, pointerEvents: navHidden ? 'none' : 'auto'
+      }}>
+        <div className="glass-nav" style={{ position: 'relative', background: 'transparent', borderRadius: 16, padding: '6px 24px', display: 'flex', alignItems: 'center', gap: 2, height: 48 }}>
+          <div style={{ display: 'flex', gap: 2 }}>
+            <Link to="/" style={{ padding: '7px 14px', borderRadius: 50, fontSize: 13, fontWeight: 600, color: '#1A1918', background: 'rgba(0,0,0,0.06)', textDecoration: 'none' }}>Home</Link>
+            <Link to={createPageUrl("Lending")} style={{ padding: '7px 14px', borderRadius: 50, fontSize: 13, fontWeight: 500, color: '#787776', textDecoration: 'none', transition: 'color 0.15s, background 0.15s' }}>Lending</Link>
+            <Link to={createPageUrl("Borrowing")} style={{ padding: '7px 14px', borderRadius: 50, fontSize: 13, fontWeight: 500, color: '#787776', textDecoration: 'none', transition: 'color 0.15s, background 0.15s' }}>Borrowing</Link>
+            <Link to={createPageUrl("CreateOffer")} style={{ padding: '7px 14px', borderRadius: 50, fontSize: 13, fontWeight: 500, color: '#787776', textDecoration: 'none', transition: 'color 0.15s, background 0.15s' }}>New Loan</Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* ── Hero ── */}
+      <div style={{ background: 'transparent', position: 'relative', zIndex: 2 }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '160px 28px 56px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', textAlign: 'center' }}>
+          <div>
+            <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.8rem', fontWeight: 600, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+              {greeting}, <em style={{ fontStyle: 'italic', fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>{firstName}</em>
+            </h1>
+            <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.55)', marginTop: 14, fontWeight: 400, letterSpacing: '-0.01em' }}>
+              Here's how your loans are looking today
+            </p>
+          </div>
+        </div>
+
+        {/* Hero alert (overdue) */}
+        {mostUrgentOverdue && (
+          <div className="glass-hero-alert" style={{ maxWidth: 1080, margin: '0 auto' }}>
+            <div style={{ maxWidth: 1080, margin: '0 auto', padding: '14px 28px', display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#E8726E', flexShrink: 0 }} />
+              <div style={{ flex: 1, fontSize: 13, color: '#787776', lineHeight: 1.4 }}>
+                <strong style={{ color: '#1A1918', fontWeight: 600 }}>Just a reminder</strong> you have a {formatMoney(mostUrgentOverdue.amount)} payment to @{mostUrgentOverdue.username} that was due {mostUrgentOverdue.days} day{mostUrgentOverdue.days !== 1 ? 's' : ''} ago.
+              </div>
+              <Link to={createPageUrl("Borrowing")} style={{
+                padding: '7px 18px', borderRadius: 20, background: '#678AFB', color: 'white',
+                fontSize: 12, fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap',
+                fontFamily: "'DM Sans', sans-serif", transition: 'background 0.15s'
+              }}>Pay now</Link>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── Main page content ── */}
+      <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px 64px', position: 'relative', zIndex: 1 }}>
+
+        {/* Top row grid: quick actions + snapshot cards */}
+        <div style={{ marginTop: 36 }}>
+          <div className="home-top-row" style={{ display: 'grid', gridTemplateColumns: '0.75fr 1fr 1fr', columnGap: 16, rowGap: 16, alignItems: 'start' }}>
+
+            {/* Left column: Quick Actions + Next Repayment + Monthly Stats */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, gridRow: '1 / 5' }}>
+              {/* Quick Actions */}
+              <div className="glass-quick-actions" style={{ position: 'relative', background: 'transparent', border: 'none', borderRadius: 16, display: 'flex', flexDirection: 'column', padding: 6, gap: 2 }}>
+                <Link to={createPageUrl("Lending")} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 10, textDecoration: 'none', color: '#0D0D0C', transition: 'background 0.15s' }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5C5B5A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 500 }}>Lending</div>
+                </Link>
+                <Link to={createPageUrl("LoanAgreements")} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 10, textDecoration: 'none', color: '#0D0D0C', transition: 'background 0.15s' }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5C5B5A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 500 }}>Documents</div>
+                </Link>
+                <Link to={createPageUrl("Friends")} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 10, textDecoration: 'none', color: '#0D0D0C', transition: 'background 0.15s' }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5C5B5A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 500 }}>Friends</div>
+                </Link>
+                <Link to={createPageUrl("RecentActivity")} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 10, textDecoration: 'none', color: '#0D0D0C', transition: 'background 0.15s' }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5C5B5A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 500 }}>Recent Activity</div>
+                </Link>
+              </div>
+
+              {/* Next Repayment card */}
+              <div className="glass-card" style={{ overflow: 'hidden' }}>
+                <div style={{ padding: '22px 26px 0' }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Next repayment</div>
+                </div>
+                <div style={{ padding: '14px 26px 18px' }}>
+                  {nextBorrowerPayment ? (
+                    <>
+                      <div style={{ fontSize: '1.3rem', fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', lineHeight: 1 }}>
+                        {format(nextBorrowerPayment.date, 'MMM d')}
+                      </div>
+                      <div style={{ fontSize: 12, color: '#787776', marginTop: 6 }}>
+                        You owe @{nextBorrowerPayment.username} {formatMoney(nextBorrowerPayment.payment_amount || 0)}
+                      </div>
+                      {overdueYouOwe.length > 0 && (
+                        <div style={{ fontSize: 11, color: '#E8726E', marginTop: 10 }}>
+                          &amp; {overdueYouOwe.length} overdue repayment{overdueYouOwe.length !== 1 ? 's' : ''}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div style={{ fontSize: 13, color: '#787776' }}>No upcoming repayments</div>
+                  )}
+                </div>
+              </div>
+
+              {/* Monthly stats card */}
+              <div className="glass-card" style={{ overflow: 'hidden' }}>
+                <div style={{ padding: '22px 26px 0' }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>How {format(today, 'MMMM')} is going</div>
+                </div>
+                <div style={{ padding: '14px 26px 20px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
+                    <div style={{ textAlign: 'center', padding: '0 12px' }}>
+                      <div style={{ fontSize: 11, color: '#787776', marginBottom: 4 }}>Received</div>
+                      <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em', color: '#678AFB' }}>{formatMoney(monthlyReceived)}</div>
+                      <div style={{ width: '100%', height: 4, borderRadius: 2, marginTop: 8, background: 'rgba(103,138,251,0.15)' }}>
+                        <div style={{ height: '100%', borderRadius: 2, background: '#678AFB', width: `${monthlyExpectedReceive > 0 ? Math.min((monthlyReceived / monthlyExpectedReceive) * 100, 100) : 0}%`, transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }} />
+                      </div>
+                      <div style={{ fontSize: 10, color: '#787776', marginTop: 4 }}>{formatMoney(monthlyReceived)} of {formatMoney(monthlyExpectedReceive)} received</div>
+                    </div>
+                    <div style={{ textAlign: 'center', padding: '0 12px' }}>
+                      <div style={{ fontSize: 11, color: '#787776', marginBottom: 4 }}>Paid out</div>
+                      <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em', color: '#A79DEA' }}>{formatMoney(monthlyPaidOut)}</div>
+                      <div style={{ width: '100%', height: 4, borderRadius: 2, marginTop: 8, background: 'rgba(167,157,234,0.15)' }}>
+                        <div style={{ height: '100%', borderRadius: 2, background: '#A79DEA', width: `${monthlyExpectedPay > 0 ? Math.min((monthlyPaidOut / monthlyExpectedPay) * 100, 100) : 0}%`, transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }} />
+                      </div>
+                      <div style={{ fontSize: 10, color: '#787776', marginTop: 4 }}>{formatMoney(monthlyPaidOut)} of {formatMoney(monthlyExpectedPay)} paid out</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Middle column: Lending snapshot */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div className="glass-card" style={{ padding: '20px 22px 18px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', fontFamily: "'DM Sans', sans-serif" }}>You've lent</div>
+                  <Link to={createPageUrl("Lending")} style={{ fontSize: 11, fontWeight: 500, color: '#A79DEA', textDecoration: 'none' }}>Details</Link>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginTop: 4 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.03em', color: '#1A1918', lineHeight: 1, marginBottom: 2 }}>{formatMoney(totalLentAmount)}</div>
+                    <div style={{ fontSize: 11, color: '#787776', marginBottom: 12 }}>across all loans</div>
+                    {lentLoans.length > 0 && (
+                      <div style={{ marginTop: 8 }}>
+                        {lentOnTrack > 0 && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 500, background: 'rgba(103,138,251,0.15)', color: '#678AFB' }}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#678AFB' }} />{lentOnTrack} on track</span>}
+                        {overdueFromBorrowers > 0 && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 500, background: 'rgba(232,114,110,0.12)', color: '#E8726E', marginLeft: lentOnTrack > 0 ? 8 : 0 }}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#E8726E' }} />{overdueFromBorrowers} late</span>}
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ position: 'relative', width: 72, height: 72, flexShrink: 0 }}>
+                    <svg viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)', width: 72, height: 72 }}>
+                      <circle cx="36" cy="36" r="29" fill="none" stroke="rgba(103,138,251,0.15)" strokeWidth="7" />
+                      <circle cx="36" cy="36" r="29" fill="none" stroke="#678AFB" strokeWidth="7" strokeLinecap="round" strokeDasharray={PIE_C} strokeDashoffset={lentPieOffset} style={{ transition: 'stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
+                    </svg>
+                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: '#292827', letterSpacing: '-0.03em' }}>{percentRepaid}%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right column: Borrowing snapshot */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div className="glass-card" style={{ padding: '20px 22px 18px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', fontFamily: "'DM Sans', sans-serif" }}>You've borrowed</div>
+                  <Link to={createPageUrl("Borrowing")} style={{ fontSize: 11, fontWeight: 500, color: '#A79DEA', textDecoration: 'none' }}>Details</Link>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginTop: 4 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.03em', color: '#1A1918', lineHeight: 1, marginBottom: 2 }}>{formatMoney(totalBorrowedAmount)}</div>
+                    <div style={{ fontSize: 11, color: '#787776', marginBottom: 12 }}>across all loans</div>
+                    {borrowedLoans.length > 0 && (
+                      <div style={{ marginTop: 8 }}>
+                        {borrowingOnTrack > 0 && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 500, background: 'rgba(103,138,251,0.15)', color: '#678AFB' }}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#678AFB' }} />{borrowingOnTrack} on track</span>}
+                        {borrowingOverdue > 0 && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 500, background: 'rgba(232,114,110,0.12)', color: '#E8726E', marginLeft: borrowingOnTrack > 0 ? 8 : 0 }}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#E8726E' }} />{borrowingOverdue} late</span>}
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ position: 'relative', width: 72, height: 72, flexShrink: 0 }}>
+                    <svg viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)', width: 72, height: 72 }}>
+                      <circle cx="36" cy="36" r="29" fill="none" stroke="rgba(167,157,234,0.15)" strokeWidth="7" />
+                      <circle cx="36" cy="36" r="29" fill="none" stroke="#A79DEA" strokeWidth="7" strokeLinecap="round" strokeDasharray={PIE_C} strokeDashoffset={borrowedPieOffset} style={{ transition: 'stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
+                    </svg>
+                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: '#292827', letterSpacing: '-0.03em' }}>{percentPaid}%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Record Payment — spans columns 2-3 */}
+            {activeLoansAll.length > 0 && (
+              <div style={{ gridColumn: '2 / 4' }} className="home-record-payment-span">
+                <div className="glass-carousel-frame" style={{ padding: 6 }}>
+                  <div className="record-payment-styled" style={{ position: 'relative', overflow: 'hidden', background: '#7792F4', borderRadius: 20, border: 'none' }}>
+                    <div style={{ padding: '22px 26px 0', fontSize: 15, fontWeight: 600, color: 'white', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>
+                      Record payment
+                    </div>
+                    <div className="home-record-form" style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', padding: '18px 26px 26px' }}>
+                      <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)', flexShrink: 0 }}>Record payment of</span>
+                      <input
+                        type="number" step="0.01" min="0.01" placeholder="$0.00"
+                        value={quickPayAmount} onChange={(e) => setQuickPayAmount(e.target.value)}
+                        style={{
+                          width: 100, flex: '0 0 60px', padding: '9px 10px', borderRadius: 10,
+                          border: '1px solid rgba(255,255,255,0.25)', fontSize: 13, fontWeight: 500,
+                          fontFamily: "'DM Sans', sans-serif", color: 'white', background: 'rgba(255,255,255,0.15)',
+                          outline: 'none', MozAppearance: 'textfield'
+                        }}
+                      />
+                      <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)', flexShrink: 0 }}>from</span>
+                      <Select value={quickPayFromPerson} onValueChange={handleFromChange}>
+                        <SelectTrigger style={{ flex: '0 0 130px', padding: '9px 12px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.25)', fontSize: 13, fontWeight: 500, fontFamily: "'DM Sans', sans-serif", color: 'rgba(255,255,255,0.8)', background: 'rgba(255,255,255,0.15)', height: 'auto' }}>
+                          <SelectValue placeholder="Select person" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {fromOptions.map((person) => (
+                            <SelectItem key={person.userId} value={person.userId}>@{person.username}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)', flexShrink: 0 }}>to</span>
+                      <Select value={quickPayToPerson} onValueChange={handleToChange}>
+                        <SelectTrigger style={{ flex: '0 0 130px', padding: '9px 12px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.25)', fontSize: 13, fontWeight: 500, fontFamily: "'DM Sans', sans-serif", color: 'rgba(255,255,255,0.8)', background: 'rgba(255,255,255,0.15)', height: 'auto' }}>
+                          <SelectValue placeholder="Select person" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {toOptions.map((person) => (
+                            <SelectItem key={person.userId} value={person.userId}>@{person.username}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <button
+                        onClick={handleRecordSubmit} disabled={!canSubmitPayment}
+                        style={{
+                          padding: '9px 16px', borderRadius: 10, background: 'white', color: '#7792F4',
+                          fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+                          border: 'none', cursor: canSubmitPayment ? 'pointer' : 'not-allowed',
+                          flexShrink: 0, transition: 'background 0.15s', opacity: canSubmitPayment ? 1 : 0.6
+                        }}
+                      >Submit</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Upcoming Payments */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div className="glass-card" style={{ overflow: 'hidden' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px 26px 0' }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Upcoming payments</div>
+                  <Link to={createPageUrl("Borrowing")} style={{ fontSize: 12, fontWeight: 500, color: '#A79DEA', textDecoration: 'none' }}>Full schedule</Link>
+                </div>
+                <div style={{ padding: '18px 26px 26px' }}>
+                  {combinedPaymentEvents.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '20px 0', color: '#787776', fontSize: 13 }}>No upcoming payments</div>
+                  ) : (
+                    <div>
+                      {combinedPaymentEvents.slice(0, 4).map((event, idx) => {
+                        const isOverdue = event.days < 0;
+                        return (
+                          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: idx < combinedPaymentEvents.slice(0, 4).length - 1 ? 'none' : 'none' }}>
+                            <div style={{ fontSize: 11, fontWeight: 600, color: isOverdue ? '#E8726E' : '#787776', minWidth: 44, flexShrink: 0 }}>
+                              {isOverdue ? `${Math.abs(event.days)}d late` : format(event.date, 'MMM d')}
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontSize: 13, fontWeight: 500, color: '#1A1918' }}>
+                                {event.isLender ? `@${event.username} pays you` : `Pay @${event.username}`}
+                              </div>
+                              {event.purpose && <div style={{ fontSize: 11, color: '#787776', marginTop: 1 }}>{event.purpose}</div>}
+                            </div>
+                            <div style={{ fontSize: 14, fontWeight: 600, flexShrink: 0, color: event.isLender ? '#678AFB' : '#1A1918' }}>
+                              {event.isLender ? '+' : '-'}{formatMoney(event.remainingAmount)}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Loans Over Time chart */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div className="glass-card" style={{ overflow: 'hidden' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px 26px 0' }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Loans over time</div>
+                  <span style={{ fontSize: 12, fontWeight: 500, color: '#A79DEA' }}>6 months</span>
+                </div>
+                <div style={{ padding: '18px 26px 26px' }}>
+                  {chartData ? (() => {
+                    const { data, maxVal } = chartData;
+                    const chartHeight = 110;
+                    const formatYLabel = (v) => v >= 1000 ? `$${(v / 1000).toFixed(v >= 10000 ? 0 : 1)}k` : `$${Math.round(v)}`;
+                    return (
+                      <>
+                        <div style={{ display: 'flex', gap: 12 }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: chartHeight }}>
+                            <span style={{ fontSize: 10, color: '#787776', textAlign: 'right', minWidth: 24 }}>{formatYLabel(maxVal)}</span>
+                            <span style={{ fontSize: 10, color: '#787776', textAlign: 'right', minWidth: 24 }}>{formatYLabel(maxVal / 2)}</span>
+                            <span style={{ fontSize: 10, color: '#787776', textAlign: 'right', minWidth: 24 }}>$0</span>
+                          </div>
+                          <div style={{ flex: 1, position: 'relative' }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', height: chartHeight, position: 'relative', zIndex: 1 }}>
+                              {data.map((d, i) => {
+                                const owedH = maxVal > 0 ? (d.owedToYou / maxVal) * chartHeight : 0;
+                                const oweH = maxVal > 0 ? (d.youOwe / maxVal) * chartHeight : 0;
+                                return (
+                                  <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: chartHeight }}>
+                                      <div style={{ width: 14, borderRadius: '4px 4px 0 0', height: Math.max(owedH, owedH > 0 ? 2 : 0), background: '#678AFB', opacity: d.isFuture ? 0.45 : 1, transition: 'height 0.3s' }} />
+                                      <div style={{ width: 14, borderRadius: '4px 4px 0 0', height: Math.max(oweH, oweH > 0 ? 2 : 0), background: '#A79DEA', opacity: d.isFuture ? 0.45 : 1, transition: 'height 0.3s' }} />
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: 10, paddingLeft: 36 }}>
+                          {data.map((d, i) => (
+                            <span key={i} style={{ flex: 1, textAlign: 'center', fontSize: 10, fontWeight: d.isCurrent ? 600 : 500, color: d.isCurrent ? '#A79DEA' : '#787776' }}>{d.label}</span>
+                          ))}
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 14, paddingTop: 14 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 11, color: '#787776' }}><div style={{ width: 8, height: 8, borderRadius: '50%', background: '#678AFB' }} /> Owed to you</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 11, color: '#787776' }}><div style={{ width: 8, height: 8, borderRadius: '50%', background: '#A79DEA' }} /> You owe</div>
+                        </div>
+                      </>
+                    );
+                  })() : (
+                    <div style={{ textAlign: 'center', padding: '20px 0', color: '#787776', fontSize: 13 }}>No loan data yet</div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* ── Loans + Recent Payments grid ── */}
+        <div style={{ marginTop: 16 }}>
+          <div className="home-loans-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, alignItems: 'start' }}>
+            {/* Your Loans */}
+            <div className="glass-card" style={{ overflow: 'hidden' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0, padding: '20px 26px 0' }}>
+                <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Your loans</div>
+                <Link to={createPageUrl("Lending")} style={{ fontSize: 12, fontWeight: 500, color: '#A79DEA', textDecoration: 'none' }}>Manage</Link>
+              </div>
+              {myLoans.filter(l => l && l.status === 'active').length === 0 ? (
+                <div style={{ padding: '20px 26px', textAlign: 'center', color: '#787776', fontSize: 13 }}>No active loans</div>
+              ) : (
+                myLoans.filter(l => l && l.status === 'active').slice(0, 4).map((loan, idx) => {
+                  const isLender = loan.lender_id === user.id;
+                  const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
+                  const otherProfile = safeAllProfiles.find(p => p.user_id === otherUserId);
+                  const totalAmt = loan.total_amount || loan.amount || 0;
+                  const amountPaid = loan.amount_paid || 0;
+                  const remaining = totalAmt - amountPaid;
+                  const pct = totalAmt > 0 ? Math.round((amountPaid / totalAmt) * 100) : 0;
+                  return (
+                    <div key={loan.id} style={{ padding: '13px 26px', display: 'flex', alignItems: 'flex-start', gap: 16, paddingTop: idx === 0 ? 18 : 13 }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', marginBottom: 8 }}>
+                          {isLender ? `You lent @${otherProfile?.username || 'user'} ${formatMoney(totalAmt)}` : `@${otherProfile?.username || 'user'} lent you ${formatMoney(totalAmt)}`}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <div style={{ flex: 1, height: 6, borderRadius: 3, overflow: 'hidden', background: isLender ? 'rgba(103,138,251,0.15)' : 'rgba(167,157,234,0.15)' }}>
+                            <div style={{ height: '100%', borderRadius: 3, width: `${pct}%`, background: isLender ? '#678AFB' : '#A79DEA' }} />
+                          </div>
+                          <div style={{ fontSize: 11, fontWeight: 500, color: '#787776', flexShrink: 0 }}>{formatMoney(amountPaid)} repaid &amp; {formatMoney(remaining)} remaining</div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Recent Payments */}
+            <div className="glass-card" style={{ overflow: 'hidden' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px 26px 0' }}>
+                <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Recent payments</div>
+                <Link to={createPageUrl("RecentActivity")} style={{ fontSize: 12, fontWeight: 500, color: '#A79DEA', textDecoration: 'none' }}>View all</Link>
+              </div>
+              <div style={{ padding: '18px 26px 26px' }}>
+                {recentActivity.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '20px 0', color: '#787776', fontSize: 13 }}>No recent payments</div>
+                ) : (
+                  recentActivity.map((item, idx) => (
+                    <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '13px 0', paddingTop: idx === 0 ? 0 : 13, paddingBottom: idx === recentActivity.length - 1 ? 0 : 13 }}>
+                      <div style={{ width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: item.isIncoming ? 'rgba(103,138,251,0.15)' : 'rgba(167,157,234,0.15)' }}>
+                        {item.isIncoming ? (
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#678AFB" strokeWidth="2" strokeLinecap="round"><polyline points="17 11 12 6 7 11"></polyline><line x1="12" y1="6" x2="12" y2="18"></line></svg>
+                        ) : (
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A79DEA" strokeWidth="2" strokeLinecap="round"><polyline points="7 13 12 18 17 13"></polyline><line x1="12" y1="18" x2="12" y2="6"></line></svg>
+                        )}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13, fontWeight: 500, color: '#1A1918' }}>{item.description}</div>
+                        <div style={{ fontSize: 11, color: '#787776', marginTop: 2 }}>{item.detail}</div>
+                      </div>
+                      <div style={{ fontSize: 14, fontWeight: 600, flexShrink: 0, color: item.isIncoming ? '#678AFB' : '#1A1918' }}>{item.amount}</div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Carousel ── */}
+        <LoanCarousel notifications={carouselNotifications} />
+
+      </div>
+
+      {/* ── Footer ── */}
+      <div style={{ background: 'transparent', marginTop: 36, position: 'relative', zIndex: 1 }}>
+        <div className="home-footer-grid" style={{ maxWidth: 1080, margin: '0 auto', padding: '52px 28px', display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr 1fr', gap: 40 }}>
+          <div>
+            <div style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 400, fontStyle: 'italic', fontSize: '1.4rem', color: '#1A1918', marginBottom: 10 }}>Vony</div>
+            <div style={{ fontSize: 12, color: '#5C5B5A', lineHeight: 1.5, marginBottom: 20 }}>Lending between friends, without the weird part.</div>
+            <button onClick={() => {
+              if (navigator.share) { navigator.share({ title: 'Join me on Vony', text: 'Lending made simple — join me on Vony!', url: 'https://lend-with-vony.com' }); }
+              else { navigator.clipboard.writeText('https://lend-with-vony.com'); }
+            }} style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 22px', borderRadius: 20,
+              background: '#678AFB', color: 'white', fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+              border: 'none', cursor: 'pointer', transition: 'background 0.15s', textDecoration: 'none'
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+              Invite Friends
+            </button>
+          </div>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 16 }}>Product</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <span style={{ fontSize: 13, color: '#3D3C3B' }}>How it works</span>
+              <span style={{ fontSize: 13, color: '#3D3C3B' }}>FAQ</span>
+              <span style={{ fontSize: 13, color: '#3D3C3B' }}>Learn</span>
+              <span style={{ fontSize: 13, color: '#3D3C3B' }}>Financial products</span>
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 16 }}>Company</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <span style={{ fontSize: 13, color: '#3D3C3B' }}>About</span>
+              <span style={{ fontSize: 13, color: '#3D3C3B' }}>Blog</span>
+              <span style={{ fontSize: 13, color: '#3D3C3B' }}>Careers</span>
+              <span style={{ fontSize: 13, color: '#3D3C3B' }}>Contact</span>
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 16 }}>Legal</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <span style={{ fontSize: 13, color: '#3D3C3B' }}>Terms of Service</span>
+              <span style={{ fontSize: 13, color: '#3D3C3B' }}>Privacy Policy</span>
+              <span style={{ fontSize: 13, color: '#3D3C3B' }}>Cookie Policy</span>
+              <span style={{ fontSize: 13, color: '#3D3C3B' }}>Licenses</span>
+            </div>
+          </div>
+        </div>
+        <div className="home-footer-bottom" style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 28px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #EBEBEA' }}>
+          <div style={{ fontSize: 11, color: '#5C5B5A' }}>2026 Vony, Inc. All rights reserved.</div>
+          <div style={{ fontSize: 11, color: '#5C5B5A', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C7C6C4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            English (US)
+          </div>
+        </div>
+      </div>
+
+      {/* ── Record Payment Modal ── */}
+      {showPaymentModal && selectedLoan && (
+        <RecordPaymentModal
+          loan={selectedLoan}
+          candidateLoans={candidateLoans}
+          onClose={() => {
+            setShowPaymentModal(false); setSelectedLoan(null); setCandidateLoans([]);
+            setQuickPayAmount(''); setQuickPayMethod(''); setQuickPayLoanId('');
+            setQuickPayFromPerson(''); setQuickPayToPerson('');
+          }}
+          onPaymentComplete={() => {
+            setShowPaymentModal(false); setSelectedLoan(null); setCandidateLoans([]);
+            setQuickPayAmount(''); setQuickPayMethod(''); setQuickPayLoanId('');
+            setQuickPayFromPerson(''); setQuickPayToPerson('');
+            loadData();
+          }}
+          isLender={selectedLoan.lender_id === user.id}
+        />
+      )}
     </div>
   );
 }

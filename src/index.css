@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -295,4 +295,221 @@ input[type="date"] {
 
 .animate-pulse-soft {
   animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* ===== GALAXY HOME PAGE STYLES ===== */
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 16px;
+  overflow: hidden;
+  backdrop-filter: blur(10px) saturate(1.1);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1);
+  box-shadow:
+    rgba(0, 0, 0, 0.01) 64px 91px 45px 0px,
+    rgba(0, 0, 0, 0.03) 36px 51px 38px 0px,
+    rgba(0, 0, 0, 0.06) 16px 23px 28px 0px,
+    rgba(0, 0, 0, 0.06) 4px 6px 15px 0px;
+}
+
+.glass-nav::before {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  content: "";
+  border-radius: 16px;
+  box-shadow:
+    rgba(0, 0, 0, 0.08) 0px 2px 4px -2px,
+    rgba(0, 0, 0, 0.03) 0px 8px 16px -8px,
+    rgba(255, 255, 255, 0.5) 0px -5px 6px 0px inset,
+    rgba(255, 255, 255, 0.12) 0px -8px 24px 0px inset;
+  overflow: hidden;
+  backdrop-filter: blur(16px) saturate(1.5);
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  background: linear-gradient(
+    rgba(255, 255, 255, 0.8) 7%,
+    rgba(255, 255, 255, 0) 86%
+  ) rgba(255, 255, 255, 0.12);
+}
+
+.glass-quick-actions::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  content: "";
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    rgba(0, 0, 0, 0.01) 64px 91px 45px 0px,
+    rgba(0, 0, 0, 0.03) 36px 51px 38px 0px,
+    rgba(0, 0, 0, 0.06) 16px 23px 28px 0px,
+    rgba(0, 0, 0, 0.06) 4px 6px 15px 0px;
+  overflow: hidden;
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0.85) 100%
+  );
+}
+
+.glass-hero-alert {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  box-shadow:
+    rgba(0, 0, 0, 0.04) 0px 4px 16px 0px,
+    rgba(0, 0, 0, 0.06) 0px 2px 8px 0px;
+  backdrop-filter: blur(16px) saturate(1.3);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+}
+
+.glass-carousel-frame {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 24px;
+  padding: 6px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    rgba(0, 0, 0, 0.03) 0px 0.6px 2.3px -0.42px,
+    rgba(0, 0, 0, 0.04) 0px 2.3px 8.7px -0.83px,
+    rgba(0, 0, 0, 0.08) 0px 10px 38px -1.25px;
+}
+
+.galaxy-slide {
+  background: #7792F4;
+  border-radius: 20px;
+  position: relative;
+}
+
+.galaxy-slide::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    rgba(255, 255, 255, 0.6) 0px 0px 30px inset,
+    rgba(255, 255, 255, 0.3) 0px 0px 50px inset;
+  pointer-events: none;
+}
+
+.record-payment-styled {
+  background: #7792F4;
+  border-radius: 20px;
+  position: relative;
+}
+
+.record-payment-styled::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    rgba(255, 255, 255, 0.6) 0px 0px 30px inset,
+    rgba(255, 255, 255, 0.3) 0px 0px 50px inset;
+  pointer-events: none;
+}
+
+/* Star twinkle animation */
+@keyframes twinkle {
+  0% { opacity: 0.3; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1.1); }
+}
+
+.twinkle-star {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, #EAF9F3 38%, #9FEBFB 100%);
+  z-index: 2;
+}
+
+.twinkle-star:nth-child(1) {
+  width: 5px; height: 5px;
+  top: 18%; left: 50%;
+  animation: twinkle 3s ease-in-out infinite alternate;
+}
+.twinkle-star:nth-child(2) {
+  width: 4px; height: 4px;
+  top: 25%; left: 22%;
+  animation: twinkle 4s ease-in-out 0.5s infinite alternate;
+}
+.twinkle-star:nth-child(3) {
+  width: 6px; height: 6px;
+  top: 12%; left: 15%;
+  animation: twinkle 3.5s ease-in-out 1s infinite alternate;
+}
+.twinkle-star:nth-child(4) {
+  width: 4px; height: 4px;
+  top: 30%; left: 78%;
+  animation: twinkle 2.8s ease-in-out 0.8s infinite alternate;
+}
+.twinkle-star:nth-child(5) {
+  width: 7px; height: 7px;
+  top: 8%; left: 82%;
+  animation: twinkle 3.2s ease-in-out 1.5s infinite alternate;
+}
+
+/* Home page responsive */
+@media (max-width: 900px) {
+  .home-top-row {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .home-top-row > div:first-child {
+    grid-column: 1 / 3;
+    grid-row: auto;
+  }
+  .home-record-payment-span {
+    grid-column: 1 / 3 !important;
+  }
+  .home-footer-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 32px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .top-bar-link-home {
+    display: none !important;
+  }
+  .home-top-row {
+    grid-template-columns: 1fr !important;
+  }
+  .home-top-row > div:first-child {
+    grid-column: auto;
+    grid-row: auto;
+  }
+  .home-record-payment-span {
+    grid-column: auto !important;
+  }
+  .home-record-form {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+  .home-loans-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .home-footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 28px !important;
+    padding: 36px 16px !important;
+  }
+  .home-footer-bottom {
+    padding: 16px 16px 24px !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    align-items: flex-start !important;
+  }
 }

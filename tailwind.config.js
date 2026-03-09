@@ -9,6 +9,9 @@ module.exports = {
   			serif: ['Libre Baskerville', 'Georgia', 'serif'],
   			mono: ['IBM Plex Mono', 'Fira Code', 'monospace'],
   			display: ['Times New Roman', 'Times', 'Georgia', 'serif'],
+  			'dm-sans': ['DM Sans', 'system-ui', '-apple-system', 'sans-serif'],
+  			'cormorant': ['Cormorant Garamond', 'Georgia', 'serif'],
+  			'playfair': ['Playfair Display', 'Georgia', 'serif'],
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
