@@ -172,6 +172,7 @@ export default function Requests() {
       const otherUserId = isBorrower ? loan.lender_id : loan.borrower_id;
       const otherProfile = profiles.find(p => p.user_id === otherUserId);
       const otherUsername = otherProfile?.username || 'unknown';
+      const paymentDate = toLocalDate(loan.next_payment_date);
 
       // Calculate remaining amount considering completed payments
       const completedPayments = allPayments.filter(p =>

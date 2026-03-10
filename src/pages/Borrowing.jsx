@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { createPageUrl } from "@/utils";
 import { Loan, Payment, User, LoanAgreement, PublicProfile, Friendship, VenmoConnection, PayPalConnection } from "@/entities/all";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   Clock, Calendar, DollarSign, AlertCircle, FileText, BarChart3,
-  Pencil, X, FolderOpen, ClipboardList, Info, Check, Shield, Smartphone, CreditCard, Banknote, CheckCircle
+  Pencil, X, FolderOpen, ClipboardList, Info
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { format, addDays, addMonths, addWeeks } from "date-fns";
@@ -26,7 +26,7 @@ import { formatMoney } from "@/components/utils/formatMoney";
 import { toLocalDate, getLocalToday, daysUntil as daysUntilDate } from "@/components/utils/dateUtils";
 
 import LoanCard from "@/components/loans/LoanCard";
-import RecordPaymentModal from "@/components/loans/RecordPaymentModal";
+
 import LoanDetailsModal from "@/components/loans/LoanDetailsModal";
 import MyLoanOffers from "@/components/dashboard/MyLoanOffers";
 import BorrowerSignatureModal from "@/components/loans/BorrowerSignatureModal";
@@ -47,8 +47,6 @@ export default function Borrowing() {
   const [loans, setLoans] = useState([]);
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedLoan, setSelectedLoan] = useState(null);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedLoanDetails, setSelectedLoanDetails] = useState(null);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
@@ -60,22 +58,12 @@ export default function Borrowing() {
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [manageLoanSelected, setManageLoanSelected] = useState(null);
   const [manageLoanInitialized, setManageLoanInitialized] = useState(false);
-  const [rankingFilter, setRankingFilter] = useState('highest_interest'); // 'highest_interest', 'highest_payment', 'soonest_deadline'
+  const [rankingFilter, setRankingFilter] = useState('highest_interest');
   const [loanAgreements, setLoanAgreements] = useState([]);
   const [activeDocPopup, setActiveDocPopup] = useState(null);
   const [docPopupAgreement, setDocPopupAgreement] = useState(null);
   const [activeInfoTooltip, setActiveInfoTooltip] = useState(null);
-  const [quickPayAmount, setQuickPayAmount] = useState('');
-  const [quickPayMethod, setQuickPayMethod] = useState('');
-  const [quickPayLoanId, setQuickPayLoanId] = useState('');
-  const [quickPayPerson, setQuickPayPerson] = useState('');
-  const [quickPayFromPerson, setQuickPayFromPerson] = useState('');
-  const [quickPayToPerson, setQuickPayToPerson] = useState('');
   const [allUserLoans, setAllUserLoans] = useState([]);
-  const [showQuickConfirm, setShowQuickConfirm] = useState(false);
-  const [isQuickProcessing, setIsQuickProcessing] = useState(false);
-  const [isQuickSuccess, setIsQuickSuccess] = useState(false);
-  const [quickPayTransactionId, setQuickPayTransactionId] = useState('');
   const [allPayments, setAllPayments] = useState([]);
 
   useEffect(() => {
@@ -121,72 +109,13 @@ export default function Borrowing() {
     setIsLoading(false);
   };
 
-  const handleMakePayment = (loan) => {
-    setSelectedLoan(loan);
-    setShowPaymentModal(true);
+  const handleMakePayment = () => {
+    window.location.href = createPageUrl("RecordPayment");
   };
 
   const handleViewDetails = (loan) => {
     setSelectedLoanDetails({ loan, type: 'borrowed' });
     setShowDetailsModal(true);
-  };
-
-  const handlePaymentComplete = async () => {
-    setShowPaymentModal(false);
-    setSelectedLoan(null);
-    await loadData();
-  };
-
-  const PAYMENT_METHOD_LABELS = {
-    venmo: 'Venmo', zelle: 'Zelle', cashapp: 'Cash App',
-    paypal: 'PayPal', cash: 'Cash', other: 'Other'
-  };
-
-  const generateTransactionId = () => {
-    const timestamp = Date.now().toString(36);
-    const random = Math.random().toString(36).substring(2, 8);
-    return `VNY-${timestamp}-${random}`.toUpperCase();
-  };
-
-  const handleQuickPaySubmit = () => {
-    setShowQuickConfirm(true);
-  };
-
-  const handleQuickPayConfirm = async () => {
-    setIsQuickProcessing(true);
-    try {
-      const loan = activeLoans.find(l => l.id === quickPayLoanId);
-      if (!loan) return;
-
-      const txnId = generateTransactionId();
-      setQuickPayTransactionId(txnId);
-      const methodLabel = PAYMENT_METHOD_LABELS[quickPayMethod] || quickPayMethod;
-
-      await Payment.create({
-        loan_id: loan.id,
-        amount: parseFloat(quickPayAmount),
-        payment_date: format(new Date(), 'yyyy-MM-dd'),
-        payment_method: quickPayMethod,
-        recorded_by: user?.id,
-        status: 'pending_confirmation',
-        notes: `${methodLabel} payment of $${parseFloat(quickPayAmount).toFixed(2)} via ${methodLabel} [Ref: ${txnId}]`
-      });
-
-      setIsQuickSuccess(true);
-      setTimeout(() => {
-        setShowQuickConfirm(false);
-        setIsQuickSuccess(false);
-        setQuickPayAmount('');
-        setQuickPayMethod('');
-        setQuickPayLoanId('');
-        setQuickPayPerson('');
-        setQuickPayTransactionId('');
-        loadData(false);
-      }, 3000);
-    } catch (error) {
-      console.error("Error recording payment:", error);
-    }
-    setIsQuickProcessing(false);
   };
 
   const handleCancelLoan = (loan) => {
@@ -337,27 +266,6 @@ export default function Borrowing() {
     const profile = publicProfiles.find(p => p.user_id === userId);
     return profile || { username: 'user', full_name: 'Unknown User' };
   };
-
-  // Get unique lenders from active loans
-  const uniqueLenders = activeLoans.reduce((acc, loan) => {
-    const lender = getUserById(loan.lender_id);
-    if (!acc.find(l => l.userId === loan.lender_id)) {
-      acc.push({ userId: loan.lender_id, username: lender?.username, fullName: lender?.full_name });
-    }
-    return acc;
-  }, []);
-
-  // Filter loans by selected person
-  const filteredLoansForQuickPay = quickPayPerson
-    ? activeLoans.filter(l => l.lender_id === quickPayPerson)
-    : activeLoans;
-
-  // Auto-select loan if only one matches the person filter
-  useEffect(() => {
-    if (quickPayPerson && filteredLoansForQuickPay.length === 1) {
-      setQuickPayLoanId(filteredLoansForQuickPay[0].id);
-    }
-  }, [quickPayPerson, filteredLoansForQuickPay.length]);
 
   // Generate amortization schedule (function declaration for hoisting)
   function generateAmortizationSchedule(agreement) {
@@ -1189,7 +1097,7 @@ export default function Borrowing() {
                         </p>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                           <p style={{ fontSize: 18, fontWeight: 700, color: 'white', margin: 0 }}>{formatMoney(overdueAmount)}</p>
-                          <Button type="button" onClick={() => { setSelectedLoan(loan); setShowPaymentModal(true); }}
+                          <Button type="button" onClick={handleMakePayment}
                             className="h-7 px-3 rounded-md text-xs font-semibold border-0 bg-white text-red-600 hover:bg-white/90">
                             Record Payment
                           </Button>
@@ -1197,69 +1105,6 @@ export default function Borrowing() {
                       </div>
                     );
                   });
-                })()}
-
-                {/* Record Payment */}
-                {activeLoans.length > 0 && (() => {
-                  const allActiveLoans = allUserLoans.filter(l => l.status === 'active');
-                  const lendingLoans = allActiveLoans.filter(l => l.lender_id === user.id);
-                  const fromBorrowerIds = [...new Set(lendingLoans.map(l => l.borrower_id))];
-                  const fromOptions = fromBorrowerIds.map(bId => {
-                    const profile = getUserById(bId);
-                    return { userId: bId, username: profile?.username || 'user', fullName: profile?.full_name || 'Unknown' };
-                  });
-                  const borrowingLoans = allActiveLoans.filter(l => l.borrower_id === user.id);
-                  const toLenderIds = [...new Set(borrowingLoans.map(l => l.lender_id))];
-                  const toOptions = toLenderIds.map(lId => {
-                    const profile = getUserById(lId);
-                    return { userId: lId, username: profile?.username || 'user', fullName: profile?.full_name || 'Unknown' };
-                  });
-                  const selfProfile = getUserById(user.id);
-                  const selfOption = { userId: user.id, username: selfProfile?.username || 'you', fullName: selfProfile?.full_name || 'You' };
-                  const fromListWithSelf = [selfOption, ...fromOptions.filter(o => o.userId !== user.id)];
-                  const toListWithSelf = [selfOption, ...toOptions.filter(o => o.userId !== user.id)];
-                  const filteredFromOptions = quickPayToPerson ? fromListWithSelf.filter(o => o.userId !== quickPayToPerson) : fromListWithSelf;
-                  const filteredToOptions = quickPayFromPerson ? toListWithSelf.filter(o => o.userId !== quickPayFromPerson) : toListWithSelf;
-                  const handleRecordSubmit = () => {
-                    let matchingLoans = [];
-                    if (quickPayFromPerson && quickPayToPerson) {
-                      matchingLoans = allActiveLoans.filter(l => (l.borrower_id === quickPayFromPerson && l.lender_id === quickPayToPerson) || (l.borrower_id === quickPayToPerson && l.lender_id === quickPayFromPerson));
-                    } else if (quickPayFromPerson) {
-                      matchingLoans = allActiveLoans.filter(l => l.borrower_id === quickPayFromPerson || l.lender_id === quickPayFromPerson);
-                    } else if (quickPayToPerson) {
-                      matchingLoans = allActiveLoans.filter(l => l.borrower_id === quickPayToPerson || l.lender_id === quickPayToPerson);
-                    }
-                    if (matchingLoans.length === 1) { setSelectedLoan({ ...matchingLoans[0], _prefillAmount: quickPayAmount }); setShowPaymentModal(true); }
-                    else if (matchingLoans.length > 1) { setSelectedLoan({ ...matchingLoans[0], _prefillAmount: quickPayAmount, _candidateLoans: matchingLoans }); setShowPaymentModal(true); }
-                  };
-                  const canSubmit = quickPayAmount && (quickPayFromPerson || quickPayToPerson);
-                  return (
-                    <div className="glass-carousel-frame">
-                      <div className="record-payment-styled" style={{ padding: '20px 26px', position: 'relative' }}>
-                        <p style={{ fontSize: 14, fontWeight: 700, color: 'white', marginBottom: 10 }}>Record Payment</p>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, fontSize: 12, color: 'white' }}>
-                          <span>Record payment of</span>
-                          <span style={{ fontWeight: 500 }}>$</span>
-                          <Input type="number" step="0.01" min="0.01" placeholder="" value={quickPayAmount} onChange={(e) => setQuickPayAmount(e.target.value)}
-                            className="w-20 h-7 px-2 bg-white/20 border-0 text-xs inline-flex rounded-md text-white placeholder:text-white/50" style={{ MozAppearance: 'textfield' }} />
-                          <span>from</span>
-                          <Select value={quickPayFromPerson} onValueChange={(val) => { setQuickPayFromPerson(val); if (val === quickPayToPerson) setQuickPayToPerson(''); }}>
-                            <SelectTrigger className="w-auto h-7 px-2 bg-white/20 border-0 text-xs inline-flex rounded-md text-white"><SelectValue placeholder="select person" /></SelectTrigger>
-                            <SelectContent>{filteredFromOptions.map((person) => (<SelectItem key={person.userId} value={person.userId}>@{person.username}</SelectItem>))}</SelectContent>
-                          </Select>
-                          <span>to</span>
-                          <Select value={quickPayToPerson} onValueChange={(val) => { setQuickPayToPerson(val); if (val === quickPayFromPerson) setQuickPayFromPerson(''); }}>
-                            <SelectTrigger className="w-auto h-7 px-2 bg-white/20 border-0 text-xs inline-flex rounded-md text-white"><SelectValue placeholder="select person" /></SelectTrigger>
-                            <SelectContent>{filteredToOptions.map((person) => (<SelectItem key={person.userId} value={person.userId}>@{person.username}</SelectItem>))}</SelectContent>
-                          </Select>
-                          <Button type="button" onClick={handleRecordSubmit} disabled={!canSubmit}
-                            className={`h-7 px-3 rounded-md text-xs font-semibold border-0 transition-all ${!canSubmit ? 'bg-white/30 text-white/70 cursor-not-allowed' : 'bg-white text-[#678AFB] hover:bg-white/90'}`}>
-                            Submit
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  );
                 })()}
 
                 {/* Loans Ranked By */}
@@ -1946,16 +1791,6 @@ export default function Borrowing() {
       </div>
 
       {/* Modals */}
-      {showPaymentModal && selectedLoan && (
-        <RecordPaymentModal
-          loan={selectedLoan}
-          candidateLoans={selectedLoan._candidateLoans || []}
-          onClose={() => setShowPaymentModal(false)}
-          onPaymentComplete={handlePaymentComplete}
-          isLender={false}
-        />
-      )}
-
       {showDetailsModal && selectedLoanDetails && (
         <LoanDetailsModal
           loan={selectedLoanDetails.loan}
@@ -2005,140 +1840,6 @@ export default function Borrowing() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Quick Confirm Payment Popup */}
-      <AnimatePresence>
-        {showQuickConfirm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-            onClick={() => !isQuickProcessing && !isQuickSuccess && setShowQuickConfirm(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="rounded-2xl max-w-md w-full shadow-2xl overflow-hidden" style={{ backgroundColor: '#F7F7F7' }}
-            >
-              {isQuickSuccess ? (
-                <div className="p-6 text-center">
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-                    className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#678AFB' }}
-                  >
-                    <Check className="w-8 h-8 text-white" />
-                  </motion.div>
-                  <h3 className="text-xl font-bold mb-1" style={{ color: '#1A1918' }}>Payment Recorded!</h3>
-                  <p className="text-sm mb-4" style={{ color: '#787776' }}>Waiting for the Lender to confirm</p>
-                  <div className="rounded-2xl p-4 space-y-2" style={{ background: 'rgba(103,138,251,0.08)' }}>
-                    <p className="text-2xl font-bold text-slate-800">${parseFloat(quickPayAmount).toFixed(2)}</p>
-                    <p className="text-xs text-slate-500">via {PAYMENT_METHOD_LABELS[quickPayMethod]}</p>
-                    {quickPayTransactionId && (
-                      <p className="text-[10px] font-mono text-slate-400 mt-2">Ref: {quickPayTransactionId}</p>
-                    )}
-                  </div>
-                  <p className="text-xs text-slate-400 mt-3">The loan balance will update once both parties confirm.</p>
-                </div>
-              ) : (
-                <div className="p-5 space-y-4">
-                  {/* Header */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(103,138,251,0.1)' }}>
-                        <Shield className="w-4 h-4" style={{ color: '#678AFB' }} />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-slate-800">Confirm Payment</h3>
-                        <p className="text-xs text-slate-500">Review and confirm the details</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setShowQuickConfirm(false)}
-                      className="w-8 h-8 rounded-full bg-white/60 hover:bg-white flex items-center justify-center transition-colors"
-                    >
-                      <X className="w-4 h-4 text-slate-600" />
-                    </button>
-                  </div>
-
-                  {/* Payment Details */}
-                  <div className="rounded-2xl p-4 space-y-3" style={{ background: 'rgba(103,138,251,0.08)' }}>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500">Amount</span>
-                      <span className="text-2xl font-bold text-slate-800">${quickPayAmount ? parseFloat(quickPayAmount).toFixed(2) : '0.00'}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500">To</span>
-                      <span className="font-medium text-slate-800">
-                        {quickPayLoanId
-                          ? getUserById(activeLoans.find(l => l.id === quickPayLoanId)?.lender_id)?.full_name || 'Lender'
-                          : '_'}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500">Method</span>
-                      <span className="font-medium text-slate-800">{PAYMENT_METHOD_LABELS[quickPayMethod] || '_____'}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500">For</span>
-                      <span className="font-medium text-slate-800">
-                        {quickPayLoanId
-                          ? (activeLoans.find(l => l.id === quickPayLoanId)?.purpose || `Loan $${activeLoans.find(l => l.id === quickPayLoanId)?.amount}`)
-                          : '_'}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500">Date</span>
-                      <span className="font-medium text-slate-800">{format(new Date(), 'MMM d, yyyy')}</span>
-                    </div>
-                  </div>
-
-                  {/* Notice */}
-                  <div className="rounded-xl p-3 flex items-start gap-2" style={{ background: 'rgba(103,138,251,0.08)' }}>
-                    <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                    <p className="text-xs text-slate-600">
-                      The Lender will need to confirm this payment. Make sure the details are correct.
-                    </p>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-3 pt-1">
-                    <Button
-                      onClick={() => setShowQuickConfirm(false)}
-                      className="flex-1 bg-white hover:bg-white/80 text-slate-700 border-0 rounded-xl"
-                      disabled={isQuickProcessing}
-                    >
-                      Cancel
-                    </Button>
-                    <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                      <Button
-                        onClick={handleQuickPayConfirm}
-                        disabled={isQuickProcessing}
-                        className="w-full text-white rounded-xl" style={{ backgroundColor: '#678AFB' }}
-                      >
-                        {isQuickProcessing ? (
-                          <>
-                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                            Recording...
-                          </>
-                        ) : (
-                          <>
-                            <Check className="w-4 h-4 mr-1" />
-                            Confirm Payment
-                          </>
-                        )}
-                      </Button>
-                    </motion.div>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 }

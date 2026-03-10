@@ -55,6 +55,7 @@ import Learn from './pages/Learn';
 import Lending from './pages/Lending';
 import LoanAgreements from './pages/LoanAgreements';
 import Profile from './pages/Profile';
+import RecordPayment from './pages/RecordPayment';
 import RecentActivity from './pages/RecentActivity';
 import Requests from './pages/Requests';
 import Shop from './pages/Shop';
@@ -71,6 +72,7 @@ export const PAGES = {
     "Lending": Lending,
     "LoanAgreements": LoanAgreements,
     "Profile": Profile,
+    "RecordPayment": RecordPayment,
     "RecentActivity": RecentActivity,
     "Requests": Requests,
     "Shop": Shop,
