@@ -78,6 +78,7 @@ export default function Lending({ initialTab }) {
   const [quickPayFromPerson, setQuickPayFromPerson] = useState('');
   const [quickPayToPerson, setQuickPayToPerson] = useState('');
   const [allUserLoans, setAllUserLoans] = useState([]);
+  const [currentUserProfile, setCurrentUserProfile] = useState(null);
 
   // Typing animation for purpose placeholder
   const [purposePlaceholder, setPurposePlaceholder] = useState('');
@@ -128,6 +129,7 @@ export default function Lending({ initialTab }) {
   }, []);
 
   const [formData, setFormData] = useState({
+    lender_username: '',
     borrower_username: '',
     amount: '',
     interest_rate: '',
@@ -209,6 +211,10 @@ export default function Lending({ initialTab }) {
 
       setFriends(friendProfiles);
       setUsers(friendProfiles);
+
+      // Store current user's profile for lender/borrower selection
+      const myProfile = (profiles || []).find(p => p.user_id === user.id);
+      setCurrentUserProfile(myProfile || null);
     } catch (error) {
       console.error("Error loading data:", error);
     }
@@ -259,6 +265,24 @@ export default function Lending({ initialTab }) {
     return { totalAmount: 0, paymentAmount: 0, monthlyPayment: 0, totalInterest: 0 };
   };
 
+  // Determine user role based on lender/borrower selection
+  const isUserLender = !!(formData.lender_username && currentUserProfile && formData.lender_username === currentUserProfile.username);
+  const isUserBorrower = !!(formData.borrower_username && currentUserProfile && formData.borrower_username === currentUserProfile.username);
+
+  // Build users list with self at top, starred friends next, then other friends
+  const usersWithSelf = React.useMemo(() => {
+    const list = [];
+    if (currentUserProfile) {
+      list.push({ ...currentUserProfile, _isSelf: true, full_name: `${currentUserProfile.full_name || currentUserProfile.username} (You)` });
+    }
+    list.push(...users);
+    return list;
+  }, [currentUserProfile, users]);
+
+  // Filter out the person selected in the other dropdown
+  const lenderUsers = usersWithSelf.filter(u => u.username !== formData.borrower_username);
+  const borrowerUsers = usersWithSelf.filter(u => u.username !== formData.lender_username);
+
   const findUserByUsername = async (username) => {
     if (!username) return null;
     const foundInLocal = users.find(u => u && u.username === username);
@@ -284,25 +308,37 @@ export default function Lending({ initialTab }) {
         return;
       }
 
+      if (!formData.lender_username.trim()) {
+        alert("Please select a lender.");
+        setIsSubmitting(false);
+        return;
+      }
+
       if (!formData.borrower_username.trim()) {
-        alert("Please select or enter a borrower's username.");
+        alert("Please select a borrower.");
         setIsSubmitting(false);
         return;
       }
 
-      const borrowerProfile = await findUserByUsername(formData.borrower_username.trim());
-
-      if (!borrowerProfile || !borrowerProfile.user_id) {
-        alert(`User "${formData.borrower_username}" could not be found.`);
+      if (formData.lender_username.trim() === formData.borrower_username.trim()) {
+        alert("The lender and borrower cannot be the same person.");
         setIsSubmitting(false);
         return;
       }
 
-      if (borrowerProfile.user_id === currentUser.id) {
-        alert("You cannot create a loan offer to yourself.");
+      // Determine which person is the "other" (not the current user)
+      const isCurrentUserTheLender = currentUserProfile && formData.lender_username.trim() === currentUserProfile.username;
+      const otherUsername = isCurrentUserTheLender ? formData.borrower_username.trim() : formData.lender_username.trim();
+      const otherProfile = await findUserByUsername(otherUsername);
+
+      if (!otherProfile || !otherProfile.user_id) {
+        alert(`User "${otherUsername}" could not be found.`);
         setIsSubmitting(false);
         return;
       }
+
+      const lenderId = isCurrentUserTheLender ? currentUser.id : otherProfile.user_id;
+      const borrowerId = isCurrentUserTheLender ? otherProfile.user_id : currentUser.id;
 
       const details = calculateLoanDetails();
       let dueDate;
@@ -319,8 +355,8 @@ export default function Lending({ initialTab }) {
       }
 
       const loanData = {
-        lender_id: currentUser.id,
-        borrower_id: borrowerProfile.user_id,
+        lender_id: lenderId,
+        borrower_id: borrowerId,
         amount: parseFloat(formData.amount),
         interest_rate: loanType === 'flexible' ? 0 : parseFloat(formData.interest_rate) || 0,
         repayment_period: loanType === 'flexible' ? 0 : parseInt(formData.repayment_period) || 0,
@@ -371,6 +407,7 @@ export default function Lending({ initialTab }) {
 
       setShowSignatureModal(false);
       setFormData({
+        lender_username: '',
         borrower_username: '',
         amount: '',
         interest_rate: '',
@@ -1836,10 +1873,54 @@ export default function Lending({ initialTab }) {
                   <div className="bg-white rounded-2xl p-5 border-0">
                     <div className="mb-5">
                       <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                        {loanType === 'flexible' ? 'Create Quick Payment Request' : 'Create Loan Offer'}
+                        {loanType === 'flexible' ? 'Create Quick Payment Request' : (isUserBorrower ? 'Request a Loan' : 'Create Loan Offer')}
                       </p>
                     </div>
                       <form onSubmit={handleSubmit} className="space-y-5">
+                        {/* No Friends Banner */}
+                        {!isLoadingUsers && friends.length === 0 && (
+                          <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
+                            <p className="text-sm font-semibold text-slate-800 mb-3">You can only send offers to people in your friends list</p>
+                            <div className="grid grid-cols-2 gap-3">
+                              <button
+                                type="button"
+                                onClick={() => navigate(createPageUrl('Friends'))}
+                                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#678AFB] text-white text-sm font-medium rounded-xl hover:bg-[#5a7ae0] transition-colors"
+                              >
+                                <UserIcon className="w-4 h-4" />
+                                Find Your Friends
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => navigate(createPageUrl('Friends') + '?tab=add')}
+                                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-slate-700 text-sm font-medium rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors"
+                              >
+                                <UserPlus className="w-4 h-4" />
+                                Invite Your Friends
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Lender Selection */}
+                        <div className="space-y-2">
+                          <Label htmlFor="lender_username">
+                            Select the lender
+                          </Label>
+                          {isLoadingUsers ? (
+                            <div className="h-10 bg-slate-100 rounded-md animate-pulse" />
+                          ) : (
+                            <UserSelector
+                              users={lenderUsers}
+                              value={formData.lender_username}
+                              onSelect={(username) => handleInputChange('lender_username', username)}
+                              placeholder="Choose a person..."
+                              showAddFriends={true}
+                              onAddFriends={() => navigate(createPageUrl('Friends') + '?tab=add')}
+                            />
+                          )}
+                        </div>
+
                         {/* Borrower Selection */}
                         <div className="space-y-2">
                           <Label htmlFor="borrower_username">
@@ -1849,10 +1930,10 @@ export default function Lending({ initialTab }) {
                             <div className="h-10 bg-slate-100 rounded-md animate-pulse" />
                           ) : (
                             <UserSelector
-                              users={users}
+                              users={borrowerUsers}
                               value={formData.borrower_username}
                               onSelect={(username) => handleInputChange('borrower_username', username)}
-                              placeholder="Choose a friend..."
+                              placeholder="Choose a person..."
                               showAddFriends={true}
                               onAddFriends={() => navigate(createPageUrl('Friends') + '?tab=add')}
                             />
@@ -2045,22 +2126,45 @@ export default function Lending({ initialTab }) {
                         {loanType === 'scheduled' && (
                           <div className="px-5 pt-5 pb-1 bg-[#DBFFEB] rounded-xl overflow-hidden">
                             <p className="text-sm text-slate-700 leading-[4.2] [&_input]:inline-flex [&_input]:align-baseline [&_input]:my-[2px] [&_input[type=number]]:appearance-none [&_input[type=number]]:[-moz-appearance:textfield] [&_input[type=number]::-webkit-outer-spin-button]:appearance-none [&_input[type=number]::-webkit-inner-spin-button]:appearance-none [&_.inline-flex]:my-[2px] [&:last-child]:mb-0">
-                              The lender agrees to lend{' '}
-                              <span className="text-[#00A86B] font-medium">
-                                {formData.borrower_username ? `@${formData.borrower_username}` : 'the borrower'}
-                              </span>{' '}
-                              ${' '}
-                              <Input
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                max="5000"
-                                placeholder=""
-                                value={formData.amount}
-                                onChange={(e) => handleInputChange('amount', e.target.value)}
-                                className="w-24 h-8 px-3 bg-white inline-flex"
-                                style={{ MozAppearance: 'textfield' }}
-                              />{' '}
+                              {isUserBorrower ? (
+                                <>
+                                  The borrower requests to receive a loan of ${' '}
+                                  <Input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    max="5000"
+                                    placeholder=""
+                                    value={formData.amount}
+                                    onChange={(e) => handleInputChange('amount', e.target.value)}
+                                    className="w-24 h-8 px-3 bg-white inline-flex"
+                                    style={{ MozAppearance: 'textfield' }}
+                                  />{' '}
+                                  from{' '}
+                                  <span className="text-[#00A86B] font-medium">
+                                    {formData.lender_username ? `@${formData.lender_username}` : 'the lender'}
+                                  </span>{' '}
+                                </>
+                              ) : (
+                                <>
+                                  The lender agrees to lend{' '}
+                                  <span className="text-[#00A86B] font-medium">
+                                    {formData.borrower_username ? `@${formData.borrower_username}` : 'the borrower'}
+                                  </span>{' '}
+                                  ${' '}
+                                  <Input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    max="5000"
+                                    placeholder=""
+                                    value={formData.amount}
+                                    onChange={(e) => handleInputChange('amount', e.target.value)}
+                                    className="w-24 h-8 px-3 bg-white inline-flex"
+                                    style={{ MozAppearance: 'textfield' }}
+                                  />{' '}
+                                </>
+                              )}
                               before{' '}
                               <Input
                                 type="date"
@@ -2232,15 +2336,15 @@ export default function Lending({ initialTab }) {
 
                         <Button
                           type="submit"
-                          disabled={isSubmitting || !formData.borrower_username || !formData.amount || !formData.purpose || (loanType === 'scheduled' && (!formData.interest_rate || !formData.repayment_period || !formData.lender_send_funds_date || !formData.first_payment_date)) || (loanType === 'flexible' && formData.is_repeating && (!formData.repeating_start_date || !formData.repeating_num_payments))}
+                          disabled={isSubmitting || !formData.lender_username || !formData.borrower_username || !formData.amount || !formData.purpose || (loanType === 'scheduled' && (!formData.interest_rate || !formData.repayment_period || !formData.lender_send_funds_date || !formData.first_payment_date)) || (loanType === 'flexible' && formData.is_repeating && (!formData.repeating_start_date || !formData.repeating_num_payments))}
                           className={`w-full py-3 text-base font-semibold rounded-xl border-0 mt-4 transition-all duration-200 ${
-                            isSubmitting || !formData.borrower_username || !formData.amount || !formData.purpose || (loanType === 'scheduled' && (!formData.interest_rate || !formData.repayment_period || !formData.lender_send_funds_date || !formData.first_payment_date)) || (loanType === 'flexible' && formData.is_repeating && (!formData.repeating_start_date || !formData.repeating_num_payments))
+                            isSubmitting || !formData.lender_username || !formData.borrower_username || !formData.amount || !formData.purpose || (loanType === 'scheduled' && (!formData.interest_rate || !formData.repayment_period || !formData.lender_send_funds_date || !formData.first_payment_date)) || (loanType === 'flexible' && formData.is_repeating && (!formData.repeating_start_date || !formData.repeating_num_payments))
                               ? 'bg-[#83F384] text-[#DBEEE3] cursor-not-allowed saturate-[0.7] brightness-[0.92]'
                               : 'bg-[#83F384] text-[#DBEEE3] hover:bg-[#83F384]/90'
                           }`}
                         >
                           <Send className="w-4 h-4 mr-2" />
-                          {isSubmitting ? "Sending..." : (loanType === 'flexible' ? "Send Quick Payment Request" : "Send Loan Offer")}
+                          {isSubmitting ? "Sending..." : (loanType === 'flexible' ? "Send Quick Payment Request" : (isUserBorrower ? "Send Loan Request" : "Send Loan Offer"))}
                         </Button>
                       </form>
                   </div>
@@ -2248,9 +2352,13 @@ export default function Lending({ initialTab }) {
                   {/* Will Your Payment Request Repeat? Info Box - Only show for Quick Payment Request */}
                   {loanType === 'flexible' && (
                     <div className="bg-[#83F384] rounded-2xl p-4 mt-4">
-                      <p className="text-base font-semibold text-slate-800 mb-2">Will Your Payment Request Repeat?</p>
+                      <p className="text-base font-semibold text-slate-800 mb-2">
+                        {isUserBorrower ? 'Will This Payment Repeat?' : 'Will Your Payment Request Repeat?'}
+                      </p>
                       <p className="text-sm text-slate-700 leading-relaxed">
-                        If you're requesting money for a recurring bill (like rent, utilities, or streaming subscriptions) set up a repeating request. Enter the details once, and we'll automatically send reminders and help you both stay on track for as long as you need.
+                        {isUserBorrower
+                          ? "If this is for a recurring expense (like rent, utilities, or streaming subscriptions) set up a repeating payment. Enter the details once, and we'll automatically send reminders and help you both stay on track for as long as you need."
+                          : "If you're requesting money for a recurring bill (like rent, utilities, or streaming subscriptions) set up a repeating request. Enter the details once, and we'll automatically send reminders and help you both stay on track for as long as you need."}
                       </p>
                     </div>
                   )}
@@ -2287,8 +2395,12 @@ export default function Lending({ initialTab }) {
                     </div>
                     <p className="text-xs text-slate-500 text-center mt-3">
                       {loanType === 'flexible'
-                        ? "Get paid back in one payment: perfect for splitting dinner with roommates or one-time expenses"
-                        : "Offer money that will be paid back gradually with a structured payment plan"}
+                        ? (isUserBorrower
+                            ? "Request a one-time payment: perfect for splitting dinner, rent, or one-time expenses"
+                            : "Get paid back in one payment: perfect for splitting dinner with roommates or one-time expenses")
+                        : (isUserBorrower
+                            ? "Request money that you'll pay back gradually with a structured payment plan"
+                            : "Offer money that will be paid back gradually with a structured payment plan")}
                     </p>
                   </div>
 
@@ -2296,7 +2408,9 @@ export default function Lending({ initialTab }) {
                   {loanType === 'scheduled' && (
                     <div className="bg-[#83F384] rounded-2xl p-4">
                       <p className="text-xs text-slate-500 text-center">
-                        {formData.borrower_username ? (
+                        {isUserBorrower ? (
+                          'You will pay'
+                        ) : formData.borrower_username ? (
                           <>
                             {(() => {
                               const selectedUser = users.find(u => u.username === formData.borrower_username);
