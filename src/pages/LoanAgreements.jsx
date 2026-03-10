@@ -1,20 +1,92 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { LoanAgreement, User, PublicProfile, Loan, Payment } from "@/entities/all";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { FileText, CheckCircle, Download, ChevronDown, X, Calendar, DollarSign, Percent, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { format, addMonths, addWeeks, addDays } from "date-fns";
 import { jsPDF } from "jspdf";
 import LoanActivity from "../components/loans/LoanActivity";
 import { formatMoney } from "@/components/utils/formatMoney";
+import DashboardSidebar from "@/components/DashboardSidebar";
+
+const STAR_CIRCLES = [
+  {cx:82,cy:45,o:0.7},{cx:195,cy:112,o:0.5},{cx:310,cy:28,o:0.8},{cx:420,cy:198,o:0.4},
+  {cx:530,cy:67,o:0.65},{cx:640,cy:245,o:0.55},{cx:755,cy:88,o:0.75},{cx:860,cy:156,o:0.45},
+  {cx:970,cy:34,o:0.7},{cx:1085,cy:201,o:0.6},{cx:1190,cy:78,o:0.5},{cx:1300,cy:267,o:0.7},
+  {cx:1410,cy:45,o:0.55},{cx:1520,cy:134,o:0.65},{cx:48,cy:189,o:0.4},{cx:158,cy:278,o:0.6},
+  {cx:268,cy:156,o:0.5},{cx:378,cy:89,o:0.7},{cx:488,cy:234,o:0.45},{cx:598,cy:145,o:0.6},
+  {cx:708,cy:312,o:0.35},{cx:818,cy:56,o:0.75},{cx:928,cy:223,o:0.5},{cx:1038,cy:98,o:0.65},
+  {cx:1148,cy:289,o:0.4},{cx:1258,cy:167,o:0.7},{cx:1368,cy:234,o:0.55},{cx:1478,cy:78,o:0.6},
+  {cx:1560,cy:256,o:0.45},{cx:125,cy:312,o:0.5},{cx:345,cy:267,o:0.6},{cx:565,cy:34,o:0.75},
+];
+
+const ROLE_OPTIONS = [
+  { id: 'all', label: 'All Roles' },
+  { id: 'lender', label: 'You are the Lender' },
+  { id: 'borrower', label: 'You are the Borrower' },
+];
+
+const STATUS_OPTIONS = [
+  { id: 'all', label: 'All Status' },
+  { id: 'active', label: 'Active' },
+  { id: 'completed', label: 'Completed' },
+  { id: 'cancelled', label: 'Cancelled' },
+];
+
+/* ── Single-select dropdown ────────────────────────────────── */
+function SingleSelectDropdown({ options, selected, onChange }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const current = options.find(o => o.id === selected) || options[0];
+
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10,
+          border: '1px solid rgba(0,0,0,0.08)', background: selected !== 'all' ? 'rgba(103,138,251,0.08)' : 'white',
+          fontSize: 13, fontWeight: 500, color: '#1A1918', cursor: 'pointer',
+          fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap', transition: 'background 0.15s',
+        }}
+      >
+        {current.label}
+        <ChevronDown size={14} style={{ opacity: 0.5, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+      </button>
+      {open && (
+        <div style={{
+          position: 'absolute', top: 'calc(100% + 6px)', left: 0, minWidth: 220,
+          background: 'white', borderRadius: 12, border: '1px solid rgba(0,0,0,0.08)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.08)', zIndex: 50, padding: 6,
+        }}>
+          {options.map(opt => (
+            <button
+              key={opt.id}
+              onClick={() => { onChange(opt.id); setOpen(false); }}
+              style={{
+                display: 'block', width: '100%', textAlign: 'left', padding: '8px 10px', borderRadius: 8,
+                border: 'none', cursor: 'pointer', fontSize: 13, color: '#1A1918',
+                background: selected === opt.id ? 'rgba(103,138,251,0.08)' : 'transparent',
+                fontWeight: selected === opt.id ? 600 : 400, fontFamily: "'DM Sans', sans-serif",
+                transition: 'background 0.1s',
+              }}
+              onMouseEnter={e => { if (selected !== opt.id) e.currentTarget.style.background = 'rgba(0,0,0,0.03)'; }}
+              onMouseLeave={e => { if (selected !== opt.id) e.currentTarget.style.background = 'transparent'; }}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function LoanAgreements() {
   const [agreements, setAgreements] = useState([]);
@@ -24,11 +96,11 @@ export default function LoanAgreements() {
   const [payments, setPayments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedAgreement, setSelectedAgreement] = useState(null);
-  const [roleFilter, setRoleFilter] = useState('both');
+  const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [activePopup, setActivePopup] = useState(null); // 'promissory', 'amortization', 'summary'
+  const [activePopup, setActivePopup] = useState(null);
   const [popupAgreement, setPopupAgreement] = useState(null);
-  const [activeInfoTooltip, setActiveInfoTooltip] = useState(null); // 'promissory' or 'amortization'
+  const [activeInfoTooltip, setActiveInfoTooltip] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -82,12 +154,12 @@ export default function LoanAgreements() {
     return loans.find(l => l.id === loanId);
   };
 
-  const getStatusColor = (status) => {
+  const getStatusBadgeStyle = (status) => {
     switch(status) {
-      case 'active': return 'bg-green-100 text-green-800 border-green-200';
-      case 'completed': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'cancelled': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'active': return { background: 'rgba(103,138,251,0.1)', color: '#678AFB', border: '1px solid rgba(103,138,251,0.2)' };
+      case 'completed': return { background: 'rgba(103,138,251,0.1)', color: '#678AFB', border: '1px solid rgba(103,138,251,0.2)' };
+      case 'cancelled': return { background: 'rgba(232,114,110,0.08)', color: '#E8726E', border: '1px solid rgba(232,114,110,0.2)' };
+      default: return { background: 'rgba(120,119,118,0.08)', color: '#787776', border: '1px solid rgba(120,119,118,0.15)' };
     }
   };
 
@@ -100,14 +172,12 @@ export default function LoanAgreements() {
 
     if (loanAmount <= 0) return schedule;
 
-    // Convert repayment period to total months
     const repaymentPeriod = agreement.repayment_period || 1;
     const repaymentUnit = agreement.repayment_unit || 'months';
     let totalMonths = repaymentPeriod;
     if (repaymentUnit === 'years') totalMonths = repaymentPeriod * 12;
     else if (repaymentUnit === 'weeks') totalMonths = repaymentPeriod / 4.333;
 
-    // Total number of payments based on frequency
     let totalPayments;
     if (frequency === 'weekly') totalPayments = Math.round(totalMonths * 4.333);
     else if (frequency === 'biweekly') totalPayments = Math.round(totalMonths * 2.167);
@@ -116,7 +186,6 @@ export default function LoanAgreements() {
 
     if (totalPayments <= 0) totalPayments = 1;
 
-    // Periodic interest rate
     let periodsPerYear = 12;
     if (frequency === 'weekly') periodsPerYear = 52;
     else if (frequency === 'biweekly') periodsPerYear = 26;
@@ -124,8 +193,6 @@ export default function LoanAgreements() {
 
     const r = annualRate > 0 ? (annualRate / 100) / periodsPerYear : 0;
 
-    // Payment using amortization formula: P = L * r / (1 - (1 + r)^(-n))
-    // Keep raw (unrounded) for accurate schedule computation
     let rawPayment;
     if (r > 0) {
       rawPayment = loanAmount * r / (1 - Math.pow(1 + r, -totalPayments));
@@ -149,11 +216,9 @@ export default function LoanAgreements() {
       let principal;
 
       if (i === totalPayments) {
-        // Final payment: pay off remaining balance
         principal = balance;
         balance = 0;
       } else {
-        // New balance = round(oldBalance * (1 + r) - payment, 2)
         const newBalance = Math.round((balance * (1 + r) - rawPayment) * 100) / 100;
         principal = Math.round((startingBalance - newBalance) * 100) / 100;
         balance = newBalance;
@@ -183,7 +248,6 @@ export default function LoanAgreements() {
     const lenderInfo = getUserById(agreement.lender_id);
     const borrowerInfo = getUserById(agreement.borrower_id);
 
-    // Page 1: Current/Final Terms
     doc.setFontSize(24);
     doc.setFont(undefined, 'bold');
     doc.text('PROMISSORY NOTE', 105, 25, { align: 'center' });
@@ -198,7 +262,6 @@ export default function LoanAgreements() {
     doc.text(`Date: ${format(new Date(agreement.created_at), 'MMMM d, yyyy')}`, 20, 50);
     doc.text(`Location: United States`, 20, 58);
 
-    // Principal amount box
     doc.setFillColor(240, 240, 240);
     doc.rect(20, 68, 170, 25, 'F');
     doc.setFontSize(12);
@@ -207,7 +270,6 @@ export default function LoanAgreements() {
     doc.setFontSize(20);
     doc.text(formatMoney(agreement.amount), 25, 88);
 
-    // Promise to pay
     doc.setFontSize(11);
     doc.setFont(undefined, 'normal');
     let yPos = 105;
@@ -216,7 +278,6 @@ export default function LoanAgreements() {
     doc.text(promiseLines, 20, yPos);
     yPos += promiseLines.length * 6 + 10;
 
-    // Terms section
     doc.setFont(undefined, 'bold');
     doc.text('TERMS OF REPAYMENT:', 20, yPos);
     yPos += 8;
@@ -241,7 +302,6 @@ export default function LoanAgreements() {
       yPos += 10;
     }
 
-    // Default clause
     yPos += 5;
     doc.setFont(undefined, 'bold');
     doc.text('DEFAULT:', 20, yPos);
@@ -252,12 +312,10 @@ export default function LoanAgreements() {
     doc.text(defaultLines, 20, yPos);
     yPos += defaultLines.length * 6 + 15;
 
-    // Signatures
     doc.setFont(undefined, 'bold');
     doc.text('SIGNATURES:', 20, yPos);
     yPos += 12;
 
-    // Borrower signature
     doc.setFont(undefined, 'normal');
     doc.text('Borrower:', 20, yPos);
     doc.setFont(undefined, 'italic');
@@ -267,7 +325,6 @@ export default function LoanAgreements() {
     doc.setFont(undefined, 'normal');
     doc.text(`Signed: ${format(new Date(agreement.borrower_signed_date), 'MMM d, yyyy h:mm a')}`, 20, yPos + 18);
 
-    // Lender signature
     doc.setFontSize(11);
     doc.text('Lender:', 120, yPos);
     doc.setFont(undefined, 'italic');
@@ -277,25 +334,20 @@ export default function LoanAgreements() {
     doc.setFont(undefined, 'normal');
     doc.text(`Signed: ${format(new Date(agreement.lender_signed_date), 'MMM d, yyyy h:mm a')}`, 120, yPos + 18);
 
-    // Check for term modifications and add additional pages
     if (agreement.contract_modified && agreement.modification_history) {
       const modifications = JSON.parse(agreement.modification_history || '[]');
-
       modifications.forEach((mod, index) => {
         doc.addPage();
         doc.setFontSize(18);
         doc.setFont(undefined, 'bold');
         doc.text(`AMENDMENT ${index + 1}`, 105, 25, { align: 'center' });
-
         doc.setFontSize(10);
         doc.setFont(undefined, 'normal');
         doc.text(`Date of Amendment: ${mod.date ? format(new Date(mod.date), 'MMMM d, yyyy') : 'N/A'}`, 20, 45);
-
         doc.setFontSize(11);
         doc.setFont(undefined, 'bold');
         doc.text('PREVIOUS TERMS:', 20, 60);
         doc.setFont(undefined, 'normal');
-
         let modYPos = 70;
         if (mod.previousTerms) {
           Object.entries(mod.previousTerms).forEach(([key, value]) => {
@@ -303,7 +355,6 @@ export default function LoanAgreements() {
             modYPos += 7;
           });
         }
-
         modYPos += 10;
         doc.setFont(undefined, 'bold');
         doc.text('REASON FOR AMENDMENT:', 20, modYPos);
@@ -334,7 +385,6 @@ export default function LoanAgreements() {
     doc.text(`Lender: ${lenderInfo.full_name} (@${lenderInfo.username})`, 20, 35);
     doc.text(`Borrower: ${borrowerInfo.full_name} (@${borrowerInfo.username})`, 20, 42);
 
-    // Summary box
     doc.setFillColor(240, 240, 240);
     doc.rect(20, 48, 257, 20, 'F');
     doc.setFontSize(10);
@@ -343,7 +393,6 @@ export default function LoanAgreements() {
     doc.text(`Total Amount: ${formatMoney(agreement.total_amount)}`, 155, 58);
     doc.text(`Payment: ${formatMoney(agreement.payment_amount)} ${agreement.payment_frequency}`, 215, 58);
 
-    // Table header
     let yPos = 78;
     doc.setFont(undefined, 'bold');
     doc.setFontSize(8);
@@ -390,7 +439,6 @@ export default function LoanAgreements() {
       yPos += 5;
     });
 
-    // Totals
     yPos += 5;
     doc.line(20, yPos, 277, yPos);
     yPos += 7;
@@ -404,7 +452,6 @@ export default function LoanAgreements() {
     doc.save(`amortization-schedule-${agreement.id}.pdf`);
   };
 
-  // Open popup
   const openPopup = (type, agreement) => {
     setActivePopup(type);
     setPopupAgreement(agreement);
@@ -415,18 +462,27 @@ export default function LoanAgreements() {
     setPopupAgreement(null);
   };
 
-  if (isLoading) {
+  const hasAnyFilter = roleFilter !== 'all' || statusFilter !== 'all';
+  const clearFilters = () => { setRoleFilter('all'); setStatusFilter('all'); };
+
+  /* ── Loading state ──────────────────────────────────────────── */
+  if (isLoading || !user) {
     return (
-      <div className="min-h-screen p-6" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
-        <div className="max-w-4xl mx-auto flex items-center justify-center min-h-96">
-          <Card style={{backgroundColor: `rgb(var(--theme-card-bg))`}}>
-            <CardContent className="p-8">
-              <div className="text-center">
-                <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin mx-auto mb-4" style={{borderColor: `rgb(var(--theme-primary))`}}></div>
-                <p className="text-slate-600">Loading agreements...</p>
-              </div>
-            </CardContent>
-          </Card>
+      <div className="home-with-sidebar" style={{ minHeight: '100vh', background: '#F7F7F7', paddingLeft: 240, fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5 }}>
+        <DashboardSidebar activePage="LoanAgreements" user={user} />
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 520, background: 'linear-gradient(180deg, #527DFF 0%, #5580FF 5%, #678AFB 13%, #7792F4 22%, #8C9BEE 32%, #A19EEB 42%, #A79DEA 50%, #BB98E8 58%, #C89CE6 65%, #D4A0E4 72%, #DDA5E2 76%, #F0D8EA 80%, #F7F7F7 84%)' }} />
+        </div>
+        <div style={{ position: 'relative', zIndex: 10, maxWidth: 1080, margin: '0 auto', padding: '0 28px' }}>
+          <div style={{ paddingTop: 80, paddingBottom: 20, textAlign: 'center' }}>
+            <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.2rem', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.1, color: 'white', margin: 0 }}>Loan Documents</h1>
+          </div>
+        </div>
+        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px 64px', position: 'relative', zIndex: 10 }}>
+          <div className="glass-card" style={{ padding: 40, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 32, height: 32, border: '2px solid #678AFB', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: 12 }} />
+            <p style={{ fontSize: 13, color: '#787776' }}>{isLoading ? 'Loading documents...' : 'Please log in to view documents'}</p>
+          </div>
         </div>
       </div>
     );
@@ -435,260 +491,286 @@ export default function LoanAgreements() {
   const lendingAgreements = agreements.filter(a => a.lender_id === user?.id);
   const borrowingAgreements = agreements.filter(a => a.borrower_id === user?.id);
 
-  // Promissory Note Popup Content
+  // Apply filters
+  let filteredAgreements = agreements;
+  if (roleFilter === 'lender') filteredAgreements = lendingAgreements;
+  else if (roleFilter === 'borrower') filteredAgreements = borrowingAgreements;
+
+  if (statusFilter !== 'all') {
+    filteredAgreements = filteredAgreements.filter(agreement => {
+      const loanStatus = getLoanStatus(agreement.loan_id);
+      return loanStatus === statusFilter;
+    });
+  }
+
+  /* ── Popup Components ───────────────────────────────────────── */
   const PromissoryNotePopup = ({ agreement }) => {
     const lenderInfo = getUserById(agreement.lender_id);
     const borrowerInfo = getUserById(agreement.borrower_id);
 
     return (
-      <div className="space-y-6">
-        <div className="text-center border-b border-slate-200 pb-4">
-          <h2 className="text-2xl font-bold text-slate-800">PROMISSORY NOTE</h2>
-          <p className="text-sm text-slate-500 mt-1">Document ID: {agreement.id}</p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <div style={{ textAlign: 'center', borderBottom: '1px solid rgba(0,0,0,0.06)', paddingBottom: 16 }}>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1A1918', margin: 0 }}>PROMISSORY NOTE</h2>
+          <p style={{ fontSize: 12, color: '#787776', marginTop: 4 }}>Document ID: {agreement.id}</p>
         </div>
 
-        <div className="bg-[#96FFD0] rounded-xl p-4">
-          <p className="text-sm text-slate-600 mb-1">Principal Amount</p>
-          <p className="text-3xl font-bold text-slate-800">{formatMoney(agreement.amount)}</p>
+        <div style={{ background: 'rgba(103,138,251,0.1)', borderRadius: 16, padding: 16 }}>
+          <p style={{ fontSize: 12, color: '#787776', marginBottom: 4 }}>Principal Amount</p>
+          <p style={{ fontSize: 28, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(agreement.amount)}</p>
         </div>
 
-        <div className="space-y-3 text-sm">
-          <p className="leading-relaxed">
-            FOR VALUE RECEIVED, the undersigned Borrower, <span className="font-semibold">{borrowerInfo.full_name}</span> (@{borrowerInfo.username}),
-            promises to pay to the order of <span className="font-semibold">{lenderInfo.full_name}</span> (@{lenderInfo.username}),
-            the principal sum of <span className="font-semibold">{formatMoney(agreement.amount)}</span>,
-            together with interest at the rate of <span className="font-semibold">{agreement.interest_rate}%</span> per annum.
-          </p>
-        </div>
+        <p style={{ fontSize: 13, lineHeight: 1.7, color: '#1A1918' }}>
+          FOR VALUE RECEIVED, the undersigned Borrower, <strong>{borrowerInfo.full_name}</strong> (@{borrowerInfo.username}),
+          promises to pay to the order of <strong>{lenderInfo.full_name}</strong> (@{lenderInfo.username}),
+          the principal sum of <strong>{formatMoney(agreement.amount)}</strong>,
+          together with interest at the rate of <strong>{agreement.interest_rate}%</strong> per annum.
+        </p>
 
-        <div className="bg-slate-50 rounded-xl p-4 space-y-2">
-          <h3 className="font-semibold text-slate-800 mb-3">Terms of Repayment</h3>
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div><span className="text-slate-500">Total Amount Due:</span> <span className="font-medium">{formatMoney(agreement.total_amount)}</span></div>
-            <div><span className="text-slate-500">Interest Rate:</span> <span className="font-medium">{agreement.interest_rate}%</span></div>
-            <div><span className="text-slate-500">Payment:</span> <span className="font-medium">{formatMoney(agreement.payment_amount)} {agreement.payment_frequency}</span></div>
-            <div><span className="text-slate-500">Term:</span> <span className="font-medium">{agreement.repayment_period} {agreement.repayment_unit || 'months'}</span></div>
+        <div style={{ background: 'rgba(0,0,0,0.03)', borderRadius: 16, padding: 16 }}>
+          <h3 style={{ fontSize: 14, fontWeight: 600, color: '#1A1918', marginBottom: 12 }}>Terms of Repayment</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, fontSize: 13 }}>
+            <div><span style={{ color: '#787776' }}>Total Amount Due:</span> <span style={{ fontWeight: 500 }}>{formatMoney(agreement.total_amount)}</span></div>
+            <div><span style={{ color: '#787776' }}>Interest Rate:</span> <span style={{ fontWeight: 500 }}>{agreement.interest_rate}%</span></div>
+            <div><span style={{ color: '#787776' }}>Payment:</span> <span style={{ fontWeight: 500 }}>{formatMoney(agreement.payment_amount)} {agreement.payment_frequency}</span></div>
+            <div><span style={{ color: '#787776' }}>Term:</span> <span style={{ fontWeight: 500 }}>{agreement.repayment_period} {agreement.repayment_unit || 'months'}</span></div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-slate-50 rounded-lg p-4">
-            <p className="text-xs text-slate-500 mb-1">Borrower</p>
-            <p className="text-lg font-serif italic text-slate-800">{agreement.borrower_name || borrowerInfo.full_name}</p>
-            <p className="text-xs text-slate-500 mt-1">Signed {format(new Date(agreement.borrower_signed_date), 'MMM d, yyyy')}</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div style={{ background: 'rgba(0,0,0,0.03)', borderRadius: 12, padding: 16 }}>
+            <p style={{ fontSize: 11, color: '#787776', marginBottom: 4 }}>Borrower</p>
+            <p style={{ fontSize: 18, fontStyle: 'italic', fontFamily: 'Georgia, serif', color: '#1A1918', margin: 0 }}>{agreement.borrower_name || borrowerInfo.full_name}</p>
+            <p style={{ fontSize: 11, color: '#787776', marginTop: 4 }}>Signed {format(new Date(agreement.borrower_signed_date), 'MMM d, yyyy')}</p>
           </div>
-          <div className="bg-slate-50 rounded-lg p-4">
-            <p className="text-xs text-slate-500 mb-1">Lender</p>
-            <p className="text-lg font-serif italic text-slate-800">{agreement.lender_name || lenderInfo.full_name}</p>
-            <p className="text-xs text-slate-500 mt-1">Signed {format(new Date(agreement.lender_signed_date), 'MMM d, yyyy')}</p>
+          <div style={{ background: 'rgba(0,0,0,0.03)', borderRadius: 12, padding: 16 }}>
+            <p style={{ fontSize: 11, color: '#787776', marginBottom: 4 }}>Lender</p>
+            <p style={{ fontSize: 18, fontStyle: 'italic', fontFamily: 'Georgia, serif', color: '#1A1918', margin: 0 }}>{agreement.lender_name || lenderInfo.full_name}</p>
+            <p style={{ fontSize: 11, color: '#787776', marginTop: 4 }}>Signed {format(new Date(agreement.lender_signed_date), 'MMM d, yyyy')}</p>
           </div>
         </div>
 
-        <Button
+        <button
           onClick={() => downloadPromissoryNote(agreement)}
-          className="w-full bg-[#00A86B] hover:bg-[#0D9B76] text-white"
+          style={{
+            width: '100%', padding: '12px 0', borderRadius: 12, border: 'none',
+            background: '#678AFB', color: 'white', fontSize: 13, fontWeight: 600,
+            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            fontFamily: "'DM Sans', sans-serif",
+          }}
         >
-          <Download className="w-4 h-4 mr-2" />
+          <Download size={16} />
           Download PDF
-        </Button>
+        </button>
       </div>
     );
   };
 
-  // Amortization Schedule Popup Content
   const AmortizationSchedulePopup = ({ agreement }) => {
     const schedule = generateAmortizationSchedule(agreement);
     const loan = getLoanById(agreement.loan_id);
     const paidPayments = loan?.amount_paid ? Math.floor(loan.amount_paid / agreement.payment_amount) : 0;
 
     return (
-      <div className="space-y-6">
-        <div className="text-center border-b border-slate-200 pb-4">
-          <h2 className="text-2xl font-bold text-slate-800">AMORTIZATION SCHEDULE</h2>
-          <p className="text-sm text-slate-500 mt-1">{schedule.length} payments · {agreement.payment_frequency}</p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <div style={{ textAlign: 'center', borderBottom: '1px solid rgba(0,0,0,0.06)', paddingBottom: 16 }}>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1A1918', margin: 0 }}>AMORTIZATION SCHEDULE</h2>
+          <p style={{ fontSize: 12, color: '#787776', marginTop: 4 }}>{schedule.length} payments · {agreement.payment_frequency}</p>
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
-          <div className="bg-[#AAFFA3] rounded-xl p-3 text-center">
-            <p className="text-xs text-slate-600">Principal</p>
-            <p className="text-lg font-bold text-slate-800">{formatMoney(agreement.amount)}</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+          <div style={{ background: 'rgba(103,138,251,0.08)', borderRadius: 16, padding: 12, textAlign: 'center' }}>
+            <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>Principal</p>
+            <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1918', margin: '4px 0 0' }}>{formatMoney(agreement.amount)}</p>
           </div>
-          <div className="bg-[#30FFA8] rounded-xl p-3 text-center">
-            <p className="text-xs text-slate-600">Interest</p>
-            <p className="text-lg font-bold text-slate-800">{formatMoney((agreement.total_amount || 0) - (agreement.amount || 0))}</p>
+          <div style={{ background: 'rgba(167,157,234,0.1)', borderRadius: 16, padding: 12, textAlign: 'center' }}>
+            <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>Interest</p>
+            <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1918', margin: '4px 0 0' }}>{formatMoney((agreement.total_amount || 0) - (agreement.amount || 0))}</p>
           </div>
-          <div className="bg-[#96FFD0] rounded-xl p-3 text-center">
-            <p className="text-xs text-slate-600">Total</p>
-            <p className="text-lg font-bold text-slate-800">{formatMoney(agreement.total_amount)}</p>
+          <div style={{ background: 'rgba(103,138,251,0.12)', borderRadius: 16, padding: 12, textAlign: 'center' }}>
+            <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>Total</p>
+            <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1918', margin: '4px 0 0' }}>{formatMoney(agreement.total_amount)}</p>
           </div>
         </div>
 
-        <div className="max-h-[300px] overflow-x-auto overflow-y-auto rounded-xl border border-slate-200">
-          <table className="w-full text-xs min-w-[700px]">
-            <thead className="bg-slate-50 sticky top-0">
-              <tr>
-                <th className="px-2 py-2 text-left font-medium text-slate-600">Payment</th>
-                <th className="px-2 py-2 text-left font-medium text-slate-600">Payment Date</th>
-                <th className="px-2 py-2 text-right font-medium text-slate-600">Starting Balance</th>
-                <th className="px-2 py-2 text-right font-medium text-slate-600">Principal Payment</th>
-                <th className="px-2 py-2 text-right font-medium text-slate-600">Interest Payment</th>
-                <th className="px-2 py-2 text-right font-medium text-slate-600">Principal to Date</th>
-                <th className="px-2 py-2 text-right font-medium text-slate-600">Interest to Date</th>
-                <th className="px-2 py-2 text-right font-medium text-slate-600">Ending Balance</th>
+        <div style={{ maxHeight: 300, overflowX: 'auto', overflowY: 'auto', borderRadius: 16, border: '1px solid rgba(0,0,0,0.06)' }}>
+          <table style={{ width: '100%', fontSize: 11, minWidth: 700, borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ background: 'rgba(0,0,0,0.03)' }}>
+                <th style={{ padding: '8px', textAlign: 'left', fontWeight: 500, color: '#787776' }}>Payment</th>
+                <th style={{ padding: '8px', textAlign: 'left', fontWeight: 500, color: '#787776' }}>Payment Date</th>
+                <th style={{ padding: '8px', textAlign: 'right', fontWeight: 500, color: '#787776' }}>Starting Balance</th>
+                <th style={{ padding: '8px', textAlign: 'right', fontWeight: 500, color: '#787776' }}>Principal Payment</th>
+                <th style={{ padding: '8px', textAlign: 'right', fontWeight: 500, color: '#787776' }}>Interest Payment</th>
+                <th style={{ padding: '8px', textAlign: 'right', fontWeight: 500, color: '#787776' }}>Principal to Date</th>
+                <th style={{ padding: '8px', textAlign: 'right', fontWeight: 500, color: '#787776' }}>Interest to Date</th>
+                <th style={{ padding: '8px', textAlign: 'right', fontWeight: 500, color: '#787776' }}>Ending Balance</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody>
               {schedule.map((row, index) => (
-                <tr
-                  key={row.number}
-                  className={index < paidPayments ? 'bg-green-50' : ''}
-                >
-                  <td className="px-2 py-2 text-slate-600">
-                    {index < paidPayments && <CheckCircle className="w-3 h-3 text-green-500 inline mr-1" />}
+                <tr key={row.number} style={{ background: index < paidPayments ? 'rgba(103,138,251,0.05)' : 'transparent', borderTop: '1px solid rgba(0,0,0,0.04)' }}>
+                  <td style={{ padding: '6px 8px', color: '#787776' }}>
+                    {index < paidPayments && <CheckCircle size={12} style={{ color: '#678AFB', marginRight: 4, verticalAlign: 'middle' }} />}
                     {row.number}
                   </td>
-                  <td className="px-2 py-2 text-slate-800">{format(row.date, 'MMM d, yyyy')}</td>
-                  <td className="px-2 py-2 text-right text-slate-600">{formatMoney(row.startingBalance)}</td>
-                  <td className="px-2 py-2 text-right font-medium text-slate-800">{formatMoney(row.principal)}</td>
-                  <td className="px-2 py-2 text-right text-slate-600">{formatMoney(row.interest)}</td>
-                  <td className="px-2 py-2 text-right text-slate-600">{formatMoney(row.principalToDate)}</td>
-                  <td className="px-2 py-2 text-right text-slate-600">{formatMoney(row.interestToDate)}</td>
-                  <td className="px-2 py-2 text-right font-medium text-slate-800">{formatMoney(row.endingBalance)}</td>
+                  <td style={{ padding: '6px 8px', color: '#1A1918' }}>{format(row.date, 'MMM d, yyyy')}</td>
+                  <td style={{ padding: '6px 8px', textAlign: 'right', color: '#787776' }}>{formatMoney(row.startingBalance)}</td>
+                  <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 500, color: '#1A1918' }}>{formatMoney(row.principal)}</td>
+                  <td style={{ padding: '6px 8px', textAlign: 'right', color: '#787776' }}>{formatMoney(row.interest)}</td>
+                  <td style={{ padding: '6px 8px', textAlign: 'right', color: '#787776' }}>{formatMoney(row.principalToDate)}</td>
+                  <td style={{ padding: '6px 8px', textAlign: 'right', color: '#787776' }}>{formatMoney(row.interestToDate)}</td>
+                  <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 500, color: '#1A1918' }}>{formatMoney(row.endingBalance)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        <Button
+        <button
           onClick={() => downloadAmortizationSchedule(agreement)}
-          className="w-full bg-[#00A86B] hover:bg-[#0D9B76] text-white"
+          style={{
+            width: '100%', padding: '12px 0', borderRadius: 12, border: 'none',
+            background: '#678AFB', color: 'white', fontSize: 13, fontWeight: 600,
+            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            fontFamily: "'DM Sans', sans-serif",
+          }}
         >
-          <Download className="w-4 h-4 mr-2" />
+          <Download size={16} />
           Download PDF
-        </Button>
+        </button>
       </div>
     );
   };
 
-  // Loan Summary Popup Content (same as original details)
   const LoanSummaryPopup = ({ agreement }) => {
     const lenderInfo = getUserById(agreement.lender_id);
     const borrowerInfo = getUserById(agreement.borrower_id);
     const loanStatus = getLoanStatus(agreement.loan_id);
     const loan = getLoanById(agreement.loan_id);
+    const badgeStyle = getStatusBadgeStyle(loanStatus);
 
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(0,0,0,0.06)', paddingBottom: 16 }}>
           <div>
-            <h2 className="text-2xl font-bold text-slate-800">Loan Summary</h2>
-            <p className="text-sm text-slate-500 mt-1">{format(new Date(agreement.created_at), 'MMMM d, yyyy')}</p>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1A1918', margin: 0 }}>Loan Summary</h2>
+            <p style={{ fontSize: 12, color: '#787776', marginTop: 4 }}>{format(new Date(agreement.created_at), 'MMMM d, yyyy')}</p>
           </div>
-          <Badge className={`${getStatusColor(loanStatus)} capitalize`}>{loanStatus}</Badge>
+          <span style={{ ...badgeStyle, padding: '4px 12px', borderRadius: 8, fontSize: 11, fontWeight: 600, textTransform: 'capitalize' }}>{loanStatus}</span>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-[#6EE8B5] rounded-xl p-4">
-            <p className="text-xs text-slate-600 mb-1">Loan Amount</p>
-            <p className="text-2xl font-bold text-slate-800">{formatMoney(agreement.amount)}</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div style={{ background: 'rgba(103,138,251,0.08)', borderRadius: 16, padding: 16 }}>
+            <p style={{ fontSize: 11, color: '#787776', marginBottom: 4 }}>Loan Amount</p>
+            <p style={{ fontSize: 24, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(agreement.amount)}</p>
           </div>
-          <div className="bg-[#30FFA8] rounded-xl p-4">
-            <p className="text-xs text-slate-600 mb-1">Total Due</p>
-            <p className="text-2xl font-bold text-[#00A86B]">{formatMoney(agreement.total_amount)}</p>
+          <div style={{ background: 'rgba(167,157,234,0.1)', borderRadius: 16, padding: 16 }}>
+            <p style={{ fontSize: 11, color: '#787776', marginBottom: 4 }}>Total Due</p>
+            <p style={{ fontSize: 24, fontWeight: 700, color: '#678AFB', margin: 0 }}>{formatMoney(agreement.total_amount)}</p>
           </div>
         </div>
 
         {loan && (
-          <div className="bg-slate-50 rounded-xl p-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-slate-600">Payment Progress</span>
-              <span className="text-sm font-medium text-slate-800">
+          <div style={{ background: 'rgba(0,0,0,0.03)', borderRadius: 16, padding: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <span style={{ fontSize: 13, color: '#787776' }}>Payment Progress</span>
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#1A1918' }}>
                 {formatMoney(loan.amount_paid || 0)} / {formatMoney(agreement.total_amount)}
               </span>
             </div>
-            <div className="w-full bg-white rounded-full h-2">
+            <div style={{ width: '100%', background: 'white', borderRadius: 999, height: 8 }}>
               <div
-                className="bg-[#00A86B] h-2 rounded-full transition-all"
-                style={{ width: `${Math.min(100, ((loan.amount_paid || 0) / agreement.total_amount) * 100)}%` }}
+                style={{
+                  background: '#678AFB', height: 8, borderRadius: 999, transition: 'width 0.3s',
+                  width: `${Math.min(100, ((loan.amount_paid || 0) / agreement.total_amount) * 100)}%`,
+                }}
               />
             </div>
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Percent className="w-4 h-4 text-slate-400" />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, fontSize: 13 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Percent size={16} style={{ color: '#787776' }} />
               <div>
-                <p className="text-slate-500">Interest Rate</p>
-                <p className="font-semibold text-slate-800">{agreement.interest_rate}%</p>
+                <p style={{ color: '#787776', margin: 0 }}>Interest Rate</p>
+                <p style={{ fontWeight: 600, color: '#1A1918', margin: 0 }}>{agreement.interest_rate}%</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-slate-400" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <DollarSign size={16} style={{ color: '#787776' }} />
               <div>
-                <p className="text-slate-500">Payment Amount</p>
-                <p className="font-semibold text-slate-800">{formatMoney(agreement.payment_amount)}</p>
+                <p style={{ color: '#787776', margin: 0 }}>Payment Amount</p>
+                <p style={{ fontWeight: 600, color: '#1A1918', margin: 0 }}>{formatMoney(agreement.payment_amount)}</p>
               </div>
             </div>
           </div>
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-slate-400" />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Clock size={16} style={{ color: '#787776' }} />
               <div>
-                <p className="text-slate-500">Payment Frequency</p>
-                <p className="font-semibold text-slate-800 capitalize">{agreement.payment_frequency}</p>
+                <p style={{ color: '#787776', margin: 0 }}>Payment Frequency</p>
+                <p style={{ fontWeight: 600, color: '#1A1918', margin: 0, textTransform: 'capitalize' }}>{agreement.payment_frequency}</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-slate-400" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Calendar size={16} style={{ color: '#787776' }} />
               <div>
-                <p className="text-slate-500">Due Date</p>
-                <p className="font-semibold text-slate-800">{agreement.due_date ? format(new Date(agreement.due_date), 'MMM d, yyyy') : 'N/A'}</p>
+                <p style={{ color: '#787776', margin: 0 }}>Due Date</p>
+                <p style={{ fontWeight: 600, color: '#1A1918', margin: 0 }}>{agreement.due_date ? format(new Date(agreement.due_date), 'MMM d, yyyy') : 'N/A'}</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-slate-200 pt-4">
-          <h4 className="font-semibold text-slate-800 mb-3">Parties</h4>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center gap-3">
+        <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', paddingTop: 16 }}>
+          <h4 style={{ fontSize: 14, fontWeight: 600, color: '#1A1918', marginBottom: 12 }}>Parties</h4>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <img
-                src={lenderInfo.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((lenderInfo.full_name || 'L').charAt(0))}&background=22c55e&color=fff&size=64`}
+                src={lenderInfo.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((lenderInfo.full_name || 'L').charAt(0))}&background=678AFB&color=fff&size=64`}
                 alt={lenderInfo.full_name}
-                className="w-10 h-10 rounded-full"
+                style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }}
               />
               <div>
-                <p className="text-xs text-slate-500">Lender</p>
-                <p className="font-medium text-slate-800">{lenderInfo.full_name}</p>
+                <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>Lender</p>
+                <p style={{ fontWeight: 500, color: '#1A1918', margin: 0 }}>{lenderInfo.full_name}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <img
-                src={borrowerInfo.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((borrowerInfo.full_name || 'B').charAt(0))}&background=22c55e&color=fff&size=64`}
+                src={borrowerInfo.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((borrowerInfo.full_name || 'B').charAt(0))}&background=678AFB&color=fff&size=64`}
                 alt={borrowerInfo.full_name}
-                className="w-10 h-10 rounded-full"
+                style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }}
               />
               <div>
-                <p className="text-xs text-slate-500">Borrower</p>
-                <p className="font-medium text-slate-800">{borrowerInfo.full_name}</p>
+                <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>Borrower</p>
+                <p style={{ fontWeight: 500, color: '#1A1918', margin: 0 }}>{borrowerInfo.full_name}</p>
               </div>
             </div>
           </div>
         </div>
 
         {agreement.purpose && (
-          <div className="bg-slate-50 rounded-xl p-4">
-            <p className="text-xs text-slate-500 mb-1">Purpose</p>
-            <p className="text-slate-800">{agreement.purpose}</p>
+          <div style={{ background: 'rgba(0,0,0,0.03)', borderRadius: 16, padding: 16 }}>
+            <p style={{ fontSize: 11, color: '#787776', marginBottom: 4 }}>Purpose</p>
+            <p style={{ color: '#1A1918', margin: 0 }}>{agreement.purpose}</p>
           </div>
         )}
       </div>
     );
   };
 
+  const colors = [
+    'rgba(103,138,251,0.08)', 'rgba(167,157,234,0.08)', 'rgba(103,138,251,0.06)',
+    'rgba(167,157,234,0.06)', 'rgba(103,138,251,0.1)', 'rgba(167,157,234,0.1)',
+  ];
+
+  /* ══════════════════════════════════════════════════════════
+     RENDER
+     ══════════════════════════════════════════════════════════ */
   return (
     <>
       {/* Popup Modal */}
@@ -698,7 +780,7 @@ export default function LoanAgreements() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
             onClick={closePopup}
           >
             <motion.div
@@ -706,25 +788,25 @@ export default function LoanAgreements() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+              style={{ background: 'white', borderRadius: 20, maxWidth: 520, width: '100%', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 48px rgba(0,0,0,0.12)' }}
             >
-              <div className="sticky top-0 bg-white border-b border-slate-100 p-4 flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-[#DBFFEB] flex items-center justify-center">
-                    <FileText className="w-4 h-4 text-[#00A86B]" />
+              <div style={{ position: 'sticky', top: 0, background: 'white', borderBottom: '1px solid rgba(0,0,0,0.06)', padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: '20px 20px 0 0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(103,138,251,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <FileText size={16} style={{ color: '#678AFB' }} />
                   </div>
-                  <span className="font-medium text-slate-800">
+                  <span style={{ fontWeight: 500, color: '#1A1918' }}>
                     {activePopup === 'promissory' && 'Promissory Note'}
                     {activePopup === 'amortization' && 'Amortization Schedule'}
                     {activePopup === 'summary' && 'Loan Summary'}
                   </span>
                 </div>
-                <Button variant="ghost" size="sm" onClick={closePopup} className="text-slate-500 hover:text-slate-800">
-                  <X className="w-5 h-5" />
-                </Button>
+                <button onClick={closePopup} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#787776' }}>
+                  <X size={20} />
+                </button>
               </div>
 
-              <div className="p-6">
+              <div style={{ padding: 24 }}>
                 {activePopup === 'promissory' && <PromissoryNotePopup agreement={popupAgreement} />}
                 {activePopup === 'amortization' && <AmortizationSchedulePopup agreement={popupAgreement} />}
                 {activePopup === 'summary' && <LoanSummaryPopup agreement={popupAgreement} />}
@@ -734,300 +816,208 @@ export default function LoanAgreements() {
         )}
       </AnimatePresence>
 
-      <div className="min-h-screen p-4 md:p-6 overflow-x-hidden" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
-        <div className="max-w-4xl mx-auto space-y-6 overflow-hidden">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="py-5">
-            <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-left">Document Center</h1>
-          </motion.div>
+      <div className="home-with-sidebar" style={{ minHeight: '100vh', background: '#F7F7F7', paddingLeft: 240, fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5 }}>
+        <DashboardSidebar activePage="LoanAgreements" user={user} />
 
-          {/* Role Filter Label + Tab Navigation */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <p className="text-lg font-bold text-slate-800 tracking-tight mb-3">
-              You are the:
-            </p>
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {[
-                { id: 'lender', label: 'Lender' },
-                { id: 'borrower', label: 'Borrower' },
-                { id: 'both', label: 'View Both' },
-              ].map(tab => (
-                <Button
-                  key={tab.id}
-                  onClick={() => setRoleFilter(tab.id)}
-                  variant={roleFilter === tab.id ? 'default' : 'outline'}
-                  className={`whitespace-nowrap ${
-                    roleFilter === tab.id
-                      ? 'bg-[#00A86B] hover:bg-[#0D9B76] text-white'
-                      : 'bg-white border-0 text-slate-600 hover:bg-[#DBFFEB]'
-                  }`}
-                >
-                  {tab.label}
-                </Button>
-              ))}
+        {/* Galaxy gradient background — covers full page */}
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 520, background: 'linear-gradient(180deg, #527DFF 0%, #5580FF 5%, #678AFB 13%, #7792F4 22%, #8C9BEE 32%, #A19EEB 42%, #A79DEA 50%, #BB98E8 58%, #C89CE6 65%, #D4A0E4 72%, #DDA5E2 76%, #F0D8EA 80%, #F7F7F7 84%)' }} />
+          <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 320, opacity: 0.6 }} viewBox="0 0 1617 329" fill="none">
+            <defs><radialGradient id="laStarGlow"><stop offset="0%" stopColor="#EAF9F3"/><stop offset="100%" stopColor="#9FEBFB"/></radialGradient></defs>
+            {STAR_CIRCLES.map((s, i) => <circle key={i} cx={s.cx} cy={s.cy} r="1.75" fill="url(#laStarGlow)" opacity={s.o}/>)}
+          </svg>
+          <div className="twinkle-star" /><div className="twinkle-star" /><div className="twinkle-star" /><div className="twinkle-star" /><div className="twinkle-star" />
+        </div>
+
+        {/* Hero title */}
+        <div style={{ position: 'relative', zIndex: 10, maxWidth: 1080, margin: '0 auto', padding: '0 28px' }}>
+          <div style={{ paddingTop: 80, paddingBottom: 20, textAlign: 'center' }}>
+            <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.2rem', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.1, color: 'white', margin: 0 }}>
+              Loan Documents
+            </h1>
+          </div>
+        </div>
+
+        {/* Page content */}
+        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px 64px', position: 'relative', zIndex: 10 }}>
+
+          {/* ── Filter Bar ─────────────────────────────────────── */}
+          <div className="glass-card" style={{ padding: '16px 22px', marginBottom: 20, overflow: 'visible', position: 'relative', zIndex: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+              <SingleSelectDropdown options={ROLE_OPTIONS} selected={roleFilter} onChange={setRoleFilter} />
+              <SingleSelectDropdown options={STATUS_OPTIONS} selected={statusFilter} onChange={setStatusFilter} />
+              <button
+                onClick={clearFilters}
+                style={{
+                  marginLeft: 'auto',
+                  padding: '8px 14px', borderRadius: 10,
+                  border: hasAnyFilter ? '1px solid rgba(232,114,110,0.3)' : '1px solid rgba(0,0,0,0.08)',
+                  background: hasAnyFilter ? 'rgba(232,114,110,0.06)' : 'transparent',
+                  fontSize: 13, fontWeight: 500,
+                  color: hasAnyFilter ? '#E8726E' : '#787776',
+                  cursor: hasAnyFilter ? 'pointer' : 'default',
+                  opacity: hasAnyFilter ? 1 : 0.5,
+                  fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap',
+                  transition: 'background 0.15s, opacity 0.15s',
+                }}
+              >
+                Clear Filters
+              </button>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Agreements List with Status Filter */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <div className="bg-[#DBFFEB] rounded-2xl p-5">
-                {/* Header with Status Filter */}
-                <div className="flex items-center justify-between mb-4">
-                  <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                    Loan Agreements
+          {/* ── Agreements List ──────────────────────────────────── */}
+          <div className="glass-card" style={{ overflow: 'hidden' }}>
+            <div style={{ padding: '20px 26px 0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Loan Agreements</span>
+                <span style={{ fontSize: 12, color: '#787776' }}>
+                  {filteredAgreements.length} {filteredAgreements.length === 1 ? 'document' : 'documents'}
+                </span>
+              </div>
+            </div>
+            <div style={{ padding: '14px 26px 26px' }}>
+              {filteredAgreements.length === 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 0', color: '#C7C6C4' }}>
+                  <FileText size={32} style={{ opacity: 0.4, marginBottom: 8 }} />
+                  <p style={{ fontSize: 13, color: '#787776', margin: 0 }}>
+                    {agreements.length === 0
+                      ? 'Your signed loan agreements will appear here'
+                      : 'No agreements match the current filters'}
                   </p>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="bg-white border-slate-200 text-slate-600 hover:bg-slate-50 gap-2">
-                        <span className="capitalize">{statusFilter === 'all' ? 'All Status' : statusFilter}</span>
-                        <ChevronDown className="w-3.5 h-3.5" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-40 bg-white">
-                      <DropdownMenuItem onClick={() => setStatusFilter('all')} className={statusFilter === 'all' ? 'bg-slate-100' : ''}>
-                        View All
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setStatusFilter('active')} className={statusFilter === 'active' ? 'bg-slate-100' : ''}>
-                        Active
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setStatusFilter('completed')} className={statusFilter === 'completed' ? 'bg-slate-100' : ''}>
-                        Completed
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setStatusFilter('cancelled')} className={statusFilter === 'cancelled' ? 'bg-slate-100' : ''}>
-                        Cancelled
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  {hasAnyFilter && <p style={{ fontSize: 12, color: '#C7C6C4', margin: '4px 0 0' }}>Try adjusting your filters</p>}
                 </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {filteredAgreements.map((agreement, index) => {
+                    const isLender = agreement.lender_id === user?.id;
+                    const otherPartyId = isLender ? agreement.borrower_id : agreement.lender_id;
+                    const otherParty = getUserById(otherPartyId);
+                    const loanStatus = getLoanStatus(agreement.loan_id);
+                    const badgeStyle = getStatusBadgeStyle(loanStatus);
 
-                {/* Filtered Agreements List */}
-                {(() => {
-                  let filteredAgreements = agreements;
-                  if (roleFilter === 'lender') {
-                    filteredAgreements = lendingAgreements;
-                  } else if (roleFilter === 'borrower') {
-                    filteredAgreements = borrowingAgreements;
-                  }
-
-                  if (statusFilter !== 'all') {
-                    filteredAgreements = filteredAgreements.filter(agreement => {
-                      const loanStatus = getLoanStatus(agreement.loan_id);
-                      return loanStatus === statusFilter;
-                    });
-                  }
-
-                  if (filteredAgreements.length === 0) {
                     return (
-                      <div className="bg-[#DBFFEB] rounded-xl p-8 text-center">
-                        <div className="w-16 h-16 rounded-full bg-[#DBFFEB] flex items-center justify-center mx-auto mb-4">
-                          <FileText className="w-8 h-8 text-[#00A86B]" />
+                      <div
+                        key={agreement.id}
+                        style={{
+                          padding: 16, borderRadius: 14,
+                          background: colors[index % 6],
+                          transition: 'background 0.15s',
+                        }}
+                      >
+                        {/* Desktop Layout */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                          {/* Status Badge */}
+                          <span style={{
+                            ...badgeStyle, padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 600,
+                            textTransform: 'capitalize', flexShrink: 0, whiteSpace: 'nowrap',
+                          }}>
+                            {loanStatus}
+                          </span>
+
+                          {/* User Info */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
+                            <div style={{
+                              width: 40, height: 40, borderRadius: '50%', background: 'rgba(103,138,251,0.1)',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden',
+                            }}>
+                              {otherParty.profile_picture_url ? (
+                                <img src={otherParty.profile_picture_url} alt={otherParty.full_name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                              ) : (
+                                <span style={{ fontSize: 16, fontWeight: 600, color: '#678AFB' }}>
+                                  {(otherParty.full_name || otherParty.username || '?').charAt(0).toUpperCase()}
+                                </span>
+                              )}
+                            </div>
+                            <div style={{ minWidth: 0 }}>
+                              <p style={{ fontWeight: 600, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 13 }}>{otherParty.full_name}</p>
+                              <p style={{ fontSize: 11, color: '#787776', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {isLender ? 'Borrower' : 'Lender'}: @{otherParty.username} · {formatMoney(agreement.total_amount)}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                            <button
+                              onClick={() => openPopup('promissory', agreement)}
+                              style={{
+                                padding: '6px 12px', borderRadius: 10, border: 'none',
+                                background: 'rgba(255,255,255,0.8)', fontSize: 12, fontWeight: 500, color: '#1A1918',
+                                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+                                fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap', transition: 'background 0.15s',
+                              }}
+                              onMouseEnter={e => e.currentTarget.style.background = 'white'}
+                              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.8)'}
+                            >
+                              Promissory Note
+                              <div
+                                style={{ position: 'relative' }}
+                                onMouseEnter={(e) => { e.stopPropagation(); setActiveInfoTooltip(`promissory-${agreement.id}`); }}
+                                onMouseLeave={() => setActiveInfoTooltip(null)}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <div style={{ width: 16, height: 16, borderRadius: '50%', background: 'rgba(103,138,251,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'help' }}>
+                                  <span style={{ fontSize: 10, fontWeight: 700, color: '#678AFB' }}>i</span>
+                                </div>
+                                {activeInfoTooltip === `promissory-${agreement.id}` && (
+                                  <div style={{ position: 'absolute', left: 24, top: 0, zIndex: 50, width: 224, background: '#1A1918', color: 'white', fontSize: 11, borderRadius: 10, padding: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', whiteSpace: 'normal' }}>
+                                    A promissory note is a legal document where the borrower promises to repay the loan amount plus any interest by a specific date.
+                                  </div>
+                                )}
+                              </div>
+                            </button>
+                            <button
+                              onClick={() => openPopup('amortization', agreement)}
+                              style={{
+                                padding: '6px 12px', borderRadius: 10, border: 'none',
+                                background: 'rgba(255,255,255,0.8)', fontSize: 12, fontWeight: 500, color: '#1A1918',
+                                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+                                fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap', transition: 'background 0.15s',
+                              }}
+                              onMouseEnter={e => e.currentTarget.style.background = 'white'}
+                              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.8)'}
+                            >
+                              Amortization
+                              <div
+                                style={{ position: 'relative' }}
+                                onMouseEnter={(e) => { e.stopPropagation(); setActiveInfoTooltip(`amortization-${agreement.id}`); }}
+                                onMouseLeave={() => setActiveInfoTooltip(null)}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <div style={{ width: 16, height: 16, borderRadius: '50%', background: 'rgba(103,138,251,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'help' }}>
+                                  <span style={{ fontSize: 10, fontWeight: 700, color: '#678AFB' }}>i</span>
+                                </div>
+                                {activeInfoTooltip === `amortization-${agreement.id}` && (
+                                  <div style={{ position: 'absolute', left: 24, top: 0, zIndex: 50, width: 224, background: '#1A1918', color: 'white', fontSize: 11, borderRadius: 10, padding: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', whiteSpace: 'normal' }}>
+                                    An amortization schedule shows the breakdown of each payment over the life of the loan, including how much goes toward principal vs. interest.
+                                  </div>
+                                )}
+                              </div>
+                            </button>
+                            <button
+                              onClick={() => openPopup('summary', agreement)}
+                              style={{
+                                padding: '6px 12px', borderRadius: 10, border: 'none',
+                                background: '#1A1918', fontSize: 12, fontWeight: 500, color: 'white',
+                                cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap',
+                                transition: 'background 0.15s',
+                              }}
+                              onMouseEnter={e => e.currentTarget.style.background = '#333'}
+                              onMouseLeave={e => e.currentTarget.style.background = '#1A1918'}
+                            >
+                              Loan Summary
+                            </button>
+                          </div>
                         </div>
-                        <h3 className="text-lg font-semibold text-slate-800 mb-2">No Agreements Found</h3>
-                        <p className="text-sm text-slate-500">
-                          {agreements.length === 0
-                            ? "Your signed loan agreements will appear here once you create or accept a loan offer."
-                            : "No agreements match the current filters. Try adjusting your filter settings."}
-                        </p>
                       </div>
                     );
-                  }
-
-                  const colors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#6EE8B5', '#83F384', '#6EE8A2'];
-
-                  return (
-                    <div className="space-y-3">
-                      {filteredAgreements.map((agreement, index) => {
-                        const isLender = agreement.lender_id === user?.id;
-                        const otherPartyId = isLender ? agreement.borrower_id : agreement.lender_id;
-                        const otherParty = getUserById(otherPartyId);
-                        const loanStatus = getLoanStatus(agreement.loan_id);
-
-                        return (
-                          <motion.div
-                            key={agreement.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            className="p-4 rounded-xl"
-                            style={{ backgroundColor: colors[index % 6] }}
-                          >
-                            {/* Desktop Layout */}
-                            <div className="hidden md:flex items-center gap-4">
-                              {/* Left: Status Badge */}
-                              <Badge className={`${getStatusColor(loanStatus)} text-xs capitalize flex-shrink-0`}>
-                                {loanStatus}
-                              </Badge>
-
-                              {/* Center: User Info */}
-                              <div className="flex items-center gap-3 flex-1 min-w-0">
-                                <div className="w-10 h-10 rounded-full bg-[#DBFFEB] flex items-center justify-center flex-shrink-0">
-                                  {otherParty.profile_picture_url ? (
-                                    <img
-                                      src={otherParty.profile_picture_url}
-                                      alt={otherParty.full_name}
-                                      className="w-full h-full rounded-full object-cover"
-                                    />
-                                  ) : (
-                                    <span className="text-lg font-semibold text-[#0A1A10]">
-                                      {(otherParty.full_name || otherParty.username || '?').charAt(0).toUpperCase()}
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="min-w-0">
-                                  <p className="font-semibold text-slate-800 truncate">{otherParty.full_name}</p>
-                                  <p className="text-xs text-slate-600 truncate">
-                                    {isLender ? 'Borrower' : 'Lender'}: @{otherParty.username} · {formatMoney(agreement.total_amount)}
-                                  </p>
-                                </div>
-                              </div>
-
-                              {/* Right: Three Buttons */}
-                              <div className="flex gap-2 flex-shrink-0">
-                                <Button
-                                  onClick={() => openPopup('promissory', agreement)}
-                                  size="sm"
-                                  variant="outline"
-                                  className="bg-white/80 border-0 hover:bg-white text-slate-700 text-xs flex items-center gap-1"
-                                >
-                                  Promissory Note
-                                  <div
-                                    className="relative"
-                                    onMouseEnter={(e) => { e.stopPropagation(); setActiveInfoTooltip(`promissory-${agreement.id}`); }}
-                                    onMouseLeave={() => setActiveInfoTooltip(null)}
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    <div className="w-4 h-4 rounded-full bg-[#6EE8A2] flex items-center justify-center cursor-help">
-                                      <span className="text-[10px] font-bold text-slate-800">i</span>
-                                    </div>
-                                    {activeInfoTooltip === `promissory-${agreement.id}` && (
-                                      <div className="absolute left-6 top-0 z-50 w-56 bg-slate-800 text-white text-xs rounded-lg p-3 shadow-lg whitespace-normal break-words">
-                                        A promissory note is a legal document where the borrower promises to repay the loan amount plus any interest by a specific date. It serves as written proof of the debt.
-                                      </div>
-                                    )}
-                                  </div>
-                                </Button>
-                                <Button
-                                  onClick={() => openPopup('amortization', agreement)}
-                                  size="sm"
-                                  variant="outline"
-                                  className="bg-white/80 border-0 hover:bg-white text-slate-700 text-xs flex items-center gap-1"
-                                >
-                                  Amortization
-                                  <div
-                                    className="relative"
-                                    onMouseEnter={(e) => { e.stopPropagation(); setActiveInfoTooltip(`amortization-${agreement.id}`); }}
-                                    onMouseLeave={() => setActiveInfoTooltip(null)}
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    <div className="w-4 h-4 rounded-full bg-[#6EE8A2] flex items-center justify-center cursor-help">
-                                      <span className="text-[10px] font-bold text-slate-800">i</span>
-                                    </div>
-                                    {activeInfoTooltip === `amortization-${agreement.id}` && (
-                                      <div className="absolute left-6 top-0 z-50 w-56 bg-slate-800 text-white text-xs rounded-lg p-3 shadow-lg whitespace-normal break-words">
-                                        An amortization schedule shows the breakdown of each payment over the life of the loan, including how much goes toward principal vs. interest.
-                                      </div>
-                                    )}
-                                  </div>
-                                </Button>
-                                <Button
-                                  onClick={() => openPopup('summary', agreement)}
-                                  size="sm"
-                                  className="bg-slate-800 hover:bg-slate-900 text-white text-xs"
-                                >
-                                  Loan Summary
-                                </Button>
-                              </div>
-                            </div>
-
-                            {/* Mobile Layout */}
-                            <div className="md:hidden space-y-3">
-                              <div className="flex items-center gap-3">
-                                <Badge className={`${getStatusColor(loanStatus)} text-xs capitalize flex-shrink-0`}>
-                                  {loanStatus}
-                                </Badge>
-                                <div className="flex items-center gap-2 flex-1 min-w-0">
-                                  <img
-                                    src={otherParty.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((otherParty.full_name || 'User').charAt(0))}&background=22c55e&color=fff&size=128`}
-                                    alt={otherParty.full_name}
-                                    className="w-8 h-8 rounded-full object-cover border-2 border-white flex-shrink-0"
-                                  />
-                                  <div className="min-w-0">
-                                    <p className="font-semibold text-slate-800 truncate text-sm">{otherParty.full_name}</p>
-                                    <p className="text-xs text-slate-600">{formatMoney(agreement.total_amount)}</p>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="flex gap-2">
-                                <Button
-                                  onClick={() => openPopup('promissory', agreement)}
-                                  size="sm"
-                                  variant="outline"
-                                  className="flex-1 bg-white/80 border-0 hover:bg-white text-slate-700 text-xs flex items-center justify-center gap-1"
-                                >
-                                  Note
-                                  <div
-                                    className="relative"
-                                    onMouseEnter={(e) => { e.stopPropagation(); setActiveInfoTooltip(`promissory-mobile-${agreement.id}`); }}
-                                    onMouseLeave={() => setActiveInfoTooltip(null)}
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    <div className="w-4 h-4 rounded-full bg-[#6EE8A2] flex items-center justify-center cursor-help">
-                                      <span className="text-[10px] font-bold text-slate-800">i</span>
-                                    </div>
-                                    {activeInfoTooltip === `promissory-mobile-${agreement.id}` && (
-                                      <div className="absolute left-6 top-0 z-50 w-56 bg-slate-800 text-white text-xs rounded-lg p-3 shadow-lg whitespace-normal break-words">
-                                        A promissory note is a legal document where the borrower promises to repay the loan amount plus any interest by a specific date. It serves as written proof of the debt.
-                                      </div>
-                                    )}
-                                  </div>
-                                </Button>
-                                <Button
-                                  onClick={() => openPopup('amortization', agreement)}
-                                  size="sm"
-                                  variant="outline"
-                                  className="flex-1 bg-white/80 border-0 hover:bg-white text-slate-700 text-xs flex items-center justify-center gap-1"
-                                >
-                                  Schedule
-                                  <div
-                                    className="relative"
-                                    onMouseEnter={(e) => { e.stopPropagation(); setActiveInfoTooltip(`amortization-mobile-${agreement.id}`); }}
-                                    onMouseLeave={() => setActiveInfoTooltip(null)}
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    <div className="w-4 h-4 rounded-full bg-[#6EE8A2] flex items-center justify-center cursor-help">
-                                      <span className="text-[10px] font-bold text-slate-800">i</span>
-                                    </div>
-                                    {activeInfoTooltip === `amortization-mobile-${agreement.id}` && (
-                                      <div className="absolute left-6 top-0 z-50 w-56 bg-slate-800 text-white text-xs rounded-lg p-3 shadow-lg whitespace-normal break-words">
-                                        An amortization schedule shows the breakdown of each payment over the life of the loan, including how much goes toward principal vs. interest.
-                                      </div>
-                                    )}
-                                  </div>
-                                </Button>
-                                <Button
-                                  onClick={() => openPopup('summary', agreement)}
-                                  size="sm"
-                                  className="flex-1 bg-slate-800 hover:bg-slate-900 text-white text-xs"
-                                >
-                                  Summary
-                                </Button>
-                              </div>
-                            </div>
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-                  );
-                })()}
+                  })}
+                </div>
+              )}
             </div>
-          </motion.div>
+          </div>
+
         </div>
       </div>
     </>
