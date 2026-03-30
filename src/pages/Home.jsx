@@ -742,55 +742,36 @@ export default function Home() {
               </div>
 
               {/* Lending & Borrowing snapshot */}
-              <div className="glass-card" style={{ padding: '20px 22px 18px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', fontFamily: "'DM Sans', sans-serif" }}>Lending & Borrowing</div>
-                  <Link to={createPageUrl("YourLoans")} style={{ fontSize: 11, fontWeight: 500, color: '#A79DEA', textDecoration: 'none' }}>Details</Link>
+              <div className="glass-card" style={{ overflow: 'hidden' }}>
+                <div style={{ padding: '22px 26px 0' }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Lending & Borrowing</div>
                 </div>
-
-                {/* You've lent */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 11, fontWeight: 500, color: '#787776', marginBottom: 4 }}>You've lent</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.03em', color: '#1A1918', lineHeight: 1, marginBottom: 2 }}>{formatMoney(totalLentAmount)}</div>
-                    <div style={{ fontSize: 11, color: '#787776', marginBottom: 8 }}>across all loans</div>
-                    {lentLoans.length > 0 && (
-                      <div>
-                        {lentOnTrack > 0 && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 500, background: 'rgba(103,138,251,0.15)', color: '#678AFB' }}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#678AFB' }} />{lentOnTrack} on track</span>}
-                        {overdueFromBorrowers > 0 && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 500, background: 'rgba(232,114,110,0.12)', color: '#E8726E', marginLeft: lentOnTrack > 0 ? 8 : 0 }}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#E8726E' }} />{overdueFromBorrowers} late</span>}
+                <div style={{ padding: '14px 26px 20px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
+                    <div style={{ textAlign: 'center', padding: '0 12px' }}>
+                      <div style={{ fontSize: 11, color: '#787776', marginBottom: 8 }}>Lending</div>
+                      <div style={{ position: 'relative', width: 64, height: 64, margin: '0 auto' }}>
+                        <svg viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)', width: 64, height: 64 }}>
+                          <circle cx="36" cy="36" r="29" fill="none" stroke="rgba(103,138,251,0.15)" strokeWidth="7" />
+                          <circle cx="36" cy="36" r="29" fill="none" stroke="#678AFB" strokeWidth="7" strokeLinecap="round" strokeDasharray={PIE_C} strokeDashoffset={lentPieOffset} style={{ transition: 'stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
+                        </svg>
+                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: '#292827', letterSpacing: '-0.03em' }}>{percentRepaid}%</div>
                       </div>
-                    )}
-                  </div>
-                  <div style={{ position: 'relative', width: 72, height: 72, flexShrink: 0 }}>
-                    <svg viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)', width: 72, height: 72 }}>
-                      <circle cx="36" cy="36" r="29" fill="none" stroke="rgba(103,138,251,0.15)" strokeWidth="7" />
-                      <circle cx="36" cy="36" r="29" fill="none" stroke="#678AFB" strokeWidth="7" strokeLinecap="round" strokeDasharray={PIE_C} strokeDashoffset={lentPieOffset} style={{ transition: 'stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
-                    </svg>
-                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: '#292827', letterSpacing: '-0.03em' }}>{percentRepaid}%</div>
-                  </div>
-                </div>
-
-                <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', margin: '16px 0' }} />
-
-                {/* You've borrowed */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 11, fontWeight: 500, color: '#787776', marginBottom: 4 }}>You've borrowed</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.03em', color: '#1A1918', lineHeight: 1, marginBottom: 2 }}>{formatMoney(totalBorrowedAmount)}</div>
-                    <div style={{ fontSize: 11, color: '#787776', marginBottom: 8 }}>across all loans</div>
-                    {borrowedLoans.length > 0 && (
-                      <div>
-                        {borrowingOnTrack > 0 && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 500, background: 'rgba(103,138,251,0.15)', color: '#678AFB' }}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#678AFB' }} />{borrowingOnTrack} on track</span>}
-                        {borrowingOverdue > 0 && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 500, background: 'rgba(232,114,110,0.12)', color: '#E8726E', marginLeft: borrowingOnTrack > 0 ? 8 : 0 }}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#E8726E' }} />{borrowingOverdue} late</span>}
+                      <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em', color: '#678AFB', marginTop: 8 }}>{formatMoney(totalLentAmount)}</div>
+                      <div style={{ fontSize: 10, color: '#787776', marginTop: 4 }}>{formatMoney(totalRepaid)} of {formatMoney(totalLentAmount)} repaid</div>
+                    </div>
+                    <div style={{ textAlign: 'center', padding: '0 12px' }}>
+                      <div style={{ fontSize: 11, color: '#787776', marginBottom: 8 }}>Borrowing</div>
+                      <div style={{ position: 'relative', width: 64, height: 64, margin: '0 auto' }}>
+                        <svg viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)', width: 64, height: 64 }}>
+                          <circle cx="36" cy="36" r="29" fill="none" stroke="rgba(167,157,234,0.15)" strokeWidth="7" />
+                          <circle cx="36" cy="36" r="29" fill="none" stroke="#A79DEA" strokeWidth="7" strokeLinecap="round" strokeDasharray={PIE_C} strokeDashoffset={borrowedPieOffset} style={{ transition: 'stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
+                        </svg>
+                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: '#292827', letterSpacing: '-0.03em' }}>{percentPaid}%</div>
                       </div>
-                    )}
-                  </div>
-                  <div style={{ position: 'relative', width: 72, height: 72, flexShrink: 0 }}>
-                    <svg viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)', width: 72, height: 72 }}>
-                      <circle cx="36" cy="36" r="29" fill="none" stroke="rgba(167,157,234,0.15)" strokeWidth="7" />
-                      <circle cx="36" cy="36" r="29" fill="none" stroke="#A79DEA" strokeWidth="7" strokeLinecap="round" strokeDasharray={PIE_C} strokeDashoffset={borrowedPieOffset} style={{ transition: 'stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
-                    </svg>
-                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: '#292827', letterSpacing: '-0.03em' }}>{percentPaid}%</div>
+                      <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em', color: '#A79DEA', marginTop: 8 }}>{formatMoney(totalBorrowedAmount)}</div>
+                      <div style={{ fontSize: 10, color: '#787776', marginTop: 4 }}>{formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)} paid back</div>
+                    </div>
                   </div>
                 </div>
               </div>
