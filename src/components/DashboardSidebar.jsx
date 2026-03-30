@@ -51,6 +51,16 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={ic('YourLoans')} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg>
           Your Loans
         </Link>
+        {/* Lending */}
+        <Link to={createPageUrl("Lending")} style={linkStyle('Lending')}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={ic('Lending')} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
+          Lending
+        </Link>
+        {/* Borrowing */}
+        <Link to={createPageUrl("Borrowing")} style={linkStyle('Borrowing')}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={ic('Borrowing')} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="7 13 12 18 17 13" /><line x1="12" y1="18" x2="12" y2="6" /></svg>
+          Borrowing
+        </Link>
         <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '8px 14px' }} />
         {/* Friends */}
         <Link to={createPageUrl("Friends")} style={linkStyle('Friends')}>
