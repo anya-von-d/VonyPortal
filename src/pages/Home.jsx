@@ -608,7 +608,7 @@ export default function Home() {
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
           <div style={{
             position: 'absolute', top: 0, left: '-10%', width: '120%', height: '100%', zIndex: 0,
-            background: 'linear-gradient(180deg, #527DFF 0%, #5B80FD 20%, #6683FA 40%, #7488F5 60%, #8490F0 80%, #9196EC 100%)'
+            background: 'linear-gradient(180deg, #6C8CF8 0%, #7490F5 20%, #7C93F2 40%, #8496EF 60%, #8C9AEC 80%, #9196EC 100%)'
           }} />
           {/* Static star field */}
           <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 420, zIndex: 1, overflow: 'hidden' }}>
