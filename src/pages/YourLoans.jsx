@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { createPageUrl } from "@/utils";
 import { Loan, Payment, User, LoanAgreement, PublicProfile, Friendship } from "@/entities/all";
 import { Badge } from "@/components/ui/badge";
@@ -12,14 +12,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   Clock, Calendar, DollarSign, AlertCircle, FileText, BarChart3,
-  Pencil, X, Save, FolderOpen, ClipboardList, Info, TrendingUp,
-  ArrowUpRight, ArrowDownLeft, Users, Percent, History, ChevronDown
+  Pencil, X, Save, FolderOpen, ClipboardList, Info, Percent, History
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { format, addDays, addMonths, addWeeks } from "date-fns";
 import { formatMoney } from "@/components/utils/formatMoney";
 import { toLocalDate, getLocalToday, daysUntil as daysUntilDate } from "@/components/utils/dateUtils";
-import { generateAmortizationSchedule, analyzeLoanPayments } from "@/lib/loanAnalysis";
+import LoanDetailsModal from "@/components/loans/LoanDetailsModal";
 import DashboardSidebar from "@/components/DashboardSidebar";
 
 const STAR_CIRCLES = [
@@ -33,34 +32,31 @@ const STAR_CIRCLES = [
   {cx:1560,cy:256,o:0.45},{cx:125,cy:312,o:0.5},{cx:345,cy:267,o:0.6},{cx:565,cy:34,o:0.75},
 ];
 
-// Color constants
-const LEND_COLOR = '#678AFB';  // blue for lending
-const BORROW_COLOR = '#A79DEA'; // purple for borrowing
-const OVERDUE_COLOR = '#E8726E'; // red for overdue
-
 export default function YourLoans() {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('summary');
+  const [activeTab, setActiveTab] = useState('lending');
   const [allLoans, setAllLoans] = useState([]);
   const [allPayments, setAllPayments] = useState([]);
   const [publicProfiles, setPublicProfiles] = useState([]);
   const [loanAgreements, setLoanAgreements] = useState([]);
-
-  // Loan Details tab state
-  const [manageLoanSelected, setManageLoanSelected] = useState(null);
-  const [manageLoanInitialized, setManageLoanInitialized] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedLoanDetails, setSelectedLoanDetails] = useState(null);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [loanToCancel, setLoanToCancel] = useState(null);
-  const [showEditLoanModal, setShowEditLoanModal] = useState(false);
-  const [editLoanData, setEditLoanData] = useState(null);
+  const [manageLoanSelected, setManageLoanSelected] = useState(null);
+  const [manageLoanInitialized, setManageLoanInitialized] = useState(false);
+  const [rankingFilterLending, setRankingFilterLending] = useState('highest_interest');
+  const [rankingFilterBorrowing, setRankingFilterBorrowing] = useState('highest_interest');
   const [activeDocPopup, setActiveDocPopup] = useState(null);
   const [docPopupAgreement, setDocPopupAgreement] = useState(null);
+  const [showEditLoanModal, setShowEditLoanModal] = useState(false);
+  const [editLoanData, setEditLoanData] = useState(null);
 
   useEffect(() => { loadData(); }, []);
 
-  const loadData = async () => {
-    setIsLoading(true);
+  const loadData = async (showLoadingState = true) => {
+    if (showLoadingState) setIsLoading(true);
     let currentUser = null;
     try {
       currentUser = await User.me();
@@ -76,8 +72,8 @@ export default function YourLoans() {
         LoanAgreement.list().catch(() => []),
         Payment.list('-payment_date').catch(() => [])
       ]);
-      const myLoans = (loans || []).filter(l => l.lender_id === currentUser.id || l.borrower_id === currentUser.id);
-      setAllLoans(myLoans);
+      const userLoans = (loans || []).filter(l => l.lender_id === currentUser.id || l.borrower_id === currentUser.id);
+      setAllLoans(userLoans);
       setPublicProfiles(profiles || []);
       setLoanAgreements(agreements || []);
       setAllPayments(payments || []);
@@ -87,39 +83,73 @@ export default function YourLoans() {
     setIsLoading(false);
   };
 
-  // Derived data
-  const lentLoans = useMemo(() => allLoans.filter(l => l.lender_id === user?.id), [allLoans, user]);
-  const borrowedLoans = useMemo(() => allLoans.filter(l => l.borrower_id === user?.id), [allLoans, user]);
-  const activeLentLoans = useMemo(() => lentLoans.filter(l => l.status === 'active'), [lentLoans]);
-  const activeBorrowedLoans = useMemo(() => borrowedLoans.filter(l => l.status === 'active'), [borrowedLoans]);
-  const manageableLoans = useMemo(() => allLoans.filter(l => l.status === 'active' || l.status === 'cancelled' || l.status === 'completed'), [allLoans]);
+  // Split loans by role
+  const lendingLoans = allLoans.filter(l => l.lender_id === user?.id);
+  const borrowingLoans = allLoans.filter(l => l.borrower_id === user?.id);
+  const activeLendingLoans = lendingLoans.filter(l => l.status === 'active');
+  const activeBorrowingLoans = borrowingLoans.filter(l => l.status === 'active');
 
-  const getUserById = (userId) => {
-    return publicProfiles.find(p => p.user_id === userId) || { full_name: 'Unknown', username: 'user', profile_picture_url: null };
-  };
-  const getLoanRole = (loan) => loan.lender_id === user?.id ? 'lender' : 'borrower';
-  const getOtherParty = (loan) => getUserById(getLoanRole(loan) === 'lender' ? loan.borrower_id : loan.lender_id);
-  const getAgreementForLoan = (loanId) => loanAgreements.find(a => a.loan_id === loanId);
+  // All manageable loans for details tab (both lending and borrowing)
+  const allManageableLoans = allLoans.filter(l => l.status === 'active' || l.status === 'cancelled');
 
-  // Auto-select first manageable loan
   useEffect(() => {
-    if (!manageLoanInitialized && manageableLoans.length > 0) {
-      setManageLoanSelected(manageableLoans[0]);
+    if (!manageLoanInitialized && allManageableLoans.length > 0) {
+      setManageLoanSelected(allManageableLoans[0]);
       setManageLoanInitialized(true);
     }
-  }, [manageableLoans, manageLoanInitialized]);
+  }, [allManageableLoans, manageLoanInitialized]);
 
-  // Loan analysis for selected loan
-  const loanAnalysis = useMemo(() => {
-    if (!manageLoanSelected) return null;
-    const agreement = getAgreementForLoan(manageLoanSelected.id);
-    return analyzeLoanPayments(manageLoanSelected, allPayments, agreement);
-  }, [manageLoanSelected, allPayments, loanAgreements]);
+  // Determine if selected loan is lending or borrowing
+  const isLendingLoan = manageLoanSelected ? manageLoanSelected.lender_id === user?.id : false;
 
-  // Handlers
-  const handleMakePayment = () => {
-    window.location.href = createPageUrl("RecordPayment");
+  // --- Lending summary stats ---
+  const totalLent = activeLendingLoans.reduce((s, l) => s + (l.amount || 0), 0);
+  const totalExpectedLending = activeLendingLoans.reduce((s, l) => s + (l.total_amount || l.amount || 0), 0);
+  const totalReceivedLending = activeLendingLoans.reduce((s, l) => s + (l.amount_paid || 0), 0);
+
+  const nextPaymentLoanLending = activeLendingLoans
+    .filter(l => l.next_payment_date)
+    .map(l => ({ ...l, date: new Date(l.next_payment_date) }))
+    .sort((a, b) => a.date - b.date)[0];
+  const nextPaymentDaysLending = nextPaymentLoanLending ? daysUntilDate(nextPaymentLoanLending.next_payment_date) : null;
+  const nextPaymentAmountLending = (() => {
+    if (!nextPaymentLoanLending) return 0;
+    const agreement = loanAgreements.find(a => a.loan_id === nextPaymentLoanLending.id);
+    const analysis = analyzeLoanPayments(nextPaymentLoanLending, allPayments, agreement);
+    if (analysis && analysis.nextPaymentAmount > 0) return analysis.nextPaymentAmount;
+    return nextPaymentLoanLending.payment_amount || 0;
+  })();
+  const nextPaymentBorrowerUsername = nextPaymentLoanLending
+    ? publicProfiles.find(p => p.user_id === nextPaymentLoanLending.borrower_id)?.username || 'user' : null;
+
+  // --- Borrowing summary stats ---
+  const totalBorrowed = activeBorrowingLoans.reduce((s, l) => s + (l.amount || 0), 0);
+  const totalOwedBorrowing = activeBorrowingLoans.reduce((s, l) => s + (l.total_amount || l.amount || 0), 0);
+  const totalPaidBorrowing = activeBorrowingLoans.reduce((s, l) => s + (l.amount_paid || 0), 0);
+
+  const nextPaymentLoanBorrowing = activeBorrowingLoans
+    .filter(l => l.next_payment_date)
+    .map(l => ({ ...l, date: new Date(l.next_payment_date) }))
+    .sort((a, b) => a.date - b.date)[0];
+  const nextPaymentDaysBorrowing = nextPaymentLoanBorrowing ? daysUntilDate(nextPaymentLoanBorrowing.next_payment_date) : null;
+  const nextPaymentAmountBorrowing = (() => {
+    if (!nextPaymentLoanBorrowing) return 0;
+    const agreement = loanAgreements.find(a => a.loan_id === nextPaymentLoanBorrowing.id);
+    const analysis = analyzeLoanPayments(nextPaymentLoanBorrowing, allPayments, agreement);
+    if (analysis && analysis.nextPaymentAmount > 0) return analysis.nextPaymentAmount;
+    return nextPaymentLoanBorrowing.payment_amount || 0;
+  })();
+  const nextPaymentLenderUsername = nextPaymentLoanBorrowing
+    ? publicProfiles.find(p => p.user_id === nextPaymentLoanBorrowing.lender_id)?.username || 'user' : null;
+
+  // --- Shared helpers ---
+  const handleMakePayment = () => { window.location.href = createPageUrl("RecordPayment"); };
+  const getUserById = (userId) => {
+    const profile = publicProfiles.find(p => p.user_id === userId);
+    return profile || { username: 'user', full_name: 'Unknown User' };
   };
+  const getAgreementForLoan = (loanId) => loanAgreements.find(a => a.loan_id === loanId);
+
   const handleCancelLoan = (loan) => { setLoanToCancel(loan); setShowCancelDialog(true); };
   const confirmCancelLoan = async () => {
     if (!loanToCancel) return;
@@ -141,19 +171,24 @@ export default function YourLoans() {
       console.error("Error cancelling loan:", error);
     }
   };
+
+  const openDocPopup = (type, agreement) => { setActiveDocPopup(type); setDocPopupAgreement(agreement); };
+  const closeDocPopup = () => { setActiveDocPopup(null); setDocPopupAgreement(null); };
+
   const handleEditLoan = (loan) => {
-    if (getLoanRole(loan) !== 'lender') {
-      alert('Only the lender can edit loan terms.');
-      return;
+    if (loan.lender_id === user?.id) {
+      setEditLoanData({
+        id: loan.id, amount: loan.amount || 0, interest_rate: loan.interest_rate || 0,
+        repayment_period: loan.repayment_period || 0, payment_frequency: loan.payment_frequency || 'monthly',
+        due_date: loan.due_date || '', payment_amount: loan.payment_amount || 0,
+        purpose: loan.purpose || '', notes: ''
+      });
+      setShowEditLoanModal(true);
+    } else {
+      alert('Loan edit request functionality coming soon');
     }
-    setEditLoanData({
-      id: loan.id, amount: loan.amount || 0, interest_rate: loan.interest_rate || 0,
-      repayment_period: loan.repayment_period || 0, payment_frequency: loan.payment_frequency || 'monthly',
-      due_date: loan.due_date || '', payment_amount: loan.payment_amount || 0,
-      purpose: loan.purpose || '', notes: ''
-    });
-    setShowEditLoanModal(true);
   };
+
   const handleSaveEditLoan = async () => {
     if (!editLoanData || !manageLoanSelected) return;
     try {
@@ -170,12 +205,19 @@ export default function YourLoans() {
           default: paymentAmount = totalAmount / period;
         }
       }
+      const changes = [];
+      if (parseFloat(editLoanData.amount) !== manageLoanSelected.amount) changes.push(`Amount: $${manageLoanSelected.amount} → $${editLoanData.amount}`);
+      if (parseFloat(editLoanData.interest_rate) !== manageLoanSelected.interest_rate) changes.push(`Interest Rate: ${manageLoanSelected.interest_rate}% → ${editLoanData.interest_rate}%`);
+      if (parseInt(editLoanData.repayment_period) !== manageLoanSelected.repayment_period) changes.push(`Repayment Period: ${manageLoanSelected.repayment_period} → ${editLoanData.repayment_period} months`);
+      if (editLoanData.payment_frequency !== manageLoanSelected.payment_frequency) changes.push(`Payment Frequency: ${manageLoanSelected.payment_frequency} → ${editLoanData.payment_frequency}`);
+      const changeLog = changes.length > 0 ? changes.join('; ') : 'No changes';
       await Loan.update(editLoanData.id, {
         amount: parseFloat(editLoanData.amount), interest_rate: parseFloat(editLoanData.interest_rate),
         repayment_period: parseInt(editLoanData.repayment_period), payment_frequency: editLoanData.payment_frequency,
         due_date: editLoanData.due_date, total_amount: totalAmount, payment_amount: paymentAmount,
         purpose: editLoanData.purpose, contract_modified: true,
-        contract_modified_date: new Date().toISOString(), contract_modification_notes: editLoanData.notes || 'Terms updated',
+        contract_modified_date: new Date().toISOString(),
+        contract_modification_notes: editLoanData.notes || changeLog,
         status: 'pending_borrower_approval'
       });
       setShowEditLoanModal(false);
@@ -185,154 +227,137 @@ export default function YourLoans() {
       console.error("Error saving loan edit:", error);
     }
   };
-  const openDocPopup = (type, agreement) => { setActiveDocPopup(type); setDocPopupAgreement(agreement); };
-  const closeDocPopup = () => { setActiveDocPopup(null); setDocPopupAgreement(null); };
 
-  // ─── SUMMARY TAB ANALYTICS ─────────────────────────────────────
-
-  const summaryData = useMemo(() => {
-    if (!user) return null;
-
-    // Per-Friend Exposure
-    const friendMap = {};
-    allLoans.filter(l => l.status === 'active').forEach(loan => {
-      const role = getLoanRole(loan);
-      const otherId = role === 'lender' ? loan.borrower_id : loan.lender_id;
-      const other = getUserById(otherId);
-      if (!friendMap[otherId]) friendMap[otherId] = { name: other.full_name, username: other.username, avatar: other.profile_picture_url, lentTo: 0, borrowedFrom: 0, lentCount: 0, borrowedCount: 0 };
-      if (role === 'lender') {
-        friendMap[otherId].lentTo += (loan.amount || 0);
-        friendMap[otherId].lentCount++;
-      } else {
-        friendMap[otherId].borrowedFrom += (loan.amount || 0);
-        friendMap[otherId].borrowedCount++;
-      }
-    });
-    const friendExposure = Object.entries(friendMap).map(([id, d]) => ({
-      id, ...d, net: d.lentTo - d.borrowedFrom
-    })).sort((a, b) => Math.abs(b.net) - Math.abs(a.net));
-
-    // Interest Analysis
-    let interestEarned = 0;
-    let interestOwed = 0;
-    let lendingWeightedRate = 0;
-    let borrowingWeightedRate = 0;
-    let totalLentAmt = 0;
-    let totalBorrowedAmt = 0;
-
-    activeLentLoans.forEach(loan => {
-      const rate = loan.interest_rate || 0;
-      const amt = loan.amount || 0;
-      interestEarned += (loan.total_amount || amt) - amt;
-      lendingWeightedRate += rate * amt;
-      totalLentAmt += amt;
-    });
-    activeBorrowedLoans.forEach(loan => {
-      const rate = loan.interest_rate || 0;
-      const amt = loan.amount || 0;
-      interestOwed += (loan.total_amount || amt) - amt;
-      borrowingWeightedRate += rate * amt;
-      totalBorrowedAmt += amt;
-    });
-    const avgLendingRate = totalLentAmt > 0 ? (lendingWeightedRate / totalLentAmt) : 0;
-    const avgBorrowingRate = totalBorrowedAmt > 0 ? (borrowingWeightedRate / totalBorrowedAmt) : 0;
-
-    // Payment Reliability
-    let borrowerOnTime = 0;
-    let borrowerTotal = 0;
-    const borrowerReliability = {};
-    allLoans.filter(l => l.status === 'active').forEach(loan => {
-      const agreement = getAgreementForLoan(loan.id);
-      const analysis = analyzeLoanPayments(loan, allPayments, agreement);
-      if (!analysis) return;
-      const role = getLoanRole(loan);
-      if (role === 'borrower') {
-        analysis.periodResults.filter(p => p.isPast).forEach(p => {
-          borrowerTotal++;
-          if (p.isFullPayment) borrowerOnTime++;
-        });
-      } else {
-        // Track reliability of each borrower
-        const bId = loan.borrower_id;
-        const bInfo = getUserById(bId);
-        if (!borrowerReliability[bId]) borrowerReliability[bId] = { name: bInfo.full_name, username: bInfo.username, onTime: 0, total: 0 };
-        analysis.periodResults.filter(p => p.isPast).forEach(p => {
-          borrowerReliability[bId].total++;
-          if (p.isFullPayment) borrowerReliability[bId].onTime++;
-        });
-      }
-    });
-    const yourOnTimeRate = borrowerTotal > 0 ? Math.round((borrowerOnTime / borrowerTotal) * 100) : null;
-    const borrowerReliabilityList = Object.entries(borrowerReliability)
-      .map(([id, d]) => ({ id, ...d, rate: d.total > 0 ? Math.round((d.onTime / d.total) * 100) : 0 }))
-      .sort((a, b) => a.rate - b.rate);
-
-    // Cash Flow Forecast (next 3 months)
-    const today = getLocalToday();
-    const cashFlowMonths = [];
-    for (let m = 0; m < 3; m++) {
-      const monthStart = new Date(today.getFullYear(), today.getMonth() + m, 1);
-      const monthEnd = new Date(today.getFullYear(), today.getMonth() + m + 1, 0);
-      let inflows = 0;
-      let outflows = 0;
-      allLoans.filter(l => l.status === 'active').forEach(loan => {
-        const agreement = getAgreementForLoan(loan.id);
-        const schedule = agreement ? generateAmortizationSchedule(agreement) : [];
-        schedule.forEach(entry => {
-          const entryDate = toLocalDate(entry.date);
-          if (entryDate >= monthStart && entryDate <= monthEnd) {
-            const role = getLoanRole(loan);
-            const pmt = (loan.payment_amount || 0);
-            if (role === 'lender') inflows += pmt;
-            else outflows += pmt;
-          }
-        });
-      });
-      cashFlowMonths.push({
-        label: format(monthStart, 'MMM yyyy'),
-        inflows: Math.round(inflows * 100) / 100,
-        outflows: Math.round(outflows * 100) / 100,
-        net: Math.round((inflows - outflows) * 100) / 100
-      });
+  // --- Financial analysis functions ---
+  function generateAmortizationSchedule(agreement) {
+    const schedule = [];
+    const loanAmount = agreement.amount || 0;
+    const frequency = agreement.payment_frequency || 'monthly';
+    const annualRate = agreement.interest_rate || 0;
+    if (loanAmount <= 0) return schedule;
+    const repaymentPeriod = agreement.repayment_period || 1;
+    const repaymentUnit = agreement.repayment_unit || 'months';
+    let totalMonths = repaymentPeriod;
+    if (repaymentUnit === 'years') totalMonths = repaymentPeriod * 12;
+    else if (repaymentUnit === 'weeks') totalMonths = repaymentPeriod / 4.333;
+    let totalPayments;
+    if (frequency === 'weekly') totalPayments = Math.round(totalMonths * 4.333);
+    else if (frequency === 'biweekly') totalPayments = Math.round(totalMonths * 2.167);
+    else if (frequency === 'daily') totalPayments = Math.round(totalMonths * 30.417);
+    else totalPayments = Math.round(totalMonths);
+    if (totalPayments <= 0) totalPayments = 1;
+    let periodsPerYear = 12;
+    if (frequency === 'weekly') periodsPerYear = 52;
+    else if (frequency === 'biweekly') periodsPerYear = 26;
+    else if (frequency === 'daily') periodsPerYear = 365;
+    const r = annualRate > 0 ? (annualRate / 100) / periodsPerYear : 0;
+    let rawPayment;
+    if (r > 0) { rawPayment = loanAmount * r / (1 - Math.pow(1 + r, -totalPayments)); }
+    else { rawPayment = loanAmount / totalPayments; }
+    let balance = loanAmount;
+    let currentDate = new Date(agreement.created_at);
+    let principalToDate = 0;
+    let interestToDate = 0;
+    for (let i = 1; i <= totalPayments; i++) {
+      if (frequency === 'weekly') currentDate = addWeeks(currentDate, 1);
+      else if (frequency === 'biweekly') currentDate = addWeeks(currentDate, 2);
+      else if (frequency === 'daily') currentDate = addDays(currentDate, 1);
+      else currentDate = addMonths(currentDate, 1);
+      const startingBalance = balance;
+      const interest = Math.round(balance * r * 100) / 100;
+      let principal;
+      if (i === totalPayments) { principal = balance; balance = 0; }
+      else { const newBalance = Math.round((balance * (1 + r) - rawPayment) * 100) / 100; principal = Math.round((startingBalance - newBalance) * 100) / 100; balance = newBalance; }
+      principalToDate = Math.round((principalToDate + principal) * 100) / 100;
+      interestToDate = Math.round((interestToDate + interest) * 100) / 100;
+      schedule.push({ number: i, date: new Date(currentDate), startingBalance, principal, interest, principalToDate, interestToDate, endingBalance: balance });
     }
+    return schedule;
+  }
 
-    // At-Risk Loans
-    const atRiskLoans = [];
-    allLoans.filter(l => l.status === 'active').forEach(loan => {
-      const role = getLoanRole(loan);
-      const other = getOtherParty(loan);
-      const nextDue = loan.next_payment_date ? daysUntilDate(loan.next_payment_date) : null;
-      const isOverdue = nextDue !== null && nextDue < 0;
-      const isDueSoon = nextDue !== null && nextDue >= 0 && nextDue <= 7;
-      if (isOverdue || isDueSoon) {
-        atRiskLoans.push({
-          id: loan.id, loan, role, otherName: other.full_name, otherUsername: other.username,
-          amount: loan.amount, isOverdue, isDueSoon, daysUntil: nextDue,
-          paymentAmount: loan.payment_amount
-        });
-      }
-    });
-    atRiskLoans.sort((a, b) => (a.daysUntil || 0) - (b.daysUntil || 0));
-
-    // Loan Timeline
-    const loanTimeline = allLoans.filter(l => l.status === 'active').map(loan => {
-      const role = getLoanRole(loan);
-      const other = getOtherParty(loan);
-      const paid = loan.amount_paid || 0;
-      const total = loan.total_amount || loan.amount || 1;
-      const progress = Math.min(100, (paid / total) * 100);
-      return { id: loan.id, role, otherName: other.full_name, otherUsername: other.username, amount: loan.amount, progress, dueDate: loan.due_date, purpose: loan.purpose };
-    }).sort((a, b) => b.progress - a.progress);
-
+  function analyzeLoanPayments(loan, payments, agreement) {
+    if (!loan) return null;
+    const principal = loan.amount || 0;
+    const annualRate = loan.interest_rate || 0;
+    const totalPeriods = loan.repayment_period || 1;
+    const frequency = loan.payment_frequency || 'monthly';
+    const originalPaymentAmount = loan.payment_amount || 0;
+    let periodsPerYear = 12;
+    if (frequency === 'weekly') periodsPerYear = 52;
+    else if (frequency === 'biweekly') periodsPerYear = 26;
+    else if (frequency === 'daily') periodsPerYear = 365;
+    const r = annualRate > 0 ? (annualRate / 100) / periodsPerYear : 0;
+    const confirmedPayments = payments.filter(p => p.loan_id === loan.id && p.status === 'confirmed').sort((a, b) => new Date(a.payment_date) - new Date(b.payment_date));
+    const allLoanPayments = payments.filter(p => p.loan_id === loan.id && (p.status === 'confirmed' || p.status === 'pending_confirmation')).sort((a, b) => new Date(a.payment_date) - new Date(b.payment_date));
+    let scheduleDates = [];
+    if (agreement) { const sched = generateAmortizationSchedule(agreement); scheduleDates = sched.map(s => s.date); }
+    else { let dt = new Date(loan.created_at); for (let i = 0; i < totalPeriods; i++) { if (frequency === 'weekly') dt = addWeeks(new Date(dt), 1); else if (frequency === 'biweekly') dt = addWeeks(new Date(dt), 2); else if (frequency === 'daily') dt = addDays(new Date(dt), 1); else dt = addMonths(new Date(dt), 1); scheduleDates.push(new Date(dt)); } }
+    const loanStart = new Date(loan.created_at);
+    const periodConfirmedPayments = [];
+    const periodAllPayments = [];
+    const effectivePeriods = Math.min(totalPeriods, scheduleDates.length);
+    for (let i = 0; i < effectivePeriods; i++) {
+      const periodStart = i === 0 ? loanStart : scheduleDates[i - 1];
+      const periodEnd = scheduleDates[i];
+      periodConfirmedPayments.push(confirmedPayments.filter(p => { const pDate = new Date(p.payment_date); return pDate > periodStart && pDate <= periodEnd; }));
+      periodAllPayments.push(allLoanPayments.filter(p => { const pDate = new Date(p.payment_date); return pDate > periodStart && pDate <= periodEnd; }));
+    }
+    if (scheduleDates.length > 0) {
+      const lastDate = scheduleDates[scheduleDates.length - 1];
+      const lateConfirmed = confirmedPayments.filter(p => new Date(p.payment_date) > lastDate);
+      const lateAll = allLoanPayments.filter(p => new Date(p.payment_date) > lastDate);
+      if (lateConfirmed.length > 0 && effectivePeriods > 0) periodConfirmedPayments[effectivePeriods - 1] = [...periodConfirmedPayments[effectivePeriods - 1], ...lateConfirmed];
+      if (lateAll.length > 0 && effectivePeriods > 0) periodAllPayments[effectivePeriods - 1] = [...periodAllPayments[effectivePeriods - 1], ...lateAll];
+    }
+    let remainingPrincipal = principal;
+    let totalInterestAccrued = 0;
+    let totalPaid = 0;
+    let fullPaymentCount = 0;
+    let deficit = 0;
+    const periodResults = [];
+    for (let i = 0; i < effectivePeriods; i++) {
+      const periodInterest = Math.round(remainingPrincipal * r * 100) / 100;
+      totalInterestAccrued += periodInterest;
+      const scheduledAmount = originalPaymentAmount + deficit;
+      const confirmedPaidSum = periodConfirmedPayments[i].reduce((sum, p) => sum + (p.amount || 0), 0);
+      totalPaid += confirmedPaidSum;
+      const allPaidSum = periodAllPayments[i].reduce((sum, p) => sum + (p.amount || 0), 0);
+      const pendingPaidSum = allPaidSum - confirmedPaidSum;
+      const isFullPayment = confirmedPaidSum >= scheduledAmount && scheduledAmount > 0;
+      if (isFullPayment) fullPaymentCount++;
+      let periodDeficit = 0;
+      if (confirmedPaidSum < scheduledAmount) periodDeficit = Math.round((scheduledAmount - confirmedPaidSum) * 100) / 100;
+      let paymentToInterest = Math.min(confirmedPaidSum, periodInterest);
+      let paymentToPrincipal = Math.max(0, confirmedPaidSum - paymentToInterest);
+      remainingPrincipal = Math.max(0, Math.round((remainingPrincipal - paymentToPrincipal) * 100) / 100);
+      const isPast = toLocalDate(scheduleDates[i]) <= getLocalToday();
+      periodResults.push({
+        period: i + 1, date: scheduleDates[i], scheduledAmount: Math.round(scheduledAmount * 100) / 100,
+        confirmedPaid: Math.round(confirmedPaidSum * 100) / 100, pendingPaid: Math.round(pendingPaidSum * 100) / 100,
+        actualPaid: Math.round(allPaidSum * 100) / 100, isFullPayment, isPast,
+        hasConfirmedPayments: periodConfirmedPayments[i].length > 0,
+        hasPendingPayments: periodAllPayments[i].length > periodConfirmedPayments[i].length,
+        hasAnyPayments: periodAllPayments[i].length > 0,
+        deficit: periodDeficit, interestThisPeriod: periodInterest, remainingPrincipal,
+        confirmedPayments: periodConfirmedPayments[i], allPayments: periodAllPayments[i]
+      });
+      deficit = periodDeficit;
+    }
+    const totalOwedNow = Math.max(0, Math.round((principal + totalInterestAccrued - totalPaid) * 100) / 100);
+    const unpaidPeriods = totalPeriods - fullPaymentCount;
+    const recalcPayment = unpaidPeriods > 0 && totalOwedNow > 0 ? Math.round((totalOwedNow / unpaidPeriods) * 100) / 100 : 0;
+    const currentPeriodIdx = periodResults.findIndex(p => !p.isPast || (p.isPast && !p.hasConfirmedPayments));
+    const nextPeriodDeficit = currentPeriodIdx > 0 ? periodResults[currentPeriodIdx - 1]?.deficit || 0 : 0;
+    const nextPaymentAmt = recalcPayment > 0 ? Math.round((recalcPayment + nextPeriodDeficit) * 100) / 100 : originalPaymentAmount;
     return {
-      friendExposure, interestEarned, interestOwed, avgLendingRate, avgBorrowingRate,
-      totalLentAmt, totalBorrowedAmt, yourOnTimeRate, borrowerReliabilityList,
-      cashFlowMonths, atRiskLoans, loanTimeline
+      principal, totalOwedNow, totalPaid, totalInterestAccrued, remainingPrincipal, fullPaymentCount, totalPeriods,
+      recalcPayment, nextPaymentAmount: nextPaymentAmt, originalPaymentAmount, periodResults,
+      deficit: periodResults.length > 0 ? periodResults[periodResults.length - 1].deficit : 0,
+      paidPercentage: (principal + totalInterestAccrued) > 0 ? Math.min(100, (totalPaid / (principal + totalInterestAccrued)) * 100) : 0
     };
-  }, [user, allLoans, allPayments, loanAgreements, publicProfiles]);
+  }
 
-  // ─── DOCUMENT POPUPS ────────────────────────────────────────────
-
+  // --- Document Popups ---
   const PromissoryNotePopup = ({ agreement }) => {
     const lenderInfo = getUserById(agreement.lender_id);
     const borrowerInfo = getUserById(agreement.borrower_id);
@@ -342,7 +367,7 @@ export default function YourLoans() {
           <h2 className="text-2xl font-bold text-slate-800">PROMISSORY NOTE</h2>
           <p className="text-sm text-slate-500 mt-1">Document ID: {agreement.id}</p>
         </div>
-        <div style={{ background: 'rgba(103,138,251,0.1)', borderRadius: 12, padding: 16 }}>
+        <div className="bg-[#83F384] rounded-xl p-4">
           <p className="text-sm text-slate-600 mb-1">Principal Amount</p>
           <p className="text-3xl font-bold text-slate-800">{formatMoney(agreement.amount)}</p>
         </div>
@@ -390,24 +415,22 @@ export default function YourLoans() {
           <p className="text-sm text-slate-500 mt-1">{schedule.length} payments · {agreement.payment_frequency}</p>
         </div>
         <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: 'Principal', value: formatMoney(agreement.amount) },
-            { label: 'Interest', value: formatMoney((agreement.total_amount || 0) - (agreement.amount || 0)) },
-            { label: 'Total', value: formatMoney(agreement.total_amount) }
-          ].map((item, i) => (
-            <div key={i} style={{ background: 'rgba(103,138,251,0.1)', borderRadius: 12, padding: 12, textAlign: 'center' }}>
-              <p className="text-xs text-slate-600">{item.label}</p>
-              <p className="text-lg font-bold text-slate-800">{item.value}</p>
-            </div>
-          ))}
+          <div className="bg-[#83F384] rounded-xl p-3 text-center"><p className="text-xs text-slate-600">Principal</p><p className="text-lg font-bold text-slate-800">{formatMoney(agreement.amount)}</p></div>
+          <div className="bg-[#83F384] rounded-xl p-3 text-center"><p className="text-xs text-slate-600">Interest</p><p className="text-lg font-bold text-slate-800">{formatMoney((agreement.total_amount || 0) - (agreement.amount || 0))}</p></div>
+          <div className="bg-[#83F384] rounded-xl p-3 text-center"><p className="text-xs text-slate-600">Total</p><p className="text-lg font-bold text-slate-800">{formatMoney(agreement.total_amount)}</p></div>
         </div>
         <div className="max-h-[300px] overflow-x-auto overflow-y-auto rounded-xl border border-slate-200">
           <table className="w-full text-xs min-w-[700px]">
             <thead className="bg-slate-50 sticky top-0">
               <tr>
-                {['Payment', 'Date', 'Starting Bal', 'Principal', 'Interest', 'Prin. to Date', 'Int. to Date', 'Ending Bal'].map(h => (
-                  <th key={h} className="px-2 py-2 text-left font-medium text-slate-600">{h}</th>
-                ))}
+                <th className="px-2 py-2 text-left font-medium text-slate-600">Payment</th>
+                <th className="px-2 py-2 text-left font-medium text-slate-600">Payment Date</th>
+                <th className="px-2 py-2 text-right font-medium text-slate-600">Starting Balance</th>
+                <th className="px-2 py-2 text-right font-medium text-slate-600">Principal Payment</th>
+                <th className="px-2 py-2 text-right font-medium text-slate-600">Interest Payment</th>
+                <th className="px-2 py-2 text-right font-medium text-slate-600">Principal to Date</th>
+                <th className="px-2 py-2 text-right font-medium text-slate-600">Interest to Date</th>
+                <th className="px-2 py-2 text-right font-medium text-slate-600">Ending Balance</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -434,40 +457,24 @@ export default function YourLoans() {
     const lenderInfo = getUserById(agreement.lender_id);
     const borrowerInfo = getUserById(agreement.borrower_id);
     const loan = manageLoanSelected;
+    const getStatusColor = (status) => {
+      switch(status) { case 'active': return 'bg-green-100 text-green-800 border-green-200'; case 'completed': return 'bg-blue-100 text-blue-800 border-blue-200'; case 'cancelled': return 'bg-red-100 text-red-800 border-red-200'; default: return 'bg-gray-100 text-gray-800 border-gray-200'; }
+    };
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between border-b border-slate-200 pb-4">
-          <div>
-            <h2 className="text-2xl font-bold text-slate-800">Loan Summary</h2>
-            <p className="text-sm text-slate-500 mt-1">{format(new Date(agreement.created_at), 'MMMM d, yyyy')}</p>
-          </div>
-          <Badge className={`capitalize ${loan?.status === 'active' ? 'bg-green-100 text-green-800' : loan?.status === 'completed' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'}`}>{loan?.status || 'active'}</Badge>
+          <div><h2 className="text-2xl font-bold text-slate-800">Loan Summary</h2><p className="text-sm text-slate-500 mt-1">{format(new Date(agreement.created_at), 'MMMM d, yyyy')}</p></div>
+          <Badge className={`${getStatusColor(loan?.status)} capitalize`}>{loan?.status || 'active'}</Badge>
         </div>
-        {loan?.purpose && (
-          <div style={{ background: 'rgba(103,138,251,0.1)', borderRadius: 12, padding: 16 }}>
-            <p className="text-xs text-slate-600 mb-1">Purpose</p>
-            <p className="text-sm font-semibold text-slate-800">{loan.purpose}</p>
-          </div>
-        )}
+        <div className="bg-[#83F384] rounded-xl p-4 mb-1"><p className="text-xs text-slate-600 mb-1">Purpose</p><p className="text-sm font-semibold text-slate-800">{loan?.purpose || agreement.purpose || 'Reason'}</p></div>
         <div className="grid grid-cols-2 gap-4">
-          <div style={{ background: 'rgba(103,138,251,0.1)', borderRadius: 12, padding: 16 }}>
-            <p className="text-xs text-slate-600 mb-1">Loan Amount</p>
-            <p className="text-2xl font-bold text-slate-800">{formatMoney(agreement.amount)}</p>
-          </div>
-          <div style={{ background: 'rgba(103,138,251,0.1)', borderRadius: 12, padding: 16 }}>
-            <p className="text-xs text-slate-600 mb-1">Total Due</p>
-            <p className="text-2xl font-bold" style={{ color: LEND_COLOR }}>{formatMoney(agreement.total_amount)}</p>
-          </div>
+          <div className="bg-[#83F384] rounded-xl p-4"><p className="text-xs text-slate-600 mb-1">Loan Amount</p><p className="text-2xl font-bold text-slate-800">{formatMoney(agreement.amount)}</p></div>
+          <div className="bg-[#83F384] rounded-xl p-4"><p className="text-xs text-slate-600 mb-1">Total Due</p><p className="text-2xl font-bold text-[#00A86B]">{formatMoney(agreement.total_amount)}</p></div>
         </div>
         {loan && (
-          <div style={{ background: 'rgba(103,138,251,0.06)', borderRadius: 12, padding: 16 }}>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-slate-600">Payment Progress</span>
-              <span className="text-sm font-medium text-slate-800">{formatMoney(loan.amount_paid || 0)} / {formatMoney(agreement.total_amount)}</span>
-            </div>
-            <div className="w-full bg-white rounded-full h-2">
-              <div className="h-2 rounded-full transition-all" style={{ width: `${Math.min(100, ((loan.amount_paid || 0) / agreement.total_amount) * 100)}%`, background: LEND_COLOR }} />
-            </div>
+          <div className="bg-[#C2FFDC] rounded-xl p-4">
+            <div className="flex justify-between items-center mb-2"><span className="text-sm text-slate-600">Payment Progress</span><span className="text-sm font-medium text-slate-800">{formatMoney(loan.amount_paid || 0)} / {formatMoney(agreement.total_amount)}</span></div>
+            <div className="w-full bg-white rounded-full h-2"><div className="bg-[#00A86B] h-2 rounded-full transition-all" style={{ width: `${Math.min(100, ((loan.amount_paid || 0) / agreement.total_amount) * 100)}%` }} /></div>
           </div>
         )}
         <div className="grid grid-cols-2 gap-4 text-sm">
@@ -485,7 +492,7 @@ export default function YourLoans() {
           <div className="grid grid-cols-2 gap-4">
             {[{ label: 'Lender', info: lenderInfo }, { label: 'Borrower', info: borrowerInfo }].map(({ label, info }) => (
               <div key={label} className="flex items-center gap-3">
-                <img src={info.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((info.full_name || 'U').charAt(0))}&background=678AFB&color=fff&size=64`} alt={info.full_name} className="w-10 h-10 rounded-full" />
+                <img src={info.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((info.full_name || 'U').charAt(0))}&background=22c55e&color=fff&size=64`} alt={info.full_name} className="w-10 h-10 rounded-full" />
                 <div><p className="text-xs text-slate-500">{label}</p><p className="font-medium text-slate-800">{info.full_name}</p></div>
               </div>
             ))}
@@ -495,7 +502,712 @@ export default function YourLoans() {
     );
   };
 
-  // ─── RENDER ──────────────────────────────────────────────────────
+  // --- Reusable Summary Tab Renderer ---
+  const renderSummaryTab = (type) => {
+    const isLending = type === 'lending';
+    const activeLoans = isLending ? activeLendingLoans : activeBorrowingLoans;
+    const nextPaymentLoan = isLending ? nextPaymentLoanLending : nextPaymentLoanBorrowing;
+    const nextPaymentDays = isLending ? nextPaymentDaysLending : nextPaymentDaysBorrowing;
+    const nextPaymentAmount = isLending ? nextPaymentAmountLending : nextPaymentAmountBorrowing;
+    const otherPartyUsername = isLending ? nextPaymentBorrowerUsername : nextPaymentLenderUsername;
+    const rankingFilter = isLending ? rankingFilterLending : rankingFilterBorrowing;
+    const setRankingFilter = isLending ? setRankingFilterLending : setRankingFilterBorrowing;
+
+    return (
+      <>
+        {/* Next Payment Alert Banner */}
+        {nextPaymentLoan && nextPaymentDays !== null && (
+          <div className="glass-hero-alert" style={{ padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 32, height: 32, borderRadius: '50%', background: nextPaymentDays < 0 ? 'rgba(232,114,110,0.1)' : 'rgba(103,138,251,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Clock style={{ width: 16, height: 16, color: nextPaymentDays < 0 ? '#E8726E' : '#678AFB' }} />
+              </div>
+              <p style={{ fontSize: 13, color: '#1A1918', margin: 0 }}>
+                {isLending ? (
+                  nextPaymentDays > 0
+                    ? <>Next payment from @{otherPartyUsername} is due in <span style={{ fontWeight: 700 }}>{nextPaymentDays} {nextPaymentDays === 1 ? 'day' : 'days'}</span></>
+                    : nextPaymentDays === 0
+                      ? <span style={{ fontWeight: 700 }}>Payment from @{otherPartyUsername} is due today</span>
+                      : <span style={{ fontWeight: 700, color: '#E8726E' }}>Payment from @{otherPartyUsername} is {Math.abs(nextPaymentDays)} {Math.abs(nextPaymentDays) === 1 ? 'day' : 'days'} overdue</span>
+                ) : (
+                  nextPaymentDays > 0
+                    ? <>Your next payment is due in <span style={{ fontWeight: 700 }}>{nextPaymentDays} {nextPaymentDays === 1 ? 'day' : 'days'}</span></>
+                    : nextPaymentDays === 0
+                      ? <span style={{ fontWeight: 700 }}>Your next payment is due today</span>
+                      : <span style={{ fontWeight: 700, color: '#E8726E' }}>Your payment is {Math.abs(nextPaymentDays)} {Math.abs(nextPaymentDays) === 1 ? 'day' : 'days'} overdue</span>
+                )}
+              </p>
+            </div>
+            <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1918', margin: 0 }}>
+              ${nextPaymentAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </p>
+          </div>
+        )}
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }} className="borrowing-grid">
+          {/* Left Column */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* Loan Progress */}
+            <div className="glass-card">
+              <div style={{ padding: '20px 26px 0' }}>
+                <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Loan Progress</span>
+              </div>
+              <div style={{ padding: '14px 26px 26px' }}>
+                {activeLoans.length === 0 ? (
+                  <p style={{ fontSize: 13, color: '#787776' }}>No active loans to track</p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {(() => {
+                      const totalAll = activeLoans.reduce((s, l) => s + (l.total_amount || l.amount || 0), 0);
+                      const paidAll = activeLoans.reduce((s, l) => s + (l.amount_paid || 0), 0);
+                      const pctAll = totalAll > 0 ? Math.round((paidAll / totalAll) * 100) : 0;
+                      return (
+                        <div style={{ marginBottom: 12 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                            <span style={{ fontSize: 11, fontWeight: 500, color: '#787776' }}>{isLending ? 'Total Repayment Progress' : 'Total Amount Loaned'}</span>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: '#1A1918' }}>{formatMoney(paidAll)} / {formatMoney(totalAll)}</span>
+                          </div>
+                          <div style={{ width: '100%', height: 20, background: '#F0F0EE', borderRadius: 6, overflow: 'hidden' }}>
+                            <div style={{ height: '100%', borderRadius: 6, width: `${Math.max(pctAll, 2)}%`, background: '#678AFB', transition: 'width 0.5s', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 8 }}>
+                              {paidAll > 0 && <span style={{ fontSize: 10, fontWeight: 700, color: 'white' }}>{pctAll}%</span>}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                    <div style={{ height: 1, background: 'rgba(0,0,0,0.06)' }} />
+                    {activeLoans.slice(0, 5).map(loan => {
+                      const otherParty = publicProfiles.find(p => p.user_id === (isLending ? loan.borrower_id : loan.lender_id));
+                      const loanTotalOwed = loan.total_amount || loan.amount || 0;
+                      const amountPaid = loan.amount_paid || 0;
+                      const percentPaid = loanTotalOwed > 0 ? Math.round((amountPaid / loanTotalOwed) * 100) : 0;
+                      return (
+                        <div key={loan.id} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(103,138,251,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <span style={{ fontSize: 11, fontWeight: 500, color: '#678AFB' }}>{otherParty?.full_name?.charAt(0) || '?'}</span>
+                              </div>
+                              <span style={{ fontSize: 11, fontWeight: 500, color: '#1A1918' }}>@{otherParty?.username || 'user'}</span>
+                              <span style={{ fontSize: 10, color: '#787776' }}>· {loan.purpose || 'Reason'}</span>
+                            </div>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: '#1A1918' }}>{percentPaid}%</span>
+                          </div>
+                          <div style={{ width: '100%', height: 20, background: '#F0F0EE', borderRadius: 6, overflow: 'hidden' }}>
+                            <div style={{ height: '100%', borderRadius: 6, width: `${Math.max(percentPaid, 2)}%`, background: '#678AFB', transition: 'width 0.5s' }} />
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#787776' }}>
+                            <span>${amountPaid.toLocaleString()} {isLending ? 'received' : 'paid'} {loan.next_payment_date && <span>· Next on {format(new Date(loan.next_payment_date), 'MMM d')}</span>}</span>
+                            <span>${loanTotalOwed.toLocaleString()} total</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Upcoming Payments */}
+            {(() => {
+              const allPaymentLoans = activeLoans
+                .filter(l => l.next_payment_date)
+                .map(l => {
+                  const otherParty = publicProfiles.find(p => p.user_id === (isLending ? l.borrower_id : l.lender_id));
+                  const days = daysUntilDate(l.next_payment_date);
+                  const payDate = toLocalDate(l.next_payment_date);
+                  return { ...l, otherPartyUsername: otherParty?.username || 'user', days, payDate };
+                })
+                .sort((a, b) => a.payDate - b.payDate);
+              const overdueLoans = allPaymentLoans.filter(l => l.days < 0);
+              const upcomingLoans = allPaymentLoans.filter(l => l.days >= 0).slice(0, 5);
+              const combinedLoans = [...overdueLoans, ...upcomingLoans];
+              return (
+                <div className="glass-card">
+                  <div style={{ padding: '20px 26px 0' }}>
+                    <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Upcoming Payments</span>
+                  </div>
+                  <div style={{ padding: '14px 26px 26px' }}>
+                    {combinedLoans.length === 0 ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 0', color: '#787776' }}>
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ opacity: 0.4, marginBottom: 6 }}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        <p style={{ fontSize: 12 }}>No upcoming payments</p>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        {combinedLoans.map(loan => {
+                          const isOverdue = loan.days < 0;
+                          const displayDays = isOverdue ? `-${Math.abs(loan.days)}` : loan.days;
+                          return (
+                            <div key={loan.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 10, borderRadius: 10, background: 'rgba(0,0,0,0.03)' }}>
+                              <div style={{ flexShrink: 0, width: 40, height: 40, borderRadius: '50%', background: isOverdue ? '#E8726E' : '#678AFB', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <p style={{ fontSize: 10, fontWeight: 700, color: 'white', textAlign: 'center', lineHeight: 1.2, margin: 0 }}>
+                                  {displayDays}
+                                  <span style={{ display: 'block', fontSize: 7, fontWeight: 500 }}>{Math.abs(loan.days) === 1 ? 'day' : 'days'}</span>
+                                </p>
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <p style={{ fontSize: 11, color: '#1A1918', margin: 0 }}>
+                                  {isLending ? 'Receive' : 'Send'} <span style={{ fontWeight: 600 }}>${(loan.payment_amount || 0).toLocaleString()}</span> {isLending ? 'from' : 'to'} <span style={{ fontWeight: 600 }}>@{loan.otherPartyUsername}</span>
+                                </p>
+                                <p style={{ fontSize: 10, marginTop: 2, color: isOverdue ? '#E8726E' : '#787776', margin: 0 }}>{format(loan.payDate, 'MMM d, yyyy')}</p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Right Column */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* Next Payment Box */}
+            <div className="glass-card">
+              <div style={{ padding: '20px 26px 0' }}>
+                <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Next Payment</span>
+              </div>
+              <div style={{ padding: '14px 26px 26px' }}>
+                {nextPaymentLoan ? (
+                  <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', paddingTop: 8, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div>
+                      <p style={{ fontSize: 11, color: '#787776', marginBottom: 2 }}>Next Payment Date</p>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                        <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1918', margin: 0 }}>{format(new Date(nextPaymentLoan.next_payment_date), 'EEE, MMM d')}</p>
+                        {nextPaymentDays !== null && (
+                          <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>{nextPaymentDays > 0 ? `${nextPaymentDays}d away` : nextPaymentDays === 0 ? 'Due today' : `${Math.abs(nextPaymentDays)}d overdue`}</p>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <p style={{ fontSize: 11, color: '#787776', marginBottom: 2 }}>{isLending ? 'Expected Amount' : 'Next Payment Amount'}</p>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                        <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(nextPaymentAmount)}</p>
+                        <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>{isLending ? `from @${otherPartyUsername}` : `to @${otherPartyUsername}`}</p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 0', color: '#787776' }}>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ opacity: 0.4, marginBottom: 6 }}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <p style={{ fontSize: 12 }}>No upcoming payments</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Overdue Payment Boxes */}
+            {(() => {
+              const overdueLoans = activeLoans.filter(loan => {
+                if (!loan.next_payment_date) return false;
+                return daysUntilDate(loan.next_payment_date) < 0;
+              });
+              if (overdueLoans.length === 0) return null;
+              return overdueLoans.map(loan => {
+                const otherParty = getUserById(isLending ? loan.borrower_id : loan.lender_id);
+                const daysOverdue = Math.abs(daysUntilDate(loan.next_payment_date));
+                const agreement = loanAgreements.find(a => a.loan_id === loan.id);
+                const analysis = analyzeLoanPayments(loan, allPayments, agreement);
+                const overdueAmount = analysis ? analysis.nextPaymentAmount : (loan.payment_amount || 0);
+                return (
+                  <div key={`overdue-${loan.id}`} style={{ borderRadius: 16, padding: '14px 20px', background: '#E8726E' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                      <AlertCircle style={{ width: 16, height: 16, color: 'white' }} />
+                      <p style={{ fontSize: 14, fontWeight: 700, color: 'white', margin: 0 }}>Overdue Payment</p>
+                    </div>
+                    <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)', marginBottom: 8 }}>
+                      {isLending
+                        ? <>Payment from <span style={{ fontWeight: 700, color: 'white' }}>@{otherParty?.username || 'user'}</span> is overdue by {daysOverdue} {daysOverdue === 1 ? 'day' : 'days'}.</>
+                        : <>Your payment to <span style={{ fontWeight: 700, color: 'white' }}>@{otherParty?.username || 'user'}</span> is overdue by {daysOverdue} {daysOverdue === 1 ? 'day' : 'days'}. If you made a payment, make sure to record it.</>
+                      }
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <p style={{ fontSize: 18, fontWeight: 700, color: 'white', margin: 0 }}>{formatMoney(overdueAmount)}</p>
+                      <Button type="button" onClick={handleMakePayment} className="h-7 px-3 rounded-md text-xs font-semibold border-0 bg-white text-red-600 hover:bg-white/90">Record Payment</Button>
+                    </div>
+                  </div>
+                );
+              });
+            })()}
+
+            {/* Loans Ranked By */}
+            {activeLoans.length > 0 && (
+              <div className="glass-card">
+                <div style={{ padding: '20px 26px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Loans Ranked By</span>
+                  <Select value={rankingFilter} onValueChange={setRankingFilter}>
+                    <SelectTrigger className="w-auto h-7 px-2 border-0 text-xs font-medium rounded-lg" style={{ background: 'rgba(103,138,251,0.1)', color: '#678AFB' }}><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="highest_interest">Highest Interest</SelectItem>
+                      <SelectItem value="highest_payment">Highest Payment</SelectItem>
+                      <SelectItem value="soonest_deadline">Soonest Deadline</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div style={{ padding: '14px 26px 26px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {(() => {
+                    const sorted = [...activeLoans].sort((a, b) => {
+                      if (rankingFilter === 'highest_interest') return (b.interest_rate || 0) - (a.interest_rate || 0);
+                      if (rankingFilter === 'highest_payment') return (b.payment_amount || 0) - (a.payment_amount || 0);
+                      if (rankingFilter === 'soonest_deadline') { const dateA = a.next_payment_date ? new Date(a.next_payment_date) : new Date('2099-01-01'); const dateB = b.next_payment_date ? new Date(b.next_payment_date) : new Date('2099-01-01'); return dateA - dateB; }
+                      return 0;
+                    });
+                    return sorted.slice(0, 5).map((loan, idx) => {
+                      const otherParty = publicProfiles.find(p => p.user_id === (isLending ? loan.borrower_id : loan.lender_id));
+                      const rankValue = rankingFilter === 'highest_interest' ? `${loan.interest_rate || 0}%` : rankingFilter === 'highest_payment' ? `$${(loan.payment_amount || 0).toLocaleString()}` : loan.next_payment_date ? format(new Date(loan.next_payment_date), 'MMM d') : 'N/A';
+                      return (
+                        <div key={loan.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 10, borderRadius: 10, background: 'rgba(0,0,0,0.03)' }}>
+                          <div style={{ flexShrink: 0, width: 28, height: 28, borderRadius: '50%', background: 'rgba(103,138,251,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ fontSize: 12, fontWeight: 700, color: '#678AFB' }}>{idx + 1}</span></div>
+                          <div style={{ flex: 1, minWidth: 0 }}><p style={{ fontSize: 11, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>@{otherParty?.username || 'user'} · {loan.purpose || 'Loan'}</p></div>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: '#1A1918', flexShrink: 0 }}>{rankValue}</span>
+                        </div>
+                      );
+                    });
+                  })()}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </>
+    );
+  };
+
+  // --- Individual Loan Details Tab ---
+  const renderDetailsTab = () => {
+    if (allManageableLoans.length === 0) {
+      return (
+        <div className="glass-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 200, padding: 26 }}>
+          <div style={{ textAlign: 'center' }}><ClipboardList style={{ width: 40, height: 40, margin: '0 auto 8px', color: '#C7C6C4' }} /><p style={{ fontSize: 13, color: '#787776' }}>No loans to display</p></div>
+        </div>
+      );
+    }
+
+    let chartData = [];
+    let plannedPaymentAmount = 0;
+    let recalculatedPayment = 0;
+    let loanAnalysis = null;
+    if (manageLoanSelected) {
+      const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id);
+      plannedPaymentAmount = manageLoanSelected.payment_amount || 0;
+      loanAnalysis = analyzeLoanPayments(manageLoanSelected, allPayments, agreement);
+      recalculatedPayment = loanAnalysis ? loanAnalysis.recalcPayment : 0;
+      if (loanAnalysis) {
+        loanAnalysis.periodResults.forEach((pr, i) => {
+          const scheduledAmt = pr.scheduledAmount || (recalculatedPayment > 0 ? recalculatedPayment : plannedPaymentAmount);
+          if (pr.hasAnyPayments) {
+            chartData.push({ label: `P${i + 1}`, amount: pr.actualPaid, scheduledAmount: scheduledAmt, confirmedAmount: pr.confirmedPaid, pendingAmount: pr.pendingPaid, isPaid: true, isProjected: false, isFullPayment: pr.isFullPayment, isInProgress: !pr.isPast && pr.hasAnyPayments, hasPendingOnly: !pr.hasConfirmedPayments && pr.hasPendingPayments });
+          } else if (pr.isPast) {
+            chartData.push({ label: `P${i + 1}`, amount: 0, scheduledAmount: scheduledAmt, isPaid: false, isProjected: false, isMissed: true });
+          } else {
+            const projectedAmount = i > 0 && loanAnalysis.periodResults[i - 1].deficit > 0 ? recalculatedPayment + loanAnalysis.periodResults[i - 1].deficit : recalculatedPayment;
+            chartData.push({ label: `P${i + 1}`, amount: projectedAmount, scheduledAmount: scheduledAmt, isPaid: false, isProjected: true });
+          }
+        });
+      }
+    }
+    const chartHeight = 140;
+    const maxChartVal = Math.max(plannedPaymentAmount, ...chartData.map(d => d.amount), 1);
+
+    // Determine perspective for selected loan
+    const isLending = isLendingLoan;
+    const otherPartyId = manageLoanSelected ? (isLending ? manageLoanSelected.borrower_id : manageLoanSelected.lender_id) : null;
+    const otherPartyProfile = otherPartyId ? publicProfiles.find(p => p.user_id === otherPartyId) : null;
+    const otherPartyUsername = otherPartyProfile?.username || 'user';
+
+    return (
+      <div>
+        {/* Select a Loan */}
+        <div className="glass-card" style={{ marginBottom: 16 }}>
+          <div style={{ padding: '20px 26px 0' }}><span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Select a Loan to Learn More</span></div>
+          <div style={{ padding: '14px 26px 26px' }}>
+            <div style={{ position: 'relative' }}>
+              <select value={manageLoanSelected?.id || ''} onChange={(e) => { const selected = allManageableLoans.find(l => l.id === e.target.value); if (selected) setManageLoanSelected(selected); }} style={{ width: '100%', appearance: 'none', borderRadius: 10, padding: '8px 12px', fontSize: 12, fontWeight: 600, color: '#1A1918', background: 'rgba(103,138,251,0.08)', cursor: 'pointer', border: '1px solid rgba(103,138,251,0.2)', outline: 'none', fontFamily: "'DM Sans', sans-serif" }}>
+                {allManageableLoans.map((loan) => {
+                  const isLend = loan.lender_id === user?.id;
+                  const otherParty = publicProfiles.find(p => p.user_id === (isLend ? loan.borrower_id : loan.lender_id));
+                  const roleLabel = isLend ? 'Lent to' : 'Borrowed from';
+                  return (<option key={loan.id} value={loan.id}>{roleLabel} @{otherParty?.username || 'user'} — ${loan.amount?.toLocaleString()}{loan.status === 'cancelled' ? ' · Cancelled' : ''}</option>);
+                })}
+              </select>
+              <div style={{ pointerEvents: 'none', position: 'absolute', top: 0, bottom: 0, right: 10, display: 'flex', alignItems: 'center' }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#678AFB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Summary bar */}
+        {manageLoanSelected && (() => {
+          return (
+            <div className="glass-hero-alert" style={{ padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+              <img src={otherPartyProfile?.profile_picture_url || otherPartyProfile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((otherPartyProfile?.full_name || 'U').charAt(0))}&background=678AFB&color=fff&size=64`} alt={otherPartyProfile?.full_name || 'User'} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, background: 'white' }} />
+              <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', margin: 0 }}>
+                {isLending
+                  ? `You lent @${otherPartyUsername} $${(manageLoanSelected.amount || 0).toLocaleString()} for ${manageLoanSelected.purpose || 'personal expenses'}`
+                  : `@${otherPartyUsername} lent you $${(manageLoanSelected.amount || 0).toLocaleString()} to help with ${manageLoanSelected.purpose || 'personal expenses'}`
+                }
+              </p>
+            </div>
+          );
+        })()}
+
+        {/* Two-column grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }} className="borrowing-grid">
+          {/* Left Column */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* Payment Progress */}
+            {manageLoanSelected && (() => {
+              const totalOwedNow = loanAnalysis ? loanAnalysis.totalOwedNow : (manageLoanSelected.total_amount || manageLoanSelected.amount || 0);
+              const totalPaidAmt = loanAnalysis ? loanAnalysis.totalPaid : (manageLoanSelected.amount_paid || 0);
+              const loanPrincipal = manageLoanSelected.amount || 0;
+              const totalWithInterest = loanAnalysis ? (loanAnalysis.principal + loanAnalysis.totalInterestAccrued) : (manageLoanSelected.total_amount || loanPrincipal);
+              const paidPct = loanAnalysis ? loanAnalysis.paidPercentage : (totalWithInterest > 0 ? (totalPaidAmt / totalWithInterest) * 100 : 0);
+              const nextPmtAmt = loanAnalysis ? loanAnalysis.nextPaymentAmount : (recalculatedPayment > 0 ? recalculatedPayment : (manageLoanSelected.payment_amount || 0));
+              let nextPmtDate = null; let daysUntil = null;
+              if (manageLoanSelected.next_payment_date) { nextPmtDate = toLocalDate(manageLoanSelected.next_payment_date); daysUntil = daysUntilDate(manageLoanSelected.next_payment_date); }
+              const size = 140; const dCx = size / 2; const dCy = size / 2; const outerR = 60; const innerR = 48;
+              const paidAngle = (paidPct / 100) * 360;
+              const toRad = (deg) => (deg - 90) * (Math.PI / 180);
+              const paidEndXo = dCx + outerR * Math.cos(toRad(paidAngle)); const paidEndYo = dCy + outerR * Math.sin(toRad(paidAngle));
+              const paidEndXi = dCx + innerR * Math.cos(toRad(paidAngle)); const paidEndYi = dCy + innerR * Math.sin(toRad(paidAngle));
+              const largeArc = paidAngle > 180 ? 1 : 0;
+              return (
+                <div className="glass-card">
+                  <div style={{ padding: '20px 26px 0' }}><span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Payment Progress</span></div>
+                  <div style={{ padding: '14px 26px 26px', display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+                        <circle cx={dCx} cy={dCy} r={(outerR + innerR) / 2} fill="none" stroke="#E5E4E2" strokeWidth={outerR - innerR} />
+                        {paidPct > 0 && paidPct < 100 && (<path d={`M ${dCx} ${dCy - outerR} A ${outerR} ${outerR} 0 ${largeArc} 1 ${paidEndXo} ${paidEndYo} L ${paidEndXi} ${paidEndYi} A ${innerR} ${innerR} 0 ${largeArc} 0 ${dCx} ${dCy - innerR} Z`} fill="#678AFB" />)}
+                        {paidPct >= 100 && (<circle cx={dCx} cy={dCy} r={(outerR + innerR) / 2} fill="none" stroke="#678AFB" strokeWidth={outerR - innerR} />)}
+                        <text x={dCx} y={dCy - 5} textAnchor="middle" dominantBaseline="middle" style={{ fontSize: 15, fontWeight: 700, fill: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>{Math.round(paidPct)}%</text>
+                        <text x={dCx} y={dCy + 10} textAnchor="middle" dominantBaseline="middle" style={{ fontSize: 8, fontWeight: 500, fill: '#787776', fontFamily: "'DM Sans', sans-serif" }}>repaid</text>
+                      </svg>
+                      <p style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', marginTop: 6, margin: 0 }}>
+                        ${totalPaidAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        <span style={{ color: '#787776', fontWeight: 400 }}> / ${totalOwedNow.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      </p>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 10, color: '#787776', fontWeight: 500, marginBottom: 4 }}>Next Payment</p>
+                      {nextPmtDate ? (
+                        <>
+                          <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>{format(nextPmtDate, 'MMM d, yyyy')}</p>
+                          <p style={{ fontSize: 10, color: '#787776', marginBottom: 12 }}>{daysUntil > 0 ? `Due in ${daysUntil} ${daysUntil === 1 ? 'day' : 'days'}` : daysUntil === 0 ? 'Due today' : `${Math.abs(daysUntil)} ${Math.abs(daysUntil) === 1 ? 'day' : 'days'} overdue`}</p>
+                        </>
+                      ) : (<p style={{ fontSize: 12, color: '#C7C6C4', marginBottom: 12 }}>No upcoming payment</p>)}
+                      <p style={{ fontSize: 10, color: '#787776', fontWeight: 500, marginBottom: 4 }}>Amount</p>
+                      <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>${nextPmtAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                      <p style={{ fontSize: 10, color: '#787776' }}>{isLending ? `from @${otherPartyUsername}` : `to @${otherPartyUsername}`}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Quick Actions */}
+            {manageLoanSelected && manageLoanSelected.status !== 'cancelled' && (
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 20, padding: '4px 0' }}>
+                <button onClick={() => handleMakePayment(manageLoanSelected)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', background: 'none', border: 'none' }}>
+                  <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(103,138,251,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#678AFB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                  </div>
+                  <p style={{ fontSize: 10, fontWeight: 600, color: '#1A1918', textAlign: 'center', lineHeight: 1.3 }}>Record<br/>Payment</p>
+                </button>
+                <button onClick={() => handleEditLoan(manageLoanSelected)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', background: 'none', border: 'none' }}>
+                  <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(103,138,251,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#678AFB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                  </div>
+                  <p style={{ fontSize: 10, fontWeight: 600, color: '#1A1918', textAlign: 'center', lineHeight: 1.3 }}>{isLending ? 'Edit' : 'Request'}<br/>{isLending ? 'Loan' : 'Loan Edit'}</p>
+                </button>
+                <button onClick={() => handleCancelLoan(manageLoanSelected)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', background: 'none', border: 'none' }}>
+                  <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(103,138,251,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#678AFB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                  </div>
+                  <p style={{ fontSize: 10, fontWeight: 600, color: '#1A1918', textAlign: 'center', lineHeight: 1.3 }}>{isLending ? 'Cancel' : 'Request'}<br/>{isLending ? 'Loan' : 'Cancellation'}</p>
+                </button>
+              </div>
+            )}
+
+            {/* Payment History Chart */}
+            <div className="glass-card">
+              <div style={{ padding: '20px 26px 0' }}><span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Payment History</span></div>
+              <div style={{ padding: '14px 26px 26px' }}>
+              {!manageLoanSelected ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: chartHeight }}><p style={{ fontSize: 12, color: '#C7C6C4' }}>Select a loan to view chart</p></div>
+              ) : chartData.length === 0 ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: chartHeight }}><p style={{ fontSize: 12, color: '#C7C6C4' }}>No payment schedule</p></div>
+              ) : (
+                <div style={{ position: 'relative' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: chartHeight }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', paddingRight: 6, flexShrink: 0, height: '100%' }}>
+                      <p style={{ fontSize: 9, color: '#787776', fontFamily: 'monospace', margin: 0 }}>${maxChartVal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                      <p style={{ fontSize: 9, color: '#787776', fontFamily: 'monospace', margin: 0 }}>${Math.round(maxChartVal / 2).toLocaleString()}</p>
+                      <p style={{ fontSize: 9, color: '#787776', fontFamily: 'monospace', margin: 0 }}>$0</p>
+                    </div>
+                    <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', position: 'relative', height: '100%' }}>
+                      {plannedPaymentAmount > 0 && (
+                        <div style={{ position: 'absolute', left: 0, right: 0, borderTop: '2px dashed rgba(103,138,251,0.3)', zIndex: 10, bottom: `${(plannedPaymentAmount / maxChartVal) * 100}%` }}>
+                          <span style={{ position: 'absolute', top: -14, right: 0, fontSize: 8, fontWeight: 600, color: '#787776', fontFamily: 'monospace', background: 'rgba(255,255,255,0.88)', padding: '0 4px' }}>${plannedPaymentAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                        </div>
+                      )}
+                      {chartData.map((d, i) => {
+                        const barHeight = maxChartVal > 0 ? (d.amount / maxChartVal) * chartHeight : 0;
+                        const scheduledBarHeight = maxChartVal > 0 && d.scheduledAmount ? (d.scheduledAmount / maxChartVal) * chartHeight : barHeight;
+                        const isFullPmt = d.isPaid && d.isFullPayment;
+                        const isPartialPmt = d.isPaid && !d.isFullPayment && !d.hasPendingOnly;
+                        const isPendingOnly = d.hasPendingOnly;
+                        const isInProgress = d.isInProgress;
+                        return (
+                          <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, maxWidth: 40 }}>
+                            <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                              {isInProgress && !isFullPmt ? (
+                                <div style={{ position: 'relative', height: Math.max(scheduledBarHeight, 4), width: '70%', minWidth: 8 }}>
+                                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '100%', borderRadius: '2px 2px 0 0', background: 'rgba(103,138,251,0.1)', border: '1px dashed rgba(103,138,251,0.3)' }} />
+                                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: Math.max(barHeight, 4), borderRadius: '2px 2px 0 0', background: 'rgba(103,138,251,0.6)' }} />
+                                </div>
+                              ) : (
+                                <div style={{
+                                  borderRadius: '2px 2px 0 0', transition: 'all 0.3s',
+                                  height: Math.max(barHeight, d.amount > 0 ? 4 : 2), width: '70%', minWidth: 8,
+                                  background: d.isProjected ? 'rgba(103,138,251,0.15)' : d.isMissed ? 'rgba(232,114,110,0.3)' : d.amount === 0 ? '#E5E4E2' : isPendingOnly ? 'rgba(245,158,11,0.4)' : isFullPmt ? '#678AFB' : isPartialPmt ? 'rgba(245,158,11,0.6)' : 'rgba(103,138,251,0.6)',
+                                  border: d.isProjected ? '1px dashed rgba(103,138,251,0.3)' : d.isMissed ? '1px dashed rgba(232,114,110,0.5)' : isPendingOnly ? '1px dashed rgba(245,158,11,0.6)' : 'none',
+                                }} title={`${d.label}: $${d.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}${d.isProjected ? ' (projected)' : d.isMissed ? ' (missed)' : isPendingOnly ? ' (pending)' : isPartialPmt ? ' (partial)' : ''}`} />
+                              )}
+                            </div>
+                            <p style={{ fontSize: 8, marginTop: 4, lineHeight: 1, margin: 0, color: isInProgress ? '#678AFB' : d.isProjected ? '#C7C6C4' : d.isMissed ? '#E8726E' : isPendingOnly ? 'rgba(245,158,11,0.6)' : '#787776' }}>{d.label}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8, paddingTop: 8, borderTop: '1px solid rgba(0,0,0,0.06)', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><div style={{ width: 10, height: 10, borderRadius: 2, background: '#678AFB' }} /><span style={{ fontSize: 9, color: '#787776' }}>Completed</span></div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><div style={{ width: 10, height: 10, borderRadius: 2, background: 'linear-gradient(to top, rgba(103,138,251,0.6) 50%, rgba(103,138,251,0.1) 50%)' }} /><span style={{ fontSize: 9, color: '#678AFB' }}>In Progress</span></div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><div style={{ width: 10, height: 10, borderRadius: 2, background: 'rgba(245,158,11,0.4)', border: '1px dashed rgba(245,158,11,0.6)' }} /><span style={{ fontSize: 9, color: 'rgba(245,158,11,0.8)' }}>Pending</span></div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><div style={{ width: 10, height: 10, borderRadius: 2, background: 'rgba(103,138,251,0.15)', border: '1px dashed rgba(103,138,251,0.3)' }} /><span style={{ fontSize: 9, color: '#C7C6C4' }}>Projected</span></div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><div style={{ width: 16, height: 0, borderTop: '2px dashed rgba(103,138,251,0.3)' }} /><span style={{ fontSize: 9, color: '#787776' }}>Plan</span></div>
+                  </div>
+                </div>
+              )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {!manageLoanSelected ? (
+              <div className="glass-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 200, padding: 26 }}>
+                <div style={{ textAlign: 'center' }}><ClipboardList style={{ width: 40, height: 40, margin: '0 auto 8px', color: '#C7C6C4' }} /><p style={{ fontSize: 13, color: '#787776' }}>Select a loan to view details</p></div>
+              </div>
+            ) : (
+              <>
+                {/* Loan Terms */}
+                <div className="glass-card">
+                  <div style={{ padding: '20px 26px 0' }}><span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Loan Terms</span></div>
+                  <div style={{ padding: '14px 26px 26px' }}>
+                  {(() => {
+                    const amount = manageLoanSelected.amount || 0;
+                    const interestRate = manageLoanSelected.interest_rate || 0;
+                    const repaymentPeriod = manageLoanSelected.repayment_period || 0;
+                    const repaymentUnit = manageLoanSelected.repayment_unit || 'months';
+                    const paymentFrequency = manageLoanSelected.payment_frequency || 'monthly';
+                    const items = [
+                      { label: 'Loan Amount', value: `$${amount.toLocaleString()}` },
+                      { label: 'Interest Rate', value: `${interestRate}%` },
+                      { label: 'Term', value: `${repaymentPeriod} ${repaymentUnit}` },
+                      { label: 'Frequency', value: paymentFrequency.charAt(0).toUpperCase() + paymentFrequency.slice(1) },
+                    ];
+                    return (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                        {items.map((item, idx) => (<div key={idx} style={{ textAlign: 'center' }}><p style={{ fontSize: 10, color: '#787776', fontWeight: 500, marginBottom: 2 }}>{item.label}</p><p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>{item.value}</p></div>))}
+                      </div>
+                    );
+                  })()}
+                  </div>
+                </div>
+
+                {/* Document Icons */}
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 20, padding: '4px 0' }}>
+                  <button onClick={() => { const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id); if (agreement) openDocPopup('promissory', agreement); }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', background: 'none', border: 'none' }}>
+                    <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(103,138,251,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#678AFB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
+                    <p style={{ fontSize: 10, fontWeight: 600, color: '#1A1918', textAlign: 'center', lineHeight: 1.3 }}>Promissory<br/>Note</p>
+                  </button>
+                  <button onClick={() => { const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id); if (agreement) openDocPopup('amortization', agreement); }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', background: 'none', border: 'none' }}>
+                    <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(103,138,251,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#678AFB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
+                    <p style={{ fontSize: 10, fontWeight: 600, color: '#1A1918', textAlign: 'center', lineHeight: 1.3 }}>Amortization<br/>Schedule</p>
+                  </button>
+                  <button onClick={() => { const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id); if (agreement) openDocPopup('summary', agreement); }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', background: 'none', border: 'none' }}>
+                    <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(103,138,251,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#678AFB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
+                    <p style={{ fontSize: 10, fontWeight: 600, color: '#1A1918', textAlign: 'center', lineHeight: 1.3 }}>Loan<br/>Summary</p>
+                  </button>
+                </div>
+
+                {/* Loan Progress Stats */}
+                <div className="glass-card">
+                  <div style={{ padding: '20px 26px 0' }}><span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Loan Progress</span></div>
+                  <div style={{ padding: '14px 26px 26px' }}>
+                  {(() => {
+                    const repaymentPeriod = manageLoanSelected.repayment_period || 0;
+                    const paymentFrequency = manageLoanSelected.payment_frequency || 'monthly';
+                    const totalOwedDisplay = loanAnalysis ? loanAnalysis.totalOwedNow : (manageLoanSelected.total_amount || manageLoanSelected.amount || 0);
+                    const amountPaidDisplay = loanAnalysis ? loanAnalysis.totalPaid : (manageLoanSelected.amount_paid || 0);
+                    const fullPayments = loanAnalysis ? loanAnalysis.fullPaymentCount : 0;
+                    const paymentAmountDisplay = loanAnalysis ? loanAnalysis.nextPaymentAmount : (recalculatedPayment > 0 ? recalculatedPayment : (manageLoanSelected.payment_amount || 0));
+                    const freqLabel = paymentFrequency.charAt(0).toUpperCase() + paymentFrequency.slice(1);
+                    const items = [
+                      { label: isLending ? 'Total Owed to You' : 'Total Owed', value: `$${totalOwedDisplay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: 'with interest' },
+                      { label: isLending ? 'Amount Received' : 'Amount Paid', value: `$${amountPaidDisplay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: null },
+                      { label: 'Payments Made', value: `${fullPayments}/${repaymentPeriod}`, sub: 'full payments' },
+                      { label: `${freqLabel} Payments`, value: `$${paymentAmountDisplay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: isLending ? `from @${otherPartyUsername}` : `to @${otherPartyUsername}` },
+                    ];
+                    return (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                        {items.map((item, idx) => (<div key={idx} style={{ textAlign: 'center' }}><p style={{ fontSize: 10, color: '#787776', fontWeight: 500, marginBottom: 2 }}>{item.label}</p><p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>{item.value}</p>{item.sub && <p style={{ fontSize: 9, color: '#787776', marginTop: 2 }}>{item.sub}</p>}</div>))}
+                      </div>
+                    );
+                  })()}
+                  </div>
+                </div>
+
+                {/* Payments */}
+                <div className="glass-card">
+                  <div style={{ padding: '20px 26px 0' }}><span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Payments</span></div>
+                  <div style={{ padding: '14px 26px 26px' }}>
+                  {(() => {
+                    const paymentAmt = manageLoanSelected.payment_amount || 0;
+                    let firstRecordFound = false;
+                    const paymentRows = loanAnalysis ? loanAnalysis.periodResults.map((pr) => {
+                      let status;
+                      if (pr.hasConfirmedPayments && pr.isFullPayment) status = 'completed';
+                      else if (pr.hasAnyPayments && !pr.isPast) status = 'in_progress';
+                      else if (pr.hasConfirmedPayments && !pr.isFullPayment) status = 'partial';
+                      else if (pr.hasPendingPayments && !pr.hasConfirmedPayments) status = 'pending';
+                      else if (pr.isPast && !pr.hasAnyPayments) status = 'missed';
+                      else if (!firstRecordFound) { status = 'record'; firstRecordFound = true; }
+                      else status = 'upcoming';
+                      const scheduledAmount = pr.scheduledAmount || (loanAnalysis.recalcPayment > 0 ? loanAnalysis.recalcPayment : paymentAmt);
+                      const paidAmount = pr.actualPaid || 0;
+                      const paidPercentage = scheduledAmount > 0 ? Math.min(100, (paidAmount / scheduledAmount) * 100) : 0;
+                      return { number: pr.period, date: pr.date, amount: scheduledAmount, paidAmount, paidPercentage, status };
+                    }) : [];
+                    const statusConfig = {
+                      completed: { label: 'Completed', bg: 'rgba(103,138,251,0.1)', text: '#678AFB', ringColor: '#678AFB', fillColor: '#678AFB' },
+                      in_progress: { label: 'In Progress', bg: 'rgba(103,138,251,0.1)', text: '#678AFB', ringColor: '#678AFB', fillColor: '#678AFB' },
+                      partial: { label: 'Partial', bg: 'rgba(245,158,11,0.1)', text: '#F59E0B', ringColor: '#F59E0B', fillColor: '#F59E0B' },
+                      pending: { label: 'Pending', bg: 'rgba(245,158,11,0.1)', text: '#F59E0B', ringColor: '#F59E0B', fillColor: '#F59E0B' },
+                      missed: { label: 'Missed', bg: 'rgba(232,114,110,0.1)', text: '#E8726E', ringColor: '#E8726E', fillColor: '#E8726E' },
+                      record: { label: 'Record Payment', bg: '#678AFB', text: 'white', ringColor: '#678AFB', fillColor: '#678AFB' },
+                      upcoming: { label: 'Upcoming', bg: 'rgba(0,0,0,0.03)', text: '#787776', ringColor: 'rgba(103,138,251,0.3)', fillColor: 'rgba(103,138,251,0.3)' },
+                    };
+                    const PieCircle = ({ percentage, ringColor, fillColor, number, size = 32 }) => {
+                      const r = (size / 2) - 2; const pcx = size / 2; const pcy = size / 2;
+                      const circumference = 2 * Math.PI * r; const filled = (percentage / 100) * circumference;
+                      return (
+                        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ flexShrink: 0 }}>
+                          <circle cx={pcx} cy={pcy} r={r} fill="#F7F7F7" stroke={ringColor} strokeWidth="2" strokeOpacity="0.3" />
+                          {percentage > 0 && (<circle cx={pcx} cy={pcy} r={r} fill="none" stroke={fillColor} strokeWidth="2" strokeDasharray={`${filled} ${circumference - filled}`} strokeDashoffset={circumference * 0.25} strokeLinecap="round" transform={`rotate(-90 ${pcx} ${pcy})`} />)}
+                          <text x={pcx} y={pcy} textAnchor="middle" dominantBaseline="central" fill="#1A1918" fontSize="11" fontWeight="bold" fontFamily="'DM Sans', sans-serif">{number}</text>
+                        </svg>
+                      );
+                    };
+                    return (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 240, overflowY: 'auto', scrollbarWidth: 'thin' }}>
+                        {paymentRows.map((row) => {
+                          const cfg = statusConfig[row.status];
+                          return (
+                            <div key={row.number} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 8, borderRadius: 10, background: 'rgba(0,0,0,0.03)' }}>
+                              <PieCircle percentage={row.paidPercentage} ringColor={cfg.ringColor} fillColor={cfg.fillColor} number={row.number} />
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <p style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', margin: 0 }}>${row.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                                <p style={{ fontSize: 10, color: '#787776', margin: 0 }}>{format(row.date, 'MMM d, yyyy')}</p>
+                              </div>
+                              {row.status === 'record' ? (
+                                <button onClick={handleMakePayment} style={{ flexShrink: 0, padding: '4px 10px', borderRadius: 8, fontSize: 10, fontWeight: 600, background: cfg.bg, color: cfg.text, border: 'none', cursor: 'pointer' }}>{cfg.label}</button>
+                              ) : (
+                                <span style={{ flexShrink: 0, padding: '4px 10px', borderRadius: 8, fontSize: 10, fontWeight: 600, background: cfg.bg, color: cfg.text }}>{cfg.label}</span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+                  </div>
+                </div>
+
+                {/* Activity Timeline */}
+                <div className="glass-card" style={{ overflow: 'hidden' }}>
+                  <div style={{ padding: '20px 26px 0' }}><p style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', marginBottom: 10 }}>Activity</p></div>
+                  <div style={{ padding: '14px 26px 26px' }}>
+                  {(() => {
+                    const ag = loanAgreements.find(a => a.loan_id === manageLoanSelected.id);
+                    const loanPmts = allPayments.filter(p => p.loan_id === manageLoanSelected.id);
+                    const lenderProfile = publicProfiles.find(p => p.user_id === manageLoanSelected.lender_id);
+                    const borrowerProfile = publicProfiles.find(p => p.user_id === manageLoanSelected.borrower_id);
+                    const lenderName = lenderProfile?.username || 'lender';
+                    const borrowerName = borrowerProfile?.username || 'borrower';
+                    const activities = [];
+                    if (manageLoanSelected.created_at) activities.push({ timestamp: new Date(manageLoanSelected.created_at), type: 'created', description: `Loan created between @${borrowerName} and @${lenderName}` });
+                    if (ag?.borrower_signed_date) activities.push({ timestamp: new Date(ag.borrower_signed_date), type: 'signature', description: `@${borrowerName} signed the loan agreement` });
+                    if (ag?.lender_signed_date) activities.push({ timestamp: new Date(ag.lender_signed_date), type: 'signature', description: `@${lenderName} signed the loan agreement` });
+                    loanPmts.forEach(payment => {
+                      const isConfirmed = payment.status === 'confirmed';
+                      const isRecordedByUser = payment.recorded_by === user?.id;
+                      const pmtAmount = `$${(payment.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                      let desc;
+                      if (isLending) {
+                        if (isRecordedByUser) desc = `You ${isConfirmed ? 'confirmed' : 'recorded'} a ${pmtAmount} payment from @${borrowerName}`;
+                        else desc = `@${borrowerName} ${isConfirmed ? 'made' : 'recorded'} a ${pmtAmount} payment`;
+                      } else {
+                        if (isRecordedByUser) desc = `You ${isConfirmed ? 'made' : 'recorded'} a ${pmtAmount} payment to @${lenderName}`;
+                        else desc = `@${lenderName} recorded a ${pmtAmount} payment from @${borrowerName}`;
+                      }
+                      activities.push({ timestamp: new Date(payment.payment_date || payment.created_at), type: 'payment', description: desc, isAwaitingConfirmation: !isConfirmed });
+                    });
+                    if (ag?.cancelled_date) activities.push({ timestamp: new Date(ag.cancelled_date), type: 'cancellation', description: 'Loan was cancelled' });
+                    if (manageLoanSelected.status === 'completed') activities.push({ timestamp: new Date(), type: 'completion', description: 'Loan repaid in full' });
+                    activities.sort((a, b) => a.timestamp - b.timestamp);
+                    const getIcon = (type) => {
+                      const strokeColor = type === 'cancellation' ? '#E8726E' : '#678AFB';
+                      const paths = { created: 'M12 4v16m8-8H4', signature: 'M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z', payment: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1', cancellation: 'M6 18L18 6M6 6l12 12', completion: 'M5 13l4 4L19 7' };
+                      return <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke={strokeColor} strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d={paths[type] || ''} /></svg>;
+                    };
+                    const getDotColor = (type) => type === 'cancellation' ? 'bg-red-50 border-[#E8726E]' : 'bg-blue-50 border-[#678AFB]';
+                    if (activities.length === 0) return <p style={{ fontSize: 11, color: '#C7C6C4' }}>No activity recorded yet.</p>;
+                    return (
+                      <div className="space-y-0 max-h-[200px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                        {activities.map((activity, idx) => (
+                          <div key={idx} className="flex items-start gap-2.5 relative">
+                            {idx < activities.length - 1 && <div className="absolute left-[11px] top-[22px] w-[1px]" style={{ height: 'calc(100% - 6px)', background: 'rgba(103,138,251,0.2)' }} />}
+                            <div className={`w-[23px] h-[23px] rounded-full border-[1.5px] ${getDotColor(activity.type)} flex items-center justify-center flex-shrink-0 z-10 mt-1`}>{getIcon(activity.type)}</div>
+                            <div className="flex-1 min-w-0 pb-3">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <p style={{ fontSize: 11, color: '#1A1918', lineHeight: 1.4 }}>{activity.description}</p>
+                                {activity.isAwaitingConfirmation && <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-semibold bg-[#F59E0B]/20 text-[#F59E0B] border border-[#F59E0B]/30 whitespace-nowrap">Awaiting Confirmation</span>}
+                              </div>
+                              <p style={{ fontSize: 9, color: '#C7C6C4', marginTop: 2 }}>{format(activity.timestamp, 'MMM d, yyyy · h:mm a')}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                  </div>
+                </div>
+
+                {manageLoanSelected.status === 'cancelled' && (
+                  <div className="bg-red-50 rounded-xl px-4 py-3 shadow-sm border border-red-200"><p className="text-sm text-red-600 font-medium">This loan has been cancelled.</p></div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   if (isLoading) {
     return (
@@ -517,9 +1229,7 @@ export default function YourLoans() {
             <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} onClick={(e) => e.stopPropagation()} className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
               <div className="sticky top-0 bg-white border-b border-slate-100 p-4 flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(103,138,251,0.1)' }}>
-                    <FileText className="w-4 h-4" style={{ color: LEND_COLOR }} />
-                  </div>
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(103,138,251,0.1)' }}><FileText className="w-4 h-4" style={{ color: '#678AFB' }} /></div>
                   <span className="font-medium text-slate-800">
                     {activeDocPopup === 'promissory' && 'Promissory Note'}
                     {activeDocPopup === 'amortization' && 'Amortization Schedule'}
@@ -551,621 +1261,32 @@ export default function YourLoans() {
           <div className="twinkle-star" /><div className="twinkle-star" /><div className="twinkle-star" /><div className="twinkle-star" /><div className="twinkle-star" />
 
           <div style={{ position: 'relative', zIndex: 10, maxWidth: 1080, margin: '0 auto', padding: '0 28px' }}>
-            {/* Hero */}
             <div style={{ paddingTop: 80, paddingBottom: 20, textAlign: 'center' }}>
               <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.2rem', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.1, color: 'white', margin: 0 }}>Your Loans</h1>
             </div>
-
-            {/* Glass tab selector */}
-            <div className="glass-nav" style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 16, padding: '6px 24px', height: 48, margin: '0 auto 36px', maxWidth: 420, zIndex: 10 }}>
-              {[{ key: 'summary', label: 'Summary' }, { key: 'details', label: 'Loan Details' }].map(tab => (
+            <div className="glass-nav" style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 16, padding: '6px 24px', height: 48, margin: '0 auto 36px', maxWidth: 560, zIndex: 10 }}>
+              {[{key:'lending',label:'Lending'},{key:'borrowing',label:'Borrowing'},{key:'details',label:'Individual Loan Details'}].map(tab => (
                 <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{ flex: 1, padding: '6px 16px', borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: activeTab === tab.key ? 600 : 500, color: activeTab === tab.key ? '#1A1918' : '#787776', background: activeTab === tab.key ? 'rgba(0,0,0,0.06)' : 'transparent', transition: 'all 0.2s', fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap' }}>
                   {tab.label}
                 </button>
               ))}
             </div>
           </div>
+        </div>
 
-          {/* ═══════════════════ SUMMARY TAB ═══════════════════ */}
-          {activeTab === 'summary' && summaryData && (
-            <div style={{ position: 'relative', zIndex: 10, maxWidth: 1080, margin: '0 auto', padding: '0 28px 60px' }}>
-
-              {/* Quick Stats Row */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
-                {[
-                  { label: 'Total Lent', value: formatMoney(summaryData.totalLentAmt), color: LEND_COLOR, icon: <ArrowUpRight className="w-4 h-4" /> },
-                  { label: 'Total Borrowed', value: formatMoney(summaryData.totalBorrowedAmt), color: BORROW_COLOR, icon: <ArrowDownLeft className="w-4 h-4" /> },
-                  { label: 'Active Lending', value: activeLentLoans.length, color: LEND_COLOR, icon: <TrendingUp className="w-4 h-4" /> },
-                  { label: 'Active Borrowing', value: activeBorrowedLoans.length, color: BORROW_COLOR, icon: <ClipboardList className="w-4 h-4" /> }
-                ].map((stat, i) => (
-                  <div key={i} className="glass-card" style={{ padding: '18px 20px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                      <div style={{ width: 28, height: 28, borderRadius: '50%', background: `${stat.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: stat.color }}>{stat.icon}</div>
-                      <span style={{ fontSize: 11, color: '#787776', fontWeight: 500 }}>{stat.label}</span>
-                    </div>
-                    <p style={{ fontSize: 22, fontWeight: 700, color: '#1A1918', margin: 0 }}>{stat.value}</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Two-column layout */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-
-                {/* ── Per-Friend Exposure ── */}
-                <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
-                  <div style={{ padding: '20px 24px 0' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                      <Users className="w-4 h-4" style={{ color: LEND_COLOR }} />
-                      <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Per-Friend Exposure</span>
-                    </div>
-                    <p style={{ fontSize: 11, color: '#787776', marginBottom: 16 }}>Net lending position with each friend</p>
-                  </div>
-                  <div style={{ padding: '0 24px 20px', maxHeight: 280, overflowY: 'auto', scrollbarWidth: 'thin' }}>
-                    {summaryData.friendExposure.length === 0 ? (
-                      <p style={{ fontSize: 12, color: '#C7C6C4', padding: '12px 0' }}>No active loans yet.</p>
-                    ) : (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                        {summaryData.friendExposure.map(friend => (
-                          <div key={friend.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, background: 'rgba(0,0,0,0.03)' }}>
-                            <img src={friend.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent((friend.name || 'U').charAt(0))}&background=678AFB&color=fff&size=64`} alt="" className="w-8 h-8 rounded-full" style={{ flexShrink: 0 }} />
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <p style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', margin: 0 }}>{friend.name}</p>
-                              <div style={{ display: 'flex', gap: 12, fontSize: 10, color: '#787776' }}>
-                                {friend.lentTo > 0 && <span>Lent: <span style={{ color: LEND_COLOR, fontWeight: 600 }}>{formatMoney(friend.lentTo)}</span></span>}
-                                {friend.borrowedFrom > 0 && <span>Borrowed: <span style={{ color: BORROW_COLOR, fontWeight: 600 }}>{formatMoney(friend.borrowedFrom)}</span></span>}
-                              </div>
-                            </div>
-                            <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                              <p style={{ fontSize: 13, fontWeight: 700, color: friend.net > 0 ? LEND_COLOR : friend.net < 0 ? BORROW_COLOR : '#787776', margin: 0 }}>
-                                {friend.net > 0 ? '+' : ''}{formatMoney(friend.net)}
-                              </p>
-                              <p style={{ fontSize: 9, color: '#787776' }}>{friend.net > 0 ? 'They owe you' : friend.net < 0 ? 'You owe them' : 'Even'}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* ── Interest Analysis ── */}
-                <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
-                  <div style={{ padding: '20px 24px 0' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                      <Percent className="w-4 h-4" style={{ color: LEND_COLOR }} />
-                      <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Interest Analysis</span>
-                    </div>
-                    <p style={{ fontSize: 11, color: '#787776', marginBottom: 16 }}>Interest earned vs owed across your loans</p>
-                  </div>
-                  <div style={{ padding: '0 24px 20px' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
-                      <div style={{ background: `${LEND_COLOR}10`, borderRadius: 10, padding: '14px 16px', borderLeft: `3px solid ${LEND_COLOR}` }}>
-                        <p style={{ fontSize: 10, color: '#787776', marginBottom: 4 }}>Interest Earned (Lending)</p>
-                        <p style={{ fontSize: 20, fontWeight: 700, color: LEND_COLOR, margin: 0 }}>{formatMoney(summaryData.interestEarned)}</p>
-                        <p style={{ fontSize: 10, color: '#787776', marginTop: 4 }}>Avg rate: {summaryData.avgLendingRate.toFixed(1)}%</p>
-                      </div>
-                      <div style={{ background: `${BORROW_COLOR}10`, borderRadius: 10, padding: '14px 16px', borderLeft: `3px solid ${BORROW_COLOR}` }}>
-                        <p style={{ fontSize: 10, color: '#787776', marginBottom: 4 }}>Interest Owed (Borrowing)</p>
-                        <p style={{ fontSize: 20, fontWeight: 700, color: BORROW_COLOR, margin: 0 }}>{formatMoney(summaryData.interestOwed)}</p>
-                        <p style={{ fontSize: 10, color: '#787776', marginTop: 4 }}>Avg rate: {summaryData.avgBorrowingRate.toFixed(1)}%</p>
-                      </div>
-                    </div>
-                    <div style={{ background: 'rgba(0,0,0,0.03)', borderRadius: 10, padding: '12px 16px', textAlign: 'center' }}>
-                      <p style={{ fontSize: 10, color: '#787776', marginBottom: 2 }}>Net Interest Position</p>
-                      <p style={{ fontSize: 18, fontWeight: 700, color: (summaryData.interestEarned - summaryData.interestOwed) >= 0 ? LEND_COLOR : BORROW_COLOR, margin: 0 }}>
-                        {(summaryData.interestEarned - summaryData.interestOwed) >= 0 ? '+' : ''}{formatMoney(summaryData.interestEarned - summaryData.interestOwed)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* ── Payment Reliability ── */}
-                <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
-                  <div style={{ padding: '20px 24px 0' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                      <BarChart3 className="w-4 h-4" style={{ color: LEND_COLOR }} />
-                      <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Payment Reliability</span>
-                    </div>
-                    <p style={{ fontSize: 11, color: '#787776', marginBottom: 16 }}>On-time payment rates</p>
-                  </div>
-                  <div style={{ padding: '0 24px 20px' }}>
-                    {/* Your reliability as borrower */}
-                    {summaryData.yourOnTimeRate !== null && (
-                      <div style={{ marginBottom: 16 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                          <span style={{ fontSize: 12, fontWeight: 600, color: BORROW_COLOR }}>Your Reliability (as borrower)</span>
-                          <span style={{ fontSize: 14, fontWeight: 700, color: summaryData.yourOnTimeRate >= 80 ? '#22c55e' : summaryData.yourOnTimeRate >= 50 ? '#F59E0B' : OVERDUE_COLOR }}>{summaryData.yourOnTimeRate}%</span>
-                        </div>
-                        <div style={{ height: 6, borderRadius: 3, background: 'rgba(0,0,0,0.06)' }}>
-                          <div style={{ height: 6, borderRadius: 3, width: `${summaryData.yourOnTimeRate}%`, background: BORROW_COLOR, transition: 'width 0.5s' }} />
-                        </div>
-                      </div>
-                    )}
-                    {/* Borrower reliability (as lender) */}
-                    {summaryData.borrowerReliabilityList.length > 0 && (
-                      <div>
-                        <p style={{ fontSize: 11, fontWeight: 600, color: LEND_COLOR, marginBottom: 8 }}>Your Borrowers' Reliability</p>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 150, overflowY: 'auto', scrollbarWidth: 'thin' }}>
-                          {summaryData.borrowerReliabilityList.map(b => (
-                            <div key={b.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', borderRadius: 8, background: 'rgba(0,0,0,0.03)' }}>
-                              <span style={{ fontSize: 11, fontWeight: 500, color: '#1A1918', flex: 1 }}>@{b.username}</span>
-                              <div style={{ width: 60, height: 4, borderRadius: 2, background: 'rgba(0,0,0,0.06)' }}>
-                                <div style={{ height: 4, borderRadius: 2, width: `${b.rate}%`, background: b.rate >= 80 ? '#22c55e' : b.rate >= 50 ? '#F59E0B' : OVERDUE_COLOR }} />
-                              </div>
-                              <span style={{ fontSize: 11, fontWeight: 700, color: b.rate >= 80 ? '#22c55e' : b.rate >= 50 ? '#F59E0B' : OVERDUE_COLOR, minWidth: 32, textAlign: 'right' }}>{b.rate}%</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {summaryData.yourOnTimeRate === null && summaryData.borrowerReliabilityList.length === 0 && (
-                      <p style={{ fontSize: 12, color: '#C7C6C4' }}>No payment data yet.</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* ── Cash Flow Forecast ── */}
-                <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
-                  <div style={{ padding: '20px 24px 0' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                      <TrendingUp className="w-4 h-4" style={{ color: LEND_COLOR }} />
-                      <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Cash Flow Forecast</span>
-                    </div>
-                    <p style={{ fontSize: 11, color: '#787776', marginBottom: 16 }}>Projected inflows & outflows over the next 3 months</p>
-                  </div>
-                  <div style={{ padding: '0 24px 20px' }}>
-                    {summaryData.cashFlowMonths.length > 0 ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                        {summaryData.cashFlowMonths.map((month, i) => {
-                          const maxVal = Math.max(...summaryData.cashFlowMonths.map(m => Math.max(m.inflows, m.outflows)), 1);
-                          return (
-                            <div key={i} style={{ padding: '12px 14px', borderRadius: 10, background: 'rgba(0,0,0,0.03)' }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                                <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918' }}>{month.label}</span>
-                                <span style={{ fontSize: 12, fontWeight: 700, color: month.net >= 0 ? LEND_COLOR : BORROW_COLOR }}>
-                                  Net: {month.net >= 0 ? '+' : ''}{formatMoney(month.net)}
-                                </span>
-                              </div>
-                              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                                <div style={{ flex: 1 }}>
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#787776', marginBottom: 3 }}>
-                                    <span>Inflows</span><span style={{ color: LEND_COLOR, fontWeight: 600 }}>{formatMoney(month.inflows)}</span>
-                                  </div>
-                                  <div style={{ height: 5, borderRadius: 3, background: 'rgba(0,0,0,0.06)' }}>
-                                    <div style={{ height: 5, borderRadius: 3, width: `${(month.inflows / maxVal) * 100}%`, background: LEND_COLOR }} />
-                                  </div>
-                                </div>
-                                <div style={{ flex: 1 }}>
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#787776', marginBottom: 3 }}>
-                                    <span>Outflows</span><span style={{ color: BORROW_COLOR, fontWeight: 600 }}>{formatMoney(month.outflows)}</span>
-                                  </div>
-                                  <div style={{ height: 5, borderRadius: 3, background: 'rgba(0,0,0,0.06)' }}>
-                                    <div style={{ height: 5, borderRadius: 3, width: `${(month.outflows / maxVal) * 100}%`, background: BORROW_COLOR }} />
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <p style={{ fontSize: 12, color: '#C7C6C4' }}>No upcoming payments.</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* ── At-Risk / Overdue Loans (full width) ── */}
-                <div className="glass-card" style={{ padding: 0, overflow: 'hidden', gridColumn: '1 / -1' }}>
-                  <div style={{ padding: '20px 24px 0' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                      <AlertCircle className="w-4 h-4" style={{ color: OVERDUE_COLOR }} />
-                      <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>At-Risk Loans</span>
-                    </div>
-                    <p style={{ fontSize: 11, color: '#787776', marginBottom: 16 }}>Overdue or due within 7 days</p>
-                  </div>
-                  <div style={{ padding: '0 24px 20px' }}>
-                    {summaryData.atRiskLoans.length === 0 ? (
-                      <div style={{ textAlign: 'center', padding: '16px 0' }}>
-                        <p style={{ fontSize: 13, color: '#22c55e', fontWeight: 600 }}>All clear! No at-risk loans.</p>
-                      </div>
-                    ) : (
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 10 }}>
-                        {summaryData.atRiskLoans.map(item => {
-                          const roleColor = item.role === 'lender' ? LEND_COLOR : BORROW_COLOR;
-                          const roleLabel = item.role === 'lender' ? 'You lent to' : 'You borrowed from';
-                          return (
-                            <div key={item.id} style={{ padding: '14px 16px', borderRadius: 10, background: item.isOverdue ? 'rgba(232,114,110,0.06)' : 'rgba(245,158,11,0.06)', border: `1px solid ${item.isOverdue ? 'rgba(232,114,110,0.15)' : 'rgba(245,158,11,0.15)'}` }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                                <div>
-                                  <span style={{ fontSize: 9, fontWeight: 600, color: roleColor, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{roleLabel}</span>
-                                  <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', margin: 0 }}>@{item.otherUsername}</p>
-                                </div>
-                                <span style={{ fontSize: 10, fontWeight: 600, padding: '3px 8px', borderRadius: 6, background: item.isOverdue ? 'rgba(232,114,110,0.15)' : 'rgba(245,158,11,0.15)', color: item.isOverdue ? OVERDUE_COLOR : '#F59E0B' }}>
-                                  {item.isOverdue ? `${Math.abs(item.daysUntil)}d overdue` : `Due in ${item.daysUntil}d`}
-                                </span>
-                              </div>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#787776' }}>
-                                <span>Loan: {formatMoney(item.amount)}</span>
-                                <span>Payment: {formatMoney(item.paymentAmount)}</span>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* ── Loan Timeline / Completion (full width) ── */}
-                <div className="glass-card" style={{ padding: 0, overflow: 'hidden', gridColumn: '1 / -1' }}>
-                  <div style={{ padding: '20px 24px 0' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                      <History className="w-4 h-4" style={{ color: LEND_COLOR }} />
-                      <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Loan Progress Timeline</span>
-                    </div>
-                    <p style={{ fontSize: 11, color: '#787776', marginBottom: 16 }}>All active loans sorted by completion progress</p>
-                  </div>
-                  <div style={{ padding: '0 24px 20px', maxHeight: 320, overflowY: 'auto', scrollbarWidth: 'thin' }}>
-                    {summaryData.loanTimeline.length === 0 ? (
-                      <p style={{ fontSize: 12, color: '#C7C6C4', padding: '12px 0' }}>No active loans.</p>
-                    ) : (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                        {summaryData.loanTimeline.map(item => {
-                          const roleColor = item.role === 'lender' ? LEND_COLOR : BORROW_COLOR;
-                          const roleTag = item.role === 'lender' ? 'LENDING' : 'BORROWING';
-                          return (
-                            <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 10, background: 'rgba(0,0,0,0.03)' }}>
-                              <div style={{ width: 40, textAlign: 'center', flexShrink: 0 }}>
-                                <p style={{ fontSize: 16, fontWeight: 700, color: roleColor, margin: 0 }}>{Math.round(item.progress)}%</p>
-                              </div>
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                                  <span style={{ fontSize: 8, fontWeight: 700, color: roleColor, background: `${roleColor}15`, padding: '2px 6px', borderRadius: 4, letterSpacing: '0.06em' }}>{roleTag}</span>
-                                  <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918' }}>@{item.otherUsername}</span>
-                                  <span style={{ fontSize: 11, color: '#787776' }}>{formatMoney(item.amount)}</span>
-                                </div>
-                                <div style={{ height: 5, borderRadius: 3, background: 'rgba(0,0,0,0.06)' }}>
-                                  <div style={{ height: 5, borderRadius: 3, width: `${item.progress}%`, background: roleColor, transition: 'width 0.5s' }} />
-                                </div>
-                                {item.purpose && <p style={{ fontSize: 10, color: '#787776', marginTop: 4 }}>{item.purpose}</p>}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ═══════════════════ LOAN DETAILS TAB ═══════════════════ */}
-          {activeTab === 'details' && (
-            <div style={{ position: 'relative', zIndex: 10, maxWidth: 1080, margin: '0 auto', padding: '0 28px 60px' }}>
-              {manageableLoans.length === 0 ? (
-                <div className="glass-card" style={{ padding: 40, textAlign: 'center' }}>
-                  <p style={{ fontSize: 16, fontWeight: 600, color: '#1A1918', marginBottom: 8 }}>No loans yet</p>
-                  <p style={{ fontSize: 13, color: '#787776' }}>Create a loan or accept a loan offer to get started.</p>
-                </div>
-              ) : (() => {
-                // Group loans by role
-                const lendingLoans = manageableLoans.filter(l => l.lender_id === user?.id);
-                const borrowingLoans = manageableLoans.filter(l => l.borrower_id === user?.id);
-                const selectedRole = manageLoanSelected ? getLoanRole(manageLoanSelected) : null;
-                const selectedColor = selectedRole === 'lender' ? LEND_COLOR : BORROW_COLOR;
-                const agreement = manageLoanSelected ? getAgreementForLoan(manageLoanSelected.id) : null;
-                const otherParty = manageLoanSelected ? getOtherParty(manageLoanSelected) : null;
-
-                return (
-                  <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: 20, alignItems: 'start' }}>
-                    {/* Loan Selector */}
-                    <div className="glass-card" style={{ padding: 0, overflow: 'hidden', position: 'sticky', top: 20 }}>
-                      <div style={{ padding: '16px 20px 0' }}>
-                        <p style={{ fontSize: 13, fontWeight: 600, color: '#0D0D0C', marginBottom: 12 }}>Select a Loan</p>
-                      </div>
-                      <div style={{ maxHeight: 460, overflowY: 'auto', scrollbarWidth: 'thin', padding: '0 12px 12px' }}>
-                        {/* Lending Section */}
-                        {lendingLoans.length > 0 && (
-                          <>
-                            <p style={{ fontSize: 10, fontWeight: 700, color: LEND_COLOR, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '10px 8px 6px', margin: 0 }}>You're Lending ({lendingLoans.length})</p>
-                            {lendingLoans.map(loan => {
-                              const other = getOtherParty(loan);
-                              const isSelected = manageLoanSelected?.id === loan.id;
-                              return (
-                                <button key={loan.id} onClick={() => setManageLoanSelected(loan)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, border: 'none', cursor: 'pointer', background: isSelected ? `${LEND_COLOR}12` : 'transparent', transition: 'background 0.15s', textAlign: 'left', marginBottom: 2 }}>
-                                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: `${LEND_COLOR}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                    <ArrowUpRight className="w-3.5 h-3.5" style={{ color: LEND_COLOR }} />
-                                  </div>
-                                  <div style={{ flex: 1, minWidth: 0 }}>
-                                    <p style={{ fontSize: 12, fontWeight: isSelected ? 700 : 500, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>@{other.username}</p>
-                                    <p style={{ fontSize: 10, color: '#787776', margin: 0 }}>{formatMoney(loan.amount)} · {loan.status}</p>
-                                  </div>
-                                  {isSelected && <div style={{ width: 4, height: 20, borderRadius: 2, background: LEND_COLOR, flexShrink: 0 }} />}
-                                </button>
-                              );
-                            })}
-                          </>
-                        )}
-                        {/* Borrowing Section */}
-                        {borrowingLoans.length > 0 && (
-                          <>
-                            <p style={{ fontSize: 10, fontWeight: 700, color: BORROW_COLOR, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '10px 8px 6px', margin: 0 }}>You're Borrowing ({borrowingLoans.length})</p>
-                            {borrowingLoans.map(loan => {
-                              const other = getOtherParty(loan);
-                              const isSelected = manageLoanSelected?.id === loan.id;
-                              return (
-                                <button key={loan.id} onClick={() => setManageLoanSelected(loan)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, border: 'none', cursor: 'pointer', background: isSelected ? `${BORROW_COLOR}12` : 'transparent', transition: 'background 0.15s', textAlign: 'left', marginBottom: 2 }}>
-                                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: `${BORROW_COLOR}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                    <ArrowDownLeft className="w-3.5 h-3.5" style={{ color: BORROW_COLOR }} />
-                                  </div>
-                                  <div style={{ flex: 1, minWidth: 0 }}>
-                                    <p style={{ fontSize: 12, fontWeight: isSelected ? 700 : 500, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>@{other.username}</p>
-                                    <p style={{ fontSize: 10, color: '#787776', margin: 0 }}>{formatMoney(loan.amount)} · {loan.status}</p>
-                                  </div>
-                                  {isSelected && <div style={{ width: 4, height: 20, borderRadius: 2, background: BORROW_COLOR, flexShrink: 0 }} />}
-                                </button>
-                              );
-                            })}
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Loan Detail Panel */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                      {manageLoanSelected && otherParty && (
-                        <>
-                          {/* Role Banner */}
-                          <div className="glass-card" style={{ padding: '16px 24px', borderLeft: `4px solid ${selectedColor}` }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                <img src={otherParty.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((otherParty.full_name || 'U').charAt(0))}&background=${selectedColor.replace('#','')}&color=fff&size=64`} alt="" className="w-10 h-10 rounded-full" />
-                                <div>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                    <span style={{ fontSize: 8, fontWeight: 700, color: selectedColor, background: `${selectedColor}15`, padding: '2px 6px', borderRadius: 4, letterSpacing: '0.06em' }}>
-                                      {selectedRole === 'lender' ? 'LENDING TO' : 'BORROWING FROM'}
-                                    </span>
-                                  </div>
-                                  <p style={{ fontSize: 16, fontWeight: 700, color: '#1A1918', margin: '2px 0 0' }}>{otherParty.full_name}</p>
-                                  <p style={{ fontSize: 11, color: '#787776' }}>@{otherParty.username}</p>
-                                </div>
-                              </div>
-                              <div style={{ textAlign: 'right' }}>
-                                <p style={{ fontSize: 22, fontWeight: 700, color: selectedColor, margin: 0 }}>{formatMoney(manageLoanSelected.amount)}</p>
-                                <Badge className={`capitalize text-xs ${manageLoanSelected.status === 'active' ? 'bg-green-100 text-green-700' : manageLoanSelected.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>{manageLoanSelected.status}</Badge>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Quick Actions */}
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, padding: '4px 0' }}>
-                            <button onClick={handleMakePayment} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', background: 'none', border: 'none' }}>
-                              <div style={{ width: 48, height: 48, borderRadius: '50%', background: `${selectedColor}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <DollarSign className="w-5 h-5" style={{ color: selectedColor }} />
-                              </div>
-                              <p style={{ fontSize: 10, fontWeight: 600, color: '#1A1918', textAlign: 'center', lineHeight: 1.3 }}>Record<br/>Payment</p>
-                            </button>
-                            {selectedRole === 'lender' && manageLoanSelected.status === 'active' && (
-                              <button onClick={() => handleEditLoan(manageLoanSelected)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', background: 'none', border: 'none' }}>
-                                <div style={{ width: 48, height: 48, borderRadius: '50%', background: `${selectedColor}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  <Pencil className="w-5 h-5" style={{ color: selectedColor }} />
-                                </div>
-                                <p style={{ fontSize: 10, fontWeight: 600, color: '#1A1918', textAlign: 'center', lineHeight: 1.3 }}>Edit<br/>Loan</p>
-                              </button>
-                            )}
-                            {manageLoanSelected.status === 'active' && (
-                              <button onClick={() => handleCancelLoan(manageLoanSelected)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', background: 'none', border: 'none' }}>
-                                <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(232,114,110,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  <X className="w-5 h-5" style={{ color: OVERDUE_COLOR }} />
-                                </div>
-                                <p style={{ fontSize: 10, fontWeight: 600, color: '#1A1918', textAlign: 'center', lineHeight: 1.3 }}>Request<br/>Cancel</p>
-                              </button>
-                            )}
-                          </div>
-
-                          {/* Document Icons */}
-                          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 20, padding: '4px 0' }}>
-                            {[
-                              { type: 'promissory', label: 'Promissory\nNote', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={selectedColor} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg> },
-                              { type: 'amortization', label: 'Amortization\nSchedule', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={selectedColor} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> },
-                              { type: 'summary', label: 'Loan\nSummary', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={selectedColor} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg> }
-                            ].map(doc => (
-                              <button key={doc.type} onClick={() => { const ag = getAgreementForLoan(manageLoanSelected.id); if (ag) openDocPopup(doc.type, ag); }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', background: 'none', border: 'none' }}>
-                                <div style={{ width: 48, height: 48, borderRadius: '50%', background: `${selectedColor}10`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{doc.icon}</div>
-                                <p style={{ fontSize: 10, fontWeight: 600, color: '#1A1918', textAlign: 'center', lineHeight: 1.3, whiteSpace: 'pre-line' }}>{doc.label}</p>
-                              </button>
-                            ))}
-                          </div>
-
-                          {/* Loan Progress Stats */}
-                          <div className="glass-card">
-                            <div style={{ padding: '20px 26px 0' }}>
-                              <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Loan Progress</span>
-                            </div>
-                            <div style={{ padding: '14px 26px 26px' }}>
-                              {(() => {
-                                const repaymentPeriod = manageLoanSelected.repayment_period || 0;
-                                const paymentFrequency = manageLoanSelected.payment_frequency || 'monthly';
-                                const totalOwedDisplay = loanAnalysis ? loanAnalysis.totalOwedNow : (manageLoanSelected.total_amount || manageLoanSelected.amount || 0);
-                                const amountPaidDisplay = loanAnalysis ? loanAnalysis.totalPaid : (manageLoanSelected.amount_paid || 0);
-                                const fullPayments = loanAnalysis ? loanAnalysis.fullPaymentCount : 0;
-                                const paymentAmountDisplay = loanAnalysis ? loanAnalysis.nextPaymentAmount : (manageLoanSelected.payment_amount || 0);
-                                const freqLabel = paymentFrequency.charAt(0).toUpperCase() + paymentFrequency.slice(1);
-                                const otherLabel = selectedRole === 'lender' ? `from @${otherParty.username}` : `to @${otherParty.username}`;
-                                const items = [
-                                  { label: selectedRole === 'lender' ? 'Total Owed to You' : 'Total You Owe', value: `$${totalOwedDisplay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: 'with interest' },
-                                  { label: 'Amount Paid', value: `$${amountPaidDisplay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: null },
-                                  { label: 'Payments Made', value: `${fullPayments}/${repaymentPeriod}`, sub: 'full payments' },
-                                  { label: `${freqLabel} Payments`, value: `$${paymentAmountDisplay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: otherLabel },
-                                ];
-                                return (
-                                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-                                    {items.map((item, idx) => (
-                                      <div key={idx} style={{ textAlign: 'center' }}>
-                                        <p style={{ fontSize: 10, color: '#787776', fontWeight: 500, marginBottom: 2 }}>{item.label}</p>
-                                        <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>{item.value}</p>
-                                        {item.sub && <p style={{ fontSize: 9, color: '#787776', marginTop: 2 }}>{item.sub}</p>}
-                                      </div>
-                                    ))}
-                                  </div>
-                                );
-                              })()}
-                            </div>
-                          </div>
-
-                          {/* Payments Table */}
-                          <div className="glass-card">
-                            <div style={{ padding: '20px 26px 0' }}>
-                              <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Payments</span>
-                            </div>
-                            <div style={{ padding: '14px 26px 26px' }}>
-                              {(() => {
-                                const paymentAmt = manageLoanSelected.payment_amount || 0;
-                                let firstRecordFound = false;
-                                const paymentRows = loanAnalysis ? loanAnalysis.periodResults.map((pr) => {
-                                  let status;
-                                  if (pr.hasConfirmedPayments && pr.isFullPayment) status = 'completed';
-                                  else if (pr.hasAnyPayments && !pr.isPast) status = 'in_progress';
-                                  else if (pr.hasConfirmedPayments && !pr.isFullPayment) status = 'partial';
-                                  else if (pr.hasPendingPayments && !pr.hasConfirmedPayments) status = 'pending';
-                                  else if (pr.isPast && !pr.hasAnyPayments) status = 'missed';
-                                  else if (!firstRecordFound) { status = 'record'; firstRecordFound = true; }
-                                  else status = 'upcoming';
-                                  const scheduledAmount = pr.scheduledAmount || (loanAnalysis.recalcPayment > 0 ? loanAnalysis.recalcPayment : paymentAmt);
-                                  const paidAmount = pr.actualPaid || 0;
-                                  const paidPercentage = scheduledAmount > 0 ? Math.min(100, (paidAmount / scheduledAmount) * 100) : 0;
-                                  return { number: pr.period, date: pr.date, amount: scheduledAmount, paidAmount, paidPercentage, status, isFullPayment: pr.isFullPayment, deficit: pr.deficit };
-                                }) : [];
-                                const statusConfig = {
-                                  completed: { label: 'Completed', bg: `${selectedColor}15`, text: selectedColor, ringColor: selectedColor, fillColor: selectedColor },
-                                  in_progress: { label: 'In Progress', bg: `${selectedColor}15`, text: selectedColor, ringColor: selectedColor, fillColor: selectedColor },
-                                  partial: { label: 'Partial', bg: 'rgba(245,158,11,0.1)', text: '#F59E0B', ringColor: '#F59E0B', fillColor: '#F59E0B' },
-                                  pending: { label: 'Pending', bg: 'rgba(245,158,11,0.1)', text: '#F59E0B', ringColor: '#F59E0B', fillColor: '#F59E0B' },
-                                  missed: { label: 'Missed', bg: 'rgba(232,114,110,0.1)', text: OVERDUE_COLOR, ringColor: OVERDUE_COLOR, fillColor: OVERDUE_COLOR },
-                                  record: { label: 'Record Payment', bg: selectedColor, text: 'white', ringColor: selectedColor, fillColor: selectedColor },
-                                  upcoming: { label: 'Upcoming', bg: 'rgba(0,0,0,0.03)', text: '#787776', ringColor: `${selectedColor}50`, fillColor: `${selectedColor}50` },
-                                };
-                                const PieCircle = ({ percentage, ringColor, fillColor, number, size = 32 }) => {
-                                  const r = (size / 2) - 2; const pcx = size / 2; const pcy = size / 2;
-                                  const circumference = 2 * Math.PI * r; const filled = (percentage / 100) * circumference;
-                                  return (
-                                    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ flexShrink: 0 }}>
-                                      <circle cx={pcx} cy={pcy} r={r} fill="#F7F7F7" stroke={ringColor} strokeWidth="2" strokeOpacity="0.3" />
-                                      {percentage > 0 && (<circle cx={pcx} cy={pcy} r={r} fill="none" stroke={fillColor} strokeWidth="2" strokeDasharray={`${filled} ${circumference - filled}`} strokeDashoffset={circumference * 0.25} strokeLinecap="round" transform={`rotate(-90 ${pcx} ${pcy})`} />)}
-                                      <text x={pcx} y={pcy} textAnchor="middle" dominantBaseline="central" fill="#1A1918" fontSize="11" fontWeight="bold" fontFamily="'DM Sans', sans-serif">{number}</text>
-                                    </svg>
-                                  );
-                                };
-                                return (
-                                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 240, overflowY: 'auto', scrollbarWidth: 'thin' }}>
-                                    {paymentRows.map((row) => {
-                                      const cfg = statusConfig[row.status];
-                                      return (
-                                        <div key={row.number} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 8, borderRadius: 10, background: 'rgba(0,0,0,0.03)' }}>
-                                          <PieCircle percentage={row.paidPercentage} ringColor={cfg.ringColor} fillColor={cfg.fillColor} number={row.number} />
-                                          <div style={{ flex: 1, minWidth: 0 }}>
-                                            <p style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', margin: 0 }}>${row.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                                            <p style={{ fontSize: 10, color: '#787776', margin: 0 }}>{format(row.date, 'MMM d, yyyy')}</p>
-                                          </div>
-                                          {row.status === 'record' ? (
-                                            <button onClick={handleMakePayment} style={{ flexShrink: 0, padding: '4px 10px', borderRadius: 8, fontSize: 10, fontWeight: 600, background: cfg.bg, color: cfg.text, border: 'none', cursor: 'pointer' }}>{cfg.label}</button>
-                                          ) : (
-                                            <span style={{ flexShrink: 0, padding: '4px 10px', borderRadius: 8, fontSize: 10, fontWeight: 600, background: cfg.bg, color: cfg.text }}>{cfg.label}</span>
-                                          )}
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
-                                );
-                              })()}
-                            </div>
-                          </div>
-
-                          {/* Activity Timeline */}
-                          <div className="glass-card" style={{ overflow: 'hidden' }}>
-                            <div style={{ padding: '20px 26px 0' }}>
-                              <p style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', marginBottom: 10, fontFamily: "'DM Sans', system-ui, sans-serif" }}>Activity</p>
-                            </div>
-                            <div style={{ padding: '14px 26px 26px' }}>
-                              {(() => {
-                                const ag = getAgreementForLoan(manageLoanSelected.id);
-                                const loanPmts = allPayments.filter(p => p.loan_id === manageLoanSelected.id);
-                                const lenderProfile = getUserById(manageLoanSelected.lender_id);
-                                const borrowerProfile = getUserById(manageLoanSelected.borrower_id);
-                                const lenderName = lenderProfile?.username || 'lender';
-                                const borrowerName = borrowerProfile?.username || 'borrower';
-
-                                const activities = [];
-                                if (manageLoanSelected.created_at) activities.push({ timestamp: new Date(manageLoanSelected.created_at), type: 'created', description: `Loan created between @${borrowerName} and @${lenderName}` });
-                                if (ag?.borrower_signed_date) activities.push({ timestamp: new Date(ag.borrower_signed_date), type: 'signature', description: `@${borrowerName} signed the loan agreement` });
-                                if (ag?.lender_signed_date) activities.push({ timestamp: new Date(ag.lender_signed_date), type: 'signature', description: `@${lenderName} signed the loan agreement` });
-                                loanPmts.forEach(payment => {
-                                  const isConfirmed = payment.status === 'confirmed';
-                                  const isRecordedByUser = payment.recorded_by === user?.id;
-                                  const pmtAmount = `$${(payment.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                                  let desc;
-                                  if (isRecordedByUser) desc = `You ${isConfirmed ? 'made' : 'recorded'} a ${pmtAmount} payment`;
-                                  else desc = `@${getUserById(payment.recorded_by)?.username || 'user'} recorded a ${pmtAmount} payment`;
-                                  activities.push({ timestamp: new Date(payment.payment_date || payment.created_at), type: 'payment', description: desc, isAwaitingConfirmation: !isConfirmed });
-                                });
-                                if (ag?.cancelled_date) activities.push({ timestamp: new Date(ag.cancelled_date), type: 'cancellation', description: 'Loan was cancelled' });
-                                if (manageLoanSelected.status === 'completed') activities.push({ timestamp: new Date(), type: 'completion', description: 'Loan repaid in full' });
-                                activities.sort((a, b) => a.timestamp - b.timestamp);
-
-                                const getIcon = (type) => {
-                                  const strokeColor = type === 'cancellation' ? OVERDUE_COLOR : selectedColor;
-                                  const paths = {
-                                    created: 'M12 4v16m8-8H4',
-                                    signature: 'M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z',
-                                    payment: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1',
-                                    cancellation: 'M6 18L18 6M6 6l12 12',
-                                    completion: 'M5 13l4 4L19 7'
-                                  };
-                                  return <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke={strokeColor} strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d={paths[type] || ''} /></svg>;
-                                };
-                                const getDotColor = (type) => type === 'cancellation' ? `bg-red-50 border-[${OVERDUE_COLOR}]` : 'bg-blue-50 border-[#678AFB]';
-
-                                if (activities.length === 0) return <p style={{ fontSize: 11, color: '#C7C6C4' }}>No activity recorded yet.</p>;
-                                return (
-                                  <div className="space-y-0 max-h-[200px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-                                    {activities.map((activity, idx) => (
-                                      <div key={idx} className="flex items-start gap-2.5 relative">
-                                        {idx < activities.length - 1 && <div className="absolute left-[11px] top-[22px] w-[1px]" style={{ height: 'calc(100% - 6px)', background: `${selectedColor}30` }} />}
-                                        <div className={`w-[23px] h-[23px] rounded-full border-[1.5px] ${getDotColor(activity.type)} flex items-center justify-center flex-shrink-0 z-10 mt-1`}>{getIcon(activity.type)}</div>
-                                        <div className="flex-1 min-w-0 pb-3">
-                                          <div className="flex items-center gap-2 flex-wrap">
-                                            <p style={{ fontSize: 11, color: '#1A1918', fontFamily: "'DM Sans', system-ui, sans-serif", lineHeight: 1.4 }}>{activity.description}</p>
-                                            {activity.isAwaitingConfirmation && <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-semibold bg-[#F59E0B]/20 text-[#F59E0B] border border-[#F59E0B]/30 whitespace-nowrap">Awaiting Confirmation</span>}
-                                          </div>
-                                          <p style={{ fontSize: 9, color: '#C7C6C4', fontFamily: "'DM Sans', system-ui, sans-serif", marginTop: 2 }}>{format(activity.timestamp, 'MMM d, yyyy · h:mm a')}</p>
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                );
-                              })()}
-                            </div>
-                          </div>
-
-                          {/* Cancelled notice */}
-                          {manageLoanSelected.status === 'cancelled' && (
-                            <div className="bg-red-50 rounded-xl px-4 py-3 shadow-sm border border-red-200">
-                              <p className="text-sm text-red-600 font-medium">This loan has been cancelled.</p>
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  </div>
-                );
-              })()}
-            </div>
-          )}
+        {/* Page content */}
+        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px 64px', position: 'relative', zIndex: 10 }}>
+          {activeTab === 'lending' && renderSummaryTab('lending')}
+          {activeTab === 'borrowing' && renderSummaryTab('borrowing')}
+          {activeTab === 'details' && renderDetailsTab()}
         </div>
       </div>
 
-      {/* Cancel Loan Dialog */}
+      {/* Modals */}
+      {showDetailsModal && selectedLoanDetails && (
+        <LoanDetailsModal loan={selectedLoanDetails.loan} type={selectedLoanDetails.type} isOpen={showDetailsModal} user={user} onCancel={() => handleCancelLoan(selectedLoanDetails.loan)} onClose={() => { setShowDetailsModal(false); setSelectedLoanDetails(null); }} />
+      )}
+
       <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
         <AlertDialogContent className="rounded-2xl border-0 p-0 overflow-hidden" style={{ backgroundColor: '#F7F7F7' }}>
           <div className="p-6 pb-4">
@@ -1175,8 +1296,8 @@ export default function YourLoans() {
             </AlertDialogHeader>
           </div>
           <div className="px-6 pb-6 flex flex-col sm:flex-row gap-3">
-            <AlertDialogCancel className="flex-1 rounded-xl border-0 font-semibold text-white text-[14px] h-12 hover:opacity-90 transition-all" style={{ backgroundColor: LEND_COLOR }}>Keep Loan</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmCancelLoan} className="flex-1 rounded-xl border-0 font-semibold text-white text-[14px] h-12 hover:opacity-90 transition-all" style={{ backgroundColor: OVERDUE_COLOR }}>Request Loan Cancellation</AlertDialogAction>
+            <AlertDialogCancel className="flex-1 rounded-xl border-0 font-semibold text-white text-[14px] h-12 hover:opacity-90 transition-all" style={{ backgroundColor: '#678AFB' }}>Keep Loan</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmCancelLoan} className="flex-1 rounded-xl border-0 font-semibold text-white text-[14px] h-12 hover:opacity-90 transition-all" style={{ backgroundColor: '#E8726E' }}>Request Loan Cancellation</AlertDialogAction>
           </div>
         </AlertDialogContent>
       </AlertDialog>
@@ -1194,10 +1315,7 @@ export default function YourLoans() {
                 <button onClick={() => { setShowEditLoanModal(false); setEditLoanData(null); }} className="text-slate-400 hover:text-slate-600"><X className="w-6 h-6" /></button>
               </div>
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-6">
-                <div className="flex items-start gap-2">
-                  <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                  <div className="text-sm text-amber-800"><p className="font-medium">Contract Modification Notice</p><p className="text-amber-700">All changes will be recorded in the loan history and the borrower will need to approve the new terms.</p></div>
-                </div>
+                <div className="flex items-start gap-2"><AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" /><div className="text-sm text-amber-800"><p className="font-medium">Contract Modification Notice</p><p className="text-amber-700">All changes will be recorded in the loan history and the borrower will need to approve the new terms.</p></div></div>
               </div>
               <div className="space-y-4">
                 <div className="space-y-2"><Label htmlFor="edit-amount" className="flex items-center gap-2"><DollarSign className="w-4 h-4 text-amber-600" />Loan Amount</Label><Input id="edit-amount" type="number" step="0.01" min="0" value={editLoanData.amount} onChange={(e) => setEditLoanData(prev => ({ ...prev, amount: e.target.value }))} /></div>
@@ -1205,12 +1323,7 @@ export default function YourLoans() {
                 <div className="space-y-2"><Label htmlFor="edit-period" className="flex items-center gap-2"><Clock className="w-4 h-4 text-amber-600" />Repayment Period (months)</Label><Input id="edit-period" type="number" min="1" value={editLoanData.repayment_period} onChange={(e) => setEditLoanData(prev => ({ ...prev, repayment_period: e.target.value }))} /></div>
                 <div className="space-y-2">
                   <Label className="flex items-center gap-2"><Calendar className="w-4 h-4 text-amber-600" />Payment Frequency</Label>
-                  <Select value={editLoanData.payment_frequency} onValueChange={(value) => setEditLoanData(prev => ({ ...prev, payment_frequency: value }))}>
-                    <SelectTrigger><SelectValue placeholder="Select frequency" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">None</SelectItem><SelectItem value="daily">Daily</SelectItem><SelectItem value="weekly">Weekly</SelectItem><SelectItem value="biweekly">Bi-weekly</SelectItem><SelectItem value="monthly">Monthly</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Select value={editLoanData.payment_frequency} onValueChange={(value) => setEditLoanData(prev => ({ ...prev, payment_frequency: value }))}><SelectTrigger><SelectValue placeholder="Select frequency" /></SelectTrigger><SelectContent><SelectItem value="none">None</SelectItem><SelectItem value="daily">Daily</SelectItem><SelectItem value="weekly">Weekly</SelectItem><SelectItem value="biweekly">Bi-weekly</SelectItem><SelectItem value="monthly">Monthly</SelectItem></SelectContent></Select>
                 </div>
                 <div className="space-y-2"><Label htmlFor="edit-due-date" className="flex items-center gap-2"><Calendar className="w-4 h-4 text-amber-600" />Due Date</Label><Input id="edit-due-date" type="date" value={editLoanData.due_date || ''} onChange={(e) => setEditLoanData(prev => ({ ...prev, due_date: e.target.value }))} /></div>
                 <div className="space-y-2"><Label htmlFor="edit-purpose" className="flex items-center gap-2"><FileText className="w-4 h-4 text-amber-600" />Purpose</Label><Input id="edit-purpose" type="text" value={editLoanData.purpose} onChange={(e) => setEditLoanData(prev => ({ ...prev, purpose: e.target.value }))} maxLength={100} /></div>
