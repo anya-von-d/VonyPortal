@@ -639,7 +639,7 @@ export default function Home() {
 
         {/* Top row grid: quick actions + snapshot cards */}
         <div style={{ marginTop: 36 }}>
-          <div className="home-top-row" style={{ display: 'grid', gridTemplateColumns: '0.75fr 1fr', columnGap: 16, rowGap: 16, alignItems: 'start' }}>
+          <div className="home-top-row" style={{ display: 'grid', gridTemplateColumns: '0.75fr 1fr 1fr', columnGap: 16, rowGap: 16, alignItems: 'start' }}>
 
             {/* Left column: Next Repayment + Monthly Stats */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, gridRow: '1 / 5' }}>
@@ -695,22 +695,21 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Lending & Borrowing snapshot */}
+            {/* Middle column: Lending snapshot */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div className="glass-card" style={{ padding: '20px 22px 18px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', fontFamily: "'DM Sans', sans-serif" }}>Lending & Borrowing</div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', fontFamily: "'DM Sans', sans-serif" }}>You've lent</div>
                   <Link to={createPageUrl("YourLoans")} style={{ fontSize: 11, fontWeight: 500, color: '#A79DEA', textDecoration: 'none' }}>Details</Link>
                 </div>
-
-                {/* You've lent */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginTop: 4 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 11, fontWeight: 500, color: '#787776', marginBottom: 4 }}>You've lent</div>
                     <div style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.03em', color: '#1A1918', lineHeight: 1, marginBottom: 2 }}>{formatMoney(totalLentAmount)}</div>
-                    <div style={{ fontSize: 11, color: '#787776', marginBottom: 8 }}>across all loans</div>
+                    <div style={{ fontSize: 11, color: '#787776', marginBottom: 12 }}>across all loans</div>
                     {lentLoans.length > 0 && (
-                      <div>
+                      <div style={{ marginTop: 8 }}>
                         {lentOnTrack > 0 && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 500, background: 'rgba(103,138,251,0.15)', color: '#678AFB' }}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#678AFB' }} />{lentOnTrack} on track</span>}
                         {overdueFromBorrowers > 0 && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 500, background: 'rgba(232,114,110,0.12)', color: '#E8726E', marginLeft: lentOnTrack > 0 ? 8 : 0 }}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#E8726E' }} />{overdueFromBorrowers} late</span>}
                       </div>
@@ -724,17 +723,22 @@ export default function Home() {
                     <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: '#292827', letterSpacing: '-0.03em' }}>{percentRepaid}%</div>
                   </div>
                 </div>
+              </div>
+            </div>
 
-                <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', margin: '16px 0' }} />
-
-                {/* You've borrowed */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+            {/* Right column: Borrowing snapshot */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div className="glass-card" style={{ padding: '20px 22px 18px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', fontFamily: "'DM Sans', sans-serif" }}>You've borrowed</div>
+                  <Link to={createPageUrl("YourLoans")} style={{ fontSize: 11, fontWeight: 500, color: '#A79DEA', textDecoration: 'none' }}>Details</Link>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginTop: 4 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 11, fontWeight: 500, color: '#787776', marginBottom: 4 }}>You've borrowed</div>
                     <div style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.03em', color: '#1A1918', lineHeight: 1, marginBottom: 2 }}>{formatMoney(totalBorrowedAmount)}</div>
-                    <div style={{ fontSize: 11, color: '#787776', marginBottom: 8 }}>across all loans</div>
+                    <div style={{ fontSize: 11, color: '#787776', marginBottom: 12 }}>across all loans</div>
                     {borrowedLoans.length > 0 && (
-                      <div>
+                      <div style={{ marginTop: 8 }}>
                         {borrowingOnTrack > 0 && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 500, background: 'rgba(103,138,251,0.15)', color: '#678AFB' }}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#678AFB' }} />{borrowingOnTrack} on track</span>}
                         {borrowingOverdue > 0 && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 500, background: 'rgba(232,114,110,0.12)', color: '#E8726E', marginLeft: borrowingOnTrack > 0 ? 8 : 0 }}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#E8726E' }} />{borrowingOverdue} late</span>}
                       </div>
