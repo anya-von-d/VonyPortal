@@ -587,33 +587,9 @@ export default function Home() {
           <div className="twinkle-star" />
         </div>
 
-      {/* ── Top bar ── */}
-      <div className="home-top-bar" style={{
-        position: 'fixed', top: 0, left: 240, right: 0, zIndex: 51,
-        transition: 'transform 0.35s ease', background: 'transparent',
-        transform: topBarHidden ? 'translateY(-100%)' : 'translateY(0)'
-      }}>
-        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '14px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link to="/" style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 400, fontStyle: 'italic', fontSize: '1.4rem', letterSpacing: '-0.02em', color: 'white', textDecoration: 'none' }}>Vony</Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Link to={createPageUrl("RecentActivity")} className="top-bar-link-home" style={{ padding: '7px 14px', borderRadius: 50, fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', transition: 'color 0.15s' }}>Recent Activity</Link>
-            <Link to={createPageUrl("LoanAgreements")} className="top-bar-link-home" style={{ padding: '7px 14px', borderRadius: 50, fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', transition: 'color 0.15s' }}>Loan Documents</Link>
-            {/* Notification bell */}
-            <Link to={createPageUrl("Requests")} style={{ width: 32, height: 32, borderRadius: '50%', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', marginLeft: 4 }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-              {pendingOffers.length > 0 && <span style={{ position: 'absolute', top: 0, right: 0, width: 7, height: 7, borderRadius: '50%', background: 'white', border: '1.5px solid rgba(249,248,246,1)' }} />}
-            </Link>
-            {/* Avatar */}
-            <Link to={createPageUrl("Profile")} style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', color: 'white', fontWeight: 600, fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 4, textDecoration: 'none' }}>
-              {avatarInitial}
-            </Link>
-          </div>
-        </div>
-      </div>
-
       {/* ── Hero ── */}
       <div style={{ background: 'transparent', position: 'relative', zIndex: 2 }}>
-        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '160px 28px 56px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', textAlign: 'center' }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '80px 28px 56px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', textAlign: 'center' }}>
           <div>
             <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.8rem', fontWeight: 600, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
               {greeting}, <em style={{ fontStyle: 'italic', fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>{firstName}</em>
@@ -978,62 +954,17 @@ export default function Home() {
 
       </div>
 
+      </div>{/* end content box */}
+
       {/* ── Footer ── */}
-      <div style={{ background: 'transparent', marginTop: 36, position: 'relative', zIndex: 1 }}>
-        <div className="home-footer-grid" style={{ maxWidth: 1080, margin: '0 auto', padding: '52px 28px', display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr 1fr', gap: 40 }}>
-          <div>
-            <div style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 400, fontStyle: 'italic', fontSize: '1.4rem', color: '#1A1918', marginBottom: 10 }}>Vony</div>
-            <div style={{ fontSize: 12, color: '#5C5B5A', lineHeight: 1.5, marginBottom: 20 }}>Lending between friends, without the weird part.</div>
-            <button onClick={() => {
-              if (navigator.share) { navigator.share({ title: 'Join me on Vony', text: 'Lending made simple — join me on Vony!', url: 'https://lend-with-vony.com' }); }
-              else { navigator.clipboard.writeText('https://lend-with-vony.com'); }
-            }} style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 22px', borderRadius: 20,
-              background: '#678AFB', color: 'white', fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
-              border: 'none', cursor: 'pointer', transition: 'background 0.15s', textDecoration: 'none'
-            }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
-              Invite Friends
-            </button>
-          </div>
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 16 }}>Product</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <span style={{ fontSize: 13, color: '#3D3C3B' }}>How it works</span>
-              <span style={{ fontSize: 13, color: '#3D3C3B' }}>FAQ</span>
-              <span style={{ fontSize: 13, color: '#3D3C3B' }}>Learn</span>
-              <span style={{ fontSize: 13, color: '#3D3C3B' }}>Financial products</span>
-            </div>
-          </div>
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 16 }}>Company</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <span style={{ fontSize: 13, color: '#3D3C3B' }}>About</span>
-              <span style={{ fontSize: 13, color: '#3D3C3B' }}>Blog</span>
-              <span style={{ fontSize: 13, color: '#3D3C3B' }}>Careers</span>
-              <span style={{ fontSize: 13, color: '#3D3C3B' }}>Contact</span>
-            </div>
-          </div>
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 16 }}>Legal</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <span style={{ fontSize: 13, color: '#3D3C3B' }}>Terms of Service</span>
-              <span style={{ fontSize: 13, color: '#3D3C3B' }}>Privacy Policy</span>
-              <span style={{ fontSize: 13, color: '#3D3C3B' }}>Cookie Policy</span>
-              <span style={{ fontSize: 13, color: '#3D3C3B' }}>Licenses</span>
-            </div>
-          </div>
-        </div>
-        <div className="home-footer-bottom" style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 28px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #EBEBEA' }}>
-          <div style={{ fontSize: 11, color: '#5C5B5A' }}>2026 Vony, Inc. All rights reserved.</div>
-          <div style={{ fontSize: 11, color: '#5C5B5A', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C7C6C4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-            English (US)
-          </div>
+      <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          <span style={{ fontSize: 11, color: '#787776' }}>Terms of Service</span>
+          <span style={{ fontSize: 11, color: '#787776' }}>Privacy Center</span>
+          <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
         </div>
       </div>
-
-      </div>{/* end content box */}
 
     </div>
   );
