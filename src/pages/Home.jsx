@@ -556,32 +556,12 @@ export default function Home() {
 
       <DashboardSidebar activePage="Dashboard" user={user} />
 
-      {/* ── Galaxy gradient background ── */}
+      {/* ── Solid blue background ── */}
       <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
         <div style={{
-          position: 'absolute', top: 0, left: '-10%', width: '120%', height: '100%', zIndex: 0,
-          background: 'linear-gradient(180deg, #527DFF 0%, #5580FF 5%, #678AFB 13%, #7792F4 22%, #8C9BEE 32%, #A19EEB 42%, #A79DEA 50%, #BB98E8 58%, #C89CE6 65%, #D4A0E4 72%, #DDA5E2 76%, #F0D8EA 80%, #F7F7F7 84%)'
+          position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0,
+          background: '#527DFF'
         }} />
-        {/* Static star field */}
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 420, zIndex: 1, overflow: 'hidden' }}>
-          <svg width="100%" height="100%" viewBox="0 0 1617 329" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <radialGradient id="starGlow">
-                <stop offset="0%" stopColor="#EAF9F3"/>
-                <stop offset="100%" stopColor="#9FEBFB"/>
-              </radialGradient>
-            </defs>
-            {STAR_CIRCLES.map((s, i) => (
-              <circle key={i} cx={s.cx} cy={s.cy} r="1.75" fill="url(#starGlow)" opacity={s.o}/>
-            ))}
-          </svg>
-        </div>
-        {/* Twinkling stars */}
-        <div className="twinkle-star" />
-        <div className="twinkle-star" />
-        <div className="twinkle-star" />
-        <div className="twinkle-star" />
-        <div className="twinkle-star" />
       </div>
 
       {/* ── Top bar ── */}

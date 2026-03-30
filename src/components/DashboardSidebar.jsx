@@ -70,8 +70,8 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
 
   const isActive = (page) => activePage === page;
   const linkStyle = (page) => ({
-    display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 10,
-    textDecoration: 'none', fontSize: 13, transition: 'background 0.15s, color 0.15s',
+    display: 'flex', alignItems: 'center', gap: 12, padding: '11px 14px', borderRadius: 10,
+    textDecoration: 'none', fontSize: 14, transition: 'background 0.15s, color 0.15s',
     color: isActive(page) ? '#678AFB' : '#5C5B5A',
     background: isActive(page) ? 'rgba(103,138,251,0.08)' : 'transparent',
     fontWeight: isActive(page) ? 600 : 500,
@@ -171,7 +171,7 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
           </div>
         </div>
       </div>
-      <nav style={{ flex: 1, padding: '0 12px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <nav style={{ flex: 1, padding: '0 12px', display: 'flex', flexDirection: 'column', gap: 3 }}>
         {/* Dashboard */}
         <Link to="/" style={linkStyle('Dashboard')}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={ic('Dashboard')} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>
@@ -197,7 +197,6 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={ic('YourLoans')} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" /></svg>
           Lending & Borrowing
         </Link>
-        <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '8px 14px' }} />
         {/* Friends */}
         <Link to={createPageUrl("Friends")} style={linkStyle('Friends')}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={ic('Friends')} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
