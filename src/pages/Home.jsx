@@ -684,7 +684,10 @@ export default function Home() {
 
         {/* Top row grid: quick actions + snapshot cards */}
         <div style={{ marginTop: 36 }}>
-          <div className="home-top-row" style={{ display: 'grid', gridTemplateColumns: '0.75fr 1fr 1fr', columnGap: 16, rowGap: 16, alignItems: 'start' }}>
+          <div className="home-top-row" style={{ display: 'grid', gridTemplateColumns: '1.75fr 1fr', columnGap: 16, rowGap: 16, alignItems: 'start' }}>
+
+            {/* LEFT SECTION: sub-grid for left two columns */}
+            <div style={{ display: 'grid', gridTemplateColumns: '0.75fr 1fr', gap: 16, alignItems: 'start' }}>
 
             {/* Left column: Next Payment Due, Next Payment Incoming, Monthly Stats */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, gridRow: '1 / 2' }}>
@@ -759,42 +762,6 @@ export default function Home() {
 
             </div>
 
-            {/* Your Loans — spans first 2 columns, directly under Loan Progress */}
-            <div className="glass-card" style={{ overflow: 'hidden', gridColumn: '1 / 3' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0, padding: '20px 26px 0' }}>
-                <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Your loans</div>
-                <Link to={createPageUrl("YourLoans")} style={{ fontSize: 12, fontWeight: 500, color: '#A79DEA', textDecoration: 'none' }}>Manage</Link>
-              </div>
-              {myLoans.filter(l => l && l.status === 'active').length === 0 ? (
-                <div style={{ padding: '20px 26px', textAlign: 'center', color: '#787776', fontSize: 13 }}>No active loans</div>
-              ) : (
-                myLoans.filter(l => l && l.status === 'active').slice(0, 4).map((loan, idx) => {
-                  const isLender = loan.lender_id === user.id;
-                  const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
-                  const otherProfile = safeAllProfiles.find(p => p.user_id === otherUserId);
-                  const totalAmt = loan.total_amount || loan.amount || 0;
-                  const amountPaid = loan.amount_paid || 0;
-                  const remaining = totalAmt - amountPaid;
-                  const pct = totalAmt > 0 ? Math.round((amountPaid / totalAmt) * 100) : 0;
-                  return (
-                    <div key={loan.id} style={{ padding: '13px 26px', display: 'flex', alignItems: 'flex-start', gap: 16, paddingTop: idx === 0 ? 18 : 13 }}>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', marginBottom: 8 }}>
-                          {isLender ? `You lent @${otherProfile?.username || 'user'} ${formatMoney(totalAmt)}` : `@${otherProfile?.username || 'user'} lent you ${formatMoney(totalAmt)}`}
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                          <div style={{ flex: 1, height: 6, borderRadius: 3, overflow: 'hidden', background: isLender ? 'rgba(103,138,251,0.15)' : 'rgba(167,157,234,0.15)' }}>
-                            <div style={{ height: '100%', borderRadius: 3, width: `${pct}%`, background: isLender ? '#678AFB' : '#A79DEA' }} />
-                          </div>
-                          <div style={{ fontSize: 11, fontWeight: 500, color: '#787776', flexShrink: 0 }}>{formatMoney(amountPaid)} repaid &amp; {formatMoney(remaining)} remaining</div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-
             {/* Upcoming Payments */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, gridRow: '1 / 2' }}>
               <div className="glass-card" style={{ overflow: 'hidden' }}>
@@ -832,8 +799,46 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Your Loans — spans both sub-columns, directly under How March is going */}
+            <div className="glass-card" style={{ overflow: 'hidden', gridColumn: '1 / 3' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0, padding: '20px 26px 0' }}>
+                <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Your loans</div>
+                <Link to={createPageUrl("YourLoans")} style={{ fontSize: 12, fontWeight: 500, color: '#A79DEA', textDecoration: 'none' }}>Manage</Link>
+              </div>
+              {myLoans.filter(l => l && l.status === 'active').length === 0 ? (
+                <div style={{ padding: '20px 26px', textAlign: 'center', color: '#787776', fontSize: 13 }}>No active loans</div>
+              ) : (
+                myLoans.filter(l => l && l.status === 'active').slice(0, 4).map((loan, idx) => {
+                  const isLender = loan.lender_id === user.id;
+                  const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
+                  const otherProfile = safeAllProfiles.find(p => p.user_id === otherUserId);
+                  const totalAmt = loan.total_amount || loan.amount || 0;
+                  const amountPaid = loan.amount_paid || 0;
+                  const remaining = totalAmt - amountPaid;
+                  const pct = totalAmt > 0 ? Math.round((amountPaid / totalAmt) * 100) : 0;
+                  return (
+                    <div key={loan.id} style={{ padding: '13px 26px', display: 'flex', alignItems: 'flex-start', gap: 16, paddingTop: idx === 0 ? 18 : 13 }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', marginBottom: 8 }}>
+                          {isLender ? `You lent @${otherProfile?.username || 'user'} ${formatMoney(totalAmt)}` : `@${otherProfile?.username || 'user'} lent you ${formatMoney(totalAmt)}`}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <div style={{ flex: 1, height: 6, borderRadius: 3, overflow: 'hidden', background: isLender ? 'rgba(103,138,251,0.15)' : 'rgba(167,157,234,0.15)' }}>
+                            <div style={{ height: '100%', borderRadius: 3, width: `${pct}%`, background: isLender ? '#678AFB' : '#A79DEA' }} />
+                          </div>
+                          <div style={{ fontSize: 11, fontWeight: 500, color: '#787776', flexShrink: 0 }}>{formatMoney(amountPaid)} repaid &amp; {formatMoney(remaining)} remaining</div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            </div>{/* end LEFT SECTION sub-grid */}
+
             {/* Loans Over Time chart + Recent Activity */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, gridRow: '1 / 2' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div className="glass-card" style={{ overflow: 'hidden' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px 26px 0' }}>
                   <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Loans over time</div>
