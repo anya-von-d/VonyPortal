@@ -51,14 +51,13 @@ import Borrowing from './pages/Borrowing';
 import CreateOffer from './pages/CreateOffer';
 import Friends from './pages/Friends';
 import Home from './pages/Home';
-import Learn from './pages/Learn';
 import Lending from './pages/Lending';
 import LoanAgreements from './pages/LoanAgreements';
 import Profile from './pages/Profile';
 import RecordPayment from './pages/RecordPayment';
 import RecentActivity from './pages/RecentActivity';
 import Requests from './pages/Requests';
-import Shop from './pages/Shop';
+import ComingSoon from './pages/ComingSoon';
 import Upcoming from './pages/Upcoming';
 import YourLoans from './pages/YourLoans';
 import __Layout from './Layout.jsx';
@@ -69,14 +68,13 @@ export const PAGES = {
     "CreateOffer": CreateOffer,
     "Friends": Friends,
     "Home": Home,
-    "Learn": Learn,
     "Lending": Lending,
     "LoanAgreements": LoanAgreements,
     "Profile": Profile,
     "RecordPayment": RecordPayment,
     "RecentActivity": RecentActivity,
     "Requests": Requests,
-    "Shop": Shop,
+    "ComingSoon": ComingSoon,
     "Upcoming": Upcoming,
     "YourLoans": YourLoans,
 }

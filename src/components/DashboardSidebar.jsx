@@ -146,6 +146,24 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
                   </svg>
                   Profile
                 </Link>
+                <Link
+                  to={createPageUrl("ComingSoon")}
+                  onClick={() => setSettingsOpen(false)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
+                    textDecoration: 'none', fontSize: 13, color: '#1A1918', fontWeight: 500,
+                    transition: 'background 0.12s',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.04)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5C5B5A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  Coming Soon
+                </Link>
                 <div style={{ height: 1, background: 'rgba(0,0,0,0.06)' }} />
                 <button
                   onClick={handleLogout}
