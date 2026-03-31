@@ -1409,37 +1409,38 @@ export default function Lending({ initialTab }) {
         signingAs="Lender"
       />
 
-      <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 240 }}>
+      <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 240, background: '#F5F4F0' }}>
 
         <DashboardSidebar activePage={initialTab === 'create' ? 'CreateOffer' : 'Lending'} user={currentUser} />
 
-        {/* Galaxy gradient background */}
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
-          <div style={{
-            position: 'absolute', top: 0, left: '-10%', width: '120%', height: '100%', zIndex: 0,
-            background: 'linear-gradient(180deg, #527DFF 0%, #5580FF 5%, #678AFB 13%, #7792F4 22%, #8C9BEE 32%, #A19EEB 42%, #A79DEA 50%, #BB98E8 58%, #C89CE6 65%, #D4A0E4 72%, #DDA5E2 76%, #F0D8EA 80%, #F7F7F7 84%)'
-          }} />
-          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 420, zIndex: 1, overflow: 'hidden' }}>
-            <svg width="100%" height="100%" viewBox="0 0 1617 329" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <radialGradient id="starGlowLending">
-                  <stop offset="0%" stopColor="#EAF9F3"/>
-                  <stop offset="100%" stopColor="#9FEBFB"/>
-                </radialGradient>
-              </defs>
-              {STAR_CIRCLES.map((s, i) => (
-                <circle key={i} cx={s.cx} cy={s.cy} r="1.75" fill="url(#starGlowLending)" opacity={s.o}/>
-              ))}
-            </svg>
+        <div style={{ position: 'relative', margin: '12px 12px 12px 0', borderRadius: 20, overflow: 'hidden', minHeight: 'calc(100vh - 24px)' }}>
+          {/* Galaxy gradient background */}
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
+            <div style={{
+              position: 'absolute', top: 0, left: '-10%', width: '120%', height: '100%', zIndex: 0,
+              background: 'linear-gradient(180deg, #5881FE 0%, #6688F8 20%, #7490F5 40%, #8296F0 60%, #8C9AEC 80%, #9196EC 100%)'
+            }} />
+            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 420, zIndex: 1, overflow: 'hidden' }}>
+              <svg width="100%" height="100%" viewBox="0 0 1617 329" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <radialGradient id="starGlowLending">
+                    <stop offset="0%" stopColor="#EAF9F3"/>
+                    <stop offset="100%" stopColor="#9FEBFB"/>
+                  </radialGradient>
+                </defs>
+                {STAR_CIRCLES.map((s, i) => (
+                  <circle key={i} cx={s.cx} cy={s.cy} r="1.75" fill="url(#starGlowLending)" opacity={s.o}/>
+                ))}
+              </svg>
+            </div>
+            <div className="twinkle-star" />
+            <div className="twinkle-star" />
+            <div className="twinkle-star" />
+            <div className="twinkle-star" />
+            <div className="twinkle-star" />
           </div>
-          <div className="twinkle-star" />
-          <div className="twinkle-star" />
-          <div className="twinkle-star" />
-          <div className="twinkle-star" />
-          <div className="twinkle-star" />
-        </div>
 
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: 1080, margin: '0 auto', padding: '100px 28px 40px' }}>
+          <div style={{ position: 'relative', zIndex: 2, maxWidth: 1080, margin: '0 auto', padding: '100px 28px 40px' }}>
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -2989,6 +2990,17 @@ export default function Lending({ initialTab }) {
 
           </AnimatePresence>
         </div>
+        </div>{/* end content box */}
+
+        {/* Footer */}
+        <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+            <span style={{ fontSize: 11, color: '#787776' }}>Terms of Service</span>
+            <span style={{ fontSize: 11, color: '#787776' }}>Privacy Center</span>
+            <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
+          </div>
+        </div>
       </div>
 
       {/* Modals */}
@@ -3016,7 +3028,7 @@ export default function Lending({ initialTab }) {
       )}
 
       <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-        <AlertDialogContent className="rounded-2xl border-0 p-0 overflow-hidden" style={{ backgroundColor: '#F7F7F7' }}>
+        <AlertDialogContent className="rounded-2xl border-0 p-0 overflow-hidden" style={{ backgroundColor: '#F5F4F0' }}>
           <div className="p-6 pb-4">
             <AlertDialogHeader>
               <AlertDialogTitle className="text-xl font-bold text-slate-800" style={{ fontFamily: "'Libre Baskerville', Georgia, serif" }}>Cancel Loan</AlertDialogTitle>

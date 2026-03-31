@@ -6,8 +6,12 @@ import {
   Check, DollarSign, Zap, Clock, Award, TrendingUp
 } from "lucide-react";
 import { motion } from "framer-motion";
+import DashboardSidebar from "@/components/DashboardSidebar";
+import { useAuth } from "@/lib/AuthContext";
 
 export default function Shop() {
+  const { user: authUser, userProfile } = useAuth();
+  const user = userProfile ? { ...userProfile, id: authUser?.id } : null;
   const [activeTab, setActiveTab] = useState('cards');
 
   const creditCards = [
@@ -131,7 +135,16 @@ export default function Shop() {
   const loanSubBoxColors = ['#6EE8A2', '#96FFD0', '#6EE8B5'];
 
   return (
-    <div className="min-h-screen p-3 md:p-6" style={{background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))`}}>
+    <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 240, background: '#F5F4F0' }}>
+      <DashboardSidebar activePage="Shop" user={user} />
+      <div style={{ position: 'relative', margin: '12px 12px 12px 0', borderRadius: 20, overflow: 'hidden', minHeight: 'calc(100vh - 24px)' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
+          <div style={{
+            position: 'absolute', top: 0, left: '-10%', width: '120%', height: '100%', zIndex: 0,
+            background: 'linear-gradient(180deg, #5881FE 0%, #6688F8 20%, #7490F5 40%, #8296F0 60%, #8C9AEC 80%, #9196EC 100%)'
+          }} />
+        </div>
+        <div style={{ position: 'relative', zIndex: 2 }} className="p-3 md:p-6">
       <div className="max-w-4xl mx-auto space-y-7">
         {/* Header */}
         <motion.div
@@ -322,6 +335,16 @@ export default function Shop() {
             This is for demonstration purposes only. Vony Portal does not issue credit cards or loans directly.
           </p>
         </motion.div>
+      </div>
+        </div>
+      </div>
+      <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          <span style={{ fontSize: 11, color: '#787776' }}>Terms of Service</span>
+          <span style={{ fontSize: 11, color: '#787776' }}>Privacy Center</span>
+          <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
+        </div>
       </div>
     </div>
   );

@@ -114,7 +114,7 @@ export default function Upcoming() {
   // Loading
   if (isLoading) {
     return (
-      <div style={{ minHeight: '100vh', background: '#F7F7F7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ minHeight: '100vh', background: '#F5F4F0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: 32, height: 32, border: '2px solid #678AFB', borderTopColor: 'transparent', borderRadius: '50%', margin: '0 auto 16px' }} className="animate-spin" />
           <p style={{ fontSize: 14, color: '#787776', fontFamily: "'DM Sans', sans-serif" }}>Loading upcoming...</p>
@@ -126,7 +126,7 @@ export default function Upcoming() {
   // Not logged in
   if (!user) {
     return (
-      <div style={{ minHeight: '100vh', background: '#F7F7F7', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      <div style={{ minHeight: '100vh', background: '#F5F4F0', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
         <div className="glass-card" style={{ padding: 32, textAlign: 'center', maxWidth: 400 }}>
           <h1 style={{ fontSize: '1.8rem', fontWeight: 700, color: '#1A1918', marginBottom: 8, fontFamily: "'DM Sans', sans-serif" }}>
             Sign in to view upcoming
@@ -308,27 +308,30 @@ export default function Upcoming() {
   );
 
   return (
-    <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 240 }}>
+    <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 240, background: '#F5F4F0' }}>
 
       <DashboardSidebar activePage="Upcoming" user={user} />
 
-      {/* ── Galaxy gradient background (shorter) ── */}
-      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 520, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
-        <div style={{
-          position: 'absolute', top: 0, left: '-10%', width: '120%', height: '100%', zIndex: 0,
-          background: 'linear-gradient(180deg, #527DFF 0%, #5580FF 5%, #678AFB 13%, #7792F4 22%, #8C9BEE 32%, #A19EEB 42%, #A79DEA 50%, #BB98E8 58%, #C89CE6 65%, #D4A0E4 72%, #DDA5E2 76%, #F0D8EA 80%, #F7F7F7 84%)'
-        }} />
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 320, zIndex: 1, overflow: 'hidden' }}>
-          <svg width="100%" height="100%" viewBox="0 0 1617 329" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-            <defs><radialGradient id="starGlowUp"><stop offset="0%" stopColor="#EAF9F3"/><stop offset="100%" stopColor="#9FEBFB"/></radialGradient></defs>
-            {STAR_CIRCLES.map((s, i) => <circle key={i} cx={s.cx} cy={s.cy} r="1.75" fill="url(#starGlowUp)" opacity={s.o}/>)}
-          </svg>
-        </div>
-        <div className="twinkle-star" /><div className="twinkle-star" /><div className="twinkle-star" />
-      </div>
+      {/* ── Rounded content box ── */}
+      <div style={{ position: 'relative', margin: '12px 12px 12px 0', borderRadius: 20, overflow: 'hidden', minHeight: 'calc(100vh - 24px)' }}>
 
-      {/* ── Page header ── */}
-      <div style={{ position: 'relative', zIndex: 2 }}>
+        {/* ── Galaxy gradient background ── */}
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
+          <div style={{
+            position: 'absolute', top: 0, left: '-10%', width: '120%', height: '100%', zIndex: 0,
+            background: 'linear-gradient(180deg, #5881FE 0%, #6688F8 20%, #7490F5 40%, #8296F0 60%, #8C9AEC 80%, #9196EC 100%)'
+          }} />
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 320, zIndex: 1, overflow: 'hidden' }}>
+            <svg width="100%" height="100%" viewBox="0 0 1617 329" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+              <defs><radialGradient id="starGlowUp"><stop offset="0%" stopColor="#EAF9F3"/><stop offset="100%" stopColor="#9FEBFB"/></radialGradient></defs>
+              {STAR_CIRCLES.map((s, i) => <circle key={i} cx={s.cx} cy={s.cy} r="1.75" fill="url(#starGlowUp)" opacity={s.o}/>)}
+            </svg>
+          </div>
+          <div className="twinkle-star" /><div className="twinkle-star" /><div className="twinkle-star" />
+        </div>
+
+        {/* ── Page header ── */}
+        <div style={{ position: 'relative', zIndex: 2 }}>
         <div style={{ maxWidth: 1080, margin: '0 auto', padding: '80px 28px 0', textAlign: 'center' }}>
           <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.2rem', fontWeight: 600, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
             Upcoming
@@ -357,10 +360,10 @@ export default function Upcoming() {
             }}>Calendar</button>
           </div>
         </div>
-      </div>
+        </div>
 
-      {/* ── Content ── */}
-      <div style={{ maxWidth: 1080, margin: '0 auto', padding: '32px 28px 64px', position: 'relative', zIndex: 1 }}>
+        {/* ── Content ── */}
+        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '32px 28px 64px', position: 'relative', zIndex: 2 }}>
 
         {activeTab === 'summary' ? (
           /* ════════ SUMMARY VIEW ════════ */
@@ -577,6 +580,15 @@ export default function Upcoming() {
             </div>
           </div>
         )}
+        </div>
+      </div>{/* end content box */}
+      <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          <span style={{ fontSize: 11, color: '#787776' }}>Terms of Service</span>
+          <span style={{ fontSize: 11, color: '#787776' }}>Privacy Center</span>
+          <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
+        </div>
       </div>
     </div>
   );

@@ -469,20 +469,33 @@ export default function LoanAgreements() {
   /* ── Loading state ──────────────────────────────────────────── */
   if (isLoading || !user) {
     return (
-      <div className="home-with-sidebar" style={{ minHeight: '100vh', background: '#F7F7F7', paddingLeft: 240, fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5 }}>
+      <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 240, background: '#F5F4F0' }}>
         <DashboardSidebar activePage="LoanAgreements" user={user} />
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 520, background: 'linear-gradient(180deg, #527DFF 0%, #5580FF 5%, #678AFB 13%, #7792F4 22%, #8C9BEE 32%, #A19EEB 42%, #A79DEA 50%, #BB98E8 58%, #C89CE6 65%, #D4A0E4 72%, #DDA5E2 76%, #F0D8EA 80%, #F7F7F7 84%)' }} />
-        </div>
-        <div style={{ position: 'relative', zIndex: 10, maxWidth: 1080, margin: '0 auto', padding: '0 28px' }}>
-          <div style={{ paddingTop: 80, paddingBottom: 20, textAlign: 'center' }}>
-            <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.2rem', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.1, color: 'white', margin: 0 }}>Loan Documents</h1>
+        <div style={{ position: 'relative', margin: '12px 12px 12px 0', borderRadius: 20, overflow: 'hidden', minHeight: 'calc(100vh - 24px)' }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
+            <div style={{
+              position: 'absolute', top: 0, left: '-10%', width: '120%', height: '100%', zIndex: 0,
+              background: 'linear-gradient(180deg, #5881FE 0%, #6688F8 20%, #7490F5 40%, #8296F0 60%, #8C9AEC 80%, #9196EC 100%)'
+            }} />
+          </div>
+          <div style={{ position: 'relative', zIndex: 2, maxWidth: 1080, margin: '0 auto', padding: '0 28px' }}>
+            <div style={{ paddingTop: 80, paddingBottom: 20, textAlign: 'center' }}>
+              <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.2rem', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.1, color: 'white', margin: 0 }}>Loan Documents</h1>
+            </div>
+          </div>
+          <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px 64px', position: 'relative', zIndex: 2 }}>
+            <div className="glass-card" style={{ padding: 40, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 32, height: 32, border: '2px solid #678AFB', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: 12 }} />
+              <p style={{ fontSize: 13, color: '#787776' }}>{isLoading ? 'Loading documents...' : 'Please log in to view documents'}</p>
+            </div>
           </div>
         </div>
-        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px 64px', position: 'relative', zIndex: 10 }}>
-          <div className="glass-card" style={{ padding: 40, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ width: 32, height: 32, border: '2px solid #678AFB', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: 12 }} />
-            <p style={{ fontSize: 13, color: '#787776' }}>{isLoading ? 'Loading documents...' : 'Please log in to view documents'}</p>
+        <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+            <span style={{ fontSize: 11, color: '#787776' }}>Terms of Service</span>
+            <span style={{ fontSize: 11, color: '#787776' }}>Privacy Center</span>
+            <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
           </div>
         </div>
       </div>
@@ -817,275 +830,285 @@ export default function LoanAgreements() {
         )}
       </AnimatePresence>
 
-      <div className="home-with-sidebar" style={{ minHeight: '100vh', background: '#F7F7F7', paddingLeft: 240, fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5 }}>
+      <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 240, background: '#F5F4F0' }}>
         <DashboardSidebar activePage="LoanAgreements" user={user} />
 
-        {/* Galaxy gradient background — covers full page */}
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 520, background: 'linear-gradient(180deg, #527DFF 0%, #5580FF 5%, #678AFB 13%, #7792F4 22%, #8C9BEE 32%, #A19EEB 42%, #A79DEA 50%, #BB98E8 58%, #C89CE6 65%, #D4A0E4 72%, #DDA5E2 76%, #F0D8EA 80%, #F7F7F7 84%)' }} />
-          <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 320, opacity: 0.6 }} viewBox="0 0 1617 329" fill="none">
-            <defs><radialGradient id="laStarGlow"><stop offset="0%" stopColor="#EAF9F3"/><stop offset="100%" stopColor="#9FEBFB"/></radialGradient></defs>
-            {STAR_CIRCLES.map((s, i) => <circle key={i} cx={s.cx} cy={s.cy} r="1.75" fill="url(#laStarGlow)" opacity={s.o}/>)}
-          </svg>
-          <div className="twinkle-star" /><div className="twinkle-star" /><div className="twinkle-star" /><div className="twinkle-star" /><div className="twinkle-star" />
-        </div>
+        {/* Rounded content box */}
+        <div style={{ position: 'relative', margin: '12px 12px 12px 0', borderRadius: 20, overflow: 'hidden', minHeight: 'calc(100vh - 24px)' }}>
 
-        {/* Hero title */}
-        <div style={{ position: 'relative', zIndex: 10, maxWidth: 1080, margin: '0 auto', padding: '0 28px' }}>
-          <div style={{ paddingTop: 80, paddingBottom: 20, textAlign: 'center' }}>
-            <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.2rem', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.1, color: 'white', margin: 0 }}>
-              Loan Documents
-            </h1>
+          {/* Gradient background */}
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
+            <div style={{
+              position: 'absolute', top: 0, left: '-10%', width: '120%', height: '100%', zIndex: 0,
+              background: 'linear-gradient(180deg, #5881FE 0%, #6688F8 20%, #7490F5 40%, #8296F0 60%, #8C9AEC 80%, #9196EC 100%)'
+            }} />
           </div>
-        </div>
 
-        {/* Page content */}
-        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px 64px', position: 'relative', zIndex: 10 }}>
-
-          {/* ── Filter Bar ─────────────────────────────────────── */}
-          <div className="glass-card" style={{ padding: '16px 22px', marginBottom: 20, overflow: 'visible', position: 'relative', zIndex: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-              <SingleSelectDropdown options={ROLE_OPTIONS} selected={roleFilter} onChange={setRoleFilter} />
-              <SingleSelectDropdown options={STATUS_OPTIONS} selected={statusFilter} onChange={setStatusFilter} />
-              <button
-                onClick={clearFilters}
-                style={{
-                  marginLeft: 'auto',
-                  padding: '8px 14px', borderRadius: 10,
-                  border: hasAnyFilter ? '1px solid rgba(232,114,110,0.3)' : '1px solid rgba(0,0,0,0.08)',
-                  background: hasAnyFilter ? 'rgba(232,114,110,0.06)' : 'transparent',
-                  fontSize: 13, fontWeight: 500,
-                  color: hasAnyFilter ? '#E8726E' : '#787776',
-                  cursor: hasAnyFilter ? 'pointer' : 'default',
-                  opacity: hasAnyFilter ? 1 : 0.5,
-                  fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap',
-                  transition: 'background 0.15s, opacity 0.15s',
-                }}
-              >
-                Clear Filters
-              </button>
+          {/* Hero title */}
+          <div style={{ position: 'relative', zIndex: 2, maxWidth: 1080, margin: '0 auto', padding: '0 28px' }}>
+            <div style={{ paddingTop: 80, paddingBottom: 20, textAlign: 'center' }}>
+              <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.2rem', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.1, color: 'white', margin: 0 }}>
+                Loan Documents
+              </h1>
             </div>
           </div>
 
-          {/* ── Agreements List ──────────────────────────────────── */}
-          <div className="glass-card" style={{ overflow: 'hidden' }}>
-            <div style={{ padding: '20px 26px 26px' }}>
-              {filteredAgreements.length === 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 0', color: '#C7C6C4' }}>
-                  <FileText size={32} style={{ opacity: 0.4, marginBottom: 8 }} />
-                  <p style={{ fontSize: 13, color: '#787776', margin: 0 }}>
-                    {agreements.length === 0
-                      ? 'Your signed loan agreements will appear here'
-                      : 'No agreements match the current filters'}
-                  </p>
-                  {hasAnyFilter && <p style={{ fontSize: 12, color: '#C7C6C4', margin: '4px 0 0' }}>Try adjusting your filters</p>}
-                </div>
-              ) : (
-                <>
-                  {/* Desktop table header */}
-                  <div className="la-table-header" style={{
-                    display: 'none', alignItems: 'center', padding: '0 14px 12px',
-                    borderBottom: '1px solid rgba(0,0,0,0.06)', marginBottom: 8,
-                  }}>
-                    <div style={{ width: 36, flexShrink: 0, marginRight: 16 }} />
-                    <span style={{ width: 80, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', flexShrink: 0 }}>Date</span>
-                    <span style={{ flex: 1.5, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', minWidth: 0, paddingLeft: 4 }}>Friend</span>
-                    <span style={{ flex: 1.2, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', minWidth: 0, paddingLeft: 4 }}>Category</span>
-                    <span style={{ width: 130, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'center', flexShrink: 0 }}>Status</span>
-                    <span style={{ width: 100, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right', flexShrink: 0 }}>Amount</span>
-                    <div style={{ width: 32, flexShrink: 0 }} />
+          {/* Page content */}
+          <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px 64px', position: 'relative', zIndex: 2 }}>
+
+            {/* ── Filter Bar ─────────────────────────────────────── */}
+            <div className="glass-card" style={{ padding: '16px 22px', marginBottom: 20, overflow: 'visible', position: 'relative', zIndex: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <SingleSelectDropdown options={ROLE_OPTIONS} selected={roleFilter} onChange={setRoleFilter} />
+                <SingleSelectDropdown options={STATUS_OPTIONS} selected={statusFilter} onChange={setStatusFilter} />
+                <button
+                  onClick={clearFilters}
+                  style={{
+                    marginLeft: 'auto',
+                    padding: '8px 14px', borderRadius: 10,
+                    border: hasAnyFilter ? '1px solid rgba(232,114,110,0.3)' : '1px solid rgba(0,0,0,0.08)',
+                    background: hasAnyFilter ? 'rgba(232,114,110,0.06)' : 'transparent',
+                    fontSize: 13, fontWeight: 500,
+                    color: hasAnyFilter ? '#E8726E' : '#787776',
+                    cursor: hasAnyFilter ? 'pointer' : 'default',
+                    opacity: hasAnyFilter ? 1 : 0.5,
+                    fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap',
+                    transition: 'background 0.15s, opacity 0.15s',
+                  }}
+                >
+                  Clear Filters
+                </button>
+              </div>
+            </div>
+
+            {/* ── Agreements List ──────────────────────────────────── */}
+            <div className="glass-card" style={{ overflow: 'hidden' }}>
+              <div style={{ padding: '20px 26px 26px' }}>
+                {filteredAgreements.length === 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 0', color: '#C7C6C4' }}>
+                    <FileText size={32} style={{ opacity: 0.4, marginBottom: 8 }} />
+                    <p style={{ fontSize: 13, color: '#787776', margin: 0 }}>
+                      {agreements.length === 0
+                        ? 'Your signed loan agreements will appear here'
+                        : 'No agreements match the current filters'}
+                    </p>
+                    {hasAnyFilter && <p style={{ fontSize: 12, color: '#C7C6C4', margin: '4px 0 0' }}>Try adjusting your filters</p>}
                   </div>
+                ) : (
+                  <>
+                    {/* Desktop table header */}
+                    <div className="la-table-header" style={{
+                      display: 'none', alignItems: 'center', padding: '0 14px 12px',
+                      borderBottom: '1px solid rgba(0,0,0,0.06)', marginBottom: 8,
+                    }}>
+                      <div style={{ width: 36, flexShrink: 0, marginRight: 16 }} />
+                      <span style={{ width: 80, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', flexShrink: 0 }}>Date</span>
+                      <span style={{ flex: 1.5, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', minWidth: 0, paddingLeft: 4 }}>Friend</span>
+                      <span style={{ flex: 1.2, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', minWidth: 0, paddingLeft: 4 }}>Category</span>
+                      <span style={{ width: 130, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'center', flexShrink: 0 }}>Status</span>
+                      <span style={{ width: 100, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right', flexShrink: 0 }}>Amount</span>
+                      <div style={{ width: 32, flexShrink: 0 }} />
+                    </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    {filteredAgreements.map((agreement) => {
-                      const isLender = agreement.lender_id === user?.id;
-                      const otherPartyId = isLender ? agreement.borrower_id : agreement.lender_id;
-                      const otherParty = getUserById(otherPartyId);
-                      const loanStatus = getLoanStatus(agreement.loan_id);
-                      const badgeStyle = getStatusBadgeStyle(loanStatus);
-                      const isExpanded = expandedId === agreement.id;
-                      const categoryLabel = isLender ? 'Lent to You' : 'Borrowed from You';
-                      const dateDisplay = agreement.created_at ? format(new Date(agreement.created_at), 'M/dd') : '';
-                      const dateYear = agreement.created_at ? new Date(agreement.created_at).getFullYear() : null;
-                      const dateFormatted = dateYear && dateYear < new Date().getFullYear()
-                        ? format(new Date(agreement.created_at), 'M/d/yyyy')
-                        : dateDisplay;
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      {filteredAgreements.map((agreement) => {
+                        const isLender = agreement.lender_id === user?.id;
+                        const otherPartyId = isLender ? agreement.borrower_id : agreement.lender_id;
+                        const otherParty = getUserById(otherPartyId);
+                        const loanStatus = getLoanStatus(agreement.loan_id);
+                        const badgeStyle = getStatusBadgeStyle(loanStatus);
+                        const isExpanded = expandedId === agreement.id;
+                        const categoryLabel = isLender ? 'Lent to You' : 'Borrowed from You';
+                        const dateDisplay = agreement.created_at ? format(new Date(agreement.created_at), 'M/dd') : '';
+                        const dateYear = agreement.created_at ? new Date(agreement.created_at).getFullYear() : null;
+                        const dateFormatted = dateYear && dateYear < new Date().getFullYear()
+                          ? format(new Date(agreement.created_at), 'M/d/yyyy')
+                          : dateDisplay;
 
-                      return (
-                        <div key={agreement.id}>
-                          <div
-                            onClick={() => setExpandedId(isExpanded ? null : agreement.id)}
-                            style={{
-                              display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px',
-                              borderRadius: isExpanded ? '12px 12px 0 0' : 12,
-                              background: 'rgba(0,0,0,0.03)', transition: 'background 0.15s', cursor: 'pointer',
-                            }}
-                          >
-                            {/* Category icon */}
-                            <div style={{
-                              width: 36, height: 36, borderRadius: '50%', background: 'rgba(103,138,251,0.1)',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                              color: '#678AFB',
-                            }}>
-                              <FileText size={16} />
-                            </div>
-
-                            {/* Mobile layout */}
-                            <div className="la-mobile-content" style={{ flex: 1, minWidth: 0 }}>
-                              <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                {categoryLabel} · {otherParty.full_name} · {formatMoney(agreement.total_amount)}
-                              </p>
-                              <p style={{ fontSize: 11, color: '#787776', margin: '2px 0 0' }}>
-                                {agreement.created_at ? format(new Date(agreement.created_at), 'MMM d, yyyy') : ''} · {loanStatus}
-                              </p>
-                            </div>
-                            <div className="la-mobile-status">
-                              <span style={{
-                                ...badgeStyle, padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 600,
-                                textTransform: 'capitalize', whiteSpace: 'nowrap',
+                        return (
+                          <div key={agreement.id}>
+                            <div
+                              onClick={() => setExpandedId(isExpanded ? null : agreement.id)}
+                              style={{
+                                display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px',
+                                borderRadius: isExpanded ? '12px 12px 0 0' : 12,
+                                background: 'rgba(0,0,0,0.03)', transition: 'background 0.15s', cursor: 'pointer',
+                              }}
+                            >
+                              {/* Category icon */}
+                              <div style={{
+                                width: 36, height: 36, borderRadius: '50%', background: 'rgba(103,138,251,0.1)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                                color: '#678AFB',
                               }}>
-                                {loanStatus}
-                              </span>
-                            </div>
+                                <FileText size={16} />
+                              </div>
 
-                            {/* Desktop layout */}
-                            <span className="la-desktop-date" style={{ display: 'none', width: 80, fontSize: 12, fontWeight: 500, color: '#787776', flexShrink: 0 }}>
-                              {dateFormatted}
-                            </span>
-                            <div className="la-desktop-friend" style={{ display: 'none', flex: 1.5, minWidth: 0, alignItems: 'center', gap: 8, paddingLeft: 4 }}>
-                              <span style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                {otherParty.full_name}
+                              {/* Mobile layout */}
+                              <div className="la-mobile-content" style={{ flex: 1, minWidth: 0 }}>
+                                <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {categoryLabel} · {otherParty.full_name} · {formatMoney(agreement.total_amount)}
+                                </p>
+                                <p style={{ fontSize: 11, color: '#787776', margin: '2px 0 0' }}>
+                                  {agreement.created_at ? format(new Date(agreement.created_at), 'MMM d, yyyy') : ''} · {loanStatus}
+                                </p>
+                              </div>
+                              <div className="la-mobile-status">
+                                <span style={{
+                                  ...badgeStyle, padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 600,
+                                  textTransform: 'capitalize', whiteSpace: 'nowrap',
+                                }}>
+                                  {loanStatus}
+                                </span>
+                              </div>
+
+                              {/* Desktop layout */}
+                              <span className="la-desktop-date" style={{ display: 'none', width: 80, fontSize: 12, fontWeight: 500, color: '#787776', flexShrink: 0 }}>
+                                {dateFormatted}
                               </span>
-                            </div>
-                            <div className="la-desktop-category" style={{ display: 'none', flex: 1.2, minWidth: 0, alignItems: 'center', gap: 6, paddingLeft: 4 }}>
-                              <span style={{ fontSize: 12, fontWeight: 500, color: isLender ? '#678AFB' : '#A79DEA' }}>{categoryLabel}</span>
-                            </div>
-                            <div className="la-desktop-status" style={{ display: 'none', width: 130, justifyContent: 'center', flexShrink: 0 }}>
-                              <span style={{
-                                ...badgeStyle, display: 'inline-flex', alignItems: 'center', padding: '4px 10px', borderRadius: 8,
-                                fontSize: 11, fontWeight: 600, textTransform: 'capitalize',
+                              <div className="la-desktop-friend" style={{ display: 'none', flex: 1.5, minWidth: 0, alignItems: 'center', gap: 8, paddingLeft: 4 }}>
+                                <span style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {otherParty.full_name}
+                                </span>
+                              </div>
+                              <div className="la-desktop-category" style={{ display: 'none', flex: 1.2, minWidth: 0, alignItems: 'center', gap: 6, paddingLeft: 4 }}>
+                                <span style={{ fontSize: 12, fontWeight: 500, color: isLender ? '#678AFB' : '#A79DEA' }}>{categoryLabel}</span>
+                              </div>
+                              <div className="la-desktop-status" style={{ display: 'none', width: 130, justifyContent: 'center', flexShrink: 0 }}>
+                                <span style={{
+                                  ...badgeStyle, display: 'inline-flex', alignItems: 'center', padding: '4px 10px', borderRadius: 8,
+                                  fontSize: 11, fontWeight: 600, textTransform: 'capitalize',
+                                }}>
+                                  {loanStatus}
+                                </span>
+                              </div>
+                              <span className="la-desktop-amount" style={{ display: 'none', width: 100, fontSize: 13, fontWeight: 600, color: '#1A1918', textAlign: 'right', flexShrink: 0 }}>
+                                {formatMoney(agreement.total_amount)}
+                              </span>
+
+                              {/* Expand arrow */}
+                              <div style={{
+                                width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                flexShrink: 0, transition: 'transform 0.2s',
+                                transform: isExpanded ? 'rotate(90deg)' : 'none',
                               }}>
-                                {loanStatus}
-                              </span>
+                                <ChevronRight size={16} style={{ color: '#787776' }} />
+                              </div>
                             </div>
-                            <span className="la-desktop-amount" style={{ display: 'none', width: 100, fontSize: 13, fontWeight: 600, color: '#1A1918', textAlign: 'right', flexShrink: 0 }}>
-                              {formatMoney(agreement.total_amount)}
-                            </span>
 
-                            {/* Expand arrow */}
-                            <div style={{
-                              width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              flexShrink: 0, transition: 'transform 0.2s',
-                              transform: isExpanded ? 'rotate(90deg)' : 'none',
-                            }}>
-                              <ChevronRight size={16} style={{ color: '#787776' }} />
-                            </div>
+                            {/* Expanded document buttons */}
+                            {isExpanded && (
+                              <div style={{
+                                padding: '16px 14px 16px 64px',
+                                background: 'rgba(0,0,0,0.02)', borderRadius: '0 0 12px 12px',
+                                borderTop: '1px solid rgba(0,0,0,0.04)',
+                                display: 'flex', gap: 8, flexWrap: 'wrap',
+                              }}>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); openPopup('promissory', agreement); }}
+                                  style={{
+                                    padding: '8px 16px', borderRadius: 10, border: '1px solid rgba(0,0,0,0.08)',
+                                    background: 'white', fontSize: 12, fontWeight: 500, color: '#1A1918',
+                                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+                                    fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap', transition: 'background 0.15s',
+                                  }}
+                                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(103,138,251,0.06)'}
+                                  onMouseLeave={e => e.currentTarget.style.background = 'white'}
+                                >
+                                  <FileText size={14} style={{ color: '#678AFB' }} />
+                                  Promissory Note
+                                  <div
+                                    style={{ position: 'relative' }}
+                                    onMouseEnter={(e) => { e.stopPropagation(); setActiveInfoTooltip(`promissory-${agreement.id}`); }}
+                                    onMouseLeave={() => setActiveInfoTooltip(null)}
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <div style={{ width: 16, height: 16, borderRadius: '50%', background: 'rgba(103,138,251,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'help' }}>
+                                      <span style={{ fontSize: 10, fontWeight: 700, color: '#678AFB' }}>i</span>
+                                    </div>
+                                    {activeInfoTooltip === `promissory-${agreement.id}` && (
+                                      <div style={{ position: 'absolute', left: 24, top: 0, zIndex: 50, width: 224, background: '#1A1918', color: 'white', fontSize: 11, borderRadius: 10, padding: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', whiteSpace: 'normal' }}>
+                                        A promissory note is a legal document where the borrower promises to repay the loan amount plus any interest by a specific date.
+                                      </div>
+                                    )}
+                                  </div>
+                                </button>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); openPopup('amortization', agreement); }}
+                                  style={{
+                                    padding: '8px 16px', borderRadius: 10, border: '1px solid rgba(0,0,0,0.08)',
+                                    background: 'white', fontSize: 12, fontWeight: 500, color: '#1A1918',
+                                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+                                    fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap', transition: 'background 0.15s',
+                                  }}
+                                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(103,138,251,0.06)'}
+                                  onMouseLeave={e => e.currentTarget.style.background = 'white'}
+                                >
+                                  <FileText size={14} style={{ color: '#A79DEA' }} />
+                                  Amortization Schedule
+                                  <div
+                                    style={{ position: 'relative' }}
+                                    onMouseEnter={(e) => { e.stopPropagation(); setActiveInfoTooltip(`amortization-${agreement.id}`); }}
+                                    onMouseLeave={() => setActiveInfoTooltip(null)}
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <div style={{ width: 16, height: 16, borderRadius: '50%', background: 'rgba(103,138,251,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'help' }}>
+                                      <span style={{ fontSize: 10, fontWeight: 700, color: '#678AFB' }}>i</span>
+                                    </div>
+                                    {activeInfoTooltip === `amortization-${agreement.id}` && (
+                                      <div style={{ position: 'absolute', left: 24, top: 0, zIndex: 50, width: 224, background: '#1A1918', color: 'white', fontSize: 11, borderRadius: 10, padding: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', whiteSpace: 'normal' }}>
+                                        An amortization schedule shows the breakdown of each payment over the life of the loan, including how much goes toward principal vs. interest.
+                                      </div>
+                                    )}
+                                  </div>
+                                </button>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); openPopup('summary', agreement); }}
+                                  style={{
+                                    padding: '8px 16px', borderRadius: 10, border: 'none',
+                                    background: '#1A1918', fontSize: 12, fontWeight: 500, color: 'white',
+                                    cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap',
+                                    transition: 'background 0.15s', display: 'flex', alignItems: 'center', gap: 6,
+                                  }}
+                                  onMouseEnter={e => e.currentTarget.style.background = '#333'}
+                                  onMouseLeave={e => e.currentTarget.style.background = '#1A1918'}
+                                >
+                                  Loan Summary
+                                </button>
+                              </div>
+                            )}
                           </div>
-
-                          {/* Expanded document buttons */}
-                          {isExpanded && (
-                            <div style={{
-                              padding: '16px 14px 16px 64px',
-                              background: 'rgba(0,0,0,0.02)', borderRadius: '0 0 12px 12px',
-                              borderTop: '1px solid rgba(0,0,0,0.04)',
-                              display: 'flex', gap: 8, flexWrap: 'wrap',
-                            }}>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); openPopup('promissory', agreement); }}
-                                style={{
-                                  padding: '8px 16px', borderRadius: 10, border: '1px solid rgba(0,0,0,0.08)',
-                                  background: 'white', fontSize: 12, fontWeight: 500, color: '#1A1918',
-                                  cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
-                                  fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap', transition: 'background 0.15s',
-                                }}
-                                onMouseEnter={e => e.currentTarget.style.background = 'rgba(103,138,251,0.06)'}
-                                onMouseLeave={e => e.currentTarget.style.background = 'white'}
-                              >
-                                <FileText size={14} style={{ color: '#678AFB' }} />
-                                Promissory Note
-                                <div
-                                  style={{ position: 'relative' }}
-                                  onMouseEnter={(e) => { e.stopPropagation(); setActiveInfoTooltip(`promissory-${agreement.id}`); }}
-                                  onMouseLeave={() => setActiveInfoTooltip(null)}
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <div style={{ width: 16, height: 16, borderRadius: '50%', background: 'rgba(103,138,251,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'help' }}>
-                                    <span style={{ fontSize: 10, fontWeight: 700, color: '#678AFB' }}>i</span>
-                                  </div>
-                                  {activeInfoTooltip === `promissory-${agreement.id}` && (
-                                    <div style={{ position: 'absolute', left: 24, top: 0, zIndex: 50, width: 224, background: '#1A1918', color: 'white', fontSize: 11, borderRadius: 10, padding: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', whiteSpace: 'normal' }}>
-                                      A promissory note is a legal document where the borrower promises to repay the loan amount plus any interest by a specific date.
-                                    </div>
-                                  )}
-                                </div>
-                              </button>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); openPopup('amortization', agreement); }}
-                                style={{
-                                  padding: '8px 16px', borderRadius: 10, border: '1px solid rgba(0,0,0,0.08)',
-                                  background: 'white', fontSize: 12, fontWeight: 500, color: '#1A1918',
-                                  cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
-                                  fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap', transition: 'background 0.15s',
-                                }}
-                                onMouseEnter={e => e.currentTarget.style.background = 'rgba(103,138,251,0.06)'}
-                                onMouseLeave={e => e.currentTarget.style.background = 'white'}
-                              >
-                                <FileText size={14} style={{ color: '#A79DEA' }} />
-                                Amortization Schedule
-                                <div
-                                  style={{ position: 'relative' }}
-                                  onMouseEnter={(e) => { e.stopPropagation(); setActiveInfoTooltip(`amortization-${agreement.id}`); }}
-                                  onMouseLeave={() => setActiveInfoTooltip(null)}
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <div style={{ width: 16, height: 16, borderRadius: '50%', background: 'rgba(103,138,251,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'help' }}>
-                                    <span style={{ fontSize: 10, fontWeight: 700, color: '#678AFB' }}>i</span>
-                                  </div>
-                                  {activeInfoTooltip === `amortization-${agreement.id}` && (
-                                    <div style={{ position: 'absolute', left: 24, top: 0, zIndex: 50, width: 224, background: '#1A1918', color: 'white', fontSize: 11, borderRadius: 10, padding: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', whiteSpace: 'normal' }}>
-                                      An amortization schedule shows the breakdown of each payment over the life of the loan, including how much goes toward principal vs. interest.
-                                    </div>
-                                  )}
-                                </div>
-                              </button>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); openPopup('summary', agreement); }}
-                                style={{
-                                  padding: '8px 16px', borderRadius: 10, border: 'none',
-                                  background: '#1A1918', fontSize: 12, fontWeight: 500, color: 'white',
-                                  cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap',
-                                  transition: 'background 0.15s', display: 'flex', alignItems: 'center', gap: 6,
-                                }}
-                                onMouseEnter={e => e.currentTarget.style.background = '#333'}
-                                onMouseLeave={e => e.currentTarget.style.background = '#1A1918'}
-                              >
-                                Loan Summary
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </>
-              )}
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
+
+            {/* Desktop table responsive styles */}
+            <style>{`
+              @media (min-width: 900px) {
+                .la-table-header { display: flex !important; }
+                .la-mobile-content { display: none !important; }
+                .la-mobile-status { display: none !important; }
+                .la-desktop-date { display: block !important; }
+                .la-desktop-friend { display: flex !important; }
+                .la-desktop-category { display: flex !important; }
+                .la-desktop-status { display: flex !important; }
+                .la-desktop-amount { display: block !important; }
+              }
+            `}</style>
+
           </div>
-
-          {/* Desktop table responsive styles */}
-          <style>{`
-            @media (min-width: 900px) {
-              .la-table-header { display: flex !important; }
-              .la-mobile-content { display: none !important; }
-              .la-mobile-status { display: none !important; }
-              .la-desktop-date { display: block !important; }
-              .la-desktop-friend { display: flex !important; }
-              .la-desktop-category { display: flex !important; }
-              .la-desktop-status { display: flex !important; }
-              .la-desktop-amount { display: block !important; }
-            }
-          `}</style>
-
+        </div>{/* end content box */}
+        <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+            <span style={{ fontSize: 11, color: '#787776' }}>Terms of Service</span>
+            <span style={{ fontSize: 11, color: '#787776' }}>Privacy Center</span>
+            <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
+          </div>
         </div>
       </div>
     </>
