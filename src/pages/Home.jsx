@@ -686,8 +686,50 @@ export default function Home() {
         <div style={{ marginTop: 36 }}>
           <div className="home-top-row" style={{ display: 'grid', gridTemplateColumns: '0.75fr 1fr 1fr', columnGap: 16, rowGap: 16, alignItems: 'start' }}>
 
-            {/* Left column: Monthly Stats + Loan Progress */}
+            {/* Left column: Next Payment Due, Next Payment Incoming, Monthly Stats */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, gridRow: '1 / 2' }}>
+              {/* Next payment due */}
+              <div className="glass-card" style={{ overflow: 'hidden' }}>
+                <div style={{ padding: '22px 26px 0' }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Next payment due</div>
+                </div>
+                <div style={{ padding: '14px 26px 18px' }}>
+                  {nextBorrowerPayment ? (
+                    <>
+                      <div style={{ fontSize: '1.3rem', fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', lineHeight: 1 }}>
+                        {format(nextBorrowerPayment.date, 'MMM d')}
+                      </div>
+                      <div style={{ fontSize: 12, color: '#787776', marginTop: 6 }}>
+                        {formatMoney(nextBorrowerPayment.payment_amount || 0)} to @{nextBorrowerPayment.username}
+                      </div>
+                    </>
+                  ) : (
+                    <div style={{ fontSize: 13, color: '#787776' }}>No upcoming payments to send</div>
+                  )}
+                </div>
+              </div>
+
+              {/* Next payment incoming */}
+              <div className="glass-card" style={{ overflow: 'hidden' }}>
+                <div style={{ padding: '22px 26px 0' }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Next payment incoming</div>
+                </div>
+                <div style={{ padding: '14px 26px 18px' }}>
+                  {nextLenderPayment ? (
+                    <>
+                      <div style={{ fontSize: '1.3rem', fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', lineHeight: 1 }}>
+                        {format(nextLenderPayment.date, 'MMM d')}
+                      </div>
+                      <div style={{ fontSize: 12, color: '#787776', marginTop: 6 }}>
+                        {formatMoney(nextLenderPayment.payment_amount || 0)} from @{nextLenderPayment.username}
+                      </div>
+                    </>
+                  ) : (
+                    <div style={{ fontSize: 13, color: '#787776' }}>No upcoming payments to receive</div>
+                  )}
+                </div>
+              </div>
+
               {/* Monthly stats card */}
               <div className="glass-card" style={{ overflow: 'hidden' }}>
                 <div style={{ padding: '22px 26px 0' }}>
@@ -710,41 +752,6 @@ export default function Home() {
                         <div style={{ height: '100%', borderRadius: 2, background: '#A79DEA', width: `${monthlyExpectedPay > 0 ? Math.min((monthlyPaidOut / monthlyExpectedPay) * 100, 100) : 0}%`, transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }} />
                       </div>
                       <div style={{ fontSize: 10, color: '#787776', marginTop: 4 }}>{formatMoney(monthlyPaidOut)} of {formatMoney(monthlyExpectedPay)} paid out</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Loan Progress */}
-              <div className="glass-card" style={{ overflow: 'hidden' }}>
-                <div style={{ padding: '22px 26px 0' }}>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Loan progress</div>
-                </div>
-                <div style={{ padding: '14px 26px 20px' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
-                    <div style={{ textAlign: 'center', padding: '0 12px' }}>
-                      <div style={{ fontSize: 11, color: '#787776', marginBottom: 8 }}>Lending</div>
-                      <div style={{ position: 'relative', width: 64, height: 64, margin: '0 auto' }}>
-                        <svg viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)', width: 64, height: 64 }}>
-                          <circle cx="36" cy="36" r="29" fill="none" stroke="rgba(103,138,251,0.15)" strokeWidth="7" />
-                          <circle cx="36" cy="36" r="29" fill="none" stroke="#678AFB" strokeWidth="7" strokeLinecap="round" strokeDasharray={PIE_C} strokeDashoffset={lentPieOffset} style={{ transition: 'stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
-                        </svg>
-                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: '#292827', letterSpacing: '-0.03em' }}>{percentRepaid}%</div>
-                      </div>
-                      <div style={{ fontSize: 10, color: '#787776', marginTop: 8, whiteSpace: 'nowrap' }}>{formatMoney(totalRepaid)} of {formatMoney(totalLentAmount)}</div>
-                      <div style={{ fontSize: 10, color: '#787776', marginTop: 2 }}>repaid</div>
-                    </div>
-                    <div style={{ textAlign: 'center', padding: '0 12px' }}>
-                      <div style={{ fontSize: 11, color: '#787776', marginBottom: 8 }}>Borrowing</div>
-                      <div style={{ position: 'relative', width: 64, height: 64, margin: '0 auto' }}>
-                        <svg viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)', width: 64, height: 64 }}>
-                          <circle cx="36" cy="36" r="29" fill="none" stroke="rgba(167,157,234,0.15)" strokeWidth="7" />
-                          <circle cx="36" cy="36" r="29" fill="none" stroke="#A79DEA" strokeWidth="7" strokeLinecap="round" strokeDasharray={PIE_C} strokeDashoffset={borrowedPieOffset} style={{ transition: 'stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
-                        </svg>
-                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: '#292827', letterSpacing: '-0.03em' }}>{percentPaid}%</div>
-                      </div>
-                      <div style={{ fontSize: 10, color: '#787776', marginTop: 8, whiteSpace: 'nowrap' }}>{formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)}</div>
-                      <div style={{ fontSize: 10, color: '#787776', marginTop: 2 }}>paid back</div>
                     </div>
                   </div>
                 </div>
@@ -876,6 +883,41 @@ export default function Home() {
                   })() : (
                     <div style={{ textAlign: 'center', padding: '20px 0', color: '#787776', fontSize: 13 }}>No loan data yet</div>
                   )}
+                </div>
+              </div>
+
+              {/* Loan Progress */}
+              <div className="glass-card" style={{ overflow: 'hidden' }}>
+                <div style={{ padding: '22px 26px 0' }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Loan progress</div>
+                </div>
+                <div style={{ padding: '14px 26px 20px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
+                    <div style={{ textAlign: 'center', padding: '0 12px' }}>
+                      <div style={{ fontSize: 11, color: '#787776', marginBottom: 8 }}>Lending</div>
+                      <div style={{ position: 'relative', width: 64, height: 64, margin: '0 auto' }}>
+                        <svg viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)', width: 64, height: 64 }}>
+                          <circle cx="36" cy="36" r="29" fill="none" stroke="rgba(103,138,251,0.15)" strokeWidth="7" />
+                          <circle cx="36" cy="36" r="29" fill="none" stroke="#678AFB" strokeWidth="7" strokeLinecap="round" strokeDasharray={PIE_C} strokeDashoffset={lentPieOffset} style={{ transition: 'stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
+                        </svg>
+                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: '#292827', letterSpacing: '-0.03em' }}>{percentRepaid}%</div>
+                      </div>
+                      <div style={{ fontSize: 10, color: '#787776', marginTop: 8, whiteSpace: 'nowrap' }}>{formatMoney(totalRepaid)} of {formatMoney(totalLentAmount)}</div>
+                      <div style={{ fontSize: 10, color: '#787776', marginTop: 2 }}>repaid</div>
+                    </div>
+                    <div style={{ textAlign: 'center', padding: '0 12px' }}>
+                      <div style={{ fontSize: 11, color: '#787776', marginBottom: 8 }}>Borrowing</div>
+                      <div style={{ position: 'relative', width: 64, height: 64, margin: '0 auto' }}>
+                        <svg viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)', width: 64, height: 64 }}>
+                          <circle cx="36" cy="36" r="29" fill="none" stroke="rgba(167,157,234,0.15)" strokeWidth="7" />
+                          <circle cx="36" cy="36" r="29" fill="none" stroke="#A79DEA" strokeWidth="7" strokeLinecap="round" strokeDasharray={PIE_C} strokeDashoffset={borrowedPieOffset} style={{ transition: 'stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
+                        </svg>
+                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: '#292827', letterSpacing: '-0.03em' }}>{percentPaid}%</div>
+                      </div>
+                      <div style={{ fontSize: 10, color: '#787776', marginTop: 8, whiteSpace: 'nowrap' }}>{formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)}</div>
+                      <div style={{ fontSize: 10, color: '#787776', marginTop: 2 }}>paid back</div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
