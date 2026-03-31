@@ -117,10 +117,17 @@ input[type="date"] {
 }
 
 .galaxy-border-card {
-  background: #F5F4F0;
+  background: rgba(255, 255, 255, 0.88);
   border-radius: 16px;
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(10px) saturate(1.1);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1);
+  box-shadow:
+    rgba(0, 0, 0, 0.01) 64px 91px 45px 0px,
+    rgba(0, 0, 0, 0.03) 36px 51px 38px 0px,
+    rgba(0, 0, 0, 0.06) 16px 23px 28px 0px,
+    rgba(0, 0, 0, 0.06) 4px 6px 15px 0px;
 }
 
 .galaxy-border-card::after {
@@ -128,7 +135,7 @@ input[type="date"] {
   position: absolute;
   inset: 0;
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid #F5F4F0;
   box-shadow:
     rgba(255, 255, 255, 0.6) 0px 0px 30px inset,
     rgba(255, 255, 255, 0.3) 0px 0px 50px inset;
