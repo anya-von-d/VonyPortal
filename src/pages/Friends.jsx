@@ -248,20 +248,22 @@ export default function Friends() {
   /* ── Loading state ──────────────────────────────────────────── */
   if (isLoading && !user) {
     return (
-      <div className="home-with-sidebar" style={{ minHeight: '100vh', background: '#F7F7F7', paddingLeft: 240, fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5 }}>
+      <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 240, background: '#F5F4F0' }}>
         <DashboardSidebar activePage="Friends" user={user} />
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 520, background: 'linear-gradient(180deg, #527DFF 0%, #5580FF 5%, #678AFB 13%, #7792F4 22%, #8C9BEE 32%, #A19EEB 42%, #A79DEA 50%, #BB98E8 58%, #C89CE6 65%, #D4A0E4 72%, #DDA5E2 76%, #F0D8EA 80%, #F7F7F7 84%)' }} />
-        </div>
-        <div style={{ position: 'relative', zIndex: 10, maxWidth: 1080, margin: '0 auto', padding: '0 28px' }}>
-          <div style={{ paddingTop: 80, paddingBottom: 20, textAlign: 'center' }}>
-            <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.2rem', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.1, color: 'white', margin: 0 }}>Friends</h1>
+        <div style={{ position: 'relative', margin: '12px 12px 12px 0', borderRadius: 20, overflow: 'hidden', minHeight: 'calc(100vh - 24px)' }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
+            <div style={{ position: 'absolute', top: 0, left: '-10%', width: '120%', height: '100%', zIndex: 0, background: 'linear-gradient(180deg, #5881FE 0%, #6688F8 20%, #7490F5 40%, #8296F0 60%, #8C9AEC 80%, #9196EC 100%)' }} />
           </div>
-        </div>
-        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px 64px', position: 'relative', zIndex: 10 }}>
-          <div className="glass-card" style={{ padding: 40, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ width: 32, height: 32, border: '2px solid #678AFB', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: 12 }} />
-            <p style={{ fontSize: 13, color: '#787776' }}>Loading friends...</p>
+          <div style={{ position: 'relative', zIndex: 2, maxWidth: 1080, margin: '0 auto', padding: '0 28px' }}>
+            <div style={{ paddingTop: 80, paddingBottom: 20, textAlign: 'center' }}>
+              <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.2rem', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.1, color: 'white', margin: 0 }}>Friends</h1>
+            </div>
+          </div>
+          <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px 64px', position: 'relative', zIndex: 2 }}>
+            <div className="glass-card" style={{ padding: 40, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 32, height: 32, border: '2px solid #678AFB', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: 12 }} />
+              <p style={{ fontSize: 13, color: '#787776' }}>Loading friends...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -272,341 +274,375 @@ export default function Friends() {
      RENDER
      ══════════════════════════════════════════════════════════ */
   return (
-    <div className="home-with-sidebar" style={{ minHeight: '100vh', background: '#F7F7F7', paddingLeft: 240, fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5 }}>
+    <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 240, background: '#F5F4F0' }}>
       <DashboardSidebar activePage="Friends" user={user} />
 
-      {/* Galaxy gradient background — covers full page */}
-      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 520, background: 'linear-gradient(180deg, #527DFF 0%, #5580FF 5%, #678AFB 13%, #7792F4 22%, #8C9BEE 32%, #A19EEB 42%, #A79DEA 50%, #BB98E8 58%, #C89CE6 65%, #D4A0E4 72%, #DDA5E2 76%, #F0D8EA 80%, #F7F7F7 84%)' }} />
-        <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 320, opacity: 0.6 }} viewBox="0 0 1617 329" fill="none">
-          <defs><radialGradient id="frStarGlow"><stop offset="0%" stopColor="#EAF9F3"/><stop offset="100%" stopColor="#9FEBFB"/></radialGradient></defs>
-          {STAR_CIRCLES.map((s, i) => <circle key={i} cx={s.cx} cy={s.cy} r="1.75" fill="url(#frStarGlow)" opacity={s.o}/>)}
-        </svg>
-        <div className="twinkle-star" /><div className="twinkle-star" /><div className="twinkle-star" /><div className="twinkle-star" /><div className="twinkle-star" />
-      </div>
+      {/* ── Content box with galaxy background ── */}
+      <div style={{ position: 'relative', margin: '12px 12px 12px 0', borderRadius: 20, overflow: 'hidden', minHeight: 'calc(100vh - 24px)' }}>
 
-      {/* Hero title */}
-      <div style={{ position: 'relative', zIndex: 10, maxWidth: 1080, margin: '0 auto', padding: '0 28px' }}>
-        <div style={{ paddingTop: 80, paddingBottom: 20, textAlign: 'center' }}>
-          <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.2rem', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.1, color: 'white', margin: 0 }}>
+        {/* Galaxy gradient background inside the box */}
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
+          <div style={{
+            position: 'absolute', top: 0, left: '-10%', width: '120%', height: '100%', zIndex: 0,
+            background: 'linear-gradient(180deg, #5881FE 0%, #6688F8 20%, #7490F5 40%, #8296F0 60%, #8C9AEC 80%, #9196EC 100%)'
+          }} />
+          {/* Static star field */}
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 420, zIndex: 1, overflow: 'hidden' }}>
+            <svg width="100%" height="100%" viewBox="0 0 1617 329" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="frStarGlow">
+                  <stop offset="0%" stopColor="#EAF9F3"/>
+                  <stop offset="100%" stopColor="#9FEBFB"/>
+                </radialGradient>
+              </defs>
+              {STAR_CIRCLES.map((s, i) => (
+                <circle key={i} cx={s.cx} cy={s.cy} r="1.75" fill="url(#frStarGlow)" opacity={s.o}/>
+              ))}
+            </svg>
+          </div>
+          {/* Twinkling stars */}
+          <div className="twinkle-star" />
+          <div className="twinkle-star" />
+          <div className="twinkle-star" />
+          <div className="twinkle-star" />
+          <div className="twinkle-star" />
+        </div>
+
+      {/* ── Hero ── */}
+      <div style={{ background: 'transparent', position: 'relative', zIndex: 2 }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '80px 28px 56px', textAlign: 'center' }}>
+          <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.2rem', fontWeight: 600, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.1, margin: 0 }}>
             Friends
           </h1>
         </div>
-      </div>
 
-      {/* Page content */}
-      <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px 64px', position: 'relative', zIndex: 10 }}>
+        {/* Page content */}
+        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px 64px' }}>
 
-        {/* Two-Column Layout: Friends Left, Search + Requests Right */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          {/* Two-Column Layout: Friends Left, Search + Requests Right */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
 
-          {/* Left Column: Your Friends */}
-          <div className="glass-card" style={{ overflow: 'hidden' }}>
-            <div style={{ padding: '20px 26px 0' }}>
-              <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Your Friends</span>
-            </div>
-            <div style={{ padding: '14px 26px 26px' }}>
-              {isLoading ? (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0' }}>
-                  <div style={{ width: 32, height: 32, border: '2px solid #678AFB', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                </div>
-              ) : sortedFriends.length === 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 0', color: '#C7C6C4' }}>
-                  <Users size={32} style={{ opacity: 0.4, marginBottom: 8 }} />
-                  <p style={{ fontSize: 13, color: '#787776', margin: 0 }}>No friends yet</p>
-                  <p style={{ fontSize: 12, color: '#C7C6C4', margin: '4px 0 0' }}>Search for friends to get started</p>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {sortedFriends.map((friendship, index) => {
-                    const friendProfile = getFriendProfile(friendship);
-                    if (!friendProfile) return null;
-
-                    return (
-                      <div
-                        key={friendship.id}
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px',
-                          borderRadius: 12, background: 'rgba(0,0,0,0.03)', transition: 'background 0.15s',
-                        }}
-                      >
-                        {/* Avatar */}
-                        <img
-                          src={friendProfile.profile_picture_url || friendProfile.avatar_url || defaultAvatarUrl(friendProfile.full_name)}
-                          alt={friendProfile.full_name || 'Friend'}
-                          style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, background: 'rgba(103,138,251,0.1)' }}
-                        />
-
-                        {/* Name */}
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {friendProfile.full_name || friendProfile.username}
-                          </p>
-                          <p style={{ fontSize: 11, color: '#787776', margin: '2px 0 0' }}>
-                            @{friendProfile.username}
-                          </p>
-                        </div>
-
-                        {/* Star Button */}
-                        <button
-                          onClick={() => handleToggleStar(friendship)}
-                          disabled={processingId === friendship.id}
-                          style={{
-                            background: 'none', border: 'none', cursor: 'pointer', padding: 6,
-                            color: friendship.is_starred ? '#F5A623' : '#C7C6C4',
-                            transition: 'color 0.15s',
-                          }}
-                        >
-                          <Star
-                            size={18}
-                            fill={friendship.is_starred ? 'currentColor' : 'none'}
-                          />
-                        </button>
-
-                        {/* Unfriend Button */}
-                        <button
-                          onClick={() => handleRemoveFriend(friendship.id)}
-                          disabled={processingId === friendship.id}
-                          style={{
-                            padding: '6px 12px', borderRadius: 10, border: 'none',
-                            background: 'rgba(232,114,110,0.08)', fontSize: 11, fontWeight: 600,
-                            color: '#E8726E', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-                            transition: 'background 0.15s', whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {processingId === friendship.id ? (
-                            <div style={{ width: 16, height: 16, border: '2px solid #E8726E', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                          ) : (
-                            'Unfriend'
-                          )}
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Right Column: Search + Friend Requests */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-
-            {/* Search for Friends */}
+            {/* Left Column: Your Friends */}
             <div className="glass-card" style={{ overflow: 'hidden' }}>
               <div style={{ padding: '20px 26px 0' }}>
-                <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Search for Friends</span>
+                <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Your Friends</span>
               </div>
               <div style={{ padding: '14px 26px 26px' }}>
-                {/* Search Input */}
-                <div style={{ position: 'relative', marginBottom: searchQuery.trim() ? 14 : 0 }}>
-                  <Search size={18} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#C7C6C4' }} />
-                  <input
-                    type="text"
-                    placeholder="Search by username..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    style={{
-                      width: '100%', padding: '10px 36px 10px 38px', borderRadius: 12,
-                      border: '1px solid rgba(0,0,0,0.08)', background: 'rgba(0,0,0,0.03)',
-                      fontSize: 13, color: '#1A1918', fontFamily: "'DM Sans', sans-serif",
-                      outline: 'none', transition: 'border-color 0.15s',
-                    }}
-                    onFocus={(e) => e.target.style.borderColor = 'rgba(103,138,251,0.4)'}
-                    onBlur={(e) => e.target.style.borderColor = 'rgba(0,0,0,0.08)'}
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery('')}
-                      style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#787776', padding: 2 }}
-                    >
-                      <X size={16} />
-                    </button>
-                  )}
-                </div>
+                {isLoading ? (
+                  <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0' }}>
+                    <div style={{ width: 32, height: 32, border: '2px solid #678AFB', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                  </div>
+                ) : sortedFriends.length === 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 0', color: '#C7C6C4' }}>
+                    <Users size={32} style={{ opacity: 0.4, marginBottom: 8 }} />
+                    <p style={{ fontSize: 13, color: '#787776', margin: 0 }}>No friends yet</p>
+                    <p style={{ fontSize: 12, color: '#C7C6C4', margin: '4px 0 0' }}>Search for friends to get started</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {sortedFriends.map((friendship, index) => {
+                      const friendProfile = getFriendProfile(friendship);
+                      if (!friendProfile) return null;
 
-                {/* Search Results */}
-                {searchQuery.trim() && (
-                  <div>
-                    {allSearchResults.length === 0 ? (
-                      <div style={{ textAlign: 'center', padding: '16px 0' }}>
-                        <p style={{ fontSize: 13, color: '#787776', margin: 0 }}>No users found</p>
-                      </div>
-                    ) : (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                        {allSearchResults.map((profile) => {
-                          const receivedRequest = getReceivedRequestFrom(profile.user_id);
-                          const sentRequest = getSentRequestTo(profile.user_id);
+                      return (
+                        <div
+                          key={friendship.id}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px',
+                            borderRadius: 12, background: 'rgba(0,0,0,0.03)', transition: 'background 0.15s',
+                          }}
+                        >
+                          {/* Avatar */}
+                          <img
+                            src={friendProfile.profile_picture_url || friendProfile.avatar_url || defaultAvatarUrl(friendProfile.full_name)}
+                            alt={friendProfile.full_name || 'Friend'}
+                            style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, background: 'rgba(103,138,251,0.1)' }}
+                          />
 
-                          return (
-                            <div
-                              key={profile.user_id}
-                              style={{
-                                display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px',
-                                borderRadius: 12, background: 'rgba(0,0,0,0.03)',
-                              }}
-                            >
-                              <img
-                                src={profile.profile_picture_url || profile.avatar_url || defaultAvatarUrl(profile.full_name)}
-                                alt={profile.full_name || 'User'}
-                                style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, background: 'rgba(103,138,251,0.1)' }}
-                              />
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                  {profile.full_name || profile.username}
-                                </p>
-                                <p style={{ fontSize: 11, color: '#787776', margin: '2px 0 0' }}>@{profile.username}</p>
-                              </div>
+                          {/* Name */}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {friendProfile.full_name || friendProfile.username}
+                            </p>
+                            <p style={{ fontSize: 11, color: '#787776', margin: '2px 0 0' }}>
+                              @{friendProfile.username}
+                            </p>
+                          </div>
 
-                              {/* Action Button */}
-                              {receivedRequest ? (
-                                <button
-                                  onClick={() => handleAcceptRequestFromSearch(receivedRequest.id)}
-                                  disabled={processingId === receivedRequest.id}
-                                  style={{
-                                    padding: '6px 12px', borderRadius: 10, border: 'none',
-                                    background: '#678AFB', fontSize: 11, fontWeight: 600,
-                                    color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
-                                    fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap',
-                                    opacity: processingId === receivedRequest.id ? 0.5 : 1,
-                                  }}
-                                >
-                                  {processingId === receivedRequest.id ? (
-                                    <div style={{ width: 14, height: 14, border: '2px solid white', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                                  ) : (
-                                    <>
-                                      <CheckCircle size={14} />
-                                      Accept
-                                    </>
-                                  )}
-                                </button>
-                              ) : sentRequest ? (
-                                <button
-                                  onClick={() => handleCancelRequest(sentRequest.id)}
-                                  disabled={processingId === sentRequest.id}
-                                  style={{
-                                    padding: '6px 12px', borderRadius: 10, border: 'none',
-                                    background: 'rgba(232,114,110,0.08)', fontSize: 11, fontWeight: 600,
-                                    color: '#E8726E', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
-                                    fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap',
-                                    opacity: processingId === sentRequest.id ? 0.5 : 1,
-                                  }}
-                                >
-                                  {processingId === sentRequest.id ? (
-                                    <div style={{ width: 14, height: 14, border: '2px solid #E8726E', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                                  ) : (
-                                    <>
-                                      <UserMinus size={14} />
-                                      Unsend Request
-                                    </>
-                                  )}
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={() => handleSendRequest(profile.user_id)}
-                                  disabled={processingId === profile.user_id}
-                                  style={{
-                                    padding: '6px 12px', borderRadius: 10, border: 'none',
-                                    background: '#678AFB', fontSize: 11, fontWeight: 600,
-                                    color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
-                                    fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap',
-                                    opacity: processingId === profile.user_id ? 0.5 : 1,
-                                  }}
-                                >
-                                  {processingId === profile.user_id ? (
-                                    <div style={{ width: 14, height: 14, border: '2px solid white', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                                  ) : (
-                                    <>
-                                      <Send size={14} />
-                                      Send Request
-                                    </>
-                                  )}
-                                </button>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
+                          {/* Star Button */}
+                          <button
+                            onClick={() => handleToggleStar(friendship)}
+                            disabled={processingId === friendship.id}
+                            style={{
+                              background: 'none', border: 'none', cursor: 'pointer', padding: 6,
+                              color: friendship.is_starred ? '#F5A623' : '#C7C6C4',
+                              transition: 'color 0.15s',
+                            }}
+                          >
+                            <Star
+                              size={18}
+                              fill={friendship.is_starred ? 'currentColor' : 'none'}
+                            />
+                          </button>
+
+                          {/* Unfriend Button */}
+                          <button
+                            onClick={() => handleRemoveFriend(friendship.id)}
+                            disabled={processingId === friendship.id}
+                            style={{
+                              padding: '6px 12px', borderRadius: 10, border: 'none',
+                              background: 'rgba(232,114,110,0.08)', fontSize: 11, fontWeight: 600,
+                              color: '#E8726E', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+                              transition: 'background 0.15s', whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {processingId === friendship.id ? (
+                              <div style={{ width: 16, height: 16, border: '2px solid #E8726E', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                            ) : (
+                              'Unfriend'
+                            )}
+                          </button>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Friend Requests (Received) */}
-            {receivedRequests.length > 0 && (
+            {/* Right Column: Search + Friend Requests */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+              {/* Search for Friends */}
               <div className="glass-card" style={{ overflow: 'hidden' }}>
                 <div style={{ padding: '20px 26px 0' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Friend Requests</span>
-                    <span style={{ fontSize: 12, color: '#787776' }}>
-                      {receivedRequests.length} pending
-                    </span>
-                  </div>
+                  <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Search for Friends</span>
                 </div>
                 <div style={{ padding: '14px 26px 26px' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {receivedRequests.map((request) => {
-                      const profile = getProfileById(request.user_id);
-                      if (!profile) return null;
-
-                      return (
-                        <div
-                          key={request.id}
-                          style={{
-                            display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px',
-                            borderRadius: 12, background: 'rgba(0,0,0,0.03)',
-                          }}
-                        >
-                          <img
-                            src={profile.profile_picture_url || profile.avatar_url || defaultAvatarUrl(profile.full_name)}
-                            alt={profile.full_name || 'User'}
-                            style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, background: 'rgba(103,138,251,0.1)' }}
-                          />
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {profile.full_name || profile.username}
-                            </p>
-                            <p style={{ fontSize: 11, color: '#787776', margin: '2px 0 0' }}>@{profile.username}</p>
-                          </div>
-                          <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-                            <button
-                              onClick={() => handleAcceptRequestFromSearch(request.id)}
-                              disabled={processingId === request.id}
-                              style={{
-                                padding: '6px 12px', borderRadius: 10, border: 'none',
-                                background: '#678AFB', fontSize: 11, fontWeight: 600,
-                                color: 'white', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-                                opacity: processingId === request.id ? 0.5 : 1,
-                              }}
-                            >
-                              {processingId === request.id ? (
-                                <div style={{ width: 14, height: 14, border: '2px solid white', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                              ) : 'Confirm'}
-                            </button>
-                            <button
-                              onClick={() => handleCancelRequest(request.id)}
-                              disabled={processingId === request.id}
-                              style={{
-                                padding: '6px 12px', borderRadius: 10, border: 'none',
-                                background: 'rgba(232,114,110,0.08)', fontSize: 11, fontWeight: 600,
-                                color: '#E8726E', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-                                opacity: processingId === request.id ? 0.5 : 1,
-                              }}
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
+                  {/* Search Input */}
+                  <div style={{ position: 'relative', marginBottom: searchQuery.trim() ? 14 : 0 }}>
+                    <Search size={18} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#C7C6C4' }} />
+                    <input
+                      type="text"
+                      placeholder="Search by username..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      style={{
+                        width: '100%', padding: '10px 36px 10px 38px', borderRadius: 12,
+                        border: '1px solid rgba(0,0,0,0.08)', background: 'rgba(0,0,0,0.03)',
+                        fontSize: 13, color: '#1A1918', fontFamily: "'DM Sans', sans-serif",
+                        outline: 'none', transition: 'border-color 0.15s',
+                      }}
+                      onFocus={(e) => e.target.style.borderColor = 'rgba(103,138,251,0.4)'}
+                      onBlur={(e) => e.target.style.borderColor = 'rgba(0,0,0,0.08)'}
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery('')}
+                        style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#787776', padding: 2 }}
+                      >
+                        <X size={16} />
+                      </button>
+                    )}
                   </div>
+
+                  {/* Search Results */}
+                  {searchQuery.trim() && (
+                    <div>
+                      {allSearchResults.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '16px 0' }}>
+                          <p style={{ fontSize: 13, color: '#787776', margin: 0 }}>No users found</p>
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                          {allSearchResults.map((profile) => {
+                            const receivedRequest = getReceivedRequestFrom(profile.user_id);
+                            const sentRequest = getSentRequestTo(profile.user_id);
+
+                            return (
+                              <div
+                                key={profile.user_id}
+                                style={{
+                                  display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px',
+                                  borderRadius: 12, background: 'rgba(0,0,0,0.03)',
+                                }}
+                              >
+                                <img
+                                  src={profile.profile_picture_url || profile.avatar_url || defaultAvatarUrl(profile.full_name)}
+                                  alt={profile.full_name || 'User'}
+                                  style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, background: 'rgba(103,138,251,0.1)' }}
+                                />
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {profile.full_name || profile.username}
+                                  </p>
+                                  <p style={{ fontSize: 11, color: '#787776', margin: '2px 0 0' }}>@{profile.username}</p>
+                                </div>
+
+                                {/* Action Button */}
+                                {receivedRequest ? (
+                                  <button
+                                    onClick={() => handleAcceptRequestFromSearch(receivedRequest.id)}
+                                    disabled={processingId === receivedRequest.id}
+                                    style={{
+                                      padding: '6px 12px', borderRadius: 10, border: 'none',
+                                      background: '#678AFB', fontSize: 11, fontWeight: 600,
+                                      color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+                                      fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap',
+                                      opacity: processingId === receivedRequest.id ? 0.5 : 1,
+                                    }}
+                                  >
+                                    {processingId === receivedRequest.id ? (
+                                      <div style={{ width: 14, height: 14, border: '2px solid white', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                                    ) : (
+                                      <>
+                                        <CheckCircle size={14} />
+                                        Accept
+                                      </>
+                                    )}
+                                  </button>
+                                ) : sentRequest ? (
+                                  <button
+                                    onClick={() => handleCancelRequest(sentRequest.id)}
+                                    disabled={processingId === sentRequest.id}
+                                    style={{
+                                      padding: '6px 12px', borderRadius: 10, border: 'none',
+                                      background: 'rgba(232,114,110,0.08)', fontSize: 11, fontWeight: 600,
+                                      color: '#E8726E', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+                                      fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap',
+                                      opacity: processingId === sentRequest.id ? 0.5 : 1,
+                                    }}
+                                  >
+                                    {processingId === sentRequest.id ? (
+                                      <div style={{ width: 14, height: 14, border: '2px solid #E8726E', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                                    ) : (
+                                      <>
+                                        <UserMinus size={14} />
+                                        Unsend Request
+                                      </>
+                                    )}
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() => handleSendRequest(profile.user_id)}
+                                    disabled={processingId === profile.user_id}
+                                    style={{
+                                      padding: '6px 12px', borderRadius: 10, border: 'none',
+                                      background: '#678AFB', fontSize: 11, fontWeight: 600,
+                                      color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+                                      fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap',
+                                      opacity: processingId === profile.user_id ? 0.5 : 1,
+                                    }}
+                                  >
+                                    {processingId === profile.user_id ? (
+                                      <div style={{ width: 14, height: 14, border: '2px solid white', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                                    ) : (
+                                      <>
+                                        <Send size={14} />
+                                        Send Request
+                                      </>
+                                    )}
+                                  </button>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
-            )}
-          </div>
 
+              {/* Friend Requests (Received) */}
+              {receivedRequests.length > 0 && (
+                <div className="glass-card" style={{ overflow: 'hidden' }}>
+                  <div style={{ padding: '20px 26px 0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Friend Requests</span>
+                      <span style={{ fontSize: 12, color: '#787776' }}>
+                        {receivedRequests.length} pending
+                      </span>
+                    </div>
+                  </div>
+                  <div style={{ padding: '14px 26px 26px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {receivedRequests.map((request) => {
+                        const profile = getProfileById(request.user_id);
+                        if (!profile) return null;
+
+                        return (
+                          <div
+                            key={request.id}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px',
+                              borderRadius: 12, background: 'rgba(0,0,0,0.03)',
+                            }}
+                          >
+                            <img
+                              src={profile.profile_picture_url || profile.avatar_url || defaultAvatarUrl(profile.full_name)}
+                              alt={profile.full_name || 'User'}
+                              style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, background: 'rgba(103,138,251,0.1)' }}
+                            />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {profile.full_name || profile.username}
+                              </p>
+                              <p style={{ fontSize: 11, color: '#787776', margin: '2px 0 0' }}>@{profile.username}</p>
+                            </div>
+                            <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                              <button
+                                onClick={() => handleAcceptRequestFromSearch(request.id)}
+                                disabled={processingId === request.id}
+                                style={{
+                                  padding: '6px 12px', borderRadius: 10, border: 'none',
+                                  background: '#678AFB', fontSize: 11, fontWeight: 600,
+                                  color: 'white', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+                                  opacity: processingId === request.id ? 0.5 : 1,
+                                }}
+                              >
+                                {processingId === request.id ? (
+                                  <div style={{ width: 14, height: 14, border: '2px solid white', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                                ) : 'Confirm'}
+                              </button>
+                              <button
+                                onClick={() => handleCancelRequest(request.id)}
+                                disabled={processingId === request.id}
+                                style={{
+                                  padding: '6px 12px', borderRadius: 10, border: 'none',
+                                  background: 'rgba(232,114,110,0.08)', fontSize: 11, fontWeight: 600,
+                                  color: '#E8726E', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+                                  opacity: processingId === request.id ? 0.5 : 1,
+                                }}
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+          </div>
         </div>
       </div>
+
+      </div>{/* end content box */}
+
+      {/* ── Footer ── */}
+      <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          <span style={{ fontSize: 11, color: '#787776' }}>Terms of Service</span>
+          <span style={{ fontSize: 11, color: '#787776' }}>Privacy Center</span>
+          <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
+        </div>
+      </div>
+
     </div>
   );
 }
