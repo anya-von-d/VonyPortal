@@ -687,7 +687,7 @@ export default function Home() {
             {/* Left column: Next Payment Due, Next Payment Incoming, Monthly Stats */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, gridRow: '1 / 2' }}>
               {/* Next payment due */}
-              <div className="glass-card" style={{ overflow: 'hidden' }}>
+              <div className="galaxy-border-card">
                 <div style={{ padding: '22px 26px 0' }}>
                   <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Next payment due</div>
                 </div>

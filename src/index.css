@@ -116,6 +116,25 @@ input[type="date"] {
     rgba(0, 0, 0, 0.08) 0px 10px 38px -1.25px;
 }
 
+.galaxy-border-card {
+  background: #F5F4F0;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.galaxy-border-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    rgba(255, 255, 255, 0.6) 0px 0px 30px inset,
+    rgba(255, 255, 255, 0.3) 0px 0px 50px inset;
+  pointer-events: none;
+}
+
 .galaxy-slide {
   background: #7792F4;
   border-radius: 20px;
