@@ -895,27 +895,31 @@ export default function Home() {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
                     <div style={{ textAlign: 'center', padding: '0 12px' }}>
                       <div style={{ fontSize: 11, color: '#787776', marginBottom: 8 }}>Lending</div>
-                      <div style={{ position: 'relative', width: 64, height: 64, margin: '0 auto' }}>
-                        <svg viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)', width: 64, height: 64 }}>
-                          <circle cx="36" cy="36" r="29" fill="none" stroke="rgba(103,138,251,0.15)" strokeWidth="7" />
-                          <circle cx="36" cy="36" r="29" fill="none" stroke="#678AFB" strokeWidth="7" strokeLinecap="round" strokeDasharray={PIE_C} strokeDashoffset={lentPieOffset} style={{ transition: 'stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
+                      <div style={{ position: 'relative', width: 100, height: 100, margin: '0 auto' }}>
+                        <svg viewBox="0 0 100 100" style={{ transform: 'rotate(-90deg)', width: 100, height: 100 }}>
+                          <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(103,138,251,0.15)" strokeWidth="7" />
+                          <circle cx="50" cy="50" r="42" fill="none" stroke="#678AFB" strokeWidth="7" strokeLinecap="round" strokeDasharray={2 * Math.PI * 42} strokeDashoffset={2 * Math.PI * 42 * (1 - percentRepaid / 100)} style={{ transition: 'stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
                         </svg>
-                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: '#292827', letterSpacing: '-0.03em' }}>{percentRepaid}%</div>
+                        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: '#292827', letterSpacing: '-0.03em', lineHeight: 1 }}>{percentRepaid}%</div>
+                          <div style={{ fontSize: 8, color: '#787776', marginTop: 3, whiteSpace: 'nowrap', lineHeight: 1 }}>{formatMoney(totalRepaid)} of {formatMoney(totalLentAmount)}</div>
+                          <div style={{ fontSize: 8, color: '#787776', marginTop: 1, lineHeight: 1 }}>repaid</div>
+                        </div>
                       </div>
-                      <div style={{ fontSize: 10, color: '#787776', marginTop: 8, whiteSpace: 'nowrap' }}>{formatMoney(totalRepaid)} of {formatMoney(totalLentAmount)}</div>
-                      <div style={{ fontSize: 10, color: '#787776', marginTop: 2 }}>repaid</div>
                     </div>
                     <div style={{ textAlign: 'center', padding: '0 12px' }}>
                       <div style={{ fontSize: 11, color: '#787776', marginBottom: 8 }}>Borrowing</div>
-                      <div style={{ position: 'relative', width: 64, height: 64, margin: '0 auto' }}>
-                        <svg viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)', width: 64, height: 64 }}>
-                          <circle cx="36" cy="36" r="29" fill="none" stroke="rgba(167,157,234,0.15)" strokeWidth="7" />
-                          <circle cx="36" cy="36" r="29" fill="none" stroke="#A79DEA" strokeWidth="7" strokeLinecap="round" strokeDasharray={PIE_C} strokeDashoffset={borrowedPieOffset} style={{ transition: 'stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
+                      <div style={{ position: 'relative', width: 100, height: 100, margin: '0 auto' }}>
+                        <svg viewBox="0 0 100 100" style={{ transform: 'rotate(-90deg)', width: 100, height: 100 }}>
+                          <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(167,157,234,0.15)" strokeWidth="7" />
+                          <circle cx="50" cy="50" r="42" fill="none" stroke="#A79DEA" strokeWidth="7" strokeLinecap="round" strokeDasharray={2 * Math.PI * 42} strokeDashoffset={2 * Math.PI * 42 * (1 - percentPaid / 100)} style={{ transition: 'stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
                         </svg>
-                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: '#292827', letterSpacing: '-0.03em' }}>{percentPaid}%</div>
+                        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: '#292827', letterSpacing: '-0.03em', lineHeight: 1 }}>{percentPaid}%</div>
+                          <div style={{ fontSize: 8, color: '#787776', marginTop: 3, whiteSpace: 'nowrap', lineHeight: 1 }}>{formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)}</div>
+                          <div style={{ fontSize: 8, color: '#787776', marginTop: 1, lineHeight: 1 }}>paid back</div>
+                        </div>
                       </div>
-                      <div style={{ fontSize: 10, color: '#787776', marginTop: 8, whiteSpace: 'nowrap' }}>{formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)}</div>
-                      <div style={{ fontSize: 10, color: '#787776', marginTop: 2 }}>paid back</div>
                     </div>
                   </div>
                 </div>
