@@ -1,11 +1,8 @@
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
-  CreditCard, Wallet, Percent, ChevronRight,
-  Check, DollarSign, Zap, Clock, Award, TrendingUp,
-  BookOpen, GraduationCap, Lightbulb,
-  FileText, Shield, Users
+  Sparkles, Shield, Zap, BarChart3, FileCheck, Users,
+  BookOpen, Scale, Heart, Receipt, Brain, Landmark,
+  ChevronRight, Lock
 } from "lucide-react";
 import { motion } from "framer-motion";
 import DashboardSidebar from "@/components/DashboardSidebar";
@@ -22,87 +19,113 @@ const STAR_CIRCLES = [
   {cx:1560,cy:256,o:0.45},{cx:125,cy:312,o:0.5},{cx:345,cy:267,o:0.6},{cx:565,cy:34,o:0.75},
 ];
 
+const products = [
+  {
+    icon: Sparkles,
+    name: "Vony+",
+    tagline: "Premium",
+    description: "Detailed loan analytics, priority support, and higher lending limits for power users.",
+    highlights: ["Advanced repayment insights", "Priority dispute resolution", "Up to $25k lending limit"],
+    color: '#A79DEA',
+  },
+  {
+    icon: BarChart3,
+    name: "Credit Builder",
+    tagline: "Track Record",
+    description: "Build a verified lending history on Vony that shows you're trustworthy with money.",
+    highlights: ["Verified lending score", "Shareable trust profile", "Repayment history export"],
+    color: '#678AFB',
+  },
+  {
+    icon: Zap,
+    name: "Instant Transfer",
+    tagline: "Speed",
+    description: "Send and receive loan payments instantly instead of waiting for bank transfers.",
+    highlights: ["Real-time payments", "No transfer delays", "Works with any bank"],
+    color: '#A79DEA',
+  },
+  {
+    icon: FileCheck,
+    name: "Smart Agreements",
+    tagline: "AI-Powered",
+    description: "Auto-generated loan agreements tailored to your terms, ready to sign and share.",
+    highlights: ["Custom clauses", "Digital signatures", "Legal templates"],
+    color: '#678AFB',
+  },
+  {
+    icon: Users,
+    name: "Group Pools",
+    tagline: "Community",
+    description: "Pool money with friends for shared goals — trips, gifts, or emergency funds.",
+    highlights: ["Transparent contributions", "Automatic splits", "Group dashboard"],
+    color: '#A79DEA',
+  },
+  {
+    icon: Shield,
+    name: "Payment Protection",
+    tagline: "Safety Net",
+    description: "Optional coverage that protects lenders if a borrower misses payments.",
+    highlights: ["Missed payment coverage", "Flexible plans", "Automated claims"],
+    color: '#678AFB',
+  },
+];
+
+const guides = [
+  {
+    icon: Scale,
+    title: "Setting Fair Interest Rates",
+    description: "What's reasonable when lending to friends? Learn how to set rates that are fair to both sides without making things awkward.",
+    readTime: "4 min read",
+    color: '#678AFB',
+  },
+  {
+    icon: FileCheck,
+    title: "Writing a Loan Agreement That Works",
+    description: "The key terms every peer loan should include — amount, schedule, what happens if things change — and how to bring it up naturally.",
+    readTime: "5 min read",
+    color: '#A79DEA',
+  },
+  {
+    icon: Heart,
+    title: "When a Friend Can't Pay You Back",
+    description: "How to have the conversation, renegotiate terms, and protect the relationship when repayment stalls.",
+    readTime: "6 min read",
+    color: '#678AFB',
+  },
+  {
+    icon: Receipt,
+    title: "Tax Implications of Peer Lending",
+    description: "What the IRS expects when you lend or borrow over $10k, how gift rules apply, and when interest income matters.",
+    readTime: "5 min read",
+    color: '#A79DEA',
+  },
+  {
+    icon: Brain,
+    title: "The Psychology of Lending to Friends",
+    description: "Why money changes relationships, how to set boundaries without guilt, and when it's okay to say no.",
+    readTime: "4 min read",
+    color: '#678AFB',
+  },
+  {
+    icon: Landmark,
+    title: "Building Your Lending Track Record",
+    description: "How consistent, on-time payments and responsible lending on Vony build trust with your network over time.",
+    readTime: "3 min read",
+    color: '#A79DEA',
+  },
+];
+
 export default function ComingSoon() {
   const { user: authUser, userProfile } = useAuth();
   const user = userProfile ? { ...userProfile, id: authUser?.id } : null;
   const [activeTab, setActiveTab] = useState('shop');
 
-  const creditCards = [
-    {
-      name: "Vony Starter Card",
-      issuer: "Vony Financial",
-      apr: "19.99% - 24.99%",
-      annualFee: "$0",
-      creditLimit: "$500 - $2,000",
-      rewards: "1% cash back on all purchases",
-      badge: "Best for Building Credit",
-      features: ["No annual fee", "Free credit score monitoring", "Auto credit limit increases", "Mobile app access"]
-    },
-    {
-      name: "Vony Rewards Card",
-      issuer: "Vony Financial",
-      apr: "15.99% - 21.99%",
-      annualFee: "$95",
-      creditLimit: "$2,000 - $10,000",
-      rewards: "3% dining, 2% groceries, 1% all else",
-      badge: "Most Popular",
-      features: ["Welcome bonus: $200", "No foreign transaction fees", "Extended warranty protection", "Travel insurance included"]
-    },
-    {
-      name: "Vony Premium Card",
-      issuer: "Vony Financial",
-      apr: "14.99% - 19.99%",
-      annualFee: "$250",
-      creditLimit: "$10,000 - $50,000",
-      rewards: "5% travel, 3% dining, 2% all else",
-      badge: "Premium",
-      features: ["Welcome bonus: $500", "Airport lounge access", "Concierge service", "Premium travel insurance"]
-    }
-  ];
-
-  const loans = [
-    {
-      name: "Personal Loan", type: "Unsecured", apr: "6.99% - 24.99%", amount: "$1,000 - $50,000", term: "12 - 60 months", badge: "Most Flexible", icon: Wallet,
-      description: "Flexible funding for any purpose - debt consolidation, home improvement, or major purchases.",
-      features: ["No collateral required", "Fixed monthly payments", "Funds in 1-3 business days", "No prepayment penalties"]
-    },
-    {
-      name: "Auto Loan", type: "Secured", apr: "4.99% - 14.99%", amount: "$5,000 - $100,000", term: "24 - 84 months", badge: "Lowest Rates", icon: TrendingUp,
-      description: "Finance your next vehicle with competitive rates and flexible terms.",
-      features: ["New and used vehicles", "Refinancing available", "GAP coverage options", "Pre-approval in minutes"]
-    },
-    {
-      name: "Emergency Loan", type: "Unsecured", apr: "9.99% - 29.99%", amount: "$500 - $10,000", term: "3 - 24 months", badge: "Fast Approval", icon: Zap,
-      description: "Quick funding for unexpected expenses when you need it most.",
-      features: ["Same-day approval", "Funds within 24 hours", "Minimal documentation", "Flexible repayment"]
-    },
-    {
-      name: "Student Loan", type: "Unsecured", apr: "4.49% - 12.99%", amount: "$1,000 - $150,000", term: "60 - 180 months", badge: "Education", icon: Award,
-      description: "Invest in your future with affordable education financing.",
-      features: ["Deferred payments while in school", "No origination fees", "Cosigner release available", "Income-driven repayment"]
-    }
-  ];
-
-  const subBoxColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#6EE8B5', '#6EE8A2'];
-  const loanSubBoxColors = ['#6EE8A2', '#96FFD0', '#6EE8B5'];
-
-  const topics = [
-    { icon: Shield, title: "Safe Lending Practices", description: "Learn how to protect yourself when lending money to friends" },
-    { icon: FileText, title: "Understanding Loan Agreements", description: "What to include in a loan agreement and why it matters" },
-    { icon: TrendingUp, title: "Interest Rates Explained", description: "How interest works and what's fair for peer lending" },
-    { icon: Users, title: "Maintaining Friendships", description: "How to keep money from ruining your relationships" },
-    { icon: Lightbulb, title: "When to Say No", description: "Setting healthy boundaries with money and friends" },
-    { icon: GraduationCap, title: "Financial Literacy Basics", description: "Build a strong foundation for your financial future" }
-  ];
-
-  const topicColors = ['#AAFFA3', '#30FFA8', '#96FFD0', '#6EE8B5', '#83F384', '#6EE8A2'];
-
   return (
     <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 240, background: '#F5F4F0' }}>
       <DashboardSidebar activePage="ComingSoon" user={user} />
 
-      {/* Content box with galaxy background */}
       <div style={{ position: 'relative', margin: '12px 12px 12px 0', borderRadius: 20, overflow: 'hidden', minHeight: 'calc(100vh - 24px)' }}>
+        {/* Galaxy background */}
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
           <div style={{
             position: 'absolute', top: 0, left: '-10%', width: '120%', height: '100%', zIndex: 0,
@@ -150,171 +173,131 @@ export default function ComingSoon() {
           {/* Page content */}
           <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px 64px' }}>
 
-            {/* Shop Tab */}
+            {/* ═══ Shop Tab ═══ */}
             {activeTab === 'shop' && (
-              <div className="space-y-4">
-                {/* Coming Soon Banner */}
-                <div className="glass-card" style={{ padding: '14px 20px', marginBottom: 16 }}>
-                  <p style={{ fontSize: 11, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 500, fontFamily: "'IBM Plex Mono', monospace", margin: 0 }}>
-                    Loan and Credit Card Offers Coming Soon
+              <div>
+                {/* Intro card */}
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="glass-card"
+                  style={{ padding: '24px 28px', marginBottom: 20 }}
+                >
+                  <span style={{ fontSize: 11, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 500, fontFamily: "'IBM Plex Mono', monospace" }}>
+                    What We're Building
+                  </span>
+                  <p style={{ fontSize: 14, color: '#5C5B5A', margin: '10px 0 0', lineHeight: 1.6 }}>
+                    New tools to make lending between friends simpler, safer, and smarter. These features are in development — we'll notify you when they launch.
                   </p>
-                </div>
+                </motion.div>
 
-                {/* Credit Cards */}
-                {creditCards.map((card, index) => (
-                  <motion.div
-                    key={card.name}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 + index * 0.1 }}
-                    className="rounded-2xl p-5"
-                    style={{ backgroundColor: '#DBFFEB' }}
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
-                          <CreditCard className="w-5 h-5 text-[#0A1A10]" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-slate-800">{card.name}</p>
-                          <p className="text-xs text-slate-500">{card.issuer}</p>
-                        </div>
-                      </div>
-                      <Badge className="bg-[#00A86B]/10 text-[#00A86B] border-0 text-xs">{card.badge}</Badge>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                      {[
-                        { label: 'APR', value: card.apr },
-                        { label: 'Annual Fee', value: card.annualFee },
-                        { label: 'Credit Limit', value: card.creditLimit },
-                        { label: 'Rewards', value: card.rewards }
-                      ].map((stat, statIdx) => (
-                        <div key={stat.label} className="rounded-xl p-3" style={{ backgroundColor: subBoxColors[(index + statIdx + 1) % 5] }}>
-                          <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>{stat.label}</p>
-                          <p className="font-semibold text-slate-800 text-sm">{stat.value}</p>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {card.features.map((feature, i) => (
-                        <div key={i} className="flex items-center gap-1.5 text-xs text-slate-600 bg-white px-2 py-1 rounded-lg">
-                          <Check className="w-3 h-3 text-[#00A86B]" />
-                          {feature}
-                        </div>
-                      ))}
-                    </div>
-                    <Button className="bg-[#00A86B] hover:bg-[#0D9B76] text-white rounded-xl">
-                      Apply Now
-                      <ChevronRight className="w-4 h-4 ml-1" />
-                    </Button>
-                  </motion.div>
-                ))}
-
-                {/* Loans */}
-                <div className="grid md:grid-cols-2 gap-4 mt-4">
-                  {loans.map((loan, index) => (
+                {/* Products grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  {products.map((product, index) => (
                     <motion.div
-                      key={loan.name}
-                      initial={{ opacity: 0, y: 20 }}
+                      key={product.name}
+                      initial={{ opacity: 0, y: 16 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 + index * 0.1 }}
-                      className="rounded-2xl p-5"
-                      style={{ backgroundColor: '#DBFFEB' }}
+                      transition={{ delay: 0.06 + index * 0.06 }}
+                      className="glass-card"
+                      style={{ padding: '24px 26px', display: 'flex', flexDirection: 'column' }}
                     >
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
-                            <loan.icon className="w-5 h-5 text-[#0A1A10]" />
-                          </div>
-                          <div>
-                            <p className="font-semibold text-slate-800">{loan.name}</p>
-                            <p className="text-xs text-slate-500">{loan.type} Loan</p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
+                        <div style={{ width: 40, height: 40, borderRadius: 12, background: `${product.color}14`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <product.icon size={20} style={{ color: product.color }} />
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>{product.name}</span>
+                            <span style={{ fontSize: 10, fontWeight: 600, color: product.color, textTransform: 'uppercase', letterSpacing: '0.08em', fontFamily: "'IBM Plex Mono', monospace" }}>{product.tagline}</span>
                           </div>
                         </div>
-                        <Badge className="bg-[#00A86B]/10 text-[#00A86B] border-0 text-xs">{loan.badge}</Badge>
                       </div>
-                      <p className="text-sm text-slate-600 mb-4">{loan.description}</p>
-                      <div className="grid grid-cols-3 gap-2 mb-4">
-                        {[
-                          { label: 'APR', value: loan.apr },
-                          { label: 'Amount', value: loan.amount },
-                          { label: 'Term', value: loan.term }
-                        ].map((stat, statIdx) => (
-                          <div key={stat.label} className="rounded-xl p-2 text-center" style={{ backgroundColor: loanSubBoxColors[(index + statIdx + 1) % 3] }}>
-                            <p className="text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>{stat.label}</p>
-                            <p className="font-semibold text-slate-800 text-xs">{stat.value}</p>
+
+                      <p style={{ fontSize: 13, color: '#5C5B5A', lineHeight: 1.55, margin: '0 0 16px' }}>
+                        {product.description}
+                      </p>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 18 }}>
+                        {product.highlights.map((h, i) => (
+                          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <div style={{ width: 5, height: 5, borderRadius: '50%', background: product.color, flexShrink: 0, opacity: 0.6 }} />
+                            <span style={{ fontSize: 12, color: '#787776' }}>{h}</span>
                           </div>
                         ))}
                       </div>
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {loan.features.map((feature, i) => (
-                          <div key={i} className="flex items-center gap-1.5 text-xs text-slate-600 bg-white px-2 py-1 rounded-lg">
-                            <Check className="w-3 h-3 text-[#00A86B]" />
-                            {feature}
-                          </div>
-                        ))}
+
+                      <div style={{ marginTop: 'auto' }}>
+                        <div style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 6,
+                          padding: '7px 14px', borderRadius: 10,
+                          background: 'rgba(0,0,0,0.03)', fontSize: 11, fontWeight: 600,
+                          color: '#787776', fontFamily: "'DM Sans', sans-serif",
+                        }}>
+                          <Lock size={12} />
+                          Coming Soon
+                        </div>
                       </div>
-                      <Button className="w-full bg-[#00A86B] hover:bg-[#0D9B76] text-white rounded-xl">
-                        Check Your Rate
-                        <ChevronRight className="w-4 h-4 ml-1" />
-                      </Button>
                     </motion.div>
                   ))}
-                </div>
-
-                <div className="text-center text-xs text-[#DBEEE3] px-4 mt-6">
-                  <p>
-                    All rates and terms are subject to credit approval. APRs shown are estimates and may vary based on creditworthiness.
-                    This is for demonstration purposes only. Vony Portal does not issue credit cards or loans directly.
-                  </p>
                 </div>
               </div>
             )}
 
-            {/* Learn Tab */}
+            {/* ═══ Learn Tab ═══ */}
             {activeTab === 'learn' && (
-              <div className="space-y-4">
-                {/* Coming Soon Banner */}
-                <div className="glass-card" style={{ padding: '14px 20px', marginBottom: 16 }}>
-                  <p style={{ fontSize: 11, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 500, fontFamily: "'IBM Plex Mono', monospace", margin: 0 }}>
-                    Educational Content Coming Soon
+              <div>
+                {/* Intro card */}
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="glass-card"
+                  style={{ padding: '24px 28px', marginBottom: 20 }}
+                >
+                  <span style={{ fontSize: 11, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 500, fontFamily: "'IBM Plex Mono', monospace" }}>
+                    Guides & Resources
+                  </span>
+                  <p style={{ fontSize: 14, color: '#5C5B5A', margin: '10px 0 0', lineHeight: 1.6 }}>
+                    Practical advice for lending and borrowing between friends — from setting terms to navigating tough conversations.
                   </p>
-                </div>
+                </motion.div>
 
-                <div className="bg-[#DBFFEB] rounded-2xl p-5">
-                  <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                    Topics
-                  </p>
-                  <div className="grid md:grid-cols-2 gap-3">
-                    {topics.map((topic, index) => (
-                      <motion.div
-                        key={topic.title}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 + index * 0.08 }}
-                        whileHover={{ y: -2, transition: { duration: 0.2 } }}
-                      >
-                        <div
-                          className="rounded-xl p-4 hover:shadow-md transition-all duration-200 cursor-pointer group"
-                          style={{ backgroundColor: topicColors[index % 6] }}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0">
-                              <topic.icon className="w-4 h-4 text-[#0A1A10]" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2">
-                                <h3 className="font-semibold text-[#0A1A10] text-sm">{topic.title}</h3>
-                                <span className="text-[10px] bg-white/60 text-slate-600 px-2 py-0.5 rounded-full font-medium">Soon</span>
-                              </div>
-                              <p className="text-xs text-[#0A1A10]/60 mt-0.5">{topic.description}</p>
-                            </div>
-                            <ChevronRight className="w-4 h-4 text-[#0A1A10]/30 group-hover:text-[#0A1A10]/60 transition-colors flex-shrink-0" />
+                {/* Guides list */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {guides.map((guide, index) => (
+                    <motion.div
+                      key={guide.title}
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.06 + index * 0.06 }}
+                      className="glass-card"
+                      style={{ padding: '22px 26px', cursor: 'default' }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+                        <div style={{ width: 40, height: 40, borderRadius: 12, background: `${guide.color}14`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+                          <guide.icon size={20} style={{ color: guide.color }} />
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 6 }}>
+                            <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>{guide.title}</span>
+                            <span style={{ fontSize: 10, color: '#787776', fontFamily: "'IBM Plex Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.08em', flexShrink: 0 }}>{guide.readTime}</span>
+                          </div>
+                          <p style={{ fontSize: 13, color: '#5C5B5A', lineHeight: 1.55, margin: '0 0 12px' }}>
+                            {guide.description}
+                          </p>
+                          <div style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 6,
+                            padding: '7px 14px', borderRadius: 10,
+                            background: 'rgba(0,0,0,0.03)', fontSize: 11, fontWeight: 600,
+                            color: '#787776', fontFamily: "'DM Sans', sans-serif",
+                          }}>
+                            <Lock size={12} />
+                            Coming Soon
                           </div>
                         </div>
-                      </motion.div>
-                    ))}
-                  </div>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
               </div>
             )}
