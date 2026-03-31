@@ -20,142 +20,13 @@ input[type="date"] {
   position: relative;
 }
 
-/* Vony Design System - Matching RebrandMainWebsite */
 :root {
-  /* Primary Color Palette */
-  --vony-primary: #00A86B;
-  --vony-primary-hover: #36CE8E;
-  --vony-primary-light: #83F384;
-  --vony-primary-dark: #0D9B76;
-  --vony-accent: #50C878;
-  --vony-lime: #AAFFA3;
-  --vony-mint: #6EE8A2;
-  --vony-forest: #1B4332;
-
-  /* Background Colors */
-  --vony-bg-light: #36CE8E;
-  --vony-bg-soft: #36CE8E;
-  --vony-bg-card: #DBFFEB;
-
-  /* Text Colors */
-  --vony-text: #0A1A10;
-  --vony-text-secondary: #4A6B55;
-  --vony-text-muted: #7A9A85;
-  --vony-text-on-dark: #E8F5ED;
-
-  /* Border & Accents */
-  --vony-border: #7AD4A0;
-  --vony-glow: #00A86B20;
-
-  /* Shadcn compatibility */
-  --background: 152 62% 51%;
-  --foreground: 150 30% 8%;
-  --card: 140 50% 97%;
-  --card-foreground: 150 30% 8%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 150 30% 8%;
-  --primary: 155 100% 33%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 145 30% 90%;
-  --secondary-foreground: 150 30% 8%;
-  --muted: 145 20% 92%;
-  --muted-foreground: 145 15% 40%;
-  --accent: 145 30% 90%;
-  --accent-foreground: 150 30% 8%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 145 35% 75%;
-  --input: 145 20% 85%;
-  --ring: 155 100% 33%;
-  --chart-1: 155 100% 33%;
-  --chart-2: 145 60% 45%;
-  --chart-3: 160 50% 40%;
-  --chart-4: 140 70% 50%;
-  --chart-5: 135 55% 55%;
   --radius: 0.75rem;
-  --sidebar-background: 140 50% 97%;
-  --sidebar-foreground: 150 30% 8%;
-  --sidebar-primary: 155 100% 33%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 145 30% 92%;
-  --sidebar-accent-foreground: 150 30% 8%;
-  --sidebar-border: 145 35% 80%;
-  --sidebar-ring: 155 100% 33%;
-
-  /* Theme Variables for Portal */
-  --theme-primary: 0 168 107;
-  --theme-primary-light: 232 252 240;
-  --theme-primary-dark: 13 155 118;
-  --theme-bg-from: 54 206 142;
-  --theme-bg-to: 54 206 142;
-  --theme-card-bg: 219 255 235;
-  --theme-border: 122 212 160 / 0.3;
-}
-
-.dark {
-  --background: 150 30% 6%;
-  --foreground: 140 20% 95%;
-  --card: 150 25% 8%;
-  --card-foreground: 140 20% 95%;
-  --popover: 150 25% 8%;
-  --popover-foreground: 140 20% 95%;
-  --primary: 155 100% 40%;
-  --primary-foreground: 150 30% 6%;
-  --secondary: 150 20% 15%;
-  --secondary-foreground: 140 20% 95%;
-  --muted: 150 20% 15%;
-  --muted-foreground: 145 15% 60%;
-  --accent: 150 20% 15%;
-  --accent-foreground: 140 20% 95%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 150 20% 18%;
-  --input: 150 20% 18%;
-  --ring: 155 100% 40%;
-  --chart-1: 155 100% 40%;
-  --chart-2: 145 60% 50%;
-  --chart-3: 160 50% 45%;
-  --chart-4: 140 70% 55%;
-  --chart-5: 135 55% 60%;
-  --sidebar-background: 150 25% 8%;
-  --sidebar-foreground: 140 20% 95%;
-  --sidebar-primary: 155 100% 40%;
-  --sidebar-primary-foreground: 150 30% 6%;
-  --sidebar-accent: 150 20% 12%;
-  --sidebar-accent-foreground: 140 20% 95%;
-  --sidebar-border: 150 20% 15%;
-  --sidebar-ring: 155 100% 40%;
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-
   html {
     scroll-behavior: smooth;
-  }
-
-  body {
-    @apply bg-background text-foreground antialiased;
-    font-family: 'Outfit', system-ui, -apple-system, sans-serif;
-    line-height: 1.7;
-    color: var(--vony-text);
-    background-color: var(--vony-bg-light);
-  }
-
-  /* Typography */
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Libre Baskerville', Georgia, serif;
-    font-weight: 700;
-    color: var(--vony-text);
-    line-height: 1.1;
-  }
-
-  /* Selection styling */
-  ::selection {
-    background-color: var(--vony-glow);
-    color: var(--vony-text);
   }
 
   /* Scrollbar styling */
@@ -169,133 +40,17 @@ input[type="date"] {
   }
 
   ::-webkit-scrollbar-thumb {
-    background: var(--vony-border);
+    background: #ccc;
     border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--vony-text-muted);
+    background: #999;
   }
 }
 
-@layer components {
-  /* Vony Button Styles */
-  .vony-btn-primary {
-    @apply px-8 py-3 rounded-lg font-semibold text-base transition-all cursor-pointer;
-    background-color: var(--vony-text);
-    color: white;
-    box-shadow: 0 10px 15px -3px rgba(10, 26, 16, 0.2);
-  }
 
-  .vony-btn-primary:hover {
-    opacity: 0.9;
-  }
 
-  .vony-btn-secondary {
-    @apply px-5 py-2 rounded-lg font-semibold text-sm transition-colors;
-    background-color: var(--vony-primary-hover);
-    color: var(--vony-text);
-  }
-
-  .vony-btn-secondary:hover {
-    opacity: 0.85;
-  }
-
-  /* Vony Card Styles */
-  .vony-card {
-    @apply rounded-xl p-5 transition-all duration-200;
-    background-color: white;
-    border: 1px solid var(--vony-border);
-  }
-
-  .vony-card:hover {
-    border-color: var(--vony-primary);
-  }
-
-  .vony-card-colored {
-    @apply rounded-xl p-5 transition-all duration-200;
-  }
-
-  /* Navigation Link Styles */
-  .vony-nav-link {
-    @apply px-4 py-2 rounded-lg transition-all duration-200 font-medium text-sm;
-    color: var(--vony-text-secondary);
-  }
-
-  .vony-nav-link:hover {
-    color: var(--vony-text);
-  }
-
-  .vony-nav-link-active {
-    color: var(--vony-text);
-  }
-
-  /* Input Styles */
-  .vony-input {
-    @apply w-full px-4 py-3 rounded-lg text-sm transition-all;
-    background-color: rgba(10, 26, 16, 0.1);
-    color: var(--vony-text);
-  }
-
-  .vony-input::placeholder {
-    color: rgba(10, 26, 16, 0.4);
-  }
-
-  .vony-input:focus {
-    @apply outline-none ring-2;
-    ring-color: rgba(10, 26, 16, 0.2);
-  }
-}
-
-@layer utilities {
-  /* Logo text style */
-  .vony-logo {
-    font-family: 'Times New Roman', Georgia, serif;
-    font-style: italic;
-    letter-spacing: 0.05em;
-  }
-
-  /* Mono text for labels */
-  .vony-mono {
-    font-family: 'IBM Plex Mono', 'Fira Code', monospace;
-    letter-spacing: 0.12em;
-  }
-
-  /* Safe area padding for mobile devices */
-  .safe-area-inset-top {
-    padding-top: env(safe-area-inset-top, 0px);
-  }
-
-  .safe-area-inset-bottom {
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-}
-
-/* Mobile navigation styles */
-@supports (padding-top: env(safe-area-inset-top)) {
-  .mobile-nav-header {
-    padding-top: calc(env(safe-area-inset-top) + 1rem);
-  }
-}
-
-/* Animations */
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-12px); }
-}
-
-@keyframes pulse-soft {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.animate-pulse-soft {
-  animation: pulse-soft 2s ease-in-out infinite;
-}
 
 /* ===== GALAXY HOME PAGE STYLES ===== */
 
@@ -337,31 +92,6 @@ input[type="date"] {
   ) rgba(255, 255, 255, 0.12);
 }
 
-.glass-quick-actions::before {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: -1;
-  width: 100%;
-  height: 100%;
-  content: "";
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow:
-    rgba(0, 0, 0, 0.01) 64px 91px 45px 0px,
-    rgba(0, 0, 0, 0.03) 36px 51px 38px 0px,
-    rgba(0, 0, 0, 0.06) 16px 23px 28px 0px,
-    rgba(0, 0, 0, 0.06) 4px 6px 15px 0px;
-  overflow: hidden;
-  backdrop-filter: blur(20px) saturate(1.4);
-  -webkit-backdrop-filter: blur(20px) saturate(1.4);
-  background: radial-gradient(
-    ellipse at center,
-    rgba(255, 255, 255, 0.12) 0%,
-    rgba(255, 255, 255, 0.4) 50%,
-    rgba(255, 255, 255, 0.85) 100%
-  );
-}
 
 .glass-hero-alert {
   background: rgba(255, 255, 255, 0.85);
@@ -404,23 +134,6 @@ input[type="date"] {
   pointer-events: none;
 }
 
-.record-payment-styled {
-  background: #7792F4;
-  border-radius: 20px;
-  position: relative;
-}
-
-.record-payment-styled::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow:
-    rgba(255, 255, 255, 0.6) 0px 0px 30px inset,
-    rgba(255, 255, 255, 0.3) 0px 0px 50px inset;
-  pointer-events: none;
-}
 
 /* Star twinkle animation */
 @keyframes twinkle {
@@ -496,46 +209,14 @@ input[type="date"] {
     grid-column: 1 / 3;
     grid-row: auto;
   }
-  .home-record-payment-span {
-    grid-column: 1 / 3 !important;
-  }
-  .home-footer-grid {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 32px !important;
-  }
 }
 
 @media (max-width: 600px) {
-  .top-bar-link-home {
-    display: none !important;
-  }
   .home-top-row {
     grid-template-columns: 1fr !important;
   }
   .home-top-row > div:first-child {
     grid-column: auto;
     grid-row: auto;
-  }
-  .home-record-payment-span {
-    grid-column: auto !important;
-  }
-  .home-record-form {
-    flex-direction: column !important;
-    align-items: stretch !important;
-    gap: 10px !important;
-  }
-  .home-loans-grid {
-    grid-template-columns: 1fr !important;
-  }
-  .home-footer-grid {
-    grid-template-columns: 1fr !important;
-    gap: 28px !important;
-    padding: 36px 16px !important;
-  }
-  .home-footer-bottom {
-    padding: 16px 16px 24px !important;
-    flex-direction: column !important;
-    gap: 8px !important;
-    align-items: flex-start !important;
   }
 }

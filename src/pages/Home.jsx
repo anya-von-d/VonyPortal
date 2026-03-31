@@ -302,11 +302,6 @@ export default function Home() {
   const percentPaid = totalBorrowedAmount > 0 ? Math.round((totalPaidBack / totalBorrowedAmount) * 100) : 0;
   const borrowedRemaining = totalBorrowedAmount - totalPaidBack;
 
-  // Pie chart math (circumference = 2*PI*29 ≈ 182.21)
-  const PIE_C = 182.21;
-  const lentPieOffset = PIE_C - (PIE_C * percentRepaid / 100);
-  const borrowedPieOffset = PIE_C - (PIE_C * percentPaid / 100);
-
   // Next payment (borrower)
   const nextBorrowerPayment = myLoans
     .filter(loan => loan && loan.borrower_id === user.id && loan.status === 'active' && loan.next_payment_date)

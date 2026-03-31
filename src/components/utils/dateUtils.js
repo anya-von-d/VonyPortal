@@ -60,11 +60,3 @@ export function daysBetween(a, b) {
 export function daysUntil(date) {
   return daysBetween(date, getLocalToday());
 }
-
-/**
- * Whether a date is in the past (before today).
- */
-export function isPastDate(date) {
-  const d = daysUntil(date);
-  return d !== null && d < 0;
-}
