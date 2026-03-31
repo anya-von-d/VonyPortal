@@ -880,36 +880,6 @@ export default function Home() {
               {/* Scrollable Week Strip */}
               <WeekStrip allPaymentEvents={allPaymentEvents} today={today} formatMoney={formatMoney} />
 
-              {/* Loan Progress */}
-              <div className="glass-card" style={{ overflow: 'hidden' }}>
-                <div style={{ padding: '22px 26px 0' }}>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Loan progress</div>
-                </div>
-                <div style={{ padding: '18px 26px 22px', display: 'flex', flexDirection: 'column', gap: 18 }}>
-                  {/* Lending */}
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 8 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>Lending</div>
-                      <div style={{ fontSize: 12, color: '#787776' }}>{percentRepaid}%</div>
-                    </div>
-                    <div style={{ width: '100%', height: 8, borderRadius: 4, background: 'rgba(103,138,251,0.15)', overflow: 'hidden' }}>
-                      <div style={{ height: '100%', borderRadius: 4, background: '#678AFB', width: `${percentRepaid}%`, transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
-                    </div>
-                    <div style={{ fontSize: 11, color: '#787776', marginTop: 6 }}>{formatMoney(totalRepaid)} of {formatMoney(totalLentAmount)} repaid</div>
-                  </div>
-                  {/* Borrowing */}
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 8 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>Borrowing</div>
-                      <div style={{ fontSize: 12, color: '#787776' }}>{percentPaid}%</div>
-                    </div>
-                    <div style={{ width: '100%', height: 8, borderRadius: 4, background: 'rgba(167,157,234,0.15)', overflow: 'hidden' }}>
-                      <div style={{ height: '100%', borderRadius: 4, background: '#A79DEA', width: `${percentPaid}%`, transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
-                    </div>
-                    <div style={{ fontSize: 11, color: '#787776', marginTop: 6 }}>{formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)} paid back</div>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Your Loans — spans both sub-columns, directly under How March is going */}
@@ -1001,6 +971,35 @@ export default function Home() {
                   })() : (
                     <div style={{ textAlign: 'center', padding: '20px 0', color: '#787776', fontSize: 13 }}>No loan data yet</div>
                   )}
+                </div>
+              </div>
+
+              {/* Loan Progress */}
+              <div className="glass-card" style={{ overflow: 'hidden' }}>
+                <div style={{ padding: '22px 26px 0' }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Loan progress</div>
+                </div>
+                <div style={{ padding: '18px 26px 22px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 8 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>Lending</div>
+                      <div style={{ fontSize: 12, color: '#787776' }}>{percentRepaid}%</div>
+                    </div>
+                    <div style={{ width: '100%', height: 8, borderRadius: 4, background: 'rgba(103,138,251,0.15)', overflow: 'hidden' }}>
+                      <div style={{ height: '100%', borderRadius: 4, background: '#678AFB', width: `${percentRepaid}%`, transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
+                    </div>
+                    <div style={{ fontSize: 11, color: '#787776', marginTop: 6 }}>{formatMoney(totalRepaid)} of {formatMoney(totalLentAmount)} repaid</div>
+                  </div>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 8 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>Borrowing</div>
+                      <div style={{ fontSize: 12, color: '#787776' }}>{percentPaid}%</div>
+                    </div>
+                    <div style={{ width: '100%', height: 8, borderRadius: 4, background: 'rgba(167,157,234,0.15)', overflow: 'hidden' }}>
+                      <div style={{ height: '100%', borderRadius: 4, background: '#A79DEA', width: `${percentPaid}%`, transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
+                    </div>
+                    <div style={{ fontSize: 11, color: '#787776', marginTop: 6 }}>{formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)} paid back</div>
+                  </div>
                 </div>
               </div>
 
