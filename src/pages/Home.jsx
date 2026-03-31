@@ -882,7 +882,7 @@ export default function Home() {
             {/* Your Loans — spans both sub-columns, directly under How March is going */}
             <div className="glass-card" style={{ overflow: 'hidden', gridColumn: '1 / 3' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0, padding: '20px 26px 0' }}>
-                <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Your loans</div>
+                <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Your active loans</div>
                 <Link to={createPageUrl("YourLoans")} style={{ fontSize: 12, fontWeight: 500, color: '#A79DEA', textDecoration: 'none' }}>Manage</Link>
               </div>
               {myLoans.filter(l => l && l.status === 'active').length === 0 ? (
