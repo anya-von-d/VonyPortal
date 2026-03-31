@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/AuthContext";
 
 
 import { motion, AnimatePresence } from "framer-motion";
-import { format, startOfMonth, endOfMonth, addMonths, addDays, isBefore, isAfter, differenceInDays } from "date-fns";
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addMonths, addDays, isBefore, isAfter, isSameMonth, isSameDay, differenceInDays } from "date-fns";
 import { formatMoney } from "@/components/utils/formatMoney";
 import { toLocalDate, getLocalToday, daysUntil as daysUntilDate } from "@/components/utils/dateUtils";
 
@@ -790,6 +790,63 @@ export default function Home() {
                       })}
                     </div>
                   )}
+                </div>
+              </div>
+
+              {/* Mini Calendar */}
+              <div className="glass-card" style={{ overflow: 'hidden' }}>
+                <div style={{ padding: '22px 26px 0' }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>{format(today, 'MMMM yyyy')}</div>
+                </div>
+                <div style={{ padding: '14px 26px 20px' }}>
+                  {(() => {
+                    const monthStart = startOfMonth(today);
+                    const monthEnd = endOfMonth(today);
+                    const calStart = startOfWeek(monthStart);
+                    const calEnd = endOfWeek(monthEnd);
+                    const days = [];
+                    let d = calStart;
+                    while (d <= calEnd) { days.push(new Date(d)); d = addDays(d, 1); }
+
+                    const paymentDates = allPaymentEvents.map(e => ({
+                      date: e.date,
+                      isLender: e.isLender,
+                    }));
+
+                    return (
+                      <div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 0, marginBottom: 4 }}>
+                          {['S','M','T','W','T','F','S'].map((d, i) => (
+                            <div key={i} style={{ textAlign: 'center', fontSize: 10, fontWeight: 600, color: '#787776', padding: '6px 0' }}>{d}</div>
+                          ))}
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 1 }}>
+                          {days.map((day, i) => {
+                            const inMonth = isSameMonth(day, today);
+                            const isToday = isSameDay(day, new Date());
+                            const matchingPayment = paymentDates.find(pd => isSameDay(pd.date, day));
+                            return (
+                              <div key={i} style={{
+                                textAlign: 'center', padding: '5px 2px', borderRadius: 6, fontSize: 11, position: 'relative',
+                                color: !inMonth ? '#C7C6C4' : isToday ? 'white' : '#1A1918',
+                                fontWeight: isToday ? 700 : 400,
+                                background: isToday ? '#678AFB' : matchingPayment ? (matchingPayment.isLender ? 'rgba(103,138,251,0.1)' : 'rgba(167,157,234,0.1)') : 'transparent',
+                              }}>
+                                {format(day, 'd')}
+                                {matchingPayment && !isToday && (
+                                  <div style={{ width: 4, height: 4, borderRadius: '50%', background: matchingPayment.isLender ? '#678AFB' : '#A79DEA', margin: '1px auto 0' }} />
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 10, paddingTop: 8, borderTop: '1px solid rgba(0,0,0,0.04)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, color: '#787776' }}><div style={{ width: 6, height: 6, borderRadius: '50%', background: '#678AFB' }} /> Incoming</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, color: '#787776' }}><div style={{ width: 6, height: 6, borderRadius: '50%', background: '#A79DEA' }} /> Due</div>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
             </div>

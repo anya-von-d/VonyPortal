@@ -471,14 +471,13 @@ export default function Requests() {
     setProcessingId(null);
   };
 
-  const totalLoanOffers = loanOffersReceived.length + loanOffersSent.length;
-  const totalRequests = paymentsToConfirm.length + paymentsAwaitingConfirmation.length + termChangeRequests.length + totalLoanOffers + friendRequestsReceived.length;
+  const totalRequests = paymentsToConfirm.length + termChangeRequests.length + loanOffersReceived.length + friendRequestsReceived.length;
 
   const tabs = [
     { id: 'all', label: 'View All Requests', count: totalRequests },
     { id: 'friends', label: 'Friend Requests', count: friendRequestsReceived.length },
-    { id: 'offers', label: 'Loan Offers', count: totalLoanOffers },
-    { id: 'payments', label: 'Payments', count: paymentsToConfirm.length + paymentsAwaitingConfirmation.length },
+    { id: 'offers', label: 'Loan Offers', count: loanOffersReceived.length },
+    { id: 'payments', label: 'Payments', count: paymentsToConfirm.length },
     { id: 'terms', label: 'Loan Changes', count: termChangeRequests.length },
   ];
 
@@ -643,18 +642,6 @@ export default function Requests() {
                         otherProfile: lender,
                       });
                     });
-
-                    // Loan Offers Sent
-                    loanOffersSent.forEach(offer => {
-                      const borrower = getUserById(offer.borrower_id);
-                      allItems.push({
-                        type: 'offer_sent',
-                        id: `offer-sent-${offer.id}`,
-                        timestamp: new Date(offer.created_at || 0),
-                        data: offer,
-                        otherProfile: borrower,
-                      });
-                    });
                   }
 
                   // Payment Confirmations Needed
@@ -665,20 +652,6 @@ export default function Requests() {
                       allItems.push({
                         type: 'payment_confirm',
                         id: `pmt-confirm-${payment.id}`,
-                        timestamp: new Date(payment.created_at || payment.payment_date || 0),
-                        data: payment,
-                        methodInfo,
-                        otherName,
-                      });
-                    });
-
-                    // Payments Awaiting Confirmation from Others
-                    paymentsAwaitingConfirmation.forEach(payment => {
-                      const methodInfo = getPaymentMethodInfo(payment.payment_method);
-                      const otherName = getOtherPartyName(payment, true);
-                      allItems.push({
-                        type: 'payment_awaiting',
-                        id: `pmt-await-${payment.id}`,
                         timestamp: new Date(payment.created_at || payment.payment_date || 0),
                         data: payment,
                         methodInfo,
@@ -739,24 +712,10 @@ export default function Requests() {
                                 </p>
                               )}
 
-                              {/* Loan Offer Sent */}
-                              {item.type === 'offer_sent' && (
-                                <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1918' }}>
-                                  You sent @{item.otherProfile?.username || 'unknown'} a loan offer
-                                </p>
-                              )}
-
                               {/* Payment Confirmation Needed */}
                               {item.type === 'payment_confirm' && (
                                 <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1918' }}>
                                   Confirm payment of ${item.data.amount?.toFixed(2)} from @{item.otherName} via {item.methodInfo.label}
-                                </p>
-                              )}
-
-                              {/* Payment Awaiting Confirmation */}
-                              {item.type === 'payment_awaiting' && (
-                                <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1918' }}>
-                                  Confirm payment of ${item.data.amount?.toFixed(2)} to @{item.otherName} via {item.methodInfo.label}
                                 </p>
                               )}
 
@@ -794,43 +753,10 @@ export default function Requests() {
                                 </button>
                               )}
 
-                              {/* Loan Offer Sent */}
-                              {item.type === 'offer_sent' && (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                  <button
-                                    onClick={() => setConfirmingDeleteOffer(item.data)}
-                                    disabled={processingId === item.data.id}
-                                    style={{ background: 'rgba(0,0,0,0.05)', color: '#E8726E', borderRadius: 8, padding: '6px 12px', fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', opacity: processingId === item.data.id ? 0.5 : 1 }}
-                                  >
-                                    Cancel
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      setSelectedOffer(item.data);
-                                      setShowSignatureModal(true);
-                                    }}
-                                    style={{ background: '#678AFB', color: 'white', borderRadius: 8, padding: '6px 12px', fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer' }}
-                                  >
-                                    View Offer
-                                  </button>
-                                </div>
-                              )}
-
                               {/* Payment Confirmation */}
                               {item.type === 'payment_confirm' && (
                                 <button
                                   onClick={() => setViewingPayment({ payment: item.data, direction: 'confirm' })}
-                                  disabled={processingId === item.data.id}
-                                  style={{ background: '#678AFB', color: 'white', borderRadius: 8, padding: '6px 12px', fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', opacity: processingId === item.data.id ? 0.5 : 1 }}
-                                >
-                                  View Payment
-                                </button>
-                              )}
-
-                              {/* Payment Awaiting */}
-                              {item.type === 'payment_awaiting' && (
-                                <button
-                                  onClick={() => setViewingPayment({ payment: item.data, direction: 'awaiting' })}
                                   disabled={processingId === item.data.id}
                                   style={{ background: '#678AFB', color: 'white', borderRadius: 8, padding: '6px 12px', fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', opacity: processingId === item.data.id ? 0.5 : 1 }}
                                 >
