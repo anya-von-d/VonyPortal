@@ -219,8 +219,12 @@ input[type="date"] {
   .home-sidebar {
     display: none !important;
   }
+  .mobile-header {
+    display: flex !important;
+  }
   .home-with-sidebar {
     padding-left: 0 !important;
+    padding-top: 56px !important;
   }
   .home-top-bar {
     left: 0 !important;
