@@ -760,13 +760,13 @@ export default function Home() {
 
         {/* Top row grid: quick actions + snapshot cards */}
         <div style={{ marginTop: 36 }}>
-          <div className="home-top-row" style={{ display: 'grid', gridTemplateColumns: '1.75fr 1fr', columnGap: 16, rowGap: 16, alignItems: 'start' }}>
+          <div className="home-top-row" style={{ display: 'grid', gridTemplateColumns: '1.75fr 1fr', columnGap: 20, rowGap: 20, alignItems: 'start' }}>
 
             {/* LEFT SECTION: sub-grid for left two columns */}
-            <div style={{ display: 'grid', gridTemplateColumns: '0.75fr 1fr', gap: 16, alignItems: 'start' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '0.75fr 1fr', gap: 20, alignItems: 'start' }}>
 
             {/* Left column: Next Payment Due, Next Payment Incoming, Monthly Stats */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, gridRow: '1 / 2' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20, gridRow: '1 / 2' }}>
               {/* Next payment due */}
               <div className="galaxy-border-card">
                 <div style={{ padding: '22px 26px 0' }}>
@@ -839,7 +839,7 @@ export default function Home() {
             </div>
 
             {/* Upcoming Payments */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, gridRow: '1 / 2' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20, gridRow: '1 / 2' }}>
               <div className="glass-card" style={{ overflow: 'hidden' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px 26px 0' }}>
                   <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Upcoming payments</div>
@@ -918,7 +918,7 @@ export default function Home() {
             </div>{/* end LEFT SECTION sub-grid */}
 
             {/* Loans Over Time chart + Recent Activity */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               <div className="glass-card" style={{ overflow: 'hidden' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px 26px 0' }}>
                   <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Loans over time</div>
