@@ -250,9 +250,9 @@ export default function Friends() {
     return (
       <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 240, background: '#EDECE9' }}>
         <DashboardSidebar activePage="Friends" user={user} />
-        <div style={{ position: 'relative', margin: '20px 12px 12px 0', borderRadius: 20, overflow: 'hidden', minHeight: 'calc(100vh - 32px)', boxShadow: '0 0 0 1px rgba(0,0,0,0.07), 0 4px 24px rgba(0,0,0,0.06)' }}>
+        <div style={{ position: 'relative', margin: '20px 12px 12px 0', borderRadius: 20, overflow: 'hidden', minHeight: 'calc(100vh - 32px)', border: '2px solid rgba(255,255,255,0.95)', boxShadow: '0 2px 32px rgba(0,0,0,0.09), 0 1px 6px rgba(0,0,0,0.05)' }}>
           <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
-            <div style={{ position: 'absolute', top: 0, left: '-10%', width: '120%', height: '100%', zIndex: 0, background: '#FAF9F7' }} />
+            <div style={{ position: 'absolute', top: 0, left: '-10%', width: '120%', height: '100%', zIndex: 0, background: '#F5F4F0' }} />
           </div>
           <div style={{ position: 'relative', zIndex: 2, maxWidth: 1080, margin: '0 auto', padding: '0 28px' }}>
             <div style={{ paddingTop: 80, paddingBottom: 20, textAlign: 'center' }}>
@@ -278,13 +278,13 @@ export default function Friends() {
       <DashboardSidebar activePage="Friends" user={user} />
 
       {/* ── Content box with galaxy background ── */}
-      <div style={{ position: 'relative', margin: '20px 12px 12px 0', borderRadius: 20, overflow: 'hidden', minHeight: 'calc(100vh - 32px)', boxShadow: '0 0 0 1px rgba(0,0,0,0.07), 0 4px 24px rgba(0,0,0,0.06)' }}>
+      <div style={{ position: 'relative', margin: '20px 12px 12px 0', borderRadius: 20, overflow: 'hidden', minHeight: 'calc(100vh - 32px)', border: '2px solid rgba(255,255,255,0.95)', boxShadow: '0 2px 32px rgba(0,0,0,0.09), 0 1px 6px rgba(0,0,0,0.05)' }}>
 
         {/* Background */}
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
           <div style={{
             position: 'absolute', top: 0, left: '-10%', width: '120%', height: '100%', zIndex: 0,
-            background: '#FAF9F7'
+            background: '#F5F4F0'
           }} />
         </div>
 
