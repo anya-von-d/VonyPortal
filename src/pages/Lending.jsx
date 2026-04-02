@@ -727,7 +727,7 @@ export default function Lending({ initialTab }) {
             <SelectContent>
               {filteredFromOptions.map((person) => (
                 <SelectItem key={person.userId} value={person.userId}>
-                  @{person.username}
+                  {person.full_name || person.username}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -746,7 +746,7 @@ export default function Lending({ initialTab }) {
             <SelectContent>
               {filteredToOptions.map((person) => (
                 <SelectItem key={person.userId} value={person.userId}>
-                  @{person.username}
+                  {person.full_name || person.username}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -885,7 +885,7 @@ export default function Lending({ initialTab }) {
     doc.setFontSize(11);
     doc.setFont(undefined, 'normal');
     let yPos = 105;
-    const promiseText = `FOR VALUE RECEIVED, the undersigned Borrower, ${borrowerInfo.full_name} (@${borrowerInfo.username}), promises to pay to the order of ${lenderInfo.full_name} (@${lenderInfo.username}), hereinafter referred to as "Lender", the principal sum of ${formatMoney(agreement.amount)}, together with interest at the rate of ${agreement.interest_rate}% per annum.`;
+    const promiseText = `FOR VALUE RECEIVED, the undersigned Borrower, ${borrowerInfo.full_name}, promises to pay to the order of ${lenderInfo.full_name}, hereinafter referred to as "Lender", the principal sum of ${formatMoney(agreement.amount)}, together with interest at the rate of ${agreement.interest_rate}% per annum.`;
     const promiseLines = doc.splitTextToSize(promiseText, 170);
     doc.text(promiseLines, 20, yPos);
     yPos += promiseLines.length * 6 + 10;
@@ -987,8 +987,8 @@ export default function Lending({ initialTab }) {
     doc.setFontSize(10);
     doc.setFont(undefined, 'normal');
     doc.text(`Loan Agreement: ${agreement.id}`, 20, 28);
-    doc.text(`Lender: ${lenderInfo.full_name} (@${lenderInfo.username})`, 20, 35);
-    doc.text(`Borrower: ${borrowerInfo.full_name} (@${borrowerInfo.username})`, 20, 42);
+    doc.text(`Lender: ${lenderInfo.full_name}`, 20, 35);
+    doc.text(`Borrower: ${borrowerInfo.full_name}`, 20, 42);
 
     doc.setFillColor(240, 240, 240);
     doc.rect(20, 48, 257, 20, 'F');
@@ -1088,8 +1088,8 @@ export default function Lending({ initialTab }) {
 
         <div className="glass-card rounded-2xl p-4">
           <p className="text-sm text-slate-700 leading-relaxed">
-            FOR VALUE RECEIVED, the undersigned Borrower, <span className="font-semibold">{borrowerInfo.full_name}</span> (@{borrowerInfo.username}),
-            promises to pay to the order of <span className="font-semibold">{lenderInfo.full_name}</span> (@{lenderInfo.username}),
+            FOR VALUE RECEIVED, the undersigned Borrower, <span className="font-semibold">{borrowerInfo.full_name}</span>,
+            promises to pay to the order of <span className="font-semibold">{lenderInfo.full_name}</span>,
             the principal sum of <span className="font-semibold">{formatMoney(agreement.amount)}</span>,
             together with interest at the rate of <span className="font-semibold">{agreement.interest_rate}%</span> per annum.
           </p>
@@ -1440,17 +1440,13 @@ export default function Lending({ initialTab }) {
             <div className="twinkle-star" />
           </div>
 
-          <div style={{ position: 'relative', zIndex: 2, maxWidth: 1080, margin: '0 auto', padding: '100px 28px 40px' }}>
+          <div style={{ position: 'relative', zIndex: 2, maxWidth: 1080, margin: '0 auto', padding: '0 28px' }}>
           {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            style={{ marginBottom: 32 }}
-          >
-            <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 300, fontSize: '2.6rem', color: 'white', letterSpacing: '-0.02em', marginBottom: 4 }}>
+          <div style={{ paddingTop: 80, paddingBottom: 20, textAlign: 'center' }}>
+            <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.2rem', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.1, color: 'white', margin: 0 }}>
               {initialTab === 'create' ? 'Create Loan' : 'Lending'}
             </h1>
-          </motion.div>
+          </div>
 
           {/* Tab Navigation — hidden when accessed as standalone Create Loan page */}
           {!initialTab && (
@@ -1575,7 +1571,7 @@ export default function Lending({ initialTab }) {
                               <div key={loan.id} className="flex items-center justify-between p-3 rounded-xl" style={{ backgroundColor: bgColors[index % 6] }}>
                                 <div>
                                   <p className="font-medium text-sm text-slate-800">
-                                    ${loan.payment_amount?.toLocaleString() || 0} from @{borrower?.username || 'user'}
+                                    ${loan.payment_amount?.toLocaleString() || 0} from {borrower?.full_name || 'User'}
                                   </p>
                                   <p className="text-xs text-slate-600">
                                     Due {format(new Date(loan.next_payment_date), 'MMM d, yyyy')}
@@ -1617,7 +1613,7 @@ export default function Lending({ initialTab }) {
                                       {borrower?.full_name?.charAt(0) || '?'}
                                     </span>
                                   </div>
-                                  <span className="text-sm font-medium text-slate-700">@{borrower?.username || 'user'}</span>
+                                  <span className="text-sm font-medium text-slate-700">{borrower?.full_name || 'User'}</span>
                                     <span className="text-xs text-slate-400 truncate max-w-[100px]">· {loan.purpose || 'Reason'}</span>
                                 </div>
                                 <span className="text-xs text-slate-500">{percentPaid}%</span>
@@ -1830,7 +1826,7 @@ export default function Lending({ initialTab }) {
                               {' '}
                               <span className="text-slate-600">from</span>
                               {' '}
-                              <span className="font-medium">@{event.username}</span>
+                              <span className="font-medium">{event.full_name || event.username}</span>
                             </p>
                           </div>
                           <div className="flex-shrink-0">
@@ -2185,14 +2181,14 @@ export default function Lending({ initialTab }) {
                                   />{' '}
                                   from{' '}
                                   <span className="text-[#678AFB] font-medium">
-                                    {formData.lender_username ? `@${formData.lender_username}` : 'the lender'}
+                                    {formData.lender_username ? formData.lender_username : 'the lender'}
                                   </span>{' '}
                                 </>
                               ) : (
                                 <>
                                   The lender agrees to lend{' '}
                                   <span className="text-[#678AFB] font-medium">
-                                    {formData.borrower_username ? `@${formData.borrower_username}` : 'the borrower'}
+                                    {formData.borrower_username ? formData.borrower_username : 'the borrower'}
                                   </span>{' '}
                                   ${' '}
                                   <Input
@@ -2458,7 +2454,7 @@ export default function Lending({ initialTab }) {
                             <>
                               {(() => {
                                 const selectedUser = users.find(u => u.username === formData.borrower_username);
-                                return selectedUser?.full_name || `@${formData.borrower_username}`;
+                                return selectedUser?.full_name || formData.borrower_username;
                               })()} will pay
                             </>
                           ) : (
@@ -2600,7 +2596,7 @@ export default function Lending({ initialTab }) {
                                         {borrower?.full_name?.charAt(0) || '?'}
                                       </span>
                                     </div>
-                                    <span>@{borrower?.username || 'user'}</span>
+                                    <span>{borrower?.full_name || 'User'}</span>
                                     <span className="text-slate-400">•</span>
                                     <span className="text-slate-500 truncate max-w-[120px]">{manageLoanSelected.purpose || 'Reason'}</span>
                                     <span className="text-slate-400">•</span>
@@ -2624,7 +2620,7 @@ export default function Lending({ initialTab }) {
                                         {borrower?.full_name?.charAt(0) || '?'}
                                       </span>
                                     </div>
-                                    <span>@{borrower?.username || 'user'}</span>
+                                    <span>{borrower?.full_name || 'User'}</span>
                                     <span className="text-slate-400">•</span>
                                     <span className="text-slate-500 truncate max-w-[120px]">{loan.purpose || 'Reason'}</span>
                                     <span className="text-slate-400">•</span>

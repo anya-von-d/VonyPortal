@@ -540,20 +540,19 @@ export default function Home() {
       const otherProfile = safeAllProfiles.find(pr => pr.user_id === otherUserId);
       const name = otherProfile?.full_name?.split(' ')[0] || otherProfile?.username || 'user';
       const amount = `$${(loan.amount || 0).toLocaleString()}`;
-      const reason = loan.purpose || 'Reason';
       let description = '';
       let icon = 'loan';
       let color = '#678AFB';
 
       if (loan.status === 'pending' || !loan.status) {
-        description = isLender ? `Sent ${amount} loan offer to ${name} for ${reason}` : `Received ${amount} loan offer from ${name} for ${reason}`;
+        description = isLender ? `Sent ${amount} loan offer to ${name}` : `Received ${amount} loan offer from ${name}`;
         icon = isLender ? 'send' : 'receive';
         color = isLender ? '#A79DEA' : '#678AFB';
       } else if (loan.status === 'active') {
-        description = isLender ? `${name} accepted your ${amount} loan for ${reason}` : `You accepted ${amount} loan from ${name} for ${reason}`;
+        description = isLender ? `${name} accepted your ${amount} loan` : `You accepted ${amount} loan from ${name}`;
         icon = 'check'; color = '#678AFB';
       } else if (loan.status === 'declined') {
-        description = isLender ? `${name} declined your ${amount} loan for ${reason}` : `You declined ${amount} loan from ${name} for ${reason}`;
+        description = isLender ? `${name} declined your ${amount} loan` : `You declined ${amount} loan from ${name}`;
         icon = 'x'; color = '#E8726E';
       } else if (loan.status === 'cancelled') {
         description = isLender ? `You cancelled ${amount} loan offer to ${name}` : `${name} cancelled their ${amount} loan offer`;
@@ -584,7 +583,7 @@ export default function Home() {
       items.push({
         type: 'payment', date: new Date(p.payment_date || p.created_at),
         description: isBorrower ? `You made a ${amount} payment to ${name}` : `Received ${amount} payment from ${name}`,
-        detail: format(new Date(p.payment_date || p.created_at), 'MMM d') + (loan.purpose ? ` · ${loan.purpose}` : ''),
+        detail: format(new Date(p.payment_date || p.created_at), 'MMM d'),
         icon: isBorrower ? 'send' : 'receive',
         color: isBorrower ? '#A79DEA' : '#678AFB',
         amount: isBorrower ? `-${amount}` : `+${amount}`

@@ -280,7 +280,7 @@ export default function Upcoming() {
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 14, fontWeight: 500, color: '#1A1918' }}>
-          {event.isLender ? `@${event.username} pays you` : `Pay @${event.username}`}
+          {event.isLender ? `${event.fullName || event.username} pays you` : `Pay ${event.fullName || event.username}`}
         </div>
         <div style={{ fontSize: 12, color: '#787776', marginTop: 2 }}>
           {event.days < 0
@@ -332,13 +332,12 @@ export default function Upcoming() {
 
         {/* ── Page header ── */}
         <div style={{ position: 'relative', zIndex: 2 }}>
-        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '80px 28px 0', textAlign: 'center' }}>
-          <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.2rem', fontWeight: 600, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-            Upcoming
-          </h1>
-          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', marginTop: 10, fontWeight: 400 }}>
-            Your scheduled payments and repayments
-          </p>
+        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px', textAlign: 'center' }}>
+          <div style={{ paddingTop: 80, paddingBottom: 20, textAlign: 'center' }}>
+            <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.2rem', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.1, color: 'white', margin: 0 }}>
+              Upcoming
+            </h1>
+          </div>
         </div>
 
         {/* ── Glass tab selector ── */}
@@ -442,28 +441,6 @@ export default function Upcoming() {
             <div>
               <div className="glass-card" style={{ padding: '20px 22px' }}>
                 <MiniCalendar today={today} paymentDates={miniCalPaymentDates} />
-              </div>
-
-              {/* Tip card */}
-              <div style={{
-                marginTop: 16, borderRadius: 16, padding: '28px 24px',
-                background: 'linear-gradient(135deg, #3B2D6B 0%, #5A3D8A 100%)',
-                color: 'white',
-              }}>
-                <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8, lineHeight: 1.3 }}>
-                  Stay on top of your loans
-                </div>
-                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5, marginBottom: 20 }}>
-                  Record payments as they happen to keep your dashboard accurate and up to date.
-                </p>
-                <Link to="/" style={{
-                  display: 'inline-block', padding: '10px 22px', borderRadius: 20,
-                  border: '1px solid rgba(255,255,255,0.3)', color: 'white',
-                  fontSize: 13, fontWeight: 600, textDecoration: 'none',
-                  fontFamily: "'DM Sans', sans-serif", transition: 'background 0.15s',
-                }}>
-                  Go to Dashboard
-                </Link>
               </div>
             </div>
           </div>

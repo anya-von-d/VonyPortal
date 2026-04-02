@@ -310,10 +310,12 @@ export default function Friends() {
 
       {/* ── Hero ── */}
       <div style={{ background: 'transparent', position: 'relative', zIndex: 2 }}>
-        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '80px 28px 56px', textAlign: 'center' }}>
-          <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.2rem', fontWeight: 600, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.1, margin: 0 }}>
-            Friends
-          </h1>
+        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px' }}>
+          <div style={{ paddingTop: 80, paddingBottom: 20, textAlign: 'center' }}>
+            <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.2rem', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.1, color: 'white', margin: 0 }}>
+              Friends
+            </h1>
+          </div>
         </div>
 
         {/* Page content */}

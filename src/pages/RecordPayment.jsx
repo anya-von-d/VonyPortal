@@ -184,7 +184,7 @@ export default function RecordPayment() {
     const ids = [...new Set(loans.map(l => l.lender_id === user?.id ? l.borrower_id : l.lender_id))];
     return [{ id: 'all', label: 'All Friends' }, ...ids.map(id => {
       const p = getUserById(id);
-      return { id, label: `@${p.username}` };
+      return { id, label: p.full_name || p.username };
     }).sort((a, b) => a.label.localeCompare(b.label))];
   })();
 
@@ -301,13 +301,13 @@ export default function RecordPayment() {
   const nameOrYou = (userId) => {
     if (userId === user?.id) return 'you';
     const p = getUserById(userId);
-    return `@${p.username}`;
+    return p.full_name || p.username;
   };
 
   const nameOrYouCapitalized = (userId) => {
     if (userId === user?.id) return 'You';
     const p = getUserById(userId);
-    return `@${p.username}`;
+    return p.full_name || p.username;
   };
 
   /* ── Loading state ──────────────────────────────────────── */
@@ -371,7 +371,7 @@ export default function RecordPayment() {
               </div>
               <h3 style={{ fontSize: 18, fontWeight: 600, color: '#1A1918', textAlign: 'center', margin: '0 0 8px' }}>Deny Payment?</h3>
               <p style={{ fontSize: 13, color: '#787776', textAlign: 'center', margin: '0 0 24px', lineHeight: 1.6 }}>
-                Are you sure you didn't receive this payment? If so click deny to let {nameOrYou(confirmingDeny.recorded_by) === 'you' ? 'them' : `@${getUserById(confirmingDeny.recorded_by).username}`} know
+                Are you sure you didn't receive this payment? If so click deny to let {nameOrYou(confirmingDeny.recorded_by) === 'you' ? 'them' : `${getUserById(confirmingDeny.recorded_by).full_name || getUserById(confirmingDeny.recorded_by).username}`} know
               </p>
               <div style={{ display: 'flex', gap: 12 }}>
                 <button onClick={() => setConfirmingDeny(null)} style={{
@@ -564,7 +564,7 @@ export default function RecordPayment() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 10, background: 'rgba(103,138,251,0.06)' }}>
                       <Clock size={14} style={{ color: '#678AFB', flexShrink: 0 }} />
                       <span style={{ fontSize: 12, color: '#678AFB' }}>
-                        @{getOtherParty(selectedLoan).username} will need to confirm this payment
+                        {getOtherParty(selectedLoan).full_name || getOtherParty(selectedLoan).username} will need to confirm this payment
                       </span>
                     </div>
 
@@ -699,7 +699,7 @@ export default function RecordPayment() {
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                ${(loan.amount || 0).toLocaleString()} loan {isUserLender(loan) ? 'to' : 'from'} @{other.username}
+                                ${(loan.amount || 0).toLocaleString()} loan {isUserLender(loan) ? 'to' : 'from'} {other.full_name || other.username}
                               </p>
                               <p style={{ fontSize: 11, color: '#787776', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {loan.purpose || 'No reason'} · ${remaining.toFixed(2)} remaining

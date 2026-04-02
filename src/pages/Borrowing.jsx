@@ -255,7 +255,7 @@ export default function Borrowing() {
     return nextPaymentLoan.payment_amount || 0;
   })();
   const nextPaymentLenderUsername = nextPaymentLoan
-    ? publicProfiles.find(p => p.user_id === nextPaymentLoan.lender_id)?.username || 'user'
+    ? publicProfiles.find(p => p.user_id === nextPaymentLoan.lender_id)?.full_name || 'User'
     : null;
 
   // Overall repayment progress
@@ -568,8 +568,8 @@ export default function Borrowing() {
 
         <div className="space-y-3 text-sm">
           <p className="leading-relaxed">
-            FOR VALUE RECEIVED, the undersigned Borrower, <span className="font-semibold">{borrowerInfo.full_name}</span> (@{borrowerInfo.username}),
-            promises to pay to the order of <span className="font-semibold">{lenderInfo.full_name}</span> (@{lenderInfo.username}),
+            FOR VALUE RECEIVED, the undersigned Borrower, <span className="font-semibold">{borrowerInfo.full_name}</span>,
+            promises to pay to the order of <span className="font-semibold">{lenderInfo.full_name}</span>,
             the principal sum of <span className="font-semibold">{formatMoney(agreement.amount)}</span>,
             together with interest at the rate of <span className="font-semibold">{agreement.interest_rate}%</span> per annum.
           </p>
@@ -965,7 +965,7 @@ export default function Borrowing() {
                                   <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(103,138,251,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <span style={{ fontSize: 11, fontWeight: 500, color: '#678AFB' }}>{lender?.full_name?.charAt(0) || '?'}</span>
                                   </div>
-                                  <span style={{ fontSize: 11, fontWeight: 500, color: '#1A1918' }}>@{lender?.username || 'user'}</span>
+                                  <span style={{ fontSize: 11, fontWeight: 500, color: '#1A1918' }}>{lender?.full_name || 'User'}</span>
                                   <span style={{ fontSize: 10, color: '#787776' }}>· {loan.purpose || 'Reason'}</span>
                                 </div>
                                 <span style={{ fontSize: 11, fontWeight: 700, color: '#1A1918' }}>{percentPaid}%</span>
@@ -993,7 +993,7 @@ export default function Borrowing() {
                       const lender = publicProfiles.find(p => p.user_id === l.lender_id);
                       const days = daysUntilDate(l.next_payment_date);
                       const payDate = toLocalDate(l.next_payment_date);
-                      return { ...l, lenderUsername: lender?.username || 'user', days, payDate };
+                      return { ...l, lenderUsername: lender?.full_name || 'User', days, payDate };
                     })
                     .sort((a, b) => a.payDate - b.payDate);
                   const overdueLoans = allPaymentLoans.filter(l => l.days < 0);
@@ -1027,7 +1027,7 @@ export default function Borrowing() {
                                   </div>
                                   <div style={{ flex: 1, minWidth: 0 }}>
                                     <p style={{ fontSize: 11, color: '#1A1918', margin: 0 }}>
-                                      Send <span style={{ fontWeight: 600 }}>${(loan.payment_amount || 0).toLocaleString()}</span> to <span style={{ fontWeight: 600 }}>@{loan.lenderUsername}</span>
+                                      Send <span style={{ fontWeight: 600 }}>${(loan.payment_amount || 0).toLocaleString()}</span> to <span style={{ fontWeight: 600 }}>{loan.lenderUsername}</span>
                                     </p>
                                     <p style={{ fontSize: 10, marginTop: 2, color: isOverdue ? '#E8726E' : '#787776', margin: 0 }}>{format(loan.payDate, 'MMM d, yyyy')}</p>
                                   </div>
@@ -1065,7 +1065,7 @@ export default function Borrowing() {
                           <p style={{ fontSize: 11, color: '#787776', marginBottom: 2 }}>Next Payment Amount</p>
                           <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
                             <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(nextPaymentAmount)}</p>
-                            <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>to @{nextPaymentLenderUsername}</p>
+                            <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>to {nextPaymentLenderUsername}</p>
                           </div>
                         </div>
                       </div>
@@ -1098,7 +1098,7 @@ export default function Borrowing() {
                           <p style={{ fontSize: 14, fontWeight: 700, color: 'white', margin: 0 }}>Overdue Payment</p>
                         </div>
                         <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)', marginBottom: 8 }}>
-                          Your payment to <span style={{ fontWeight: 700, color: 'white' }}>@{lender?.username || 'user'}</span> is overdue by {daysOverdue} {daysOverdue === 1 ? 'day' : 'days'}. If you made a payment, make sure to record it.
+                          Your payment to <span style={{ fontWeight: 700, color: 'white' }}>{lender?.full_name || 'User'}</span> is overdue by {daysOverdue} {daysOverdue === 1 ? 'day' : 'days'}. If you made a payment, make sure to record it.
                         </p>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                           <p style={{ fontSize: 18, fontWeight: 700, color: 'white', margin: 0 }}>{formatMoney(overdueAmount)}</p>
@@ -1154,7 +1154,7 @@ export default function Borrowing() {
                               </div>
                               <div style={{ flex: 1, minWidth: 0 }}>
                                 <p style={{ fontSize: 11, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
-                                  @{lender?.username || 'user'} · {loan.purpose || 'Loan'}
+                                  {lender?.full_name || 'User'} · {loan.purpose || 'Loan'}
                                 </p>
                               </div>
                               <span style={{ fontSize: 11, fontWeight: 700, color: '#1A1918', flexShrink: 0 }}>{rankValue}</span>
@@ -1250,7 +1250,7 @@ export default function Borrowing() {
                                 >
                                   {manageableLoans.map((loan) => {
                                     const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
-                                    return (<option key={loan.id} value={loan.id}>@{lender?.username || 'user'} — ${loan.amount?.toLocaleString()}{loan.status === 'cancelled' ? ' · Cancelled' : ''}</option>);
+                                    return (<option key={loan.id} value={loan.id}>{lender?.full_name || 'User'} — ${loan.amount?.toLocaleString()}{loan.status === 'cancelled' ? ' · Cancelled' : ''}</option>);
                                   })}
                                 </select>
                                 <div style={{ pointerEvents: 'none', position: 'absolute', top: 0, bottom: 0, right: 10, display: 'flex', alignItems: 'center' }}>
@@ -1268,7 +1268,7 @@ export default function Borrowing() {
                                 <img src={selLender?.profile_picture_url || selLender?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((selLender?.full_name || 'U').charAt(0))}&background=678AFB&color=fff&size=64`}
                                   alt={selLender?.full_name || 'Lender'} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, background: 'white' }} />
                                 <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', margin: 0 }}>
-                                  @{selLender?.username || 'user'} lent you ${(manageLoanSelected.amount || 0).toLocaleString()} to help with {manageLoanSelected.purpose || 'personal expenses'}
+                                  {selLender?.full_name || 'User'} lent you ${(manageLoanSelected.amount || 0).toLocaleString()} to help with {manageLoanSelected.purpose || 'personal expenses'}
                                 </p>
                               </div>
                             );
@@ -1287,7 +1287,7 @@ export default function Borrowing() {
                                 const totalWithInterest = loanAnalysis ? (loanAnalysis.principal + loanAnalysis.totalInterestAccrued) : (manageLoanSelected.total_amount || loanPrincipal);
                                 const paidPct = loanAnalysis ? loanAnalysis.paidPercentage : (totalWithInterest > 0 ? (totalPaidAmt / totalWithInterest) * 100 : 0);
                                 const selLender = publicProfiles.find(p => p.user_id === manageLoanSelected.lender_id);
-                                const lenderUsername = selLender?.username || 'user';
+                                const lenderUsername = selLender?.full_name || 'User';
                                 const nextPmtAmt = loanAnalysis ? loanAnalysis.nextPaymentAmount : (recalculatedPayment > 0 ? recalculatedPayment : (manageLoanSelected.payment_amount || 0));
                                 let nextPmtDate = null; let daysUntil = null;
                                 if (manageLoanSelected.next_payment_date) { nextPmtDate = toLocalDate(manageLoanSelected.next_payment_date); daysUntil = daysUntilDate(manageLoanSelected.next_payment_date); }
@@ -1328,7 +1328,7 @@ export default function Borrowing() {
                                         ) : (<p style={{ fontSize: 12, color: '#C7C6C4', marginBottom: 12 }}>No upcoming payment</p>)}
                                         <p style={{ fontSize: 10, color: '#787776', fontWeight: 500, marginBottom: 4 }}>Amount</p>
                                         <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>${nextPmtAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                                        <p style={{ fontSize: 10, color: '#787776' }}>to @{lenderUsername}</p>
+                                        <p style={{ fontSize: 10, color: '#787776' }}>to {lenderUsername}</p>
                                       </div>
                                     </div>
                                   </div>
@@ -1507,7 +1507,7 @@ export default function Borrowing() {
                                       const repaymentPeriod = manageLoanSelected.repayment_period || 0;
                                       const paymentFrequency = manageLoanSelected.payment_frequency || 'monthly';
                                       const lender = publicProfiles.find(p => p.user_id === manageLoanSelected.lender_id);
-                                      const lenderUsername = lender?.username || 'user';
+                                      const lenderUsername = lender?.full_name || 'User';
                                       const totalOwedDisplay = loanAnalysis ? loanAnalysis.totalOwedNow : (manageLoanSelected.total_amount || manageLoanSelected.amount || 0);
                                       const amountPaidDisplay = loanAnalysis ? loanAnalysis.totalPaid : (manageLoanSelected.amount_paid || 0);
                                       const fullPayments = loanAnalysis ? loanAnalysis.fullPaymentCount : 0;
@@ -1517,7 +1517,7 @@ export default function Borrowing() {
                                         { label: 'Total Owed', value: `$${totalOwedDisplay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: 'with interest' },
                                         { label: 'Amount Paid', value: `$${amountPaidDisplay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: null },
                                         { label: 'Payments Made', value: `${fullPayments}/${repaymentPeriod}`, sub: 'full payments' },
-                                        { label: `${freqLabel} Payments`, value: `$${paymentAmountDisplay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: `to @${lenderUsername}` },
+                                        { label: `${freqLabel} Payments`, value: `$${paymentAmountDisplay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: `to ${lenderUsername}` },
                                       ];
                                       return (
                                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
@@ -1615,8 +1615,8 @@ export default function Borrowing() {
                                       const loanPmts = allPayments.filter(p => p.loan_id === manageLoanSelected.id);
                                       const lenderProfile = publicProfiles.find(p => p.user_id === manageLoanSelected.lender_id);
                                       const borrowerProfile = publicProfiles.find(p => p.user_id === user?.id);
-                                      const lenderName = lenderProfile?.username || 'lender';
-                                      const borrowerName = borrowerProfile?.username || 'you';
+                                      const lenderName = lenderProfile?.full_name || 'Lender';
+                                      const borrowerName = borrowerProfile?.full_name || 'You';
 
                                       const activities = [];
 
@@ -1625,7 +1625,7 @@ export default function Borrowing() {
                                         activities.push({
                                           timestamp: new Date(manageLoanSelected.created_at),
                                           type: 'created',
-                                          description: `Loan created between @${borrowerName} and @${lenderName}`,
+                                          description: `Loan created between ${borrowerName} and ${lenderName}`,
                                         });
                                       }
 
@@ -1634,7 +1634,7 @@ export default function Borrowing() {
                                         activities.push({
                                           timestamp: new Date(agreement.borrower_signed_date),
                                           type: 'signature',
-                                          description: `@${borrowerName} signed the loan agreement`,
+                                          description: `${borrowerName} signed the loan agreement`,
                                         });
                                       }
 
@@ -1643,7 +1643,7 @@ export default function Borrowing() {
                                         activities.push({
                                           timestamp: new Date(agreement.lender_signed_date),
                                           type: 'signature',
-                                          description: `@${lenderName} signed the loan agreement`,
+                                          description: `${lenderName} signed the loan agreement`,
                                         });
                                       }
 
@@ -1654,13 +1654,13 @@ export default function Borrowing() {
                                         const otherPartyProfile = publicProfiles.find(p => p.user_id === (isRecordedByUser
                                           ? (manageLoanSelected.lender_id === user?.id ? manageLoanSelected.borrower_id : manageLoanSelected.lender_id)
                                           : payment.recorded_by));
-                                        const otherPartyUsername = otherPartyProfile?.username || 'user';
+                                        const otherPartyUsername = otherPartyProfile?.full_name || 'User';
                                         const pmtAmount = `$${(payment.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                                         let desc;
                                         if (isRecordedByUser) {
-                                          desc = `You ${isConfirmed ? 'made' : 'recorded'} a ${pmtAmount} payment to @${lenderName}`;
+                                          desc = `You ${isConfirmed ? 'made' : 'recorded'} a ${pmtAmount} payment to ${lenderName}`;
                                         } else {
-                                          desc = `@${otherPartyUsername} recorded a ${pmtAmount} payment from @${borrowerName}`;
+                                          desc = `${otherPartyUsername} recorded a ${pmtAmount} payment from ${borrowerName}`;
                                         }
                                         activities.push({
                                           timestamp: new Date(payment.payment_date || payment.created_at),

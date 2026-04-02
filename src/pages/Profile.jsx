@@ -25,7 +25,6 @@ import {
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import PaymentMethodsConnect from "@/components/profile/PaymentMethodsConnect";
 import DashboardSidebar from "@/components/DashboardSidebar";
 
 const STAR_CIRCLES = [
@@ -577,9 +576,6 @@ export default function Profile() {
                   )}
                 </div>
               </div>
-
-              {/* Payment Methods - Second */}
-              <PaymentMethodsConnect />
             </div>
 
             {/* Stats & Verification */}

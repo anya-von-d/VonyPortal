@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Loan, Payment, User, LoanAgreement, PublicProfile, Friendship } from "@/entities/all";
 import { Badge } from "@/components/ui/badge";
@@ -120,7 +121,7 @@ export default function YourLoans() {
     return nextPaymentLoanLending.payment_amount || 0;
   })();
   const nextPaymentBorrowerUsername = nextPaymentLoanLending
-    ? publicProfiles.find(p => p.user_id === nextPaymentLoanLending.borrower_id)?.username || 'user' : null;
+    ? publicProfiles.find(p => p.user_id === nextPaymentLoanLending.borrower_id)?.full_name || 'User' : null;
 
   // --- Borrowing summary stats ---
   const totalBorrowed = activeBorrowingLoans.reduce((s, l) => s + (l.amount || 0), 0);
@@ -140,7 +141,7 @@ export default function YourLoans() {
     return nextPaymentLoanBorrowing.payment_amount || 0;
   })();
   const nextPaymentLenderUsername = nextPaymentLoanBorrowing
-    ? publicProfiles.find(p => p.user_id === nextPaymentLoanBorrowing.lender_id)?.username || 'user' : null;
+    ? publicProfiles.find(p => p.user_id === nextPaymentLoanBorrowing.lender_id)?.full_name || 'User' : null;
 
   // --- Shared helpers ---
   const handleMakePayment = () => { window.location.href = createPageUrl("RecordPayment"); };
@@ -373,8 +374,8 @@ export default function YourLoans() {
         </div>
         <div className="space-y-3 text-sm">
           <p className="leading-relaxed">
-            FOR VALUE RECEIVED, the undersigned Borrower, <span className="font-semibold">{borrowerInfo.full_name}</span> (@{borrowerInfo.username}),
-            promises to pay to the order of <span className="font-semibold">{lenderInfo.full_name}</span> (@{lenderInfo.username}),
+            FOR VALUE RECEIVED, the undersigned Borrower, <span className="font-semibold">{borrowerInfo.full_name}</span>,
+            promises to pay to the order of <span className="font-semibold">{lenderInfo.full_name}</span>,
             the principal sum of <span className="font-semibold">{formatMoney(agreement.amount)}</span>,
             together with interest at the rate of <span className="font-semibold">{agreement.interest_rate}%</span> per annum.
           </p>
@@ -525,10 +526,10 @@ export default function YourLoans() {
               <p style={{ fontSize: 13, color: '#1A1918', margin: 0 }}>
                 {isLending ? (
                   nextPaymentDays > 0
-                    ? <>Next payment from @{otherPartyUsername} is due in <span style={{ fontWeight: 700 }}>{nextPaymentDays} {nextPaymentDays === 1 ? 'day' : 'days'}</span></>
+                    ? <>Next payment from {otherPartyUsername} is due in <span style={{ fontWeight: 700 }}>{nextPaymentDays} {nextPaymentDays === 1 ? 'day' : 'days'}</span></>
                     : nextPaymentDays === 0
-                      ? <span style={{ fontWeight: 700 }}>Payment from @{otherPartyUsername} is due today</span>
-                      : <span style={{ fontWeight: 700, color: '#E8726E' }}>Payment from @{otherPartyUsername} is {Math.abs(nextPaymentDays)} {Math.abs(nextPaymentDays) === 1 ? 'day' : 'days'} overdue</span>
+                      ? <span style={{ fontWeight: 700 }}>Payment from {otherPartyUsername} is due today</span>
+                      : <span style={{ fontWeight: 700, color: '#E8726E' }}>Payment from {otherPartyUsername} is {Math.abs(nextPaymentDays)} {Math.abs(nextPaymentDays) === 1 ? 'day' : 'days'} overdue</span>
                 ) : (
                   nextPaymentDays > 0
                     ? <>Your next payment is due in <span style={{ fontWeight: 700 }}>{nextPaymentDays} {nextPaymentDays === 1 ? 'day' : 'days'}</span></>
@@ -588,7 +589,7 @@ export default function YourLoans() {
                               <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(103,138,251,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <span style={{ fontSize: 11, fontWeight: 500, color: '#678AFB' }}>{otherParty?.full_name?.charAt(0) || '?'}</span>
                               </div>
-                              <span style={{ fontSize: 11, fontWeight: 500, color: '#1A1918' }}>@{otherParty?.username || 'user'}</span>
+                              <span style={{ fontSize: 11, fontWeight: 500, color: '#1A1918' }}>{otherParty?.full_name || 'User'}</span>
                               <span style={{ fontSize: 10, color: '#787776' }}>· {loan.purpose || 'Reason'}</span>
                             </div>
                             <span style={{ fontSize: 11, fontWeight: 700, color: '#1A1918' }}>{percentPaid}%</span>
@@ -616,7 +617,7 @@ export default function YourLoans() {
                   const otherParty = publicProfiles.find(p => p.user_id === (isLending ? l.borrower_id : l.lender_id));
                   const days = daysUntilDate(l.next_payment_date);
                   const payDate = toLocalDate(l.next_payment_date);
-                  return { ...l, otherPartyUsername: otherParty?.username || 'user', days, payDate };
+                  return { ...l, otherPartyUsername: otherParty?.full_name || 'User', days, payDate };
                 })
                 .sort((a, b) => a.payDate - b.payDate);
               const overdueLoans = allPaymentLoans.filter(l => l.days < 0);
@@ -648,7 +649,7 @@ export default function YourLoans() {
                               </div>
                               <div style={{ flex: 1, minWidth: 0 }}>
                                 <p style={{ fontSize: 11, color: '#1A1918', margin: 0 }}>
-                                  {isLending ? 'Receive' : 'Send'} <span style={{ fontWeight: 600 }}>${(loan.payment_amount || 0).toLocaleString()}</span> {isLending ? 'from' : 'to'} <span style={{ fontWeight: 600 }}>@{loan.otherPartyUsername}</span>
+                                  {isLending ? 'Receive' : 'Send'} <span style={{ fontWeight: 600 }}>${(loan.payment_amount || 0).toLocaleString()}</span> {isLending ? 'from' : 'to'} <span style={{ fontWeight: 600 }}>{loan.otherPartyUsername}</span>
                                 </p>
                                 <p style={{ fontSize: 10, marginTop: 2, color: isOverdue ? '#E8726E' : '#787776', margin: 0 }}>{format(loan.payDate, 'MMM d, yyyy')}</p>
                               </div>
@@ -686,7 +687,7 @@ export default function YourLoans() {
                       <p style={{ fontSize: 11, color: '#787776', marginBottom: 2 }}>{isLending ? 'Expected Amount' : 'Next Payment Amount'}</p>
                       <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
                         <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(nextPaymentAmount)}</p>
-                        <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>{isLending ? `from @${otherPartyUsername}` : `to @${otherPartyUsername}`}</p>
+                        <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>{isLending ? `from ${otherPartyUsername}` : `to ${otherPartyUsername}`}</p>
                       </div>
                     </div>
                   </div>
@@ -720,8 +721,8 @@ export default function YourLoans() {
                     </div>
                     <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)', marginBottom: 8 }}>
                       {isLending
-                        ? <>Payment from <span style={{ fontWeight: 700, color: 'white' }}>@{otherParty?.username || 'user'}</span> is overdue by {daysOverdue} {daysOverdue === 1 ? 'day' : 'days'}.</>
-                        : <>Your payment to <span style={{ fontWeight: 700, color: 'white' }}>@{otherParty?.username || 'user'}</span> is overdue by {daysOverdue} {daysOverdue === 1 ? 'day' : 'days'}. If you made a payment, make sure to record it.</>
+                        ? <>Payment from <span style={{ fontWeight: 700, color: 'white' }}>{otherParty?.full_name || 'User'}</span> is overdue by {daysOverdue} {daysOverdue === 1 ? 'day' : 'days'}.</>
+                        : <>Your payment to <span style={{ fontWeight: 700, color: 'white' }}>{otherParty?.full_name || 'User'}</span> is overdue by {daysOverdue} {daysOverdue === 1 ? 'day' : 'days'}. If you made a payment, make sure to record it.</>
                       }
                     </p>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -761,7 +762,7 @@ export default function YourLoans() {
                       return (
                         <div key={loan.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 10, borderRadius: 10, background: 'rgba(0,0,0,0.03)' }}>
                           <div style={{ flexShrink: 0, width: 28, height: 28, borderRadius: '50%', background: 'rgba(103,138,251,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ fontSize: 12, fontWeight: 700, color: '#678AFB' }}>{idx + 1}</span></div>
-                          <div style={{ flex: 1, minWidth: 0 }}><p style={{ fontSize: 11, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>@{otherParty?.username || 'user'} · {loan.purpose || 'Loan'}</p></div>
+                          <div style={{ flex: 1, minWidth: 0 }}><p style={{ fontSize: 11, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>{otherParty?.full_name || 'User'} · {loan.purpose || 'Loan'}</p></div>
                           <span style={{ fontSize: 11, fontWeight: 700, color: '#1A1918', flexShrink: 0 }}>{rankValue}</span>
                         </div>
                       );
@@ -816,7 +817,7 @@ export default function YourLoans() {
     const isLending = isLendingLoan;
     const otherPartyId = manageLoanSelected ? (isLending ? manageLoanSelected.borrower_id : manageLoanSelected.lender_id) : null;
     const otherPartyProfile = otherPartyId ? publicProfiles.find(p => p.user_id === otherPartyId) : null;
-    const otherPartyUsername = otherPartyProfile?.username || 'user';
+    const otherPartyUsername = otherPartyProfile?.full_name || 'User';
 
     return (
       <div>
@@ -830,7 +831,7 @@ export default function YourLoans() {
                   const isLend = loan.lender_id === user?.id;
                   const otherParty = publicProfiles.find(p => p.user_id === (isLend ? loan.borrower_id : loan.lender_id));
                   const roleLabel = isLend ? 'Lent to' : 'Borrowed from';
-                  return (<option key={loan.id} value={loan.id}>{roleLabel} @{otherParty?.username || 'user'} — ${loan.amount?.toLocaleString()}{loan.status === 'cancelled' ? ' · Cancelled' : ''}</option>);
+                  return (<option key={loan.id} value={loan.id}>{roleLabel} {otherParty?.full_name || 'User'} — ${loan.amount?.toLocaleString()}{loan.status === 'cancelled' ? ' · Cancelled' : ''}</option>);
                 })}
               </select>
               <div style={{ pointerEvents: 'none', position: 'absolute', top: 0, bottom: 0, right: 10, display: 'flex', alignItems: 'center' }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#678AFB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
@@ -845,8 +846,8 @@ export default function YourLoans() {
               <img src={otherPartyProfile?.profile_picture_url || otherPartyProfile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((otherPartyProfile?.full_name || 'U').charAt(0))}&background=678AFB&color=fff&size=64`} alt={otherPartyProfile?.full_name || 'User'} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, background: 'white' }} />
               <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', margin: 0 }}>
                 {isLending
-                  ? `You lent @${otherPartyUsername} $${(manageLoanSelected.amount || 0).toLocaleString()} for ${manageLoanSelected.purpose || 'personal expenses'}`
-                  : `@${otherPartyUsername} lent you $${(manageLoanSelected.amount || 0).toLocaleString()} to help with ${manageLoanSelected.purpose || 'personal expenses'}`
+                  ? `You lent ${otherPartyUsername} $${(manageLoanSelected.amount || 0).toLocaleString()} for ${manageLoanSelected.purpose || 'personal expenses'}`
+                  : `${otherPartyUsername} lent you $${(manageLoanSelected.amount || 0).toLocaleString()} to help with ${manageLoanSelected.purpose || 'personal expenses'}`
                 }
               </p>
             </div>
@@ -876,7 +877,7 @@ export default function YourLoans() {
               return (
                 <div className="glass-card">
                   <div style={{ padding: '20px 26px 0' }}><span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Payment Progress</span></div>
-                  <div style={{ padding: '14px 26px 26px', display: 'flex', alignItems: 'center', gap: 16 }}>
+                  <div style={{ padding: '14px 26px 26px', display: 'flex', alignItems: 'flex-start', gap: 16 }}>
                     <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
                         <circle cx={dCx} cy={dCy} r={(outerR + innerR) / 2} fill="none" stroke="#E5E4E2" strokeWidth={outerR - innerR} />
@@ -890,7 +891,7 @@ export default function YourLoans() {
                         <span style={{ color: '#787776', fontWeight: 400 }}> / ${totalOwedNow.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                       </p>
                     </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>
                       <p style={{ fontSize: 10, color: '#787776', fontWeight: 500, marginBottom: 4 }}>Next Payment</p>
                       {nextPmtDate ? (
                         <>
@@ -900,36 +901,13 @@ export default function YourLoans() {
                       ) : (<p style={{ fontSize: 12, color: '#C7C6C4', marginBottom: 12 }}>No upcoming payment</p>)}
                       <p style={{ fontSize: 10, color: '#787776', fontWeight: 500, marginBottom: 4 }}>Amount</p>
                       <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>${nextPmtAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                      <p style={{ fontSize: 10, color: '#787776' }}>{isLending ? `from @${otherPartyUsername}` : `to @${otherPartyUsername}`}</p>
+                      <p style={{ fontSize: 10, color: '#787776' }}>{isLending ? `from ${otherPartyUsername}` : `to ${otherPartyUsername}`}</p>
+                      <Link to={createPageUrl("RecordPayment")} style={{ display: 'inline-block', marginTop: 12, padding: '8px 18px', borderRadius: 12, background: '#678AFB', color: 'white', fontSize: 12, fontWeight: 600, textDecoration: 'none', fontFamily: "'DM Sans', sans-serif" }}>Record Payment</Link>
                     </div>
                   </div>
                 </div>
               );
             })()}
-
-            {/* Quick Actions */}
-            {manageLoanSelected && manageLoanSelected.status !== 'cancelled' && (
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 20, padding: '4px 0' }}>
-                <button onClick={() => handleMakePayment(manageLoanSelected)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', background: 'none', border: 'none' }}>
-                  <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(103,138,251,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#678AFB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                  </div>
-                  <p style={{ fontSize: 10, fontWeight: 600, color: '#1A1918', textAlign: 'center', lineHeight: 1.3 }}>Record<br/>Payment</p>
-                </button>
-                <button onClick={() => handleEditLoan(manageLoanSelected)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', background: 'none', border: 'none' }}>
-                  <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(103,138,251,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#678AFB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                  </div>
-                  <p style={{ fontSize: 10, fontWeight: 600, color: '#1A1918', textAlign: 'center', lineHeight: 1.3 }}>{isLending ? 'Edit' : 'Request'}<br/>{isLending ? 'Loan' : 'Loan Edit'}</p>
-                </button>
-                <button onClick={() => handleCancelLoan(manageLoanSelected)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', background: 'none', border: 'none' }}>
-                  <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(103,138,251,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#678AFB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
-                  </div>
-                  <p style={{ fontSize: 10, fontWeight: 600, color: '#1A1918', textAlign: 'center', lineHeight: 1.3 }}>{isLending ? 'Cancel' : 'Request'}<br/>{isLending ? 'Loan' : 'Cancellation'}</p>
-                </button>
-              </div>
-            )}
 
             {/* Payment History Chart */}
             <div className="glass-card">
@@ -994,6 +972,68 @@ export default function YourLoans() {
               )}
               </div>
             </div>
+
+            {/* Activity Timeline */}
+            {manageLoanSelected && (
+            <div className="glass-card" style={{ overflow: 'hidden' }}>
+              <div style={{ padding: '20px 26px 0' }}><p style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', marginBottom: 10 }}>Activity</p></div>
+              <div style={{ padding: '14px 26px 26px' }}>
+              {(() => {
+                const ag = loanAgreements.find(a => a.loan_id === manageLoanSelected.id);
+                const loanPmts = allPayments.filter(p => p.loan_id === manageLoanSelected.id);
+                const lenderProfile = publicProfiles.find(p => p.user_id === manageLoanSelected.lender_id);
+                const borrowerProfile = publicProfiles.find(p => p.user_id === manageLoanSelected.borrower_id);
+                const lenderName = lenderProfile?.full_name || 'lender';
+                const borrowerName = borrowerProfile?.full_name || 'borrower';
+                const activities = [];
+                if (manageLoanSelected.created_at) activities.push({ timestamp: new Date(manageLoanSelected.created_at), type: 'created', description: `Loan created between ${borrowerName} and ${lenderName}` });
+                if (ag?.borrower_signed_date) activities.push({ timestamp: new Date(ag.borrower_signed_date), type: 'signature', description: `${borrowerName} signed the loan agreement` });
+                if (ag?.lender_signed_date) activities.push({ timestamp: new Date(ag.lender_signed_date), type: 'signature', description: `${lenderName} signed the loan agreement` });
+                loanPmts.forEach(payment => {
+                  const isConfirmed = payment.status === 'confirmed';
+                  const isRecordedByUser = payment.recorded_by === user?.id;
+                  const pmtAmount = `$${(payment.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                  let desc;
+                  if (isLending) {
+                    if (isRecordedByUser) desc = `You ${isConfirmed ? 'confirmed' : 'recorded'} a ${pmtAmount} payment from ${borrowerName}`;
+                    else desc = `${borrowerName} ${isConfirmed ? 'made' : 'recorded'} a ${pmtAmount} payment`;
+                  } else {
+                    if (isRecordedByUser) desc = `You ${isConfirmed ? 'made' : 'recorded'} a ${pmtAmount} payment to ${lenderName}`;
+                    else desc = `${lenderName} recorded a ${pmtAmount} payment from ${borrowerName}`;
+                  }
+                  activities.push({ timestamp: new Date(payment.payment_date || payment.created_at), type: 'payment', description: desc, isAwaitingConfirmation: !isConfirmed });
+                });
+                if (ag?.cancelled_date) activities.push({ timestamp: new Date(ag.cancelled_date), type: 'cancellation', description: 'Loan was cancelled' });
+                if (manageLoanSelected.status === 'completed') activities.push({ timestamp: new Date(), type: 'completion', description: 'Loan repaid in full' });
+                activities.sort((a, b) => a.timestamp - b.timestamp);
+                const getIcon = (type) => {
+                  const strokeColor = type === 'cancellation' ? '#E8726E' : '#678AFB';
+                  const paths = { created: 'M12 4v16m8-8H4', signature: 'M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z', payment: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1', cancellation: 'M6 18L18 6M6 6l12 12', completion: 'M5 13l4 4L19 7' };
+                  return <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke={strokeColor} strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d={paths[type] || ''} /></svg>;
+                };
+                const getDotColor = (type) => type === 'cancellation' ? 'bg-red-50 border-[#E8726E]' : 'bg-blue-50 border-[#678AFB]';
+                if (activities.length === 0) return <p style={{ fontSize: 11, color: '#C7C6C4' }}>No activity recorded yet.</p>;
+                return (
+                  <div className="space-y-0 max-h-[200px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                    {activities.map((activity, idx) => (
+                      <div key={idx} className="flex items-start gap-2.5 relative">
+                        {idx < activities.length - 1 && <div className="absolute left-[11px] top-[22px] w-[1px]" style={{ height: 'calc(100% - 6px)', background: 'rgba(103,138,251,0.2)' }} />}
+                        <div className={`w-[23px] h-[23px] rounded-full border-[1.5px] ${getDotColor(activity.type)} flex items-center justify-center flex-shrink-0 z-10 mt-1`}>{getIcon(activity.type)}</div>
+                        <div className="flex-1 min-w-0 pb-3">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p style={{ fontSize: 11, color: '#1A1918', lineHeight: 1.4 }}>{activity.description}</p>
+                            {activity.isAwaitingConfirmation && <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-semibold bg-[#F59E0B]/20 text-[#F59E0B] border border-[#F59E0B]/30 whitespace-nowrap">Awaiting Confirmation</span>}
+                          </div>
+                          <p style={{ fontSize: 9, color: '#C7C6C4', marginTop: 2 }}>{format(activity.timestamp, 'MMM d, yyyy · h:mm a')}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+              </div>
+            </div>
+            )}
           </div>
 
           {/* Right Column */}
@@ -1061,7 +1101,7 @@ export default function YourLoans() {
                       { label: isLending ? 'Total Owed to You' : 'Total Owed', value: `$${totalOwedDisplay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: 'with interest' },
                       { label: isLending ? 'Amount Received' : 'Amount Paid', value: `$${amountPaidDisplay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: null },
                       { label: 'Payments Made', value: `${fullPayments}/${repaymentPeriod}`, sub: 'full payments' },
-                      { label: `${freqLabel} Payments`, value: `$${paymentAmountDisplay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: isLending ? `from @${otherPartyUsername}` : `to @${otherPartyUsername}` },
+                      { label: `${freqLabel} Payments`, value: `$${paymentAmountDisplay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: isLending ? `from ${otherPartyUsername}` : `to ${otherPartyUsername}` },
                     ];
                     return (
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
@@ -1132,66 +1172,6 @@ export default function YourLoans() {
                             </div>
                           );
                         })}
-                      </div>
-                    );
-                  })()}
-                  </div>
-                </div>
-
-                {/* Activity Timeline */}
-                <div className="glass-card" style={{ overflow: 'hidden' }}>
-                  <div style={{ padding: '20px 26px 0' }}><p style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', marginBottom: 10 }}>Activity</p></div>
-                  <div style={{ padding: '14px 26px 26px' }}>
-                  {(() => {
-                    const ag = loanAgreements.find(a => a.loan_id === manageLoanSelected.id);
-                    const loanPmts = allPayments.filter(p => p.loan_id === manageLoanSelected.id);
-                    const lenderProfile = publicProfiles.find(p => p.user_id === manageLoanSelected.lender_id);
-                    const borrowerProfile = publicProfiles.find(p => p.user_id === manageLoanSelected.borrower_id);
-                    const lenderName = lenderProfile?.username || 'lender';
-                    const borrowerName = borrowerProfile?.username || 'borrower';
-                    const activities = [];
-                    if (manageLoanSelected.created_at) activities.push({ timestamp: new Date(manageLoanSelected.created_at), type: 'created', description: `Loan created between @${borrowerName} and @${lenderName}` });
-                    if (ag?.borrower_signed_date) activities.push({ timestamp: new Date(ag.borrower_signed_date), type: 'signature', description: `@${borrowerName} signed the loan agreement` });
-                    if (ag?.lender_signed_date) activities.push({ timestamp: new Date(ag.lender_signed_date), type: 'signature', description: `@${lenderName} signed the loan agreement` });
-                    loanPmts.forEach(payment => {
-                      const isConfirmed = payment.status === 'confirmed';
-                      const isRecordedByUser = payment.recorded_by === user?.id;
-                      const pmtAmount = `$${(payment.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                      let desc;
-                      if (isLending) {
-                        if (isRecordedByUser) desc = `You ${isConfirmed ? 'confirmed' : 'recorded'} a ${pmtAmount} payment from @${borrowerName}`;
-                        else desc = `@${borrowerName} ${isConfirmed ? 'made' : 'recorded'} a ${pmtAmount} payment`;
-                      } else {
-                        if (isRecordedByUser) desc = `You ${isConfirmed ? 'made' : 'recorded'} a ${pmtAmount} payment to @${lenderName}`;
-                        else desc = `@${lenderName} recorded a ${pmtAmount} payment from @${borrowerName}`;
-                      }
-                      activities.push({ timestamp: new Date(payment.payment_date || payment.created_at), type: 'payment', description: desc, isAwaitingConfirmation: !isConfirmed });
-                    });
-                    if (ag?.cancelled_date) activities.push({ timestamp: new Date(ag.cancelled_date), type: 'cancellation', description: 'Loan was cancelled' });
-                    if (manageLoanSelected.status === 'completed') activities.push({ timestamp: new Date(), type: 'completion', description: 'Loan repaid in full' });
-                    activities.sort((a, b) => a.timestamp - b.timestamp);
-                    const getIcon = (type) => {
-                      const strokeColor = type === 'cancellation' ? '#E8726E' : '#678AFB';
-                      const paths = { created: 'M12 4v16m8-8H4', signature: 'M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z', payment: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1', cancellation: 'M6 18L18 6M6 6l12 12', completion: 'M5 13l4 4L19 7' };
-                      return <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke={strokeColor} strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d={paths[type] || ''} /></svg>;
-                    };
-                    const getDotColor = (type) => type === 'cancellation' ? 'bg-red-50 border-[#E8726E]' : 'bg-blue-50 border-[#678AFB]';
-                    if (activities.length === 0) return <p style={{ fontSize: 11, color: '#C7C6C4' }}>No activity recorded yet.</p>;
-                    return (
-                      <div className="space-y-0 max-h-[200px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-                        {activities.map((activity, idx) => (
-                          <div key={idx} className="flex items-start gap-2.5 relative">
-                            {idx < activities.length - 1 && <div className="absolute left-[11px] top-[22px] w-[1px]" style={{ height: 'calc(100% - 6px)', background: 'rgba(103,138,251,0.2)' }} />}
-                            <div className={`w-[23px] h-[23px] rounded-full border-[1.5px] ${getDotColor(activity.type)} flex items-center justify-center flex-shrink-0 z-10 mt-1`}>{getIcon(activity.type)}</div>
-                            <div className="flex-1 min-w-0 pb-3">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <p style={{ fontSize: 11, color: '#1A1918', lineHeight: 1.4 }}>{activity.description}</p>
-                                {activity.isAwaitingConfirmation && <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-semibold bg-[#F59E0B]/20 text-[#F59E0B] border border-[#F59E0B]/30 whitespace-nowrap">Awaiting Confirmation</span>}
-                              </div>
-                              <p style={{ fontSize: 9, color: '#C7C6C4', marginTop: 2 }}>{format(activity.timestamp, 'MMM d, yyyy · h:mm a')}</p>
-                            </div>
-                          </div>
-                        ))}
                       </div>
                     );
                   })()}
