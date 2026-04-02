@@ -399,8 +399,8 @@ export default function Lending({ initialTab }) {
   const handleSign = async (signature) => {
     setIsSubmitting(true);
     try {
-      // Strip repayment_unit — not a column in loans table
-      const { repayment_unit, ...loanPayload } = pendingLoanData;
+      // Strip fields that aren't columns in loans table
+      const { repayment_unit, borrowerName, ...loanPayload } = pendingLoanData;
       const createdLoan = await Loan.create(loanPayload);
 
       await LoanAgreement.create({
