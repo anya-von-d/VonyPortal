@@ -627,7 +627,7 @@ export default function RecentActivityPage() {
   const friendUserIds = [...new Set(allActivities.map(a => a._otherPartyId).filter(Boolean))];
   const friendOptions = friendUserIds.map(uid => {
     const p = getUserById(uid);
-    return { id: uid, label: `@${p.username || 'user'}` };
+    return { id: uid, label: p.full_name || p.username || 'User' };
   }).sort((a, b) => a.label.localeCompare(b.label));
 
   const totalCount = allActivities.length;
@@ -640,7 +640,8 @@ export default function RecentActivityPage() {
     const q = searchQuery.trim().toLowerCase();
     filtered = filtered.filter(a => {
       const info = getActivityInfo(a);
-      return info.title.toLowerCase().includes(q) || info.friendName.toLowerCase().includes(q) || info.amount.toLowerCase().includes(q);
+      const catLabel = (CATEGORY_DISPLAY[info.category]?.label || '').toLowerCase();
+      return info.title.toLowerCase().includes(q) || info.friendName.toLowerCase().includes(q) || info.amount.toLowerCase().includes(q) || catLabel.includes(q);
     });
   }
 
@@ -702,15 +703,15 @@ export default function RecentActivityPage() {
 
   /* ── Category display config ──────────────────────────────── */
   const CATEGORY_DISPLAY = {
-    sent_offer: { label: 'Loan Offer Sent', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> },
-    received_offer: { label: 'Loan Offer Received', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="7 13 12 18 17 13"/><line x1="12" y1="18" x2="12" y2="6"/></svg> },
-    loan_accepted: { label: 'Loan Accepted', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> },
-    loan_declined: { label: 'Loan Declined', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> },
-    loan_cancelled: { label: 'Loan Cancelled', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> },
-    loan_completed: { label: 'Loan Completed', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> },
-    loan_defaulted: { label: 'Loan Defaulted', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> },
-    payment_sent: { label: 'Payment Sent', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> },
-    payment_received: { label: 'Payment Received', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> },
+    sent_offer: { label: 'You offered', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> },
+    received_offer: { label: 'Offered to you', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="7 13 12 18 17 13"/><line x1="12" y1="18" x2="12" y2="6"/></svg> },
+    loan_accepted: { label: 'Accepted', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> },
+    loan_declined: { label: 'Declined', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> },
+    loan_cancelled: { label: 'Cancelled', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> },
+    loan_completed: { label: 'Fully repaid', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> },
+    loan_defaulted: { label: 'Defaulted', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> },
+    payment_sent: { label: 'You paid', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> },
+    payment_received: { label: 'Paid to you', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> },
   };
 
   /* ── Format date for table display ──────────────────────────── */
@@ -741,24 +742,23 @@ export default function RecentActivityPage() {
       const isLender = activity.lender_id === user.id;
       const otherParty = getUserById(isLender ? activity.borrower_id : activity.lender_id);
       amount = `$${activity.amount?.toLocaleString() || '0'}`;
-      const username = `@${otherParty?.username || 'user'}`;
+      const username = otherParty?.full_name || otherParty?.username || 'User';
       friendName = otherParty?.full_name || otherParty?.username || 'Unknown';
-      const reason = activity.purpose || 'Reason';
 
       if (activity.status === 'pending' || !activity.status) {
-        title = isLender ? `Sent ${amount} loan offer to ${username} for ${reason}` : `Received ${amount} loan offer from ${username} for ${reason}`;
+        title = isLender ? `Sent ${amount} loan offer to ${username}` : `Received ${amount} loan offer from ${username}`;
         icon = isLender ? Send : ArrowDownRight;
       } else if (activity.status === 'active') {
-        title = isLender ? `${username} accepted your ${amount} loan for ${reason}` : `You accepted ${amount} loan from ${username} for ${reason}`;
+        title = isLender ? `${username} accepted your ${amount} loan` : `You accepted ${amount} loan from ${username}`;
         icon = Check;
       } else if (activity.status === 'declined') {
-        title = isLender ? `${username} declined your ${amount} loan for ${reason}` : `You declined ${amount} loan from ${username} for ${reason}`;
+        title = isLender ? `${username} declined your ${amount} loan` : `You declined ${amount} loan from ${username}`;
         icon = X;
       } else if (activity.status === 'cancelled') {
-        title = isLender ? `You cancelled ${amount} loan offer to ${username} for ${reason}` : `${username} cancelled their ${amount} loan offer for ${reason}`;
+        title = isLender ? `You cancelled ${amount} loan offer to ${username}` : `${username} cancelled their ${amount} loan offer`;
         icon = Ban;
       } else if (activity.status === 'completed') {
-        title = isLender ? `${username} fully repaid your ${amount} loan for ${reason}` : `You fully repaid ${amount} loan to ${username} for ${reason}`;
+        title = isLender ? `${username} fully repaid your ${amount} loan` : `You fully repaid ${amount} loan to ${username}`;
         icon = Check;
       } else {
         title = isLender ? `${amount} loan to ${username}` : `${amount} loan from ${username}`;
@@ -771,7 +771,7 @@ export default function RecentActivityPage() {
         const isBorrower = associatedLoan.borrower_id === user.id;
         const otherParty = getUserById(isBorrower ? associatedLoan.lender_id : associatedLoan.borrower_id);
         amount = `$${activity.amount?.toLocaleString() || '0'}`;
-        const username = `@${otherParty?.username || 'user'}`;
+        const username = otherParty?.full_name || otherParty?.username || 'User';
         friendName = otherParty?.full_name || otherParty?.username || 'Unknown';
         title = isBorrower ? `You made a ${amount} payment to ${username}` : `Received ${amount} payment from ${username}`;
         icon = isBorrower ? ArrowUpRight : ArrowDownRight;
@@ -945,15 +945,6 @@ export default function RecentActivityPage() {
                             borderRadius: 12, background: 'rgba(0,0,0,0.03)', transition: 'background 0.15s',
                           }}
                         >
-                          {/* Category icon — always visible */}
-                          <div style={{
-                            width: 36, height: 36, borderRadius: '50%', background: 'rgba(103,138,251,0.1)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                            color: '#678AFB',
-                          }}>
-                            {catDisplay.icon}
-                          </div>
-
                           {/* Mobile layout — shown on small screens */}
                           <div className="activity-mobile-content" style={{ flex: 1, minWidth: 0 }}>
                             <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -1015,7 +1006,7 @@ export default function RecentActivityPage() {
             @media (min-width: 900px) {
               .activity-table-header { display: flex !important; }
               .activity-row { gap: 0 !important; }
-              .activity-row > div:first-child { margin-right: 16px; }
+
               .activity-mobile-content { display: none !important; }
               .activity-mobile-status { display: none !important; }
               .activity-desktop-date { display: block !important; }
