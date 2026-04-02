@@ -271,7 +271,7 @@ export default function Profile() {
   // Loading state
   if (isLoading) {
     return (
-      <div style={{ minHeight: '100vh', background: '#F5F4F0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ minHeight: '100vh', background: '#F3F1EF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: 32, height: 32, border: '2px solid #678AFB', borderTopColor: 'transparent', borderRadius: '50%', margin: '0 auto 16px' }} className="animate-spin" />
           <p style={{ fontSize: 14, color: '#787776', fontFamily: "'DM Sans', sans-serif" }}>Loading profile...</p>
@@ -283,7 +283,7 @@ export default function Profile() {
   // Error state for initial load failure
   if (error && !user) {
     return (
-      <div style={{ minHeight: '100vh', background: '#F5F4F0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ minHeight: '100vh', background: '#F3F1EF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div className="glass-card" style={{ padding: 32, maxWidth: 400 }}>
           <div style={{ textAlign: 'center' }}>
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -303,9 +303,9 @@ export default function Profile() {
   if (!user) return null;
 
   return (
-    <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 240, background: '#F5F4F0' }}>
+    <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 240, background: '#F3F1EF' }}>
       <DashboardSidebar activePage="Profile" user={user} />
-      <div style={{ position: 'relative', margin: '20px 12px 12px 0', borderRadius: 20, overflow: 'hidden', minHeight: 'calc(100vh - 32px)' }}>
+      <div style={{ position: 'relative', margin: '20px 12px 12px 0', borderRadius: 20, overflow: 'hidden', minHeight: 'calc(100vh - 32px)', boxShadow: '0 0 0 1px rgba(0,0,0,0.07), 0 4px 24px rgba(0,0,0,0.06)' }}>
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
           <div style={{
             position: 'absolute', top: 0, left: '-10%', width: '120%', height: '100%', zIndex: 0,
