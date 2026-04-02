@@ -470,13 +470,13 @@ export default function LoanAgreements() {
   /* ── Loading state ──────────────────────────────────────────── */
   if (isLoading || !user) {
     return (
-      <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 240, background: '#F3F1EF' }}>
+      <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 240, background: '#EDECE9' }}>
         <DashboardSidebar activePage="LoanAgreements" user={user} />
         <div style={{ position: 'relative', margin: '20px 12px 12px 0', borderRadius: 20, overflow: 'hidden', minHeight: 'calc(100vh - 32px)', boxShadow: '0 0 0 1px rgba(0,0,0,0.07), 0 4px 24px rgba(0,0,0,0.06)' }}>
           <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
             <div style={{
               position: 'absolute', top: 0, left: '-10%', width: '120%', height: '100%', zIndex: 0,
-              background: '#F7F5F2'
+              background: '#FAF9F7'
             }} />
           </div>
           <div style={{ position: 'relative', zIndex: 2, maxWidth: 1080, margin: '0 auto', padding: '0 28px' }}>
@@ -842,7 +842,7 @@ export default function LoanAgreements() {
         )}
       </AnimatePresence>
 
-      <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 240, background: '#F3F1EF' }}>
+      <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 240, background: '#EDECE9' }}>
         <DashboardSidebar activePage="LoanAgreements" user={user} />
 
         {/* Rounded content box */}
@@ -852,7 +852,7 @@ export default function LoanAgreements() {
           <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
             <div style={{
               position: 'absolute', top: 0, left: '-10%', width: '120%', height: '100%', zIndex: 0,
-              background: '#F7F5F2'
+              background: '#FAF9F7'
             }} />
           </div>
 
