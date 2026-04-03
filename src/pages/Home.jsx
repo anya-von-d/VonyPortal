@@ -821,19 +821,23 @@ export default function Home() {
                     <div>
                       {combinedPaymentEvents.slice(0, 5).map((event, idx) => {
                         const isOverdue = event.days < 0;
+                        const daysLabel = isOverdue ? `${Math.abs(event.days)}d late` : `${event.days}d`;
                         return (
                           <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: idx < Math.min(combinedPaymentEvents.length, 5) - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none' }}>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ fontSize: 13, fontWeight: 500, color: isOverdue ? '#E8726E' : '#1A1918' }}>
+                              <div style={{ fontSize: 10, fontWeight: 600, color: isOverdue ? '#E8726E' : '#787776', marginBottom: 3, letterSpacing: '0.02em' }}>
+                                {daysLabel}
+                              </div>
+                              <div style={{ fontSize: 13, fontWeight: 500, color: '#1A1918' }}>
                                 {event.isLender
                                   ? `${event.firstName} pays you${event.purpose ? ` for ${event.purpose}` : ''}`
                                   : `Pay ${event.firstName}${event.purpose ? ` for ${event.purpose}` : ''}`}
                               </div>
-                              <div style={{ fontSize: 11, color: isOverdue ? '#E8726E' : '#787776', marginTop: 2 }}>
-                                {format(event.date, 'MMM do')}{isOverdue ? ' · overdue' : ''}
+                              <div style={{ fontSize: 11, color: '#787776', marginTop: 2 }}>
+                                due {format(event.date, 'do MMM')}
                               </div>
                             </div>
-                            <div style={{ fontSize: 14, fontWeight: 600, flexShrink: 0, color: isOverdue ? '#E8726E' : event.isLender ? '#7C3AED' : '#2563EB' }}>
+                            <div style={{ fontSize: 14, fontWeight: 600, flexShrink: 0, color: '#1A1918' }}>
                               {event.isLender ? '+' : '-'}{formatMoney(event.remainingAmount)}
                             </div>
                           </div>
