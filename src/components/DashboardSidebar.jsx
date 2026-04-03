@@ -235,28 +235,6 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
 
   return (
     <>
-      {/* Desktop top bar — My Profile aligned to content right edge */}
-      <div className="home-sidebar" style={{
-        position: 'fixed', top: 0, left: 200, right: 0, height: 56,
-        background: 'white',
-        boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
-        zIndex: 58,
-        display: 'flex', alignItems: 'center',
-        fontFamily: "'DM Sans', sans-serif",
-      }}>
-        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px 0 14px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          {activePage === 'Dashboard' && (
-            <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: '#1A1918' }}>
-              {(() => { const h = new Date().getHours(); const g = h >= 5 && h < 12 ? 'Good morning' : h >= 12 && h < 18 ? 'Good afternoon' : 'Good night'; const fn = user?.full_name?.split(' ')[0] || ''; return <>{g}{fn ? `, ${fn}` : ''}</>; })()}
-            </span>
-          )}
-          {activePage !== 'Dashboard' && <span />}
-          <Link to={createPageUrl("Profile")} style={{ display: 'flex', alignItems: 'center', height: 32, padding: '0 12px', borderRadius: 6, background: '#DCF7FD', textDecoration: 'none', fontSize: 12, fontWeight: 600, color: ic, flexShrink: 0 }}>
-            My Profile
-          </Link>
-        </div>
-      </div>
-
       {/* ── Mobile top bar ── */}
       <div className="mobile-header" style={{
         display: 'none', /* shown via CSS at <=900px */
@@ -329,8 +307,8 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
         <nav style={{ flex: 1, padding: '4px 12px 8px', display: 'flex', flexDirection: 'column', gap: 2 }}>
           {navLinks}
         </nav>
-        {/* Settings footer */}
-        <div style={{ padding: '8px 12px 16px', borderTop: '1px solid rgba(0,0,0,0.06)', flexShrink: 0 }}>
+        {/* Settings + Profile footer */}
+        <div style={{ padding: '8px 12px 16px', borderTop: '1px solid rgba(0,0,0,0.06)', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
           <div ref={settingsRef} style={{ position: 'relative' }}>
             <button onClick={() => setSettingsOpen(!settingsOpen)} style={{ ...linkStyle('Settings'), width: '100%', border: 'none', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", textAlign: 'left', background: settingsOpen ? 'rgba(0,0,0,0.08)' : 'transparent' }}>
               {iconBox(<svg width="16" height="16" viewBox="0 0 24 24" fill={ic}><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>)}
@@ -338,6 +316,10 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
             </button>
             {settingsOpen && settingsDropdown}
           </div>
+          <Link to={createPageUrl("Profile")} style={linkStyle('Profile')}>
+            {iconBox(<svg width="16" height="16" viewBox="0 0 24 24" fill={ic}><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>)}
+            Profile
+          </Link>
         </div>
       </aside>
     </>
