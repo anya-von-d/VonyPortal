@@ -697,42 +697,6 @@ export default function Home() {
         </h1>
       </div>
 
-      {/* ── Hero alert (overdue) ── */}
-      <div style={{ background: 'transparent', position: 'relative', zIndex: 2 }}>
-
-        {/* Hero alert (overdue) — carousel if multiple */}
-        {overdueReminders.length > 0 && (
-          <div style={{ maxWidth: 1080, margin: '28px auto 0', padding: '0 28px' }}><div className="glass-hero-alert" style={{ overflow: 'hidden', position: 'relative' }}>
-            <div style={{ display: 'flex', transition: 'transform 0.45s cubic-bezier(0.4, 0, 0.2, 1)', transform: `translateX(-${alertSlide * 100}%)` }}>
-              {overdueReminders.map((item, i) => (
-                <div key={i} style={{ minWidth: '100%', padding: '14px 28px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#E8726E', flexShrink: 0 }} />
-                  <div style={{ flex: 1, fontSize: 13, color: '#787776', lineHeight: 1.5 }}>
-                    <strong style={{ color: '#1A1918', fontWeight: 600 }}>Just a reminder</strong> you have a payment to {item.firstName} that is overdue. If you've already paid, make sure to record the payment so it's up to date.
-                  </div>
-                  <Link to={createPageUrl("RecordPayment")} style={{
-                    padding: '7px 18px', borderRadius: 20, background: '#678AFB', color: 'white',
-                    fontSize: 12, fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap',
-                    fontFamily: "'DM Sans', sans-serif", transition: 'background 0.15s'
-                  }}>Record Payment</Link>
-                </div>
-              ))}
-            </div>
-            {alertTotal > 1 && (
-              <div style={{ display: 'flex', justifyContent: 'center', gap: 6, paddingBottom: 10 }}>
-                {overdueReminders.map((_, i) => (
-                  <button key={i} onClick={() => setAlertSlide(i)} style={{
-                    width: i === alertSlide ? 18 : 6, height: 6, borderRadius: i === alertSlide ? 8 : '50%',
-                    background: i === alertSlide ? '#678AFB' : 'rgba(0,0,0,0.12)',
-                    border: 'none', padding: 0, cursor: 'pointer',
-                    transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)'
-                  }} />
-                ))}
-              </div>
-            )}
-          </div></div>
-        )}
-      </div>
 
       {/* ── Main page content ── */}
       <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px 64px', position: 'relative', zIndex: 1 }}>
@@ -744,8 +708,40 @@ export default function Home() {
             {/* LEFT SECTION: sub-grid for left two columns */}
             <div style={{ display: 'grid', gridTemplateColumns: '0.75fr 1fr', gap: 20, alignItems: 'start' }}>
 
-            {/* Left column: Next Payment Due, Next Payment Incoming, Monthly Stats */}
+            {/* Left column: Inbox, Next Payment Due, Next Payment Incoming, Monthly Stats */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20, gridRow: '1 / 2' }}>
+              {/* Inbox */}
+              <div className="glass-card" style={{ overflow: 'hidden' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 0' }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Inbox</div>
+                  <Link to={createPageUrl("Requests")} style={{ fontSize: 12, fontWeight: 500, color: '#A79DEA', textDecoration: 'none' }}>View</Link>
+                </div>
+                <div style={{ padding: '12px 16px 14px', display: 'flex', alignItems: 'center', gap: 14 }}>
+                  {/* Bell icon with badge */}
+                  <div style={{ position: 'relative', flexShrink: 0 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 12, background: '#DCF7FD', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="#01ADE9">
+                        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                      </svg>
+                    </div>
+                    {notifCount > 0 && (
+                      <div style={{ position: 'absolute', top: -4, right: -4, background: '#E8726E', color: 'white', fontSize: 9, fontWeight: 700, minWidth: 16, height: 16, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px', lineHeight: 1 }}>
+                        {notifCount > 99 ? '99+' : notifCount}
+                      </div>
+                    )}
+                  </div>
+                  {/* Message */}
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>
+                      {notifCount > 0 ? `You have ${notifCount} new notification${notifCount === 1 ? '' : 's'}` : "You're all caught up"}
+                    </div>
+                    <div style={{ fontSize: 11, color: '#787776', marginTop: 2 }}>
+                      {notifCount > 0 ? 'Tap view to see what needs your attention' : 'No pending actions right now'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* Next payment due */}
               <div className="galaxy-border-card">
                 <div style={{ padding: '14px 16px 0' }}>
@@ -895,40 +891,8 @@ export default function Home() {
 
             </div>{/* end LEFT SECTION sub-grid */}
 
-            {/* Right column: Inbox + Loan Progress + Loans Over Time + Recent Activity */}
+            {/* Right column: Loan Progress + Loans Over Time + Recent Activity */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-
-              {/* Inbox */}
-              <div className="glass-card" style={{ overflow: 'hidden' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 0' }}>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Inbox</div>
-                  <Link to={createPageUrl("Requests")} style={{ fontSize: 12, fontWeight: 500, color: '#A79DEA', textDecoration: 'none' }}>View</Link>
-                </div>
-                <div style={{ padding: '12px 16px 14px', display: 'flex', alignItems: 'center', gap: 14 }}>
-                  {/* Bell icon with badge */}
-                  <div style={{ position: 'relative', flexShrink: 0 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 12, background: '#DCF7FD', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="#01ADE9">
-                        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
-                      </svg>
-                    </div>
-                    {notifCount > 0 && (
-                      <div style={{ position: 'absolute', top: -4, right: -4, background: '#E8726E', color: 'white', fontSize: 9, fontWeight: 700, minWidth: 16, height: 16, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px', lineHeight: 1 }}>
-                        {notifCount > 99 ? '99+' : notifCount}
-                      </div>
-                    )}
-                  </div>
-                  {/* Message */}
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>
-                      {notifCount > 0 ? `You have ${notifCount} new notification${notifCount === 1 ? '' : 's'}` : "You're all caught up"}
-                    </div>
-                    <div style={{ fontSize: 11, color: '#787776', marginTop: 2 }}>
-                      {notifCount > 0 ? 'Tap view to see what needs your attention' : 'No pending actions right now'}
-                    </div>
-                  </div>
-                </div>
-              </div>
 
               {/* Loan Progress */}
               <div className="glass-card" style={{ overflow: 'hidden' }}>
