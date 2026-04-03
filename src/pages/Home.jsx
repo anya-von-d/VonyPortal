@@ -676,8 +676,15 @@ export default function Home() {
 
       <DashboardSidebar activePage="Dashboard" user={user} />
 
+      {/* ── Title above content box ── */}
+      <div style={{ padding: '24px 20px 8px 20px' }}>
+        <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '2.8rem', fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', lineHeight: 1.1, margin: 0 }}>
+          {greeting}, <em style={{ fontStyle: 'italic', fontWeight: 600, color: '#678AFB' }}>{firstName}</em>
+        </h1>
+      </div>
+
       {/* ── Content box with galaxy background ── */}
-      <div className="content-box-glow" style={{ position: 'relative', margin: '20px 12px 12px 0', borderRadius: 24, minHeight: 'calc(100vh - 32px)', border: '12px solid rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', boxShadow: 'rgba(0,0,0,0.03) 0px 0.6px 2.3px -0.42px, rgba(0,0,0,0.04) 0px 2.3px 8.7px -0.83px, rgba(0,0,0,0.08) 0px 10px 38px -1.25px' }}>
+      <div className="content-box-glow" style={{ position: 'relative', margin: '8px 12px 12px 0', borderRadius: 24, minHeight: 'calc(100vh - 80px)', border: '12px solid rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', boxShadow: 'rgba(0,0,0,0.03) 0px 0.6px 2.3px -0.42px, rgba(0,0,0,0.04) 0px 2.3px 8.7px -0.83px, rgba(0,0,0,0.08) 0px 10px 38px -1.25px' }}>
 
         {/* Galaxy gradient background inside the box */}
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', bottom: 0, overflow: 'hidden', borderRadius: 12, zIndex: 0, pointerEvents: 'none' }}>
@@ -687,19 +694,12 @@ export default function Home() {
           }} />
         </div>
 
-      {/* ── Hero ── */}
+      {/* ── Hero alert (overdue) only ── */}
       <div style={{ background: 'transparent', position: 'relative', zIndex: 2 }}>
-        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '56px 28px 56px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', textAlign: 'center' }}>
-          <div>
-            <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.8rem', fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-              {greeting}, <em style={{ fontStyle: 'italic', fontWeight: 600, color: '#678AFB' }}>{firstName}</em>
-            </h1>
-          </div>
-        </div>
 
         {/* Hero alert (overdue) — carousel if multiple */}
         {overdueReminders.length > 0 && (
-          <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px' }}><div className="glass-hero-alert" style={{ overflow: 'hidden', position: 'relative' }}>
+          <div style={{ maxWidth: 1080, margin: '28px auto 0', padding: '0 28px' }}><div className="glass-hero-alert" style={{ overflow: 'hidden', position: 'relative' }}>
             <div style={{ display: 'flex', transition: 'transform 0.45s cubic-bezier(0.4, 0, 0.2, 1)', transform: `translateX(-${alertSlide * 100}%)` }}>
               {overdueReminders.map((item, i) => (
                 <div key={i} style={{ minWidth: '100%', padding: '14px 28px', display: 'flex', alignItems: 'center', gap: 12 }}>
