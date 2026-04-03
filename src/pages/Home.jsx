@@ -530,7 +530,12 @@ export default function Home() {
         const remaining = Math.max(0, totalAmount - effectivePaid);
         if (isFuture) {
           const currentRemaining = Math.max(0, totalAmount - (loan.amount_paid || 0));
-          if (isLender) owedToYou += currentRemaining; else youOwe += currentRemaining;
+          const monthsDiff = (monthDate.getFullYear() - curMonth.getFullYear()) * 12 + (monthDate.getMonth() - curMonth.getMonth());
+          const freq = loan.payment_frequency || 'monthly';
+          const paymentsPerMonth = freq === 'weekly' ? 4 : freq === 'bi-weekly' ? 2 : 1;
+          const expectedPaid = monthsDiff * (loan.payment_amount || 0) * paymentsPerMonth;
+          const predicted = Math.max(0, currentRemaining - expectedPaid);
+          if (isLender) owedToYou += predicted; else youOwe += predicted;
           return;
         }
         if (isLender) owedToYou += remaining; else youOwe += remaining;
@@ -706,14 +711,7 @@ export default function Home() {
               {/* Inbox / Notifications */}
               <div className="glass-card" style={{ overflow: 'hidden' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 0' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'rgba(37,99,235,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="#2563EB">
-                        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
-                      </svg>
-                    </div>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Inbox</span>
-                  </div>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Inbox</span>
                   {notifCount > 0 && (
                     <Link to={createPageUrl("Requests")} style={{ fontSize: 12, fontWeight: 500, color: '#2563EB', textDecoration: 'none' }}>View all</Link>
                   )}
@@ -721,40 +719,22 @@ export default function Home() {
                 <div style={{ padding: '10px 16px 12px' }}>
                   {notifCount === 0 ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(37,99,235,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="#2563EB">
+                      <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="#D97706">
                           <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
                         </svg>
                       </div>
                       <span style={{ fontSize: 13, color: '#787776' }}>You're all caught up</span>
                     </div>
                   ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      {paymentsToConfirm.length > 0 && (
-                        <Link to={createPageUrl("Requests")} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-                          <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(130,240,185,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#82F0B9" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-                          </div>
-                          <div style={{ fontSize: 13, color: '#1A1918', fontWeight: 500 }}>{paymentsToConfirm.length} payment{paymentsToConfirm.length > 1 ? 's' : ''} to confirm</div>
-                        </Link>
-                      )}
-                      {pendingOffers.length > 0 && (
-                        <Link to={createPageUrl("Requests")} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-                          <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(37,99,235,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                          </div>
-                          <div style={{ fontSize: 13, color: '#1A1918', fontWeight: 500 }}>{pendingOffers.length} loan offer{pendingOffers.length > 1 ? 's' : ''} pending</div>
-                        </Link>
-                      )}
-                      {friendRequestsInbox.length > 0 && (
-                        <Link to={createPageUrl("Requests")} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-                          <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(155,122,219,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9B7ADB" strokeWidth="2" strokeLinecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
-                          </div>
-                          <div style={{ fontSize: 13, color: '#1A1918', fontWeight: 500 }}>{friendRequestsInbox.length} friend request{friendRequestsInbox.length > 1 ? 's' : ''}</div>
-                        </Link>
-                      )}
-                    </div>
+                    <Link to={createPageUrl("Requests")} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+                      <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="#D97706">
+                          <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                        </svg>
+                      </div>
+                      <span style={{ fontSize: 13, color: '#1A1918', fontWeight: 500 }}>You have new notifications</span>
+                    </Link>
                   )}
                 </div>
               </div>
@@ -843,20 +823,17 @@ export default function Home() {
                         const isOverdue = event.days < 0;
                         return (
                           <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: idx < Math.min(combinedPaymentEvents.length, 5) - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none' }}>
-                            {/* My Loans circle for day countdown */}
-                            <div style={{ flexShrink: 0, width: 40, height: 40, borderRadius: '50%', background: isOverdue ? '#E8726E' : event.isLender ? '#7C3AED' : '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              <p style={{ fontSize: 10, fontWeight: 700, color: 'white', textAlign: 'center', lineHeight: 1.2, margin: 0 }}>
-                                {isOverdue ? `-${Math.abs(event.days)}` : event.days}
-                                <span style={{ display: 'block', fontSize: 7, fontWeight: 500 }}>{Math.abs(event.days) === 1 ? 'day' : 'days'}</span>
-                              </p>
-                            </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ fontSize: 13, fontWeight: 500, color: '#1A1918' }}>
-                                {event.isLender ? `${event.firstName} pays you` : `Pay ${event.firstName}`}
+                              <div style={{ fontSize: 13, fontWeight: 500, color: isOverdue ? '#E8726E' : '#1A1918' }}>
+                                {event.isLender
+                                  ? `${event.firstName} pays you${event.purpose ? ` for ${event.purpose}` : ''}`
+                                  : `Pay ${event.firstName}${event.purpose ? ` for ${event.purpose}` : ''}`}
                               </div>
-                              {event.purpose && <div style={{ fontSize: 11, color: '#787776', marginTop: 1 }}>{event.purpose}</div>}
+                              <div style={{ fontSize: 11, color: isOverdue ? '#E8726E' : '#787776', marginTop: 2 }}>
+                                {format(event.date, 'MMM do')}{isOverdue ? ' · overdue' : ''}
+                              </div>
                             </div>
-                            <div style={{ fontSize: 14, fontWeight: 600, flexShrink: 0, color: event.isLender ? '#7C3AED' : '#2563EB' }}>
+                            <div style={{ fontSize: 14, fontWeight: 600, flexShrink: 0, color: isOverdue ? '#E8726E' : event.isLender ? '#7C3AED' : '#2563EB' }}>
                               {event.isLender ? '+' : '-'}{formatMoney(event.remainingAmount)}
                             </div>
                           </div>

@@ -106,7 +106,7 @@ export default function DashboardSidebar({ activePage = "Dashboard", user, tabs,
       <div style={{ position: 'fixed', left: 0, top: 0, width: 200, height: '100vh', background: '#F1EADE', zIndex: 88 }} />
 
       {/* ══════ FLOATING TOP BAR ══════ */}
-      <div style={{ position: 'fixed', top: 12, left: 208, right: 0, paddingRight: 24, zIndex: 100, pointerEvents: 'none' }}>
+      <div style={{ position: 'fixed', top: 18, left: 208, right: 0, paddingRight: 24, zIndex: 100, pointerEvents: 'none' }}>
         <div style={{ maxWidth: 1080, margin: '0 auto', height: 52, pointerEvents: 'auto' }}>
           <div style={{
             width: '100%', height: '100%',
@@ -185,10 +185,17 @@ export default function DashboardSidebar({ activePage = "Dashboard", user, tabs,
         <div style={{ maxWidth: 1080, margin: '0 auto', paddingLeft: 40, display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 48, pointerEvents: 'auto' }}>
           <h1 style={{
             fontFamily: "'Cormorant Garamond', Georgia, serif",
-            fontSize: 34, fontWeight: 600, fontStyle: 'italic',
+            fontSize: 34, fontWeight: 600,
             color: '#1A1918', margin: 0, letterSpacing: '-0.01em', lineHeight: 1,
           }}>
-            {pageTitle}
+            {activePage === 'Dashboard' && firstName ? (
+              <>
+                <span style={{ fontStyle: 'normal' }}>{timeGreeting}, </span>
+                <span style={{ fontStyle: 'italic' }}>{firstName}</span>
+              </>
+            ) : (
+              <span style={{ fontStyle: 'italic' }}>{pageTitle}</span>
+            )}
           </h1>
           {tabs && tabs.length > 0 && onTabChange && (
             <div style={{ display: 'inline-flex', gap: 2, background: 'rgba(0,0,0,0.05)', borderRadius: 10, padding: 3 }}>
