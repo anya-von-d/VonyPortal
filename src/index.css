@@ -27,6 +27,10 @@ input[type="date"] {
 @layer base {
   html {
     scroll-behavior: smooth;
+    background-color: #F5F4F0;
+    background-image: url('/images/tile.jpeg');
+    background-repeat: repeat;
+    background-size: 50px 50px;
   }
 
   /* Scrollbar styling */
@@ -226,6 +230,11 @@ input[type="date"] {
   .upcoming-summary-grid {
     grid-template-columns: 1fr !important;
   }
+}
+
+/* Let html paper texture show through all page containers */
+.home-with-sidebar {
+  background: transparent !important;
 }
 
 /* Home + Dashboard pages responsive */
