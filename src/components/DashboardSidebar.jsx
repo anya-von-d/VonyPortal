@@ -239,7 +239,7 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
       {/* ══════ BLUE TOP BAR ══════ */}
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, height: TOP_BAR_H,
-        background: '#03ACEA', zIndex: 110,
+        background: '#03ACEA', zIndex: 70,
         display: 'flex', alignItems: 'center', padding: '0 28px',
       }}>
         <span style={{
@@ -250,7 +250,7 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
 
       {/* ══════ LEFT NAV SIDEBAR ══════ */}
       <nav ref={navRef} style={{
-        position: 'fixed', left: 0, top: TOP_BAR_H, bottom: 0, width: 200,
+        position: 'fixed', left: 0, top: 0, bottom: 0, width: 200,
         background: 'white', zIndex: 100,
         display: 'flex', flexDirection: 'column',
         fontFamily: "'DM Sans', sans-serif",
@@ -347,7 +347,7 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
 
       {/* ══════ RIGHT INFO SIDEBAR ══════ */}
       <aside style={{
-        position: 'fixed', right: 0, top: TOP_BAR_H, bottom: 0, width: 260,
+        position: 'fixed', right: 0, top: 0, bottom: 0, width: 260,
         background: 'white', zIndex: 80,
         display: 'flex', flexDirection: 'column',
         overflowY: 'auto', overflowX: 'hidden',

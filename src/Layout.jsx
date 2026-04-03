@@ -100,22 +100,6 @@ export default function Layout({ children }) {
 
   return (
     <div className="min-h-screen flex flex-col w-full safe-area-inset-top safe-area-inset-bottom" style={isDashboardStyle ? { background: '#F5F4F0' } : { background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))` }}>
-      {/* Gradient — vertical line on sidebar right edge */}
-      {isDashboardStyle && (
-        <div style={{
-          position: 'fixed', top: 0, left: 239, bottom: 0, width: 22,
-          background: 'linear-gradient(to right, #03ACEA 0%, #03ACEA 1px, rgba(245,244,240,0) 22px)',
-          pointerEvents: 'none', zIndex: 57,
-        }} />
-      )}
-      {/* Gradient — horizontal line below white top bar */}
-      {isDashboardStyle && (
-        <div style={{
-          position: 'fixed', top: 52, left: 240, right: 0, height: 22,
-          background: 'linear-gradient(to bottom, #03ACEA 0%, #03ACEA 1px, rgba(245,244,240,0) 22px)',
-          pointerEvents: 'none', zIndex: 57,
-        }} />
-      )}
 
       {/* TopNav handles its own fixed positioning and mobile menu — hidden on dashboard-style pages */}
       {user && !isDashboardStyle && <TopNav location={location} />}
