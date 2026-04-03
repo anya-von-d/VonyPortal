@@ -57,7 +57,7 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
   const [notifCount, setNotifCount] = useState(0);
   const [upcomingPayments, setUpcomingPayments] = useState([]);
   const [notifications, setNotifications] = useState([]);
-  const [friends, setFriends] = useState([]);
+  const [pendingItems, setPendingItems] = useState([]);
 
   /* Nav dropdown state: null | 'loans' | 'upcoming' | 'more' */
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -65,7 +65,7 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
   /* Sidebar accordion state */
   const [notifOpen, setNotifOpen] = useState(false);
   const [upcomingOpen, setUpcomingOpen] = useState(true);
-  const [friendsOpen, setFriendsOpen] = useState(true);
+  const [pendingOpen, setPendingOpen] = useState(true);
 
   const dropdownWrapRef = useRef(null);
 
@@ -110,6 +110,35 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
       setNotifCount(notifItems.length);
       setNotifications(notifItems.slice(0, 5));
 
+      /* ── Pending (actionable) ── */
+      const pending = [
+        ...paymentsToConfirm.map(p => ({
+          id: p.id, type: 'payment',
+          label: 'Payment confirmation',
+          sub: `$${(p.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+          actionLabel: 'View & Confirm',
+        })),
+        ...offersReceived.map(l => ({
+          id: l.id, type: 'offer',
+          label: 'Loan offer received',
+          sub: `$${(l.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+          actionLabel: 'View Offer',
+        })),
+        ...termChanges.map(l => ({
+          id: l.id, type: 'term',
+          label: 'Loan term change',
+          sub: 'Approval needed',
+          actionLabel: 'Review',
+        })),
+        ...friendRequests.map(f => ({
+          id: f.id, type: 'friend',
+          label: 'Friend request',
+          sub: getName(f.user_id),
+          actionLabel: 'Confirm',
+        })),
+      ];
+      setPendingItems(pending.slice(0, 8));
+
       /* ── Upcoming ── */
       const upcoming = userLoans
         .filter(l => l.status === 'active' && l.next_payment_date && new Date(l.next_payment_date) >= today)
@@ -123,18 +152,6 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
           isLender: l.lender_id === user.id,
         }));
       setUpcomingPayments(upcoming);
-
-      /* ── Friends ── */
-      const accepted = friendships.filter(f =>
-        f.status === 'accepted' && (f.user_id === user.id || f.friend_id === user.id)
-      );
-      const friendProfiles = accepted
-        .map(f => {
-          const otherId = f.user_id === user.id ? f.friend_id : f.user_id;
-          return profiles.find(p => p.user_id === otherId);
-        })
-        .filter(Boolean);
-      setFriends(friendProfiles);
 
     } catch (e) {
       console.error("Sidebar data error:", e);
@@ -368,64 +385,44 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
       }}>
 
         {/* ── Sidebar Header ── */}
-        <div style={{ padding: '16px 14px 14px', borderBottom: '1px solid rgba(0,0,0,0.05)', flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+        <div style={{ padding: '20px 16px 16px', borderBottom: '1px solid rgba(0,0,0,0.05)', flexShrink: 0 }}>
 
-            {/* Profile photo (left) */}
+          {/* Row 1: profile photo + first name */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 11, marginBottom: 12 }}>
             <div style={{
-              width: 38, height: 38, borderRadius: '50%', background: '#1A1918',
+              width: 44, height: 44, borderRadius: '50%', background: '#1A1918',
               flexShrink: 0, overflow: 'hidden',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
               {user?.profile_picture_url
                 ? <img src={user.profile_picture_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                : <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 700, color: 'white' }}>{avatarInitial}</span>
+                : <span style={{ fontSize: 16, fontWeight: 700, color: 'white' }}>{avatarInitial}</span>
               }
             </div>
-
-            {/* Greeting text */}
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: 10, color: '#9B9A98', margin: 0, lineHeight: 1.2 }}>{greeting},</p>
-              <p style={{
-                fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0, lineHeight: 1.3,
-                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-              }}>
-                {firstName || 'there'}
-              </p>
-            </div>
-
-            {/* Notifications bell */}
-            <Link to={createPageUrl("Requests")} style={{
-              position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              width: 30, height: 30, borderRadius: 8, textDecoration: 'none', flexShrink: 0,
-              background: active('Requests') ? 'rgba(0,0,0,0.07)' : 'rgba(0,0,0,0.03)',
+            <p style={{
+              fontSize: 15, fontWeight: 700, color: '#1A1918', margin: 0,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill={active('Requests') ? '#1A1918' : '#787776'}>
-                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
-              </svg>
-              {notifCount > 0 && (
-                <div style={{
-                  position: 'absolute', top: -2, right: -2,
-                  background: '#E8726E', color: 'white',
-                  fontSize: 8, fontWeight: 700, minWidth: 13, height: 13, borderRadius: 7,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 2px',
-                }}>{notifCount > 99 ? '99+' : notifCount}</div>
-              )}
-            </Link>
-
-            {/* Profile avatar button */}
-            <Link to={createPageUrl("Profile")} style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              width: 30, height: 30, borderRadius: '50%', background: '#1A1918',
-              textDecoration: 'none', flexShrink: 0, overflow: 'hidden',
-              outline: active('Profile') ? '2px solid #82F0B9' : 'none', outlineOffset: 2,
-            }}>
-              {user?.profile_picture_url
-                ? <img src={user.profile_picture_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                : <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, fontWeight: 700, color: 'white' }}>{avatarInitial}</span>
-              }
-            </Link>
+              {firstName || 'there'}
+            </p>
           </div>
+
+          {/* Row 2: My Profile button */}
+          <Link to={createPageUrl("Profile")} style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            width: '100%', padding: '7px 12px', borderRadius: 10,
+            background: active('Profile') ? '#1A1918' : 'rgba(0,0,0,0.05)',
+            textDecoration: 'none',
+            fontSize: 12, fontWeight: 600,
+            color: active('Profile') ? 'white' : '#1A1918',
+            transition: 'background 0.15s',
+            boxSizing: 'border-box',
+          }}
+          onMouseEnter={e => { if (!active('Profile')) e.currentTarget.style.background = 'rgba(0,0,0,0.09)'; }}
+          onMouseLeave={e => { if (!active('Profile')) e.currentTarget.style.background = 'rgba(0,0,0,0.05)'; }}
+          >
+            My Profile
+          </Link>
         </div>
 
         {/* ── Notifications accordion ── */}
@@ -436,7 +433,7 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
           badge={notifCount}
         >
           {notifications.length === 0
-            ? <p style={{ fontSize: 12, color: '#C7C6C4', margin: 0, padding: '2px 4px' }}>No pending notifications</p>
+            ? <p style={{ fontSize: 12, color: '#C7C6C4', margin: 0, padding: '2px 4px' }}>No new notifications</p>
             : (
               <>
                 {notifications.map((n, i) => (
@@ -496,11 +493,9 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
                   </svg>
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                    <p style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', margin: 0 }}>
-                      ${p.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </p>
-                  </div>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', margin: 0 }}>
+                    ${p.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
                   <p style={{ fontSize: 11, color: '#787776', margin: '1px 0 0' }}>
                     {p.isLender ? `From ${p.name}` : `To ${p.name}`}
                   </p>
@@ -515,50 +510,72 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
           }
         </AccordionSection>
 
-        {/* ── Friends accordion ── */}
+        {/* ── Pending accordion ── */}
         <AccordionSection
-          title="Friends"
-          open={friendsOpen}
-          onToggle={() => setFriendsOpen(v => !v)}
-          badge={0}
+          title="Pending"
+          open={pendingOpen}
+          onToggle={() => setPendingOpen(v => !v)}
+          badge={pendingItems.length}
         >
-          {friends.length === 0
-            ? <p style={{ fontSize: 12, color: '#C7C6C4', margin: 0, padding: '2px 4px' }}>No friends added yet</p>
-            : friends.map((friend, i) => {
-              const initial = (friend.full_name || 'U').charAt(0).toUpperCase();
-              return (
-                <Link
-                  key={friend.user_id || i}
-                  to={createPageUrl("Friends")}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    padding: '6px 6px', borderRadius: 10, marginBottom: 3,
-                    textDecoration: 'none', transition: 'background 0.12s',
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.03)'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                >
-                  <div style={{
-                    width: 28, height: 28, borderRadius: '50%', background: '#1A1918',
-                    flexShrink: 0, overflow: 'hidden',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    {friend.profile_picture_url
-                      ? <img src={friend.profile_picture_url} alt={friend.full_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      : <span style={{ fontSize: 11, fontWeight: 700, color: 'white' }}>{initial}</span>
-                    }
-                  </div>
-                  <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {friend.full_name}
-                  </span>
-                </Link>
-              );
-            })
+          {pendingItems.length === 0
+            ? <p style={{ fontSize: 12, color: '#C7C6C4', margin: 0, padding: '2px 4px' }}>Nothing pending right now</p>
+            : pendingItems.map((item, i) => (
+              <div key={item.id || i} style={{
+                borderRadius: 10, marginBottom: 6,
+                background: 'rgba(0,0,0,0.02)',
+                border: '1px solid rgba(0,0,0,0.06)',
+                overflow: 'hidden',
+              }}>
+                {/* Item info */}
+                <div style={{ padding: '8px 10px 6px' }}>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', margin: 0, lineHeight: 1.3 }}>{item.label}</p>
+                  {item.sub && (
+                    <p style={{ fontSize: 11, color: '#787776', margin: '2px 0 0' }}>{item.sub}</p>
+                  )}
+                </div>
+                {/* Action row */}
+                <div style={{ display: 'flex', gap: 0 }}>
+                  {/* View / Confirm button */}
+                  <Link
+                    to={createPageUrl("Requests")}
+                    style={{
+                      flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      padding: '7px 8px',
+                      background: 'rgba(3,172,234,0.08)',
+                      borderTop: '1px solid rgba(3,172,234,0.14)',
+                      textDecoration: 'none',
+                      fontSize: 11, fontWeight: 600, color: '#03ACEA',
+                      transition: 'background 0.12s',
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(3,172,234,0.15)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'rgba(3,172,234,0.08)'}
+                  >
+                    {item.actionLabel}
+                  </Link>
+                  {/* Reject / X button */}
+                  <Link
+                    to={createPageUrl("Requests")}
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      width: 36,
+                      background: '#E8726E',
+                      borderTop: '1px solid rgba(232,114,110,0.6)',
+                      textDecoration: 'none',
+                      transition: 'background 0.12s',
+                      flexShrink: 0,
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#d45f5b'}
+                    onMouseLeave={e => e.currentTarget.style.background = '#E8726E'}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+                      <line x1="18" y1="6" x2="6" y2="18"/>
+                      <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  </Link>
+                </div>
+              </div>
+            ))
           }
-          <Link to={createPageUrl("Friends")} style={{
-            display: 'block', fontSize: 11, color: '#03ACEA',
-            textDecoration: 'none', fontWeight: 600, padding: '4px 6px', marginTop: 2,
-          }}>See all friends →</Link>
         </AccordionSection>
       </aside>
     </>
