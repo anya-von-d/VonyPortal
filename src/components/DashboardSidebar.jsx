@@ -5,58 +5,34 @@ import { Loan, Payment, Friendship, PublicProfile } from "@/entities/all";
 import { useAuth } from "@/lib/AuthContext";
 import { format, differenceInDays } from "date-fns";
 
-/* ── Accordion — no border lines ───────────────────────────── */
-function AccordionSection({ title, open, onToggle, badge, children }) {
+/* ── Timeline section — title + thin line ─────────────────── */
+function TimelineSection({ title, children }) {
   return (
-    <div style={{ marginBottom: 4 }}>
-      <button
-        onClick={onToggle}
-        style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          width: '100%', padding: '10px 16px 6px', border: 'none', background: 'transparent',
-          cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-          fontSize: 11, fontWeight: 600, color: '#9B9A98',
-          letterSpacing: '0.07em', textTransform: 'uppercase',
-        }}
-      >
-        <span style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-          {title}
-        </span>
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#C7C6C4"
-          strokeWidth="2.5" strokeLinecap="round"
-          style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }}>
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
-      </button>
-      {open && (
-        <div style={{ padding: '2px 16px 14px' }}>
-          {children}
-        </div>
-      )}
+    <div style={{ padding: '14px 20px 16px' }}>
+      <div style={{ fontSize: 10, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif", marginBottom: 8 }}>
+        {title}
+      </div>
+      <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 14 }} />
+      {children}
     </div>
   );
 }
 
-/* ── Mini avatar ─────────────────────────────────────────────── */
-function MiniAvatar({ photoUrl, name, size = 26 }) {
-  const initial = (name || 'U').charAt(0).toUpperCase();
+/* ── Tiny icon square ────────────────────────────────────────── */
+function TinyIcon({ color, children }) {
   return (
     <div style={{
-      width: size, height: size, borderRadius: '50%', background: '#03ACEA',
-      flexShrink: 0, overflow: 'hidden',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      width: 16, height: 16, borderRadius: 4, background: color,
+      flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1,
     }}>
-      {photoUrl
-        ? <img src={photoUrl} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        : <span style={{ fontSize: size * 0.42, fontWeight: 600, color: 'white' }}>{initial}</span>
-      }
+      {children}
     </div>
   );
 }
 
 /* ── Shared text styles ──────────────────────────────────────── */
-const itemText = { fontSize: 12, fontWeight: 500, color: '#1A1918', margin: 0, lineHeight: 1.4 };
-const itemSub  = { fontSize: 10, fontWeight: 400, color: '#9B9A98', margin: '2px 0 0', lineHeight: 1.3 };
+const itemText = { fontSize: 12.5, fontWeight: 500, color: '#1A1918', margin: 0, lineHeight: 1.45 };
+const itemSub  = { fontSize: 9.5, fontWeight: 500, color: '#9B9A98', margin: '3px 0 0', lineHeight: 1.2, textTransform: 'uppercase', letterSpacing: '0.02em' };
 
 /* ── Main component ──────────────────────────────────────────── */
 export default function DashboardSidebar({ activePage = "Dashboard", user }) {
@@ -67,14 +43,9 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
   const [notifCount, setNotifCount]     = useState(0);
   const [notifications, setNotifications] = useState([]);
   const [upcomingPayments, setUpcomingPayments] = useState([]);
-  const [friends, setFriends]           = useState([]);
   const [pendingItems, setPendingItems]  = useState([]);
 
   const [openDropdown, setOpenDropdown] = useState(null);
-  const [notifOpen, setNotifOpen]       = useState(true);
-  const [upcomingOpen, setUpcomingOpen] = useState(true);
-  const [friendsOpen, setFriendsOpen]   = useState(true);
-  const [pendingOpen, setPendingOpen]   = useState(true);
 
   const dropdownWrapRef = useRef(null);
 
@@ -109,24 +80,20 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
 
       const notifItems = [
         ...offersReceived.map(l => ({
-          id: l.id, date: l.created_at,
+          id: l.id, date: l.created_at, type: 'loan_offer',
           text: `${getName(l.lender_id)} sent you a loan offer`,
-          senderPhoto: getPhoto(l.lender_id), senderName: getName(l.lender_id),
         })),
         ...paymentsToConfirm.map(p => ({
-          id: p.id, date: p.created_at,
+          id: p.id, date: p.created_at, type: 'payment',
           text: `Confirm payment from ${getName(p.recorded_by)}`,
-          senderPhoto: getPhoto(p.recorded_by), senderName: getName(p.recorded_by),
         })),
         ...friendRequests.map(f => ({
-          id: f.id, date: f.created_at,
+          id: f.id, date: f.created_at, type: 'friend',
           text: `${getName(f.user_id)} sent you a friend request`,
-          senderPhoto: getPhoto(f.user_id), senderName: getName(f.user_id),
         })),
         ...termChanges.map(l => ({
-          id: l.id, date: l.updated_at,
+          id: l.id, date: l.updated_at, type: 'term_change',
           text: `${getName(l.lender_id)} updated loan terms`,
-          senderPhoto: getPhoto(l.lender_id), senderName: getName(l.lender_id),
         })),
       ];
       setNotifCount(notifItems.length);
@@ -149,19 +116,6 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
         });
       setUpcomingPayments(upcoming);
 
-      /* ── Friends ── */
-      const accepted = friendships.filter(f =>
-        f.status === 'accepted' && (f.user_id === user.id || f.friend_id === user.id)
-      );
-      setFriends(
-        accepted
-          .map(f => {
-            const otherId = f.user_id === user.id ? f.friend_id : f.user_id;
-            return profiles.find(p => p.user_id === otherId);
-          })
-          .filter(Boolean)
-      );
-
       /* ── Pending (waiting for others) ── */
       const myRecordedPending = payments.filter(p =>
         p.recorded_by === user.id && p.status === 'pending_confirmation'
@@ -173,17 +127,13 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
           const loan    = userLoans.find(l => l.id === p.loan_id);
           const otherId = loan ? (loan.lender_id === user.id ? loan.borrower_id : loan.lender_id) : null;
           return {
-            id: p.id, date: p.created_at,
+            id: p.id, date: p.created_at, type: 'payment',
             text: `Waiting for ${otherId ? getName(otherId) : 'them'} to confirm payment`,
-            senderPhoto: otherId ? getPhoto(otherId) : null,
-            senderName:  otherId ? getName(otherId) : null,
           };
         }),
         ...myOffersOut.map(l => ({
-          id: l.id, date: l.created_at,
+          id: l.id, date: l.created_at, type: 'loan_offer',
           text: `Waiting for ${getName(l.borrower_id)} to confirm loan offer`,
-          senderPhoto: getPhoto(l.borrower_id),
-          senderName:  getName(l.borrower_id),
         })),
       ].slice(0, 8));
 
@@ -255,7 +205,18 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
     >{label}</Link>
   );
 
-  const fmtDate = (d) => { try { return format(new Date(d), 'MMM d'); } catch { return ''; } };
+  const fmtDate = (d) => { try { return format(new Date(d), 'MMM d, yyyy').toUpperCase(); } catch { return ''; } };
+
+  /* ── Icon color + SVG per notification type ── */
+  const notifIcon = (type) => {
+    switch (type) {
+      case 'loan_offer': return { color: '#E8956E', svg: <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> };
+      case 'payment': return { color: '#9B7FDB', svg: <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> };
+      case 'friend': return { color: '#82F0B9', svg: <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> };
+      case 'term_change': return { color: '#03ACEA', svg: <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> };
+      default: return { color: '#9B9A98', svg: <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> };
+    }
+  };
 
   return (
     <>
@@ -418,52 +379,51 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
         </div>
 
         {/* ── Notifications ── */}
-        <AccordionSection title="Notifications" open={notifOpen} onToggle={() => setNotifOpen(v => !v)} badge={0}>
+        <TimelineSection title="Notifications">
           {notifications.length === 0
             ? <p style={{ ...itemText, color: '#C7C6C4' }}>No new notifications</p>
             : <>
-                {notifications.map((n, i) => (
-                  <Link key={n.id || i} to={createPageUrl("Requests")} style={{
-                    display: 'flex', alignItems: 'flex-start', gap: 9,
-                    textDecoration: 'none',
-                    marginBottom: i < notifications.length - 1 ? 10 : 0,
-                  }}>
-                    <MiniAvatar photoUrl={n.senderPhoto} name={n.senderName} size={24} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={itemText}>{n.text}</p>
-                      {n.date && <p style={itemSub}>{fmtDate(n.date)}</p>}
-                    </div>
-                  </Link>
-                ))}
+                {notifications.map((n, i) => {
+                  const icon = notifIcon(n.type);
+                  return (
+                    <Link key={n.id || i} to={createPageUrl("Requests")} style={{
+                      display: 'flex', alignItems: 'flex-start', gap: 10,
+                      textDecoration: 'none',
+                      marginBottom: i < notifications.length - 1 ? 16 : 0,
+                    }}>
+                      <TinyIcon color={icon.color}>{icon.svg}</TinyIcon>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={itemText}>{n.text}</p>
+                        {n.date && <p style={itemSub}>{fmtDate(n.date)}</p>}
+                      </div>
+                    </Link>
+                  );
+                })}
                 {notifCount > 0 && (
-                  <Link to={createPageUrl("Requests")} style={{ fontSize: 10, color: '#03ACEA', textDecoration: 'none', fontWeight: 600, display: 'block', marginTop: 8 }}>See all</Link>
+                  <Link to={createPageUrl("Requests")} style={{ fontSize: 10, color: '#03ACEA', textDecoration: 'none', fontWeight: 600, display: 'block', marginTop: 10 }}>See all</Link>
                 )}
               </>
           }
-        </AccordionSection>
+        </TimelineSection>
 
         {/* ── Upcoming ── */}
-        <AccordionSection title="Upcoming" open={upcomingOpen} onToggle={() => setUpcomingOpen(v => !v)} badge={upcomingPayments.length}>
+        <TimelineSection title="Upcoming">
           {upcomingPayments.length === 0
             ? <p style={{ ...itemText, color: '#C7C6C4' }}>No upcoming payments</p>
             : upcomingPayments.map((p, i) => {
-              const overdue   = p.daysLeft < 0;
-              const soon      = !overdue && p.daysLeft <= 3;
-              const daysColor = overdue ? '#E8726E' : soon ? '#F5A623' : '#2DBD75';
+              const overdue = p.daysLeft < 0;
+              const soon    = !overdue && p.daysLeft <= 3;
+              const iconColor = overdue ? '#E8726E' : soon ? '#F5A623' : '#2DBD75';
               return (
                 <div key={p.id} style={{
                   display: 'flex', alignItems: 'flex-start', gap: 10,
-                  marginBottom: i < upcomingPayments.length - 1 ? 5 : 0,
+                  marginBottom: i < upcomingPayments.length - 1 ? 16 : 0,
                 }}>
-                  {/* Days remaining — no + sign, negative when overdue */}
-                  <div style={{ minWidth: 28, textAlign: 'center', flexShrink: 0, paddingTop: 1 }}>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: daysColor, fontFamily: "'IBM Plex Mono', monospace", display: 'block' }}>
-                      {p.daysLeft}
-                    </span>
-                    <span style={{ fontSize: 9, color: '#C7C6C4', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
-                      {Math.abs(p.daysLeft) === 1 ? 'day' : 'days'}
-                    </span>
-                  </div>
+                  <TinyIcon color={iconColor}>
+                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                  </TinyIcon>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={itemText}>
                       {p.isLender ? `${p.name} pays you $${p.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : `Pay ${p.name} $${p.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
@@ -474,69 +434,33 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
               );
             })
           }
-        </AccordionSection>
-
-        {/* ── Friends ── */}
-        <AccordionSection title="Friends" open={friendsOpen} onToggle={() => setFriendsOpen(v => !v)} badge={0}>
-          {friends.length === 0
-            ? <p style={{ ...itemText, color: '#C7C6C4', marginBottom: 10 }}>No friends added yet</p>
-            : (
-              <div style={{ marginBottom: 10 }}>
-                {friends.map((friend, i) => (
-                  <div key={friend.user_id || i} style={{
-                    display: 'flex', alignItems: 'center', gap: 9,
-                    marginBottom: i < friends.length - 1 ? 12 : 0,
-                  }}>
-                    <MiniAvatar photoUrl={friend.profile_picture_url} name={friend.full_name} size={22} />
-                    <span style={itemText}>{friend.full_name}</span>
-                  </div>
-                ))}
-              </div>
-            )
-          }
-
-          <div style={{ display: 'flex', gap: 5, marginTop: friends.length ? 0 : 4 }}>
-            <Link to={createPageUrl("Friends")} style={{
-              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              padding: '4px 5px', borderRadius: 7, textDecoration: 'none',
-              background: 'rgba(3,172,234,0.08)', border: '1px solid rgba(3,172,234,0.14)',
-              fontSize: 10, fontWeight: 600, color: '#03ACEA', transition: 'background 0.12s',
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = 'rgba(3,172,234,0.14)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'rgba(3,172,234,0.08)'}
-            >Find More Friends</Link>
-            <button style={{
-              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              padding: '4px 5px', borderRadius: 7, border: '1px solid rgba(0,0,0,0.08)',
-              background: 'rgba(0,0,0,0.03)', cursor: 'pointer',
-              fontSize: 10, fontWeight: 600, color: '#5C5B5A',
-              fontFamily: "'DM Sans', sans-serif", transition: 'background 0.12s',
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.07)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.03)'}
-            >Invite Friends</button>
-          </div>
-        </AccordionSection>
+        </TimelineSection>
 
         {/* ── Pending ── */}
-        <AccordionSection title="Pending" open={pendingOpen} onToggle={() => setPendingOpen(v => !v)} badge={pendingItems.length}>
+        <TimelineSection title="Pending">
           {pendingItems.length === 0
             ? <p style={{ ...itemText, color: '#C7C6C4' }}>Nothing pending right now</p>
-            : pendingItems.map((item, i) => (
-              <div key={item.id || i} style={{
-                display: 'flex', alignItems: 'flex-start', gap: 9,
-                marginBottom: i < pendingItems.length - 1 ? 12 : 0,
-              }}>
-                {/* Person waiting on — photo LEFT */}
-                <MiniAvatar photoUrl={item.senderPhoto} name={item.senderName} size={26} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={itemText}>{item.text}</p>
-                  {item.date && <p style={itemSub}>{fmtDate(item.date)}</p>}
+            : pendingItems.map((item, i) => {
+              const icon = notifIcon(item.type);
+              return (
+                <div key={item.id || i} style={{
+                  display: 'flex', alignItems: 'flex-start', gap: 10,
+                  marginBottom: i < pendingItems.length - 1 ? 16 : 0,
+                }}>
+                  <TinyIcon color={'#9B9A98'}>
+                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+                      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                  </TinyIcon>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={itemText}>{item.text}</p>
+                    {item.date && <p style={itemSub}>{fmtDate(item.date)}</p>}
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           }
-        </AccordionSection>
+        </TimelineSection>
 
       </aside>
     </>
