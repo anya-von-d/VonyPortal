@@ -686,7 +686,7 @@ export default function Home() {
   overdueCountRef.current = alertTotal;
 
   return (
-    <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 208, paddingRight: 268, paddingTop: 68, background: '#F5F4F0' }}>
+    <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 208, paddingRight: 24, paddingTop: 76, background: '#F5F4F0' }}>
 
       <DashboardSidebar activePage="Dashboard" user={user} />
 
@@ -700,8 +700,51 @@ export default function Home() {
             {/* LEFT SECTION: sub-grid for left two columns */}
             <div style={{ display: 'grid', gridTemplateColumns: '0.75fr 1fr', gap: 20, alignItems: 'start' }}>
 
-            {/* Left column: Inbox, Next Payment Due, Next Payment Incoming, Monthly Stats */}
+            {/* Left column: Inbox, Next Payment Due, Next Payment Incoming */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20, gridRow: '1 / 2' }}>
+
+              {/* Inbox / Notifications */}
+              <div className="glass-card" style={{ overflow: 'hidden' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 0' }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Inbox</div>
+                  {notifCount > 0 && (
+                    <Link to={createPageUrl("Requests")} style={{ fontSize: 12, fontWeight: 500, color: '#03ACEA', textDecoration: 'none' }}>View all</Link>
+                  )}
+                </div>
+                <div style={{ padding: '10px 16px 12px' }}>
+                  {notifCount === 0 ? (
+                    <div style={{ fontSize: 13, color: '#787776' }}>You're all caught up</div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {paymentsToConfirm.length > 0 && (
+                        <Link to={createPageUrl("Requests")} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+                          <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(130,240,185,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#82F0B9" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                          </div>
+                          <div style={{ fontSize: 13, color: '#1A1918', fontWeight: 500 }}>{paymentsToConfirm.length} payment{paymentsToConfirm.length > 1 ? 's' : ''} to confirm</div>
+                        </Link>
+                      )}
+                      {pendingOffers.length > 0 && (
+                        <Link to={createPageUrl("Requests")} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+                          <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(3,172,234,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                          </div>
+                          <div style={{ fontSize: 13, color: '#1A1918', fontWeight: 500 }}>{pendingOffers.length} loan offer{pendingOffers.length > 1 ? 's' : ''} pending</div>
+                        </Link>
+                      )}
+                      {friendRequestsInbox.length > 0 && (
+                        <Link to={createPageUrl("Requests")} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+                          <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(155,122,219,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9B7ADB" strokeWidth="2" strokeLinecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                          </div>
+                          <div style={{ fontSize: 13, color: '#1A1918', fontWeight: 500 }}>{friendRequestsInbox.length} friend request{friendRequestsInbox.length > 1 ? 's' : ''}</div>
+                        </Link>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Next payment due */}
               <div className="galaxy-border-card">
                 <div style={{ padding: '14px 16px 0' }}>
@@ -744,33 +787,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* How [Month] is going — moved from right column */}
-              <div className="glass-card" style={{ overflow: 'hidden' }}>
-                <div style={{ padding: '14px 16px 0' }}>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>How {format(today, 'MMMM')} is going</div>
-                </div>
-                <div style={{ padding: '10px 16px 14px' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
-                    <div style={{ textAlign: 'center', padding: '0 12px' }}>
-                      <div style={{ fontSize: 11, color: '#787776', marginBottom: 4 }}>Received</div>
-                      <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em', color: '#82F0B9' }}>{formatMoney(monthlyReceived)}</div>
-                      <div style={{ width: '100%', height: 4, borderRadius: 2, marginTop: 8, background: 'rgba(130,240,185,0.15)' }}>
-                        <div style={{ height: '100%', borderRadius: 2, background: '#82F0B9', width: `${monthlyExpectedReceive > 0 ? Math.min((monthlyReceived / monthlyExpectedReceive) * 100, 100) : 0}%`, transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }} />
-                      </div>
-                      <div style={{ fontSize: 10, color: '#787776', marginTop: 4 }}>{formatMoney(monthlyReceived)} of {formatMoney(monthlyExpectedReceive)} received</div>
-                    </div>
-                    <div style={{ textAlign: 'center', padding: '0 12px' }}>
-                      <div style={{ fontSize: 11, color: '#787776', marginBottom: 4 }}>Paid out</div>
-                      <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em', color: '#03ACEA' }}>{formatMoney(monthlyPaidOut)}</div>
-                      <div style={{ width: '100%', height: 4, borderRadius: 2, marginTop: 8, background: 'rgba(3,172,234,0.15)' }}>
-                        <div style={{ height: '100%', borderRadius: 2, background: '#03ACEA', width: `${monthlyExpectedPay > 0 ? Math.min((monthlyPaidOut / monthlyExpectedPay) * 100, 100) : 0}%`, transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }} />
-                      </div>
-                      <div style={{ fontSize: 10, color: '#787776', marginTop: 4 }}>{formatMoney(monthlyPaidOut)} of {formatMoney(monthlyExpectedPay)} paid out</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
             </div>
 
             {/* Upcoming Payments */}
@@ -809,41 +825,29 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* 7-day calendar */}
+              {/* How [Month] is going */}
               <div className="glass-card" style={{ overflow: 'hidden' }}>
                 <div style={{ padding: '14px 16px 0' }}>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>This week</div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>How {format(today, 'MMMM')} is going</div>
                 </div>
                 <div style={{ padding: '10px 16px 14px' }}>
-                  <div style={{ display: 'flex', gap: 4, justifyContent: 'space-between' }}>
-                    {Array.from({ length: 7 }, (_, i) => {
-                      const day = addDays(today, i);
-                      const dayPayments = combinedPaymentEvents.filter(e => isSameDay(e.date, day));
-                      const isToday = i === 0;
-                      const hasPayment = dayPayments.length > 0;
-                      const isLenderDay = hasPayment && dayPayments[0].isLender;
-                      return (
-                        <div key={i} style={{ flex: 1, textAlign: 'center' }}>
-                          <div style={{ fontSize: 9, fontWeight: 500, color: '#9B9A98', textTransform: 'uppercase', marginBottom: 4 }}>
-                            {format(day, 'EEE').charAt(0)}
-                          </div>
-                          <div style={{
-                            width: '100%', paddingBottom: '100%', position: 'relative',
-                            borderRadius: 8,
-                            background: isToday ? '#1A1918' : hasPayment ? (isLenderDay ? 'rgba(130,240,185,0.18)' : 'rgba(3,172,234,0.12)') : 'rgba(0,0,0,0.03)',
-                          }}>
-                            <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: isToday || hasPayment ? 700 : 400, color: isToday ? 'white' : hasPayment ? (isLenderDay ? '#2DBD75' : '#03ACEA') : '#C7C6C4' }}>
-                              {format(day, 'd')}
-                            </span>
-                          </div>
-                          {hasPayment && (
-                            <div style={{ marginTop: 3, fontSize: 8, color: isLenderDay ? '#2DBD75' : '#03ACEA', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {formatMoney(dayPayments.reduce((s, e) => s + (e.remainingAmount || 0), 0))}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
+                    <div style={{ textAlign: 'center', padding: '0 12px' }}>
+                      <div style={{ fontSize: 11, color: '#787776', marginBottom: 4 }}>Received</div>
+                      <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em', color: '#82F0B9' }}>{formatMoney(monthlyReceived)}</div>
+                      <div style={{ width: '100%', height: 4, borderRadius: 2, marginTop: 8, background: 'rgba(130,240,185,0.15)' }}>
+                        <div style={{ height: '100%', borderRadius: 2, background: '#82F0B9', width: `${monthlyExpectedReceive > 0 ? Math.min((monthlyReceived / monthlyExpectedReceive) * 100, 100) : 0}%`, transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }} />
+                      </div>
+                      <div style={{ fontSize: 10, color: '#787776', marginTop: 4 }}>{formatMoney(monthlyReceived)} of {formatMoney(monthlyExpectedReceive)} received</div>
+                    </div>
+                    <div style={{ textAlign: 'center', padding: '0 12px' }}>
+                      <div style={{ fontSize: 11, color: '#787776', marginBottom: 4 }}>Paid out</div>
+                      <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em', color: '#03ACEA' }}>{formatMoney(monthlyPaidOut)}</div>
+                      <div style={{ width: '100%', height: 4, borderRadius: 2, marginTop: 8, background: 'rgba(3,172,234,0.15)' }}>
+                        <div style={{ height: '100%', borderRadius: 2, background: '#03ACEA', width: `${monthlyExpectedPay > 0 ? Math.min((monthlyPaidOut / monthlyExpectedPay) * 100, 100) : 0}%`, transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }} />
+                      </div>
+                      <div style={{ fontSize: 10, color: '#787776', marginTop: 4 }}>{formatMoney(monthlyPaidOut)} of {formatMoney(monthlyExpectedPay)} paid out</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -892,6 +896,36 @@ export default function Home() {
 
             {/* Right column: Loan Progress + Loans Over Time + Recent Activity */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+              {/* Loan Progress */}
+              <div className="glass-card" style={{ overflow: 'hidden' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 0' }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Loan progress</div>
+                  <Link to={createPageUrl("Lending")} style={{ fontSize: 12, fontWeight: 500, color: '#03ACEA', textDecoration: 'none' }}>Manage</Link>
+                </div>
+                <div style={{ padding: '12px 16px 14px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 8 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>Lending</div>
+                      <div style={{ fontSize: 12, color: '#787776' }}>{percentRepaid}%</div>
+                    </div>
+                    <div style={{ width: '100%', height: 8, borderRadius: 4, background: 'rgba(130,240,185,0.15)', overflow: 'hidden' }}>
+                      <div style={{ height: '100%', borderRadius: 4, background: '#82F0B9', width: `${percentRepaid}%`, transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
+                    </div>
+                    <div style={{ fontSize: 11, color: '#787776', marginTop: 6 }}>{formatMoney(totalRepaid)} of {formatMoney(totalLentAmount)} repaid</div>
+                  </div>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 8 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>Borrowing</div>
+                      <div style={{ fontSize: 12, color: '#787776' }}>{percentPaid}%</div>
+                    </div>
+                    <div style={{ width: '100%', height: 8, borderRadius: 4, background: 'rgba(3,172,234,0.15)', overflow: 'hidden' }}>
+                      <div style={{ height: '100%', borderRadius: 4, background: '#03ACEA', width: `${percentPaid}%`, transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
+                    </div>
+                    <div style={{ fontSize: 11, color: '#787776', marginTop: 6 }}>{formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)} paid back</div>
+                  </div>
+                </div>
+              </div>
 
               {/* Loans Over Time chart */}
               <div className="glass-card" style={{ overflow: 'hidden' }}>
@@ -943,36 +977,6 @@ export default function Home() {
                   })() : (
                     <div style={{ textAlign: 'center', padding: '20px 0', color: '#787776', fontSize: 13 }}>No loan data yet</div>
                   )}
-                </div>
-              </div>
-
-              {/* Loan Progress */}
-              <div className="glass-card" style={{ overflow: 'hidden' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 0' }}>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Loan progress</div>
-                  <Link to={createPageUrl("Lending")} style={{ fontSize: 12, fontWeight: 500, color: '#03ACEA', textDecoration: 'none' }}>Manage</Link>
-                </div>
-                <div style={{ padding: '12px 16px 14px', display: 'flex', flexDirection: 'column', gap: 18 }}>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 8 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>Lending</div>
-                      <div style={{ fontSize: 12, color: '#787776' }}>{percentRepaid}%</div>
-                    </div>
-                    <div style={{ width: '100%', height: 8, borderRadius: 4, background: 'rgba(130,240,185,0.15)', overflow: 'hidden' }}>
-                      <div style={{ height: '100%', borderRadius: 4, background: '#82F0B9', width: `${percentRepaid}%`, transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
-                    </div>
-                    <div style={{ fontSize: 11, color: '#787776', marginTop: 6 }}>{formatMoney(totalRepaid)} of {formatMoney(totalLentAmount)} repaid</div>
-                  </div>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 8 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>Borrowing</div>
-                      <div style={{ fontSize: 12, color: '#787776' }}>{percentPaid}%</div>
-                    </div>
-                    <div style={{ width: '100%', height: 8, borderRadius: 4, background: 'rgba(3,172,234,0.15)', overflow: 'hidden' }}>
-                      <div style={{ height: '100%', borderRadius: 4, background: '#03ACEA', width: `${percentPaid}%`, transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
-                    </div>
-                    <div style={{ fontSize: 11, color: '#787776', marginTop: 6 }}>{formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)} paid back</div>
-                  </div>
                 </div>
               </div>
 

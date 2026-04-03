@@ -121,7 +121,7 @@ export default function ComingSoon() {
   const [activeTab, setActiveTab] = useState('shop');
 
   return (
-    <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 208, paddingRight: 268, paddingTop: 68, background: '#F5F4F0' }}>
+    <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 208, paddingRight: 24, paddingTop: 76, background: '#F5F4F0' }}>
       <DashboardSidebar activePage="ComingSoon" user={user} tabs={[{key:'shop',label:'Shop'},{key:'learn',label:'Learn'}]} activeTab={activeTab} onTabChange={setActiveTab} />
 
         <div style={{ background: 'transparent', position: 'relative', zIndex: 2 }}>
@@ -130,7 +130,7 @@ export default function ComingSoon() {
           <div style={{ maxWidth: 1080, margin: '0 auto', padding: '24px 40px 64px' }}>
 
             {/* Tab bar — centered */}
-            <div className="mobile-tab-bar" style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
               <div style={{ display: 'inline-flex', gap: 2, background: 'rgba(0,0,0,0.05)', borderRadius: 10, padding: 3 }}>
                 {[{key:'shop',label:'Shop'},{key:'learn',label:'Learn'}].map(tab => (
                   <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{
