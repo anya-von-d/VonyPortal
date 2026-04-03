@@ -643,15 +643,16 @@ export default function Profile() {
             </Button>
           </div>
 
+
+        <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+            <span style={{ fontSize: 11, color: '#787776' }}>Terms of Service</span>
+            <span style={{ fontSize: 11, color: '#787776' }}>Privacy Center</span>
+            <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
+          </div>
         </div>
-      <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-          <span style={{ fontSize: 11, color: '#787776' }}>Terms of Service</span>
-          <span style={{ fontSize: 11, color: '#787776' }}>Privacy Center</span>
-          <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
         </div>
-      </div>
     </div>
   );
 }

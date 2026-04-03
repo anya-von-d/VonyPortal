@@ -1776,7 +1776,6 @@ export default function Borrowing() {
                     })()}
 
         </div>
-          </div>{/* end zIndex:2 wrapper */}
 
         {/* Footer */}
         <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -1787,6 +1786,7 @@ export default function Borrowing() {
             <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
           </div>
         </div>
+          </div>{/* end zIndex:2 wrapper */}
       </div>
 
       {/* Modals */}

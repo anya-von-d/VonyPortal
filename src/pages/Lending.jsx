@@ -3052,7 +3052,6 @@ export default function Lending({ initialTab }) {
             )}
 
           </AnimatePresence>
-        </div>
 
         {/* Footer */}
         <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -3063,6 +3062,7 @@ export default function Lending({ initialTab }) {
             <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
           </div>
         </div>
+          </div>
       </div>
 
       {/* Modals */}

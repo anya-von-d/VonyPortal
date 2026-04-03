@@ -518,7 +518,6 @@ export default function RecentActivityPage() {
               <div style={{ width: 32, height: 32, border: '2px solid #82F0B9', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: 12 }} />
               <p style={{ fontSize: 13, color: '#787776' }}>{isLoading ? 'Loading activity...' : 'Please log in to view activity'}</p>
             </div>
-          </div>
           <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
@@ -526,6 +525,7 @@ export default function RecentActivityPage() {
               <span style={{ fontSize: 11, color: '#787776' }}>Privacy Center</span>
               <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
             </div>
+          </div>
           </div>
         </div>
     );
@@ -951,7 +951,7 @@ export default function RecentActivityPage() {
             }
           `}</style>
 
-        </div>
+
         <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
@@ -960,6 +960,7 @@ export default function RecentActivityPage() {
             <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
           </div>
         </div>
+          </div>
       </div>
     </>
   );
