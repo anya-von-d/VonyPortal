@@ -116,6 +116,14 @@ export default function Layout({ children }) {
           pointerEvents: 'none', zIndex: 57,
         }} />
       )}
+      {/* White top bar — covers both gradients in main content area, does not cover sidebar */}
+      {isDashboardStyle && (
+        <div style={{
+          position: 'fixed', top: 0, left: 240, right: 0, height: 44,
+          background: 'white',
+          pointerEvents: 'none', zIndex: 58,
+        }} />
+      )}
 
       {/* TopNav handles its own fixed positioning and mobile menu — hidden on dashboard-style pages */}
       {user && !isDashboardStyle && <TopNav location={location} />}
