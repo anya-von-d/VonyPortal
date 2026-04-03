@@ -94,7 +94,7 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
   const iconBox = (svg) => (
     <div style={{
       width: 24, height: 24, borderRadius: 6,
-      background: '#B5E8F5',
+      background: '#DCF7FD',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       flexShrink: 0,
     }}>
@@ -147,11 +147,11 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
     </>
   );
 
-  // Settings dropdown — opens downward from top bar
+  // Settings dropdown — opens upward from sidebar footer
   const settingsDropdown = (
     <div style={{
-      position: 'absolute', top: 'calc(100% + 6px)', right: 0, minWidth: 160,
-      background: 'white', borderRadius: 10, boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+      position: 'absolute', bottom: '100%', left: 0, right: 0, marginBottom: 6,
+      background: 'white', borderRadius: 10, boxShadow: '0 -4px 20px rgba(0,0,0,0.12)',
       border: '1px solid rgba(0,0,0,0.06)', overflow: 'hidden', zIndex: 100,
     }}>
       <Link
@@ -235,36 +235,20 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
 
   return (
     <>
-      {/* Desktop top bar — Settings · Notifications · My Profile on right */}
+      {/* Desktop top bar — My Profile aligned to content right edge */}
       <div className="home-sidebar" style={{
         position: 'fixed', top: 0, left: 200, right: 0, height: 56,
         background: '#F5F4F0',
         boxShadow: '0 6px 24px rgba(0,0,0,0.13)',
         zIndex: 58,
-        display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
-        padding: '0 20px', gap: 10,
+        display: 'flex', alignItems: 'center',
         fontFamily: "'DM Sans', sans-serif",
       }}>
-        {/* Settings */}
-        <div ref={settingsRef} style={{ position: 'relative' }}>
-          <button onClick={() => setSettingsOpen(!settingsOpen)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 6, border: 'none', cursor: 'pointer', background: '#B5E8F5', padding: 0 }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill={ic}><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
-          </button>
-          {settingsOpen && settingsDropdown}
+        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+          <Link to={createPageUrl("Profile")} style={{ display: 'flex', alignItems: 'center', height: 32, padding: '0 12px', borderRadius: 6, background: '#DCF7FD', textDecoration: 'none', fontSize: 12, fontWeight: 600, color: ic, flexShrink: 0 }}>
+            My Profile
+          </Link>
         </div>
-        {/* Notifications */}
-        <Link to={createPageUrl("Requests")} style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 6, background: '#B5E8F5', textDecoration: 'none', flexShrink: 0 }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill={ic}><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-          {notifCount > 0 && (
-            <div style={{ position: 'absolute', top: -4, right: -4, background: '#E8726E', color: 'white', fontSize: 9, fontWeight: 700, minWidth: 16, height: 16, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px', lineHeight: 1 }}>
-              {notifCount > 99 ? '99+' : notifCount}
-            </div>
-          )}
-        </Link>
-        {/* My Profile */}
-        <Link to={createPageUrl("Profile")} style={{ display: 'flex', alignItems: 'center', height: 32, padding: '0 12px', borderRadius: 6, background: '#B5E8F5', textDecoration: 'none', fontSize: 12, fontWeight: 600, color: ic, flexShrink: 0 }}>
-          My Profile
-        </Link>
       </div>
 
       {/* ── Mobile top bar ── */}
@@ -305,7 +289,7 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
         >
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.3)' }} onClick={() => setMobileMenuOpen(false)} />
           <div style={{
-            position: 'relative', width: 260, background: '#F5F4F0',
+            position: 'relative', width: 260, background: 'white',
             paddingTop: 64, display: 'flex', flexDirection: 'column',
             overflowY: 'auto', boxShadow: '4px 0 20px rgba(0,0,0,0.1)',
           }}>
@@ -320,17 +304,35 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
       {/* ── Desktop sidebar ── */}
       <aside className="home-sidebar" style={{
         position: 'fixed', left: 0, top: 0, bottom: 0, width: 200,
-        background: '#F5F4F0',
+        background: 'white',
         zIndex: 52, display: 'flex', flexDirection: 'column',
         fontFamily: "'DM Sans', sans-serif", overflowY: 'auto',
       }}>
-        {/* Logo */}
-        <div style={{ padding: '18px 16px 10px', flexShrink: 0 }}>
+        {/* Header: Vony + Notifications icon */}
+        <div style={{ height: 56, padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <Link to="/" style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 400, fontStyle: 'italic', fontSize: '1.5rem', letterSpacing: '-0.02em', color: '#1A1918', textDecoration: 'none' }}>Vony</Link>
+          <Link to={createPageUrl("Requests")} style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 30, height: 30, borderRadius: 8, background: '#DCF7FD', textDecoration: 'none', flexShrink: 0 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill={ic}><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+            {notifCount > 0 && (
+              <div style={{ position: 'absolute', top: -3, right: -3, background: '#E8726E', color: 'white', fontSize: 9, fontWeight: 700, minWidth: 15, height: 15, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px', lineHeight: 1 }}>
+                {notifCount > 99 ? '99+' : notifCount}
+              </div>
+            )}
+          </Link>
         </div>
-        <nav style={{ flex: 1, padding: '4px 12px 16px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <nav style={{ flex: 1, padding: '4px 12px 8px', display: 'flex', flexDirection: 'column', gap: 2 }}>
           {navLinks}
         </nav>
+        {/* Settings footer */}
+        <div style={{ padding: '8px 12px 16px', borderTop: '1px solid rgba(0,0,0,0.06)', flexShrink: 0 }}>
+          <div ref={settingsRef} style={{ position: 'relative' }}>
+            <button onClick={() => setSettingsOpen(!settingsOpen)} style={{ ...linkStyle('Settings'), width: '100%', border: 'none', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", textAlign: 'left', background: settingsOpen ? 'rgba(0,0,0,0.08)' : 'transparent' }}>
+              {iconBox(<svg width="16" height="16" viewBox="0 0 24 24" fill={ic}><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>)}
+              Settings
+            </button>
+            {settingsOpen && settingsDropdown}
+          </div>
+        </div>
       </aside>
     </>
   );
