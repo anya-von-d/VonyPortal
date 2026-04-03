@@ -36,7 +36,7 @@ function AccordionSection({ title, open, onToggle, badge, children }) {
         </svg>
       </button>
       {open && (
-        <div style={{ padding: '0 10px 10px' }}>
+        <div style={{ padding: '0 12px 12px' }}>
           {children}
         </div>
       )}
@@ -48,23 +48,20 @@ function AccordionSection({ title, open, onToggle, badge, children }) {
 export default function DashboardSidebar({ activePage = "Dashboard", user }) {
   const avatarInitial = (user?.full_name || 'U').charAt(0).toUpperCase();
   const { logout } = useAuth();
-
-  /* Time-based greeting */
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
   const firstName = user?.full_name?.split(' ')[0] || '';
 
   const [notifCount, setNotifCount] = useState(0);
-  const [upcomingPayments, setUpcomingPayments] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [upcomingPayments, setUpcomingPayments] = useState([]);
+  const [friends, setFriends] = useState([]);
   const [pendingItems, setPendingItems] = useState([]);
 
-  /* Nav dropdown state: null | 'loans' | 'upcoming' | 'more' */
+  /* Nav dropdown state */
   const [openDropdown, setOpenDropdown] = useState(null);
 
   /* Sidebar accordion state */
-  const [notifOpen, setNotifOpen] = useState(false);
   const [upcomingOpen, setUpcomingOpen] = useState(true);
+  const [friendsOpen, setFriendsOpen] = useState(true);
   const [pendingOpen, setPendingOpen] = useState(true);
 
   const dropdownWrapRef = useRef(null);
@@ -88,10 +85,10 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
 
       const getName = (userId) => {
         const p = profiles.find(pr => pr.user_id === userId);
-        return p?.full_name?.split(' ')[0] || 'User';
+        return p?.full_name?.split(' ')[0] || 'Someone';
       };
 
-      /* ── Notifications ── */
+      /* ── Notifications (actionable by current user) ── */
       const paymentsToConfirm = payments.filter(p =>
         p.status === 'pending_confirmation' && userLoanIds.includes(p.loan_id) && p.recorded_by !== user.id
       );
@@ -102,42 +99,29 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
       const friendRequests = friendships.filter(f => f.friend_id === user.id && f.status === 'pending');
 
       const notifItems = [
-        ...paymentsToConfirm.map(p => ({ label: 'Payment awaiting confirmation', id: p.id })),
-        ...termChanges.map(l => ({ label: 'Loan term change request', id: l.id })),
-        ...offersReceived.map(l => ({ label: 'New loan offer received', id: l.id })),
-        ...friendRequests.map(f => ({ label: 'New friend request', id: f.id })),
-      ];
-      setNotifCount(notifItems.length);
-      setNotifications(notifItems.slice(0, 5));
-
-      /* ── Pending (actionable) ── */
-      const pending = [
-        ...paymentsToConfirm.map(p => ({
-          id: p.id, type: 'payment',
-          label: 'Payment confirmation',
-          sub: `$${(p.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-          actionLabel: 'View & Confirm',
-        })),
         ...offersReceived.map(l => ({
-          id: l.id, type: 'offer',
-          label: 'Loan offer received',
-          sub: `$${(l.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-          actionLabel: 'View Offer',
+          id: l.id,
+          text: `${getName(l.lender_id)} sent you a loan offer`,
+          date: l.created_at,
         })),
-        ...termChanges.map(l => ({
-          id: l.id, type: 'term',
-          label: 'Loan term change',
-          sub: 'Approval needed',
-          actionLabel: 'Review',
+        ...paymentsToConfirm.map(p => ({
+          id: p.id,
+          text: `Confirm payment from ${getName(p.recorded_by)}`,
+          date: p.created_at,
         })),
         ...friendRequests.map(f => ({
-          id: f.id, type: 'friend',
-          label: 'Friend request',
-          sub: getName(f.user_id),
-          actionLabel: 'Confirm',
+          id: f.id,
+          text: `${getName(f.user_id)} sent you a friend request`,
+          date: f.created_at,
+        })),
+        ...termChanges.map(l => ({
+          id: l.id,
+          text: `${getName(l.lender_id)} updated loan terms`,
+          date: l.updated_at,
         })),
       ];
-      setPendingItems(pending.slice(0, 8));
+      setNotifCount(notifItems.length);
+      setNotifications(notifItems.slice(0, 6));
 
       /* ── Upcoming ── */
       const upcoming = userLoans
@@ -153,12 +137,48 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
         }));
       setUpcomingPayments(upcoming);
 
+      /* ── Friends ── */
+      const accepted = friendships.filter(f =>
+        f.status === 'accepted' && (f.user_id === user.id || f.friend_id === user.id)
+      );
+      const friendProfiles = accepted
+        .map(f => {
+          const otherId = f.user_id === user.id ? f.friend_id : f.user_id;
+          return profiles.find(p => p.user_id === otherId);
+        })
+        .filter(Boolean);
+      setFriends(friendProfiles);
+
+      /* ── Pending (waiting for others to act) ── */
+      const myRecordedPending = payments.filter(p =>
+        p.recorded_by === user.id && p.status === 'pending_confirmation'
+      );
+      const myOffersOut = loans.filter(l => l.lender_id === user.id && l.status === 'pending');
+
+      const pendingList = [
+        ...myRecordedPending.map(p => {
+          const loan = userLoans.find(l => l.id === p.loan_id);
+          const otherId = loan ? (loan.lender_id === user.id ? loan.borrower_id : loan.lender_id) : null;
+          return {
+            id: p.id,
+            text: `Waiting for ${otherId ? getName(otherId) : 'them'} to confirm payment`,
+            date: p.created_at,
+          };
+        }),
+        ...myOffersOut.map(l => ({
+          id: l.id,
+          text: `Waiting for ${getName(l.borrower_id)} to confirm loan offer`,
+          date: l.created_at,
+        })),
+      ];
+      setPendingItems(pendingList.slice(0, 8));
+
     } catch (e) {
       console.error("Sidebar data error:", e);
     }
   };
 
-  /* ── Close dropdown on outside click ── */
+  /* ── Close nav dropdown on outside click ── */
   useEffect(() => {
     const h = (e) => {
       if (dropdownWrapRef.current && !dropdownWrapRef.current.contains(e.target)) {
@@ -213,7 +233,6 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
     padding: 5, zIndex: 200,
   });
 
-  /* ── Dropdown item ── */
   const DropdownItem = ({ page, label, search = '' }) => (
     <Link
       to={search ? { pathname: createPageUrl(page), search } : createPageUrl(page)}
@@ -234,6 +253,11 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
     </Link>
   );
 
+  const formatDate = (d) => {
+    if (!d) return '';
+    try { return format(new Date(d), 'MMM d'); } catch { return ''; }
+  };
+
   return (
     <>
       {/* ── Mobile tab bar responsive CSS ── */}
@@ -244,7 +268,7 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
       `}</style>
 
       {/* ══════════════════════════════════════════════════════════
-          FLOATING GLASS PILL NAV — aligned with content (after sidebar)
+          FLOATING GLASS PILL NAV
           ══════════════════════════════════════════════════════════ */}
       <div ref={dropdownWrapRef} style={{
         position: 'fixed', top: 8, left: 268, right: 8, height: 52, zIndex: 100,
@@ -259,41 +283,26 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
           display: 'flex', alignItems: 'center',
           padding: '0 16px', gap: 2,
           fontFamily: "'DM Sans', sans-serif",
-          overflow: 'visible',
-          boxSizing: 'border-box',
+          overflow: 'visible', boxSizing: 'border-box',
         }}>
-          {/* Vony logo — far left */}
           <Link to="/" style={{
             fontFamily: "'Playfair Display', Georgia, serif",
             fontWeight: 400, fontStyle: 'italic', fontSize: '1.25rem',
-            letterSpacing: '-0.02em', color: '#1A1918', textDecoration: 'none',
-            flexShrink: 0,
+            letterSpacing: '-0.02em', color: '#1A1918', textDecoration: 'none', flexShrink: 0,
           }}>Vony</Link>
 
-          {/* Spacer — pushes nav items to spread across available width */}
           <div style={{ flex: 1 }} />
-
-          {/* Home */}
           <Link to="/" style={navLinkStyle('Dashboard')}>Home</Link>
-
           <div style={{ flex: 1 }} />
-
-          {/* Create Loan */}
           <Link to={createPageUrl("CreateOffer")} style={navLinkStyle('CreateOffer')}>Create Loan</Link>
-
           <div style={{ flex: 1 }} />
-
-          {/* Record Payment */}
           <Link to={createPageUrl("RecordPayment")} style={navLinkStyle('RecordPayment')}>Record Payment</Link>
-
           <div style={{ flex: 1 }} />
 
-          {/* Upcoming — dropdown */}
+          {/* Upcoming dropdown */}
           <div style={{ position: 'relative', flexShrink: 0 }}>
-            <button
-              style={dropdownBtnStyle('upcoming', 'Upcoming')}
-              onClick={() => setOpenDropdown(openDropdown === 'upcoming' ? null : 'upcoming')}
-            >
+            <button style={dropdownBtnStyle('upcoming', 'Upcoming')}
+              onClick={() => setOpenDropdown(openDropdown === 'upcoming' ? null : 'upcoming')}>
               Upcoming {chevronDown(openDropdown === 'upcoming')}
             </button>
             {openDropdown === 'upcoming' && (
@@ -306,12 +315,10 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
 
           <div style={{ flex: 1 }} />
 
-          {/* My Loans — dropdown */}
+          {/* My Loans dropdown */}
           <div style={{ position: 'relative', flexShrink: 0 }}>
-            <button
-              style={dropdownBtnStyle('loans', 'YourLoans', 'Borrowing', 'Lending')}
-              onClick={() => setOpenDropdown(openDropdown === 'loans' ? null : 'loans')}
-            >
+            <button style={dropdownBtnStyle('loans', 'YourLoans', 'Borrowing', 'Lending')}
+              onClick={() => setOpenDropdown(openDropdown === 'loans' ? null : 'loans')}>
               My Loans {chevronDown(openDropdown === 'loans')}
             </button>
             {openDropdown === 'loans' && (
@@ -324,18 +331,13 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
           </div>
 
           <div style={{ flex: 1 }} />
-
-          {/* Friends */}
           <Link to={createPageUrl("Friends")} style={navLinkStyle('Friends')}>Friends</Link>
-
           <div style={{ flex: 1 }} />
 
-          {/* More — dropdown */}
+          {/* More dropdown */}
           <div style={{ position: 'relative', flexShrink: 0 }}>
-            <button
-              style={dropdownBtnStyle('more', 'RecentActivity', 'LoanAgreements', 'ComingSoon')}
-              onClick={() => setOpenDropdown(openDropdown === 'more' ? null : 'more')}
-            >
+            <button style={dropdownBtnStyle('more', 'RecentActivity', 'LoanAgreements', 'ComingSoon')}
+              onClick={() => setOpenDropdown(openDropdown === 'more' ? null : 'more')}>
               More {chevronDown(openDropdown === 'more')}
             </button>
             {openDropdown === 'more' && (
@@ -345,18 +347,15 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
                 <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '4px 5px' }} />
                 <DropdownItem page="ComingSoon" label="Settings" />
                 <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '4px 5px' }} />
-                <button
-                  onClick={handleLogout}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    padding: '8px 12px', borderRadius: 8, width: '100%', border: 'none',
-                    background: 'transparent', cursor: 'pointer', fontSize: 13,
-                    fontFamily: "'DM Sans', sans-serif", color: '#E8726E', fontWeight: 500, textAlign: 'left',
-                    transition: 'background 0.12s',
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(232,114,110,0.06)'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                >
+                <button onClick={handleLogout} style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '8px 12px', borderRadius: 8, width: '100%', border: 'none',
+                  background: 'transparent', cursor: 'pointer', fontSize: 13,
+                  fontFamily: "'DM Sans', sans-serif", color: '#E8726E', fontWeight: 500, textAlign: 'left',
+                  transition: 'background 0.12s',
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(232,114,110,0.06)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E8726E" strokeWidth="1.8" strokeLinecap="round">
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
                     <polyline points="16 17 21 12 16 7"/>
@@ -384,88 +383,115 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
         fontFamily: "'DM Sans', sans-serif",
       }}>
 
-        {/* ── Sidebar Header ── */}
-        <div style={{ padding: '20px 16px 16px', borderBottom: '1px solid rgba(0,0,0,0.05)', flexShrink: 0 }}>
+        {/* ── Header ── */}
+        <div style={{ position: 'relative', padding: '16px 16px 18px', borderBottom: '1px solid rgba(0,0,0,0.05)', flexShrink: 0 }}>
 
-          {/* Row 1: profile photo + first name */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 11, marginBottom: 12 }}>
+          {/* Notifications bell — top right, no box */}
+          <Link to={createPageUrl("Requests")} style={{
+            position: 'absolute', top: 14, right: 14,
+            textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <div style={{ position: 'relative' }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill={active('Requests') ? '#1A1918' : '#9B9A98'}>
+                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+              </svg>
+              {notifCount > 0 && (
+                <div style={{
+                  position: 'absolute', top: -4, right: -5,
+                  background: '#E8726E', color: 'white',
+                  fontSize: 8, fontWeight: 700, minWidth: 14, height: 14, borderRadius: 7,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px',
+                }}>{notifCount > 99 ? '99+' : notifCount}</div>
+              )}
+            </div>
+          </Link>
+
+          {/* Profile photo — centered, large, clickable */}
+          <Link to={createPageUrl("Profile")} style={{
+            display: 'flex', justifyContent: 'center', marginBottom: 10, textDecoration: 'none',
+          }}>
             <div style={{
-              width: 44, height: 44, borderRadius: '50%', background: '#1A1918',
-              flexShrink: 0, overflow: 'hidden',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: 68, height: 68, borderRadius: '50%', background: '#1A1918',
+              overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              outline: active('Profile') ? '3px solid #82F0B9' : '3px solid rgba(0,0,0,0.06)',
+              outlineOffset: 2,
+              transition: 'outline 0.15s',
             }}>
               {user?.profile_picture_url
                 ? <img src={user.profile_picture_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                : <span style={{ fontSize: 16, fontWeight: 700, color: 'white' }}>{avatarInitial}</span>
+                : <span style={{ fontSize: 24, fontWeight: 700, color: 'white' }}>{avatarInitial}</span>
               }
             </div>
-            <p style={{
-              fontSize: 15, fontWeight: 700, color: '#1A1918', margin: 0,
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-            }}>
-              {firstName || 'there'}
-            </p>
-          </div>
+          </Link>
 
-          {/* Row 2: My Profile button */}
+          {/* Name — centered */}
+          <p style={{
+            textAlign: 'center', fontSize: 15, fontWeight: 700, color: '#1A1918',
+            margin: '0 0 10px', lineHeight: 1.2,
+          }}>
+            {user?.full_name || firstName || 'there'}
+          </p>
+
+          {/* My Profile button */}
           <Link to={createPageUrl("Profile")} style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            width: '100%', padding: '7px 12px', borderRadius: 10,
+            padding: '7px 14px', borderRadius: 10,
             background: active('Profile') ? '#1A1918' : 'rgba(0,0,0,0.05)',
             textDecoration: 'none',
             fontSize: 12, fontWeight: 600,
             color: active('Profile') ? 'white' : '#1A1918',
             transition: 'background 0.15s',
-            boxSizing: 'border-box',
           }}
           onMouseEnter={e => { if (!active('Profile')) e.currentTarget.style.background = 'rgba(0,0,0,0.09)'; }}
-          onMouseLeave={e => { if (!active('Profile')) e.currentTarget.style.background = 'rgba(0,0,0,0.05)'; }}
+          onMouseLeave={e => { if (!active('Profile')) e.currentTarget.style.background = active('Profile') ? '#1A1918' : 'rgba(0,0,0,0.05)'; }}
           >
             My Profile
           </Link>
         </div>
 
-        {/* ── Notifications accordion ── */}
-        <AccordionSection
-          title="Notifications"
-          open={notifOpen}
-          onToggle={() => setNotifOpen(v => !v)}
-          badge={notifCount}
-        >
-          {notifications.length === 0
-            ? <p style={{ fontSize: 12, color: '#C7C6C4', margin: 0, padding: '2px 4px' }}>No new notifications</p>
-            : (
-              <>
-                {notifications.map((n, i) => (
-                  <Link key={i} to={createPageUrl("Requests")} style={{
-                    display: 'flex', alignItems: 'flex-start', gap: 10,
-                    textDecoration: 'none', padding: '7px 6px', borderRadius: 10, marginBottom: 4,
-                    background: 'rgba(232,114,110,0.04)',
-                    border: '1px solid rgba(232,114,110,0.10)',
-                  }}>
-                    <div style={{
-                      width: 28, height: 28, borderRadius: 8,
-                      background: 'rgba(232,114,110,0.12)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                    }}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="#E8726E">
-                        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
-                      </svg>
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', margin: 0, lineHeight: 1.3 }}>{n.label}</p>
-                      <p style={{ fontSize: 10, color: '#9B9A98', margin: '2px 0 0', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Action needed</p>
-                    </div>
-                  </Link>
-                ))}
-                <Link to={createPageUrl("Requests")} style={{
-                  display: 'block', fontSize: 11, color: '#03ACEA',
-                  textDecoration: 'none', fontWeight: 600, padding: '4px 6px',
-                }}>View all →</Link>
-              </>
-            )
-          }
-        </AccordionSection>
+        {/* ── Notifications — flat list, no accordion ── */}
+        <div style={{ borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+          {/* Section title */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 16px 8px' }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 7 }}>
+              Notifications
+              {notifCount > 0 && (
+                <span style={{
+                  background: '#E8726E', color: 'white', fontSize: 9, fontWeight: 700,
+                  minWidth: 16, height: 16, borderRadius: 8,
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px',
+                }}>{notifCount}</span>
+              )}
+            </span>
+            {notifCount > 0 && (
+              <Link to={createPageUrl("Requests")} style={{ fontSize: 10, color: '#03ACEA', textDecoration: 'none', fontWeight: 600 }}>
+                See all
+              </Link>
+            )}
+          </div>
+
+          {/* Items — no boxes, just text + date */}
+          <div style={{ padding: '0 16px 12px' }}>
+            {notifications.length === 0
+              ? <p style={{ fontSize: 12, color: '#C7C6C4', margin: 0 }}>No new notifications</p>
+              : notifications.map((n, i) => (
+                <Link key={n.id || i} to={createPageUrl("Requests")} style={{
+                  display: 'block', textDecoration: 'none',
+                  paddingBottom: i < notifications.length - 1 ? 10 : 0,
+                  marginBottom: i < notifications.length - 1 ? 10 : 0,
+                  borderBottom: i < notifications.length - 1 ? '1px solid rgba(0,0,0,0.04)' : 'none',
+                }}>
+                  <p style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', margin: 0, lineHeight: 1.4 }}>{n.text}</p>
+                  {n.date && (
+                    <p style={{ fontSize: 10, color: '#9B9A98', margin: '2px 0 0' }}>
+                      {formatDate(n.date)}
+                    </p>
+                  )}
+                </Link>
+              ))
+            }
+          </div>
+        </div>
 
         {/* ── Upcoming accordion ── */}
         <AccordionSection
@@ -475,20 +501,20 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
           badge={upcomingPayments.length}
         >
           {upcomingPayments.length === 0
-            ? <p style={{ fontSize: 12, color: '#C7C6C4', margin: 0, padding: '2px 4px' }}>No upcoming payments</p>
+            ? <p style={{ fontSize: 12, color: '#C7C6C4', margin: 0 }}>No upcoming payments</p>
             : upcomingPayments.map(p => (
               <div key={p.id} style={{
-                display: 'flex', alignItems: 'flex-start', gap: 10,
-                padding: '7px 6px', borderRadius: 10, marginBottom: 4,
-                background: 'rgba(130,240,185,0.04)',
-                border: '1px solid rgba(130,240,185,0.14)',
+                display: 'flex', alignItems: 'flex-start', gap: 9,
+                padding: '7px 8px', borderRadius: 9, marginBottom: 4,
+                background: 'rgba(130,240,185,0.05)',
+                border: '1px solid rgba(130,240,185,0.16)',
               }}>
                 <div style={{
-                  width: 28, height: 28, borderRadius: 8,
-                  background: 'rgba(130,240,185,0.20)',
+                  width: 26, height: 26, borderRadius: 7,
+                  background: 'rgba(130,240,185,0.22)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                 }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="#2DBD75">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="#2DBD75">
                     <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
                   </svg>
                 </div>
@@ -500,14 +526,80 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
                     {p.isLender ? `From ${p.name}` : `To ${p.name}`}
                   </p>
                   {p.date && (
-                    <p style={{ fontSize: 10, color: '#9B9A98', margin: '2px 0 0', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                      {format(new Date(p.date), 'MMM d, yyyy')}
+                    <p style={{ fontSize: 10, color: '#9B9A98', margin: '2px 0 0' }}>
+                      {formatDate(p.date)}
                     </p>
                   )}
                 </div>
               </div>
             ))
           }
+        </AccordionSection>
+
+        {/* ── Friends accordion ── */}
+        <AccordionSection
+          title="Friends"
+          open={friendsOpen}
+          onToggle={() => setFriendsOpen(v => !v)}
+          badge={0}
+        >
+          {friends.length === 0
+            ? <p style={{ fontSize: 12, color: '#C7C6C4', margin: '0 0 10px' }}>No friends added yet</p>
+            : (
+              <div style={{ marginBottom: 10 }}>
+                {friends.map((friend, i) => {
+                  const initial = (friend.full_name || 'U').charAt(0).toUpperCase();
+                  return (
+                    <div key={friend.user_id || i} style={{
+                      display: 'flex', alignItems: 'center', gap: 9,
+                      padding: '5px 4px', borderRadius: 8, marginBottom: 2,
+                    }}>
+                      <div style={{
+                        width: 30, height: 30, borderRadius: '50%', background: '#1A1918',
+                        flexShrink: 0, overflow: 'hidden',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        {friend.profile_picture_url
+                          ? <img src={friend.profile_picture_url} alt={friend.full_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          : <span style={{ fontSize: 12, fontWeight: 700, color: 'white' }}>{initial}</span>
+                        }
+                      </div>
+                      <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {friend.full_name}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )
+          }
+
+          {/* Action buttons */}
+          <div style={{ display: 'flex', gap: 6 }}>
+            <Link to={createPageUrl("Friends")} style={{
+              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '7px 8px', borderRadius: 9, textDecoration: 'none',
+              background: 'rgba(3,172,234,0.08)', border: '1px solid rgba(3,172,234,0.14)',
+              fontSize: 11, fontWeight: 600, color: '#03ACEA', transition: 'background 0.12s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(3,172,234,0.14)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(3,172,234,0.08)'}
+            >
+              Find Friends
+            </Link>
+            <button style={{
+              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '7px 8px', borderRadius: 9, border: '1px solid rgba(0,0,0,0.08)',
+              background: 'rgba(0,0,0,0.03)', cursor: 'pointer',
+              fontSize: 11, fontWeight: 600, color: '#5C5B5A',
+              fontFamily: "'DM Sans', sans-serif", transition: 'background 0.12s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.07)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.03)'}
+            >
+              Invite Friends
+            </button>
+          </div>
         </AccordionSection>
 
         {/* ── Pending accordion ── */}
@@ -518,61 +610,21 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
           badge={pendingItems.length}
         >
           {pendingItems.length === 0
-            ? <p style={{ fontSize: 12, color: '#C7C6C4', margin: 0, padding: '2px 4px' }}>Nothing pending right now</p>
+            ? <p style={{ fontSize: 12, color: '#C7C6C4', margin: 0 }}>Nothing pending right now</p>
             : pendingItems.map((item, i) => (
               <div key={item.id || i} style={{
-                borderRadius: 10, marginBottom: 6,
-                background: 'rgba(0,0,0,0.02)',
-                border: '1px solid rgba(0,0,0,0.06)',
-                overflow: 'hidden',
+                padding: '6px 8px', borderRadius: 8, marginBottom: 4,
+                background: 'rgba(0,0,0,0.025)',
+                border: '1px solid rgba(0,0,0,0.05)',
               }}>
-                {/* Item info */}
-                <div style={{ padding: '8px 10px 6px' }}>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', margin: 0, lineHeight: 1.3 }}>{item.label}</p>
-                  {item.sub && (
-                    <p style={{ fontSize: 11, color: '#787776', margin: '2px 0 0' }}>{item.sub}</p>
-                  )}
-                </div>
-                {/* Action row */}
-                <div style={{ display: 'flex', gap: 0 }}>
-                  {/* View / Confirm button */}
-                  <Link
-                    to={createPageUrl("Requests")}
-                    style={{
-                      flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      padding: '7px 8px',
-                      background: 'rgba(3,172,234,0.08)',
-                      borderTop: '1px solid rgba(3,172,234,0.14)',
-                      textDecoration: 'none',
-                      fontSize: 11, fontWeight: 600, color: '#03ACEA',
-                      transition: 'background 0.12s',
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(3,172,234,0.15)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'rgba(3,172,234,0.08)'}
-                  >
-                    {item.actionLabel}
-                  </Link>
-                  {/* Reject / X button */}
-                  <Link
-                    to={createPageUrl("Requests")}
-                    style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      width: 36,
-                      background: '#E8726E',
-                      borderTop: '1px solid rgba(232,114,110,0.6)',
-                      textDecoration: 'none',
-                      transition: 'background 0.12s',
-                      flexShrink: 0,
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.background = '#d45f5b'}
-                    onMouseLeave={e => e.currentTarget.style.background = '#E8726E'}
-                  >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
-                      <line x1="18" y1="6" x2="6" y2="18"/>
-                      <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                  </Link>
-                </div>
+                <p style={{ fontSize: 11, fontWeight: 500, color: '#5C5B5A', margin: 0, lineHeight: 1.4 }}>
+                  {item.text}
+                </p>
+                {item.date && (
+                  <p style={{ fontSize: 10, color: '#C7C6C4', margin: '2px 0 0' }}>
+                    {formatDate(item.date)}
+                  </p>
+                )}
               </div>
             ))
           }
