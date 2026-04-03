@@ -206,6 +206,36 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
 
   return (
     <>
+      {/* ── Desktop top bar ── */}
+      <div className="home-sidebar" style={{
+        position: 'fixed', top: 0, left: 0, right: 0, height: 56,
+        background: '#6587F9', zIndex: 60,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 20px 0 24px',
+        fontFamily: "'DM Sans', sans-serif",
+      }}>
+        <Link to="/" style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 400, fontStyle: 'italic', fontSize: '1.5rem', letterSpacing: '-0.02em', color: 'white', textDecoration: 'none' }}>Vony</Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <div ref={settingsRef} style={{ position: 'relative' }}>
+            <button onClick={() => setSettingsOpen(!settingsOpen)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 8, border: 'none', cursor: 'pointer', background: settingsOpen ? 'rgba(255,255,255,0.15)' : 'transparent', transition: 'background 0.15s' }}>
+              {gearIcon('white')}
+            </button>
+            {settingsOpen && settingsDropdown}
+          </div>
+          <Link to={createPageUrl("Requests")} style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 8, background: activePage === 'Requests' ? 'rgba(255,255,255,0.15)' : 'transparent', transition: 'background 0.15s', textDecoration: 'none' }}>
+            {bellIcon('white')}
+            {notifCount > 0 && (
+              <span style={{ position: 'absolute', top: 4, right: 4, background: '#E8726E', color: 'white', fontSize: 8, fontWeight: 700, minWidth: 14, height: 14, borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px', lineHeight: 1 }}>
+                {notifCount > 99 ? '99+' : notifCount}
+              </span>
+            )}
+          </Link>
+          <Link to={createPageUrl("Profile")} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 34, height: 34, borderRadius: '50%', background: 'rgba(255,255,255,0.25)', color: 'white', fontWeight: 700, fontSize: 13, textDecoration: 'none', flexShrink: 0 }}>
+            {avatarInitial}
+          </Link>
+        </div>
+      </div>
+
       {/* ── Mobile top bar ── */}
       <div className="mobile-header" style={{
         display: 'none', /* shown via CSS at <=900px */
@@ -291,59 +321,14 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
 
       {/* ── Desktop sidebar ── */}
       <aside className="home-sidebar" style={{
-        position: 'fixed', left: 0, top: 0, bottom: 0, width: 240,
+        position: 'fixed', left: 0, top: 56, bottom: 0, width: 240,
         background: '#F5F4F0',
         zIndex: 52, display: 'flex', flexDirection: 'column',
         fontFamily: "'DM Sans', sans-serif", overflowY: 'auto',
       }}>
-        <div style={{ padding: '22px 24px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link to="/" style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 400, fontStyle: 'italic', fontSize: '1.5rem', letterSpacing: '-0.02em', color: '#1A1918', textDecoration: 'none' }}>Vony</Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Link to={createPageUrl("Requests")} style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 8, background: activePage === 'Requests' ? 'rgba(103,138,251,0.1)' : 'transparent', transition: 'background 0.15s', textDecoration: 'none' }}>
-              {bellIcon(activePage === 'Requests' ? '#678AFB' : '#5C5B5A')}
-              {notifCount > 0 && (
-                <span style={{
-                  position: 'absolute', top: 2, right: 2,
-                  background: '#E8726E', color: 'white',
-                  fontSize: 9, fontWeight: 700,
-                  minWidth: 16, height: 16, borderRadius: 8,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  padding: '0 4px', lineHeight: 1,
-                }}>
-                  {notifCount > 99 ? '99+' : notifCount}
-                </span>
-              )}
-            </Link>
-            <div ref={settingsRef} style={{ position: 'relative' }}>
-              <button
-                onClick={() => setSettingsOpen(!settingsOpen)}
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  width: 32, height: 32, borderRadius: 8, border: 'none', cursor: 'pointer',
-                  background: settingsOpen ? 'rgba(103,138,251,0.1)' : 'transparent',
-                  transition: 'background 0.15s',
-                }}
-              >
-                {gearIcon(settingsOpen ? '#678AFB' : '#5C5B5A')}
-              </button>
-              {settingsOpen && settingsDropdown}
-            </div>
-          </div>
-        </div>
-        <nav style={{ flex: 1, padding: '0 12px', display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <nav style={{ flex: 1, padding: '12px 12px', display: 'flex', flexDirection: 'column', gap: 3 }}>
           {navLinks}
         </nav>
-        <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
-          <Link to={createPageUrl("Profile")} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#678AFB', color: 'white', fontWeight: 600, fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              {avatarInitial}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.full_name || 'User'}</div>
-              <div style={{ fontSize: 11, color: '#787776' }}>View profile</div>
-            </div>
-          </Link>
-        </div>
       </aside>
     </>
   );

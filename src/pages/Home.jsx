@@ -672,12 +672,12 @@ export default function Home() {
   overdueCountRef.current = alertTotal;
 
   return (
-    <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 240, background: '#F5F4F0' }}>
+    <div className="home-with-sidebar" style={{ minHeight: '100vh', position: 'relative', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingLeft: 240, paddingTop: 56, background: '#F5F4F0' }}>
 
       <DashboardSidebar activePage="Dashboard" user={user} />
 
       {/* ── Title above content box ── */}
-      <div style={{ padding: '24px 20px 8px 20px' }}>
+      <div style={{ padding: '16px 20px 8px 20px' }}>
         <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '2.8rem', fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', lineHeight: 1.1, margin: 0 }}>
           {greeting}, <em style={{ fontStyle: 'italic', fontWeight: 600, color: '#1A1918' }}>{firstName}</em>
         </h1>
