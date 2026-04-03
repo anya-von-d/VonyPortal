@@ -88,13 +88,12 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
     background: isActive(page) ? 'rgba(0,0,0,0.08)' : 'transparent',
     fontWeight: isActive(page) ? 600 : 450,
   });
-  const ic = '#01ADE9';
+  const ic = '#9B9A98';
 
-  // Compact rounded icon box — filled icons in light cyan tint
+  // Icon wrapper — no background, just consistent sizing
   const iconBox = (svg) => (
     <div style={{
-      width: 24, height: 24, borderRadius: 6,
-      background: '#DCF7FD',
+      width: 24, height: 24,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       flexShrink: 0,
     }}>
@@ -285,17 +284,35 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
         </div>
       )}
 
+      {/* ── Blue top bar ── */}
+      <div className="home-sidebar" style={{
+        position: 'fixed', top: 0, left: 240, right: 0, height: 44,
+        background: '#03ACEA', zIndex: 58,
+        display: 'flex', alignItems: 'center',
+        padding: '0 24px',
+        fontFamily: "'DM Sans', sans-serif",
+      }}>
+        <span style={{ fontSize: 14, fontWeight: 500, color: 'white' }}>
+          {(() => {
+            const h = new Date().getHours();
+            const g = h >= 5 && h < 12 ? 'Good morning' : h >= 12 && h < 18 ? 'Good afternoon' : 'Good night';
+            const fn = user?.full_name?.split(' ')[0] || '';
+            return `${g}${fn ? `, ${fn}` : ''}`;
+          })()}
+        </span>
+      </div>
+
       {/* ── Desktop sidebar ── */}
       <aside className="home-sidebar" style={{
-        position: 'fixed', left: 0, top: 0, bottom: 0, width: 200,
-        background: 'white',
+        position: 'fixed', left: 0, top: 0, bottom: 0, width: 240,
+        background: '#EDF4FB',
         zIndex: 52, display: 'flex', flexDirection: 'column',
         fontFamily: "'DM Sans', sans-serif", overflowY: 'auto',
       }}>
         {/* Header: Vony + Notifications icon */}
-        <div style={{ padding: '28px 16px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+        <div style={{ padding: '14px 20px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <Link to="/" style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 400, fontStyle: 'italic', fontSize: '1.5rem', letterSpacing: '-0.02em', color: '#1A1918', textDecoration: 'none' }}>Vony</Link>
-          <Link to={createPageUrl("Requests")} style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 30, height: 30, borderRadius: 8, background: '#DCF7FD', textDecoration: 'none', flexShrink: 0 }}>
+          <Link to={createPageUrl("Requests")} style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, textDecoration: 'none', flexShrink: 0 }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill={ic}><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
             {notifCount > 0 && (
               <div style={{ position: 'absolute', top: -3, right: -3, background: '#E8726E', color: 'white', fontSize: 9, fontWeight: 700, minWidth: 15, height: 15, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px', lineHeight: 1 }}>
@@ -304,11 +321,11 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
             )}
           </Link>
         </div>
-        <nav style={{ flex: 1, padding: '4px 12px 8px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <nav style={{ flex: 1, padding: '4px 16px 8px', display: 'flex', flexDirection: 'column', gap: 2 }}>
           {navLinks}
         </nav>
         {/* Settings + Profile footer */}
-        <div style={{ padding: '8px 12px 16px', borderTop: '1px solid rgba(0,0,0,0.06)', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <div style={{ padding: '8px 16px 16px', borderTop: '1px solid rgba(0,0,0,0.06)', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
           <div ref={settingsRef} style={{ position: 'relative' }}>
             <button onClick={() => setSettingsOpen(!settingsOpen)} style={{ ...linkStyle('Settings'), width: '100%', border: 'none', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", textAlign: 'left', background: settingsOpen ? 'rgba(0,0,0,0.08)' : 'transparent' }}>
               {iconBox(<svg width="16" height="16" viewBox="0 0 24 24" fill={ic}><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>)}
