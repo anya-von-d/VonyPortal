@@ -292,14 +292,6 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
         padding: '0 24px',
         fontFamily: "'DM Sans', sans-serif",
       }}>
-        <span style={{ fontSize: 17, fontWeight: 700, color: 'white', fontFamily: "'DM Sans', sans-serif", letterSpacing: '-0.02em' }}>
-          {(() => {
-            const h = new Date().getHours();
-            const g = h >= 5 && h < 12 ? 'Good morning' : h >= 12 && h < 18 ? 'Good afternoon' : 'Good night';
-            const fn = user?.full_name?.split(' ')[0] || '';
-            return `${g}${fn ? `, ${fn}` : ''}`;
-          })()}
-        </span>
       </div>
 
       {/* ── Desktop sidebar ── */}

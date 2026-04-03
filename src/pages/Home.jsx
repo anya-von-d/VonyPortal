@@ -693,8 +693,13 @@ export default function Home() {
       {/* ── Main page content ── */}
       <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px 64px', position: 'relative', zIndex: 1 }}>
 
+        {/* Greeting title */}
+        <h1 style={{ fontSize: '1.8rem', fontWeight: 700, color: '#1A1918', marginBottom: 20, marginTop: 0, fontFamily: "'DM Sans', sans-serif", letterSpacing: '-0.02em' }}>
+          {(() => { const h = new Date().getHours(); const g = h >= 5 && h < 12 ? 'Good morning' : h >= 12 && h < 18 ? 'Good afternoon' : 'Good night'; const fn = user?.full_name?.split(' ')[0] || ''; return `${g}${fn ? `, ${fn}` : ''}`; })()}
+        </h1>
+
         {/* Top row grid: quick actions + snapshot cards */}
-        <div style={{ marginTop: 20 }}>
+        <div style={{ marginTop: 0 }}>
           <div className="home-top-row" style={{ display: 'grid', gridTemplateColumns: '1.75fr 1fr', columnGap: 20, rowGap: 20, alignItems: 'start' }}>
 
             {/* LEFT SECTION: sub-grid for left two columns */}
