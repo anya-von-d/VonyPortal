@@ -238,14 +238,14 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
       {/* Desktop top bar — My Profile aligned to content right edge */}
       <div className="home-sidebar" style={{
         position: 'fixed', top: 0, left: 200, right: 0, height: 56,
-        background: '#F5F4F0',
-        boxShadow: '0 6px 24px rgba(0,0,0,0.13)',
+        background: '#05ACEC',
+        boxShadow: '0 6px 24px rgba(5,172,236,0.3)',
         zIndex: 58,
         display: 'flex', alignItems: 'center',
         fontFamily: "'DM Sans', sans-serif",
       }}>
         <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-          <Link to={createPageUrl("Profile")} style={{ display: 'flex', alignItems: 'center', height: 32, padding: '0 12px', borderRadius: 6, background: '#DCF7FD', textDecoration: 'none', fontSize: 12, fontWeight: 600, color: ic, flexShrink: 0 }}>
+          <Link to={createPageUrl("Profile")} style={{ display: 'flex', alignItems: 'center', height: 32, padding: '0 12px', borderRadius: 6, background: 'rgba(255,255,255,0.22)', textDecoration: 'none', fontSize: 12, fontWeight: 600, color: 'white', flexShrink: 0 }}>
             My Profile
           </Link>
         </div>
