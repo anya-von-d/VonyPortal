@@ -691,7 +691,7 @@ export default function Home() {
       <DashboardSidebar activePage="Dashboard" user={user} />
 
       {/* ── Main page content ── */}
-      <div style={{ padding: '0 20px 64px', position: 'relative', zIndex: 1 }}>
+      <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 28px 64px', position: 'relative', zIndex: 1 }}>
 
         {/* Top row grid: quick actions + snapshot cards */}
         <div style={{ marginTop: 20 }}>

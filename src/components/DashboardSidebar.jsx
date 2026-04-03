@@ -292,7 +292,7 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
         padding: '0 24px',
         fontFamily: "'DM Sans', sans-serif",
       }}>
-        <span style={{ fontSize: 14, fontWeight: 500, color: 'white' }}>
+        <span style={{ fontSize: 17, fontWeight: 700, color: 'white', fontFamily: "'DM Sans', sans-serif", letterSpacing: '-0.02em' }}>
           {(() => {
             const h = new Date().getHours();
             const g = h >= 5 && h < 12 ? 'Good morning' : h >= 12 && h < 18 ? 'Good afternoon' : 'Good night';
@@ -305,7 +305,7 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
       {/* ── Desktop sidebar ── */}
       <aside className="home-sidebar" style={{
         position: 'fixed', left: 0, top: 0, bottom: 0, width: 240,
-        background: '#EDF4FB',
+        background: '#F5F4F0',
         zIndex: 52, display: 'flex', flexDirection: 'column',
         fontFamily: "'DM Sans', sans-serif", overflowY: 'auto',
       }}>
