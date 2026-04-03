@@ -1568,7 +1568,7 @@ export default function Lending({ initialTab }) {
                   {/* Total Active Lending */}
                   <div className="glass-card rounded-2xl border-0" style={{ overflow: 'hidden' }}>
                     <div style={{ padding: '20px 22px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Total Active Lending</span>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Total Active Lending</span>
                     </div>
                     <div style={{ padding: '14px 22px 20px', display: 'flex', flexDirection: 'column', gap: 18 }}>
                       {activeLoans.length === 0 ? (
@@ -1596,7 +1596,7 @@ export default function Lending({ initialTab }) {
                   {/* Your Lending */}
                   <div className="glass-card rounded-2xl border-0" style={{ overflow: 'hidden' }}>
                     <div style={{ padding: '20px 22px 0' }}>
-                      <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Your Lending</span>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Your Lending</span>
                     </div>
                     <div style={{ padding: '14px 22px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
                       {activeLoans.length === 0 ? (

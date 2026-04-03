@@ -912,10 +912,10 @@ export default function Borrowing() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {/* Total Active Borrowing */}
                 <div className="glass-card" style={{ overflow: 'hidden' }}>
-                  <div style={{ padding: '20px 26px 0' }}>
-                    <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Total Active Borrowing</span>
+                  <div style={{ padding: '14px 16px 0' }}>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Total Active Borrowing</span>
                   </div>
-                  <div style={{ padding: '14px 26px 20px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+                  <div style={{ padding: '10px 16px 14px', display: 'flex', flexDirection: 'column', gap: 18 }}>
                     {activeLoans.length === 0 ? (
                       <p style={{ fontSize: 13, color: '#787776' }}>No active loans</p>
                     ) : (() => {
@@ -940,10 +940,10 @@ export default function Borrowing() {
 
                 {/* Your Borrowing */}
                 <div className="glass-card" style={{ overflow: 'hidden' }}>
-                  <div style={{ padding: '20px 26px 0' }}>
-                    <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Your Borrowing</span>
+                  <div style={{ padding: '14px 16px 0' }}>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Your Borrowing</span>
                   </div>
-                  <div style={{ padding: '14px 26px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <div style={{ padding: '10px 16px 14px', display: 'flex', flexDirection: 'column', gap: 16 }}>
                     {activeLoans.length === 0 ? (
                       <p style={{ fontSize: 13, color: '#787776' }}>No active loans to track</p>
                     ) : (
@@ -987,10 +987,10 @@ export default function Borrowing() {
                   const combinedLoans = [...overdueLoans, ...upcomingLoans];
                   return (
                     <div className="glass-card">
-                      <div style={{ padding: '20px 26px 0' }}>
-                        <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Upcoming Payments</span>
+                      <div style={{ padding: '14px 16px 0' }}>
+                        <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Upcoming Payments</span>
                       </div>
-                      <div style={{ padding: '14px 26px 26px' }}>
+                      <div style={{ padding: '10px 16px 16px' }}>
                         {combinedLoans.length === 0 ? (
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 0', color: '#787776' }}>
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ opacity: 0.4, marginBottom: 6 }}>
@@ -1032,10 +1032,10 @@ export default function Borrowing() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {/* Next Payment Box */}
                 <div className="glass-card">
-                  <div style={{ padding: '20px 26px 0' }}>
-                    <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Next Payment</span>
+                  <div style={{ padding: '14px 16px 0' }}>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Next Payment</span>
                   </div>
-                  <div style={{ padding: '14px 26px 26px' }}>
+                  <div style={{ padding: '10px 16px 16px' }}>
                     {nextPaymentLoan ? (
                       <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', paddingTop: 8, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                         <div>
@@ -1097,8 +1097,8 @@ export default function Borrowing() {
                 {/* Loans Ranked By */}
                 {activeLoans.length > 0 && (
                   <div className="glass-card">
-                    <div style={{ padding: '20px 26px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Loans Ranked By</span>
+                    <div style={{ padding: '14px 16px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Loans Ranked By</span>
                       <Select value={rankingFilter} onValueChange={setRankingFilter}>
                         <SelectTrigger className="w-auto h-7 px-2 border-0 text-xs font-medium rounded-lg" style={{ background: 'rgba(103,138,251,0.1)', color: '#678AFB' }}>
                           <SelectValue />
@@ -1110,7 +1110,7 @@ export default function Borrowing() {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div style={{ padding: '14px 26px 26px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div style={{ padding: '10px 16px 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {(() => {
                         const sorted = [...activeLoans].sort((a, b) => {
                           if (rankingFilter === 'highest_interest') return (b.interest_rate || 0) - (a.interest_rate || 0);
@@ -1220,10 +1220,10 @@ export default function Borrowing() {
                         <div>
                           {/* Select a Loan */}
                           <div className="glass-card" style={{ marginBottom: 16 }}>
-                            <div style={{ padding: '20px 26px 0' }}>
-                              <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Select a Loan to Learn More</span>
+                            <div style={{ padding: '14px 16px 0' }}>
+                              <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Select a Loan to Learn More</span>
                             </div>
-                            <div style={{ padding: '14px 26px 26px' }}>
+                            <div style={{ padding: '10px 16px 16px' }}>
                               <div style={{ position: 'relative' }}>
                                 <select
                                   value={manageLoanSelected?.id || ''}
@@ -1281,10 +1281,10 @@ export default function Borrowing() {
                                 const largeArc = paidAngle > 180 ? 1 : 0;
                                 return (
                                   <div className="glass-card">
-                                    <div style={{ padding: '20px 26px 0' }}>
-                                      <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Payment Progress</span>
+                                    <div style={{ padding: '14px 16px 0' }}>
+                                      <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Payment Progress</span>
                                     </div>
-                                    <div style={{ padding: '14px 26px 26px', display: 'flex', alignItems: 'center', gap: 16 }}>
+                                    <div style={{ padding: '10px 16px 16px', display: 'flex', alignItems: 'center', gap: 16 }}>
                                       <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
                                           <circle cx={dCx} cy={dCy} r={(outerR + innerR) / 2} fill="none" stroke="#E5E4E2" strokeWidth={outerR - innerR} />
@@ -1342,10 +1342,10 @@ export default function Borrowing() {
                               )}
 
                               <div className="glass-card">
-                                <div style={{ padding: '20px 26px 0' }}>
-                                  <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Payment History</span>
+                                <div style={{ padding: '14px 16px 0' }}>
+                                  <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Payment History</span>
                                 </div>
-                                <div style={{ padding: '14px 26px 26px' }}>
+                                <div style={{ padding: '10px 16px 16px' }}>
                                 {!manageLoanSelected ? (
                                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: chartHeight }}>
                                     <p style={{ fontSize: 12, color: '#C7C6C4' }}>Select a loan to view chart</p>
@@ -1427,10 +1427,10 @@ export default function Borrowing() {
                                 <>
                                   {/* Loan Terms */}
                                   <div className="glass-card">
-                                    <div style={{ padding: '20px 26px 0' }}>
-                                      <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Loan Terms</span>
+                                    <div style={{ padding: '14px 16px 0' }}>
+                                      <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Loan Terms</span>
                                     </div>
-                                    <div style={{ padding: '14px 26px 26px' }}>
+                                    <div style={{ padding: '10px 16px 16px' }}>
                                     {(() => {
                                       const amount = manageLoanSelected.amount || 0;
                                       const interestRate = manageLoanSelected.interest_rate || 0;
@@ -1481,10 +1481,10 @@ export default function Borrowing() {
 
                                   {/* Loan Progress Stats */}
                                   <div className="glass-card">
-                                    <div style={{ padding: '20px 26px 0' }}>
-                                      <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Loan Progress</span>
+                                    <div style={{ padding: '14px 16px 0' }}>
+                                      <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Loan Progress</span>
                                     </div>
-                                    <div style={{ padding: '14px 26px 26px' }}>
+                                    <div style={{ padding: '10px 16px 16px' }}>
                                     {(() => {
                                       const repaymentPeriod = manageLoanSelected.repayment_period || 0;
                                       const paymentFrequency = manageLoanSelected.payment_frequency || 'monthly';
@@ -1518,10 +1518,10 @@ export default function Borrowing() {
 
                                   {/* Payments */}
                                   <div className="glass-card">
-                                    <div style={{ padding: '20px 26px 0' }}>
-                                      <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Payments</span>
+                                    <div style={{ padding: '14px 16px 0' }}>
+                                      <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Payments</span>
                                     </div>
-                                    <div style={{ padding: '14px 26px 26px' }}>
+                                    <div style={{ padding: '10px 16px 16px' }}>
                                     {(() => {
                                       const paymentAmt = manageLoanSelected.payment_amount || 0;
                                       let firstRecordFound = false;
@@ -1586,12 +1586,12 @@ export default function Borrowing() {
 
                                   {/* Activity Box */}
                                   <div className="glass-card" style={{ overflow: 'hidden' }}>
-                                    <div style={{ padding: '20px 26px 0' }}>
-                                      <p style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', marginBottom: 10, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                                    <div style={{ padding: '14px 16px 0' }}>
+                                      <p style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 10, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
                                         Activity
                                       </p>
                                     </div>
-                                    <div style={{ padding: '14px 26px 26px' }}>
+                                    <div style={{ padding: '10px 16px 16px' }}>
                                     {(() => {
                                       const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id);
                                       const loanPmts = allPayments.filter(p => p.loan_id === manageLoanSelected.id);

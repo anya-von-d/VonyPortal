@@ -402,7 +402,7 @@ export default function RecordPayment() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
               {/* Progress Bar */}
-              <div className="glass-card" style={{ padding: '16px 26px' }}>
+              <div className="glass-card" style={{ padding: '12px 16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0 }}>
                   {stepLabels.map((label, i) => (
                     <React.Fragment key={i}>
@@ -611,7 +611,7 @@ export default function RecordPayment() {
 
               {/* Recommended Payment */}
               {selectedLoan && currentStep <= 1 && (
-                <div className="glass-card" style={{ padding: '20px 26px' }}>
+                <div className="glass-card" style={{ padding: '14px 16px' }}>
                   <span style={{ fontSize: 13, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Recommended Payment</span>
                   <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div>
@@ -635,7 +635,7 @@ export default function RecordPayment() {
             {/* ── Right Column: Select Your Loan ────────────── */}
             <div className="glass-card" style={{ overflow: 'visible' }}>
               <div style={{ padding: '20px 22px 0' }}>
-                <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Select Your Loan</span>
+                <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Select Your Loan</span>
               </div>
 
               {/* Filters */}
@@ -703,13 +703,13 @@ export default function RecordPayment() {
           {/* ── Payments Waiting for Approval ──────────────── */}
           {(paymentsToConfirm.length > 0 || paymentsYouRecorded.length > 0) && (
             <div className="glass-card" style={{ marginTop: 16, overflow: 'hidden' }}>
-              <div style={{ padding: '20px 26px 0' }}>
+              <div style={{ padding: '14px 16px 0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Payments Waiting for Approval</span>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Payments Waiting for Approval</span>
                   <span style={{ fontSize: 12, color: '#787776' }}>{pendingPayments.length} pending</span>
                 </div>
               </div>
-              <div style={{ padding: '14px 26px 26px' }}>
+              <div style={{ padding: '10px 16px 16px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {/* Payments needing your response */}
                   {paymentsToConfirm.map(payment => {

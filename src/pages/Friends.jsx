@@ -294,10 +294,10 @@ export default function Friends() {
 
             {/* Left Column: Your Friends */}
             <div className="glass-card" style={{ overflow: 'hidden' }}>
-              <div style={{ padding: '20px 26px 0' }}>
-                <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Your Friends</span>
+              <div style={{ padding: '14px 16px 0' }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Your Friends</span>
               </div>
-              <div style={{ padding: '14px 26px 26px' }}>
+              <div style={{ padding: '10px 16px 16px' }}>
                 {isLoading ? (
                   <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0' }}>
                     <div style={{ width: 32, height: 32, border: '2px solid #678AFB', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
@@ -385,10 +385,10 @@ export default function Friends() {
 
               {/* Search for Friends */}
               <div className="glass-card" style={{ overflow: 'hidden' }}>
-                <div style={{ padding: '20px 26px 0' }}>
-                  <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Search for Friends</span>
+                <div style={{ padding: '14px 16px 0' }}>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Search for Friends</span>
                 </div>
-                <div style={{ padding: '14px 26px 26px' }}>
+                <div style={{ padding: '10px 16px 16px' }}>
                   {/* Search Input */}
                   <div style={{ position: 'relative', marginBottom: searchQuery.trim() ? 14 : 0 }}>
                     <Search size={18} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#C7C6C4' }} />
@@ -527,15 +527,15 @@ export default function Friends() {
               {/* Friend Requests (Received) */}
               {receivedRequests.length > 0 && (
                 <div className="glass-card" style={{ overflow: 'hidden' }}>
-                  <div style={{ padding: '20px 26px 0' }}>
+                  <div style={{ padding: '14px 16px 0' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>Friend Requests</span>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Friend Requests</span>
                       <span style={{ fontSize: 12, color: '#787776' }}>
                         {receivedRequests.length} pending
                       </span>
                     </div>
                   </div>
-                  <div style={{ padding: '14px 26px 26px' }}>
+                  <div style={{ padding: '10px 16px 16px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {receivedRequests.map((request) => {
                         const profile = getProfileById(request.user_id);

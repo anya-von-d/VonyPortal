@@ -897,7 +897,7 @@ export default function LoanAgreements() {
 
             {/* ── Agreements List ──────────────────────────────────── */}
             <div className="glass-card" style={{ overflow: 'hidden' }}>
-              <div style={{ padding: '20px 26px 26px' }}>
+              <div style={{ padding: '14px 16px 16px' }}>
                 {filteredAgreements.length === 0 ? (
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 0', color: '#C7C6C4' }}>
                     <FileText size={32} style={{ opacity: 0.4, marginBottom: 8 }} />

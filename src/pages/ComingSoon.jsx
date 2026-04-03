@@ -175,7 +175,7 @@ export default function ComingSoon() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.06 + index * 0.06 }}
                       className="glass-card"
-                      style={{ padding: '24px 26px', display: 'flex', flexDirection: 'column' }}
+                      style={{ padding: '16px 16px', display: 'flex', flexDirection: 'column' }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
                         <div style={{ width: 40, height: 40, borderRadius: 12, background: `${product.color}14`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -183,7 +183,7 @@ export default function ComingSoon() {
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>{product.name}</span>
+                            <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>{product.name}</span>
                             <span style={{ fontSize: 10, fontWeight: 600, color: product.color, textTransform: 'uppercase', letterSpacing: '0.08em', fontFamily: "'IBM Plex Mono', monospace" }}>{product.tagline}</span>
                           </div>
                         </div>
@@ -254,7 +254,7 @@ export default function ComingSoon() {
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 6 }}>
-                            <span style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em' }}>{guide.title}</span>
+                            <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>{guide.title}</span>
                             <span style={{ fontSize: 10, color: '#787776', fontFamily: "'IBM Plex Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.08em', flexShrink: 0 }}>{guide.readTime}</span>
                           </div>
                           <p style={{ fontSize: 13, color: '#5C5B5A', lineHeight: 1.55, margin: '0 0 12px' }}>

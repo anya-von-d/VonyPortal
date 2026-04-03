@@ -433,8 +433,8 @@ export default function Profile() {
             {/* Profile Info */}
             <div className="lg:col-span-2 space-y-4 md:space-y-6 min-w-0 w-full">
               {/* Personal Information - First */}
-              <div className="glass-card" style={{ padding: '24px 26px' }}>
-                <p style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', marginBottom: 16 }}>
+              <div className="glass-card" style={{ padding: '16px 16px' }}>
+                <p style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 16 }}>
                   Personal Information
                 </p>
 
@@ -569,8 +569,8 @@ export default function Profile() {
             {/* Stats & Verification */}
             <div className="space-y-4 md:space-y-6 min-w-0 w-full">
               {/* Bank Account Connection */}
-              <div className="glass-card" style={{ padding: '24px 26px' }}>
-                <p style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', marginBottom: 16 }}>
+              <div className="glass-card" style={{ padding: '16px 16px' }}>
+                <p style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 16 }}>
                   Bank Account
                 </p>
                 <div className="space-y-4">
@@ -592,8 +592,8 @@ export default function Profile() {
               </div>
 
               {/* Verification Status */}
-              <div className="glass-card" style={{ padding: '24px 26px' }}>
-                <p style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', marginBottom: 16 }}>
+              <div className="glass-card" style={{ padding: '16px 16px' }}>
+                <p style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 16 }}>
                   Verification
                 </p>
                 <div className="space-y-4">

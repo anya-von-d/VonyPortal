@@ -176,7 +176,7 @@ function WeekStrip({ allPaymentEvents, today, formatMoney }) {
 
   return (
     <div className="glass-card" style={{ overflow: 'hidden', userSelect: 'none' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 26px 0' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px 0' }}>
         <button onClick={() => setWeekOffset(w => w - 1)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#787776', display: 'flex', alignItems: 'center' }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="15 18 9 12 15 6" /></svg>
         </button>
@@ -191,7 +191,7 @@ function WeekStrip({ allPaymentEvents, today, formatMoney }) {
         </button>
       </div>
       <div
-        style={{ padding: '10px 26px 0' }}
+        style={{ padding: '8px 16px 0' }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
@@ -224,7 +224,7 @@ function WeekStrip({ allPaymentEvents, today, formatMoney }) {
           })}
         </div>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 14, padding: '6px 26px 12px' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 14, padding: '6px 16px 10px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 9, color: '#787776' }}><div style={{ width: 6, height: 6, borderRadius: '50%', background: '#678AFB' }} /> Owed to you</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 9, color: '#787776' }}><div style={{ width: 6, height: 6, borderRadius: '50%', background: '#A79DEA' }} /> You owe</div>
       </div>
@@ -734,10 +734,10 @@ export default function Home() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20, gridRow: '1 / 2' }}>
               {/* Next payment due */}
               <div className="galaxy-border-card">
-                <div style={{ padding: '22px 26px 0' }}>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Next payment due</div>
+                <div style={{ padding: '14px 16px 0' }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Next payment due</div>
                 </div>
-                <div style={{ padding: '14px 26px 18px' }}>
+                <div style={{ padding: '10px 16px 12px' }}>
                   {nextBorrowerPayment ? (
                     <>
                       <div style={{ fontSize: '1.3rem', fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', lineHeight: 1 }}>
@@ -755,10 +755,10 @@ export default function Home() {
 
               {/* Next payment incoming */}
               <div className="glass-card" style={{ overflow: 'hidden' }}>
-                <div style={{ padding: '22px 26px 0' }}>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Next payment incoming</div>
+                <div style={{ padding: '14px 16px 0' }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Next payment incoming</div>
                 </div>
-                <div style={{ padding: '14px 26px 18px' }}>
+                <div style={{ padding: '10px 16px 12px' }}>
                   {nextLenderPayment ? (
                     <>
                       <div style={{ fontSize: '1.3rem', fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', lineHeight: 1 }}>
@@ -776,10 +776,10 @@ export default function Home() {
 
               {/* Monthly stats card */}
               <div className="glass-card" style={{ overflow: 'hidden' }}>
-                <div style={{ padding: '22px 26px 0' }}>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>How {format(today, 'MMMM')} is going</div>
+                <div style={{ padding: '14px 16px 0' }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>How {format(today, 'MMMM')} is going</div>
                 </div>
-                <div style={{ padding: '14px 26px 20px' }}>
+                <div style={{ padding: '10px 16px 14px' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
                     <div style={{ textAlign: 'center', padding: '0 12px' }}>
                       <div style={{ fontSize: 11, color: '#787776', marginBottom: 4 }}>Received</div>
@@ -806,11 +806,11 @@ export default function Home() {
             {/* Upcoming Payments */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20, gridRow: '1 / 2' }}>
               <div className="glass-card" style={{ overflow: 'hidden' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px 26px 0' }}>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Upcoming payments</div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 0' }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Upcoming payments</div>
                   <Link to={createPageUrl("YourLoans")} style={{ fontSize: 12, fontWeight: 500, color: '#A79DEA', textDecoration: 'none' }}>Full schedule</Link>
                 </div>
-                <div style={{ padding: '18px 26px 26px', minHeight: 200 }}>
+                <div style={{ padding: '12px 16px 16px', minHeight: 200 }}>
                   {combinedPaymentEvents.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '40px 0', color: '#787776', fontSize: 13 }}>No upcoming payments</div>
                   ) : (
@@ -846,14 +846,14 @@ export default function Home() {
 
             {/* Your Loans — spans both sub-columns, directly under How March is going */}
             <div className="glass-card" style={{ overflow: 'hidden', gridColumn: '1 / 3' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0, padding: '20px 26px 0' }}>
-                <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Your active loans</div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0, padding: '14px 16px 0' }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Your active loans</div>
                 <Link to={createPageUrl("YourLoans")} style={{ fontSize: 12, fontWeight: 500, color: '#A79DEA', textDecoration: 'none' }}>Manage</Link>
               </div>
               {myLoans.filter(l => l && l.status === 'active').length === 0 ? (
-                <div style={{ padding: '20px 26px', textAlign: 'center', color: '#787776', fontSize: 13 }}>No active loans</div>
+                <div style={{ padding: '14px 16px', textAlign: 'center', color: '#787776', fontSize: 13 }}>No active loans</div>
               ) : (
-                <div style={{ padding: '14px 26px 22px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div style={{ padding: '10px 16px 14px', display: 'flex', flexDirection: 'column', gap: 16 }}>
                   {myLoans.filter(l => l && l.status === 'active').slice(0, 4).map((loan, idx) => {
                     const isLender = loan.lender_id === user.id;
                     const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
@@ -887,11 +887,11 @@ export default function Home() {
             {/* Loans Over Time chart + Recent Activity */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               <div className="glass-card" style={{ overflow: 'hidden' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px 26px 0' }}>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Loans over time</div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 0' }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Loans over time</div>
                   <span style={{ fontSize: 12, fontWeight: 500, color: '#A79DEA' }}>6 months</span>
                 </div>
-                <div style={{ padding: '18px 26px 26px' }}>
+                <div style={{ padding: '12px 16px 16px' }}>
                   {chartData ? (() => {
                     const { data, maxVal } = chartData;
                     const chartHeight = 110;
@@ -940,11 +940,11 @@ export default function Home() {
 
               {/* Loan Progress */}
               <div className="glass-card" style={{ overflow: 'hidden' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px 26px 0' }}>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Loan progress</div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 0' }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Loan progress</div>
                   <Link to={createPageUrl("Lending")} style={{ fontSize: 12, fontWeight: 500, color: '#A79DEA', textDecoration: 'none' }}>Manage</Link>
                 </div>
-                <div style={{ padding: '18px 26px 22px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+                <div style={{ padding: '12px 16px 14px', display: 'flex', flexDirection: 'column', gap: 18 }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 8 }}>
                       <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>Lending</div>
@@ -970,11 +970,11 @@ export default function Home() {
 
               {/* Recent Activity */}
               <div className="glass-card" style={{ overflow: 'hidden' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px 26px 0' }}>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: '#0D0D0C', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>Recent activity</div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 0' }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Recent activity</div>
                   <Link to={createPageUrl("RecentActivity")} style={{ fontSize: 12, fontWeight: 500, color: '#A79DEA', textDecoration: 'none' }}>View all</Link>
                 </div>
-                <div style={{ padding: '18px 26px 26px' }}>
+                <div style={{ padding: '12px 16px 16px' }}>
                   {recentActivity.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '20px 0', color: '#787776', fontSize: 13 }}>No recent activity</div>
                   ) : (
