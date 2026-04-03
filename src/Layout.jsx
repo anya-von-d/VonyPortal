@@ -100,7 +100,7 @@ export default function Layout({ children }) {
 
   return (
     <div className="min-h-screen flex flex-col w-full safe-area-inset-top safe-area-inset-bottom" style={isDashboardStyle ? { background: '#F5F4F0' } : { background: `linear-gradient(to bottom right, rgb(var(--theme-bg-from)), rgb(var(--theme-bg-to)))` }}>
-      {/* Blue gradient — vertical along sidebar right edge, starts below top bar */}
+      {/* Gradient — vertical, sidebar right edge (below top bar) */}
       {isDashboardStyle && (
         <div style={{
           position: 'fixed', top: 56, left: 197, bottom: 0, width: 46,
@@ -108,11 +108,27 @@ export default function Layout({ children }) {
           pointerEvents: 'none', zIndex: 57,
         }} />
       )}
-      {/* Blue gradient — horizontal under top bar, from sidebar edge rightward, fades down */}
+      {/* Gradient — horizontal under top bar, fades down */}
       {isDashboardStyle && (
         <div style={{
           position: 'fixed', top: 56, left: 200, right: 0, height: 40,
           background: 'linear-gradient(to bottom, #03ACEA 0%, #03ACEA 3px, rgba(245,244,240,0) 40px)',
+          pointerEvents: 'none', zIndex: 57,
+        }} />
+      )}
+      {/* Gradient — vertical, right edge of screen */}
+      {isDashboardStyle && (
+        <div style={{
+          position: 'fixed', top: 56, right: 0, bottom: 0, width: 46,
+          background: 'linear-gradient(to left, #03ACEA 0%, #03ACEA 3px, rgba(245,244,240,0) 46px)',
+          pointerEvents: 'none', zIndex: 57,
+        }} />
+      )}
+      {/* Gradient — horizontal at bottom of main content, fades up */}
+      {isDashboardStyle && (
+        <div style={{
+          position: 'fixed', bottom: 0, left: 200, right: 0, height: 46,
+          background: 'linear-gradient(to top, #03ACEA 0%, #03ACEA 3px, rgba(245,244,240,0) 46px)',
           pointerEvents: 'none', zIndex: 57,
         }} />
       )}
