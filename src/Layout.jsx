@@ -105,7 +105,7 @@ export default function Layout({ children }) {
       {user && !isDashboardStyle && <TopNav location={location} />}
 
       {/* Main content container */}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1">
         {children}
       </main>
 

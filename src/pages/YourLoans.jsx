@@ -668,62 +668,90 @@ export default function YourLoans() {
             {/* LENDING: next payment incoming → upcoming payments */}
             {/* BORROWING: next payment due → loans ranked by */}
 
-            {/* Next payment due — borrowing only */}
+            {/* Next payment due — borrowing only (split into two side-by-side cards) */}
             {!isLending && (
-              <div className="galaxy-border-card">
-                <div style={{ padding: '14px 16px 0' }}>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Next payment due</div>
-                </div>
-                <div style={{ padding: '10px 16px 16px' }}>
-                  {nextPaymentLoan ? (
-                    <>
-                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
-                        <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', lineHeight: 1 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                {/* Card 1: Date + days badge */}
+                <div className="galaxy-border-card" style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ padding: '14px 16px 0' }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Next payment due</div>
+                  </div>
+                  <div style={{ padding: '10px 16px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
+                    {nextPaymentLoan ? (
+                      <>
+                        <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', lineHeight: 1 }}>
                           {format(new Date(nextPaymentLoan.next_payment_date), 'MMM d')}
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-                          <span style={{ fontSize: 10, fontWeight: 700, color: nextPaymentDays < 0 ? '#E8726E' : accentColor, background: nextPaymentDays < 0 ? 'rgba(232,114,110,0.1)' : accentLight, borderRadius: 6, padding: '2px 6px', whiteSpace: 'nowrap' }}>
-                            {nextPaymentDays < 0 ? `${Math.abs(nextPaymentDays)}d late` : nextPaymentDays === 0 ? 'today' : `${nextPaymentDays}d`}
-                          </span>
-                          <div style={{ fontSize: 12, color: '#787776', textAlign: 'right' }}>
-                            {formatMoney(nextPaymentAmount)} to {otherPartyUsername}
-                          </div>
+                        <span style={{ fontSize: 10, fontWeight: 700, color: nextPaymentDays < 0 ? '#E8726E' : accentColor, background: nextPaymentDays < 0 ? 'rgba(232,114,110,0.1)' : accentLight, borderRadius: 6, padding: '2px 6px', whiteSpace: 'nowrap' }}>
+                          {nextPaymentDays < 0 ? `${Math.abs(nextPaymentDays)}d late` : nextPaymentDays === 0 ? 'today' : `${nextPaymentDays}d`}
+                        </span>
+                      </>
+                    ) : (
+                      <div style={{ fontSize: 13, color: '#787776' }}>No upcoming</div>
+                    )}
+                  </div>
+                </div>
+                {/* Card 2: Amount + to/from name */}
+                <div className="glass-card" style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ padding: '14px 16px 0' }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Next payment amount</div>
+                  </div>
+                  <div style={{ padding: '10px 16px 16px', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+                    {nextPaymentLoan ? (
+                      <>
+                        <div style={{ fontSize: '1.2rem', fontWeight: 700, color: accentColor, letterSpacing: '-0.02em', lineHeight: 1 }}>
+                          {formatMoney(nextPaymentAmount)}
                         </div>
-                      </div>
-                    </>
-                  ) : (
-                    <div style={{ fontSize: 13, color: '#787776' }}>No upcoming payments to send</div>
-                  )}
+                        <div style={{ fontSize: 11, color: '#787776' }}>to {otherPartyUsername}</div>
+                      </>
+                    ) : (
+                      <div style={{ fontSize: 13, color: '#787776' }}>—</div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Next payment incoming — lending only */}
+            {/* Next payment incoming — lending only (split into two side-by-side cards) */}
             {isLending && (
-              <div className="galaxy-border-card">
-                <div style={{ padding: '14px 16px 0' }}>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Next payment incoming</div>
-                </div>
-                <div style={{ padding: '10px 16px 16px' }}>
-                  {nextPaymentLoan ? (
-                    <>
-                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
-                        <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', lineHeight: 1 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                {/* Card 1: Date + days badge */}
+                <div className="galaxy-border-card" style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ padding: '14px 16px 0' }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Next payment incoming</div>
+                  </div>
+                  <div style={{ padding: '10px 16px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
+                    {nextPaymentLoan ? (
+                      <>
+                        <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', lineHeight: 1 }}>
                           {format(new Date(nextPaymentLoan.next_payment_date), 'MMM d')}
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-                          <span style={{ fontSize: 10, fontWeight: 700, color: nextPaymentDays < 0 ? '#E8726E' : accentColor, background: nextPaymentDays < 0 ? 'rgba(232,114,110,0.1)' : accentLight, borderRadius: 6, padding: '2px 6px', whiteSpace: 'nowrap' }}>
-                            {nextPaymentDays < 0 ? `${Math.abs(nextPaymentDays)}d late` : nextPaymentDays === 0 ? 'today' : `${nextPaymentDays}d`}
-                          </span>
-                          <div style={{ fontSize: 12, color: '#787776', textAlign: 'right' }}>
-                            {formatMoney(nextPaymentAmount)} from {otherPartyUsername}
-                          </div>
+                        <span style={{ fontSize: 10, fontWeight: 700, color: nextPaymentDays < 0 ? '#E8726E' : accentColor, background: nextPaymentDays < 0 ? 'rgba(232,114,110,0.1)' : accentLight, borderRadius: 6, padding: '2px 6px', whiteSpace: 'nowrap' }}>
+                          {nextPaymentDays < 0 ? `${Math.abs(nextPaymentDays)}d late` : nextPaymentDays === 0 ? 'today' : `${nextPaymentDays}d`}
+                        </span>
+                      </>
+                    ) : (
+                      <div style={{ fontSize: 13, color: '#787776' }}>No incoming</div>
+                    )}
+                  </div>
+                </div>
+                {/* Card 2: Amount + from name */}
+                <div className="glass-card" style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ padding: '14px 16px 0' }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Next payment amount</div>
+                  </div>
+                  <div style={{ padding: '10px 16px 16px', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+                    {nextPaymentLoan ? (
+                      <>
+                        <div style={{ fontSize: '1.2rem', fontWeight: 700, color: accentColor, letterSpacing: '-0.02em', lineHeight: 1 }}>
+                          {formatMoney(nextPaymentAmount)}
                         </div>
-                      </div>
-                    </>
-                  ) : (
-                    <div style={{ fontSize: 13, color: '#787776' }}>No incoming payments expected</div>
-                  )}
+                        <div style={{ fontSize: 11, color: '#787776' }}>from {otherPartyUsername}</div>
+                      </>
+                    ) : (
+                      <div style={{ fontSize: 13, color: '#787776' }}>—</div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
