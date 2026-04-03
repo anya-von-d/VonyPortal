@@ -659,16 +659,16 @@ export default function RecordPayment() {
                     <p style={{ fontSize: 12, color: '#787776', margin: 0 }}>No active loans found</p>
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
                     {filteredLoans.map(loan => {
                       const other = getOtherParty(loan);
                       const remaining = getRemainingBalance(loan);
                       const isSelected = selectedLoan?.id === loan.id;
                       return (
                         <button key={loan.id} onClick={() => handleSelectLoan(loan)} style={{
-                          display: 'block', width: '100%', textAlign: 'left', padding: '12px 14px', borderRadius: 12,
-                          border: isSelected ? '2px solid #678AFB' : '1px solid rgba(0,0,0,0.06)',
-                          background: isSelected ? 'rgba(103,138,251,0.06)' : 'rgba(0,0,0,0.02)',
+                          display: 'block', width: '100%', textAlign: 'left', padding: '13px 0',
+                          background: isSelected ? 'rgba(1,173,233,0.05)' : 'transparent',
+                          borderBottom: '1px solid rgba(0,0,0,0.05)',
                           cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", transition: 'all 0.15s',
                         }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -710,7 +710,7 @@ export default function RecordPayment() {
                 </div>
               </div>
               <div style={{ padding: '10px 16px 16px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
                   {/* Payments needing your response */}
                   {paymentsToConfirm.map(payment => {
                     const loan = getPaymentLoan(payment);
@@ -719,8 +719,8 @@ export default function RecordPayment() {
                     const otherId = loan.lender_id === payment.recorded_by ? loan.borrower_id : loan.lender_id;
                     return (
                       <div key={payment.id} style={{
-                        display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px',
-                        borderRadius: 12, background: 'rgba(0,0,0,0.03)',
+                        display: 'flex', alignItems: 'center', gap: 12, padding: '13px 0',
+                        borderBottom: '1px solid rgba(0,0,0,0.05)',
                       }}>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0 }}>
@@ -766,8 +766,8 @@ export default function RecordPayment() {
                     const otherId = loan.lender_id === user?.id ? loan.borrower_id : loan.lender_id;
                     return (
                       <div key={payment.id} style={{
-                        display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px',
-                        borderRadius: 12, background: 'rgba(0,0,0,0.03)',
+                        display: 'flex', alignItems: 'center', gap: 12, padding: '13px 0',
+                        borderBottom: '1px solid rgba(0,0,0,0.05)',
                       }}>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0 }}>

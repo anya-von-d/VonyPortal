@@ -923,7 +923,7 @@ export default function LoanAgreements() {
                       <div style={{ width: 32, flexShrink: 0 }} />
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
                       {filteredAgreements.map((agreement) => {
                         const isLender = agreement.lender_id === user?.id;
                         const otherPartyId = isLender ? agreement.borrower_id : agreement.lender_id;
@@ -939,13 +939,12 @@ export default function LoanAgreements() {
                           : dateDisplay;
 
                         return (
-                          <div key={agreement.id}>
+                          <div key={agreement.id} style={{ borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
                             <div
                               onClick={() => setExpandedId(isExpanded ? null : agreement.id)}
                               style={{
-                                display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px',
-                                borderRadius: isExpanded ? '12px 12px 0 0' : 12,
-                                background: 'rgba(0,0,0,0.03)', transition: 'background 0.15s', cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0',
+                                transition: 'background 0.15s', cursor: 'pointer',
                               }}
                             >
                               {/* Mobile layout */}
@@ -1003,9 +1002,8 @@ export default function LoanAgreements() {
                             {/* Expanded document buttons */}
                             {isExpanded && (
                               <div style={{
-                                padding: '16px 14px',
-                                background: 'rgba(0,0,0,0.02)', borderRadius: '0 0 12px 12px',
-                                borderTop: '1px solid rgba(0,0,0,0.04)',
+                                padding: '12px 0 16px',
+                                borderTop: '1px solid rgba(0,0,0,0.05)',
                                 display: 'flex', gap: 8, flexWrap: 'wrap',
                               }}>
                                 <button

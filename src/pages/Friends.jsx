@@ -309,7 +309,7 @@ export default function Friends() {
                     <p style={{ fontSize: 12, color: '#C7C6C4', margin: '4px 0 0' }}>Search for friends to get started</p>
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
                     {sortedFriends.map((friendship, index) => {
                       const friendProfile = getFriendProfile(friendship);
                       if (!friendProfile) return null;
@@ -318,8 +318,8 @@ export default function Friends() {
                         <div
                           key={friendship.id}
                           style={{
-                            display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px',
-                            borderRadius: 12, background: 'rgba(0,0,0,0.03)', transition: 'background 0.15s',
+                            display: 'flex', alignItems: 'center', gap: 12, padding: '13px 0',
+                            borderBottom: index < sortedFriends.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none',
                           }}
                         >
                           {/* Avatar */}
@@ -424,7 +424,7 @@ export default function Friends() {
                           <p style={{ fontSize: 13, color: '#787776', margin: 0 }}>No users found</p>
                         </div>
                       ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
                           {allSearchResults.map((profile) => {
                             const receivedRequest = getReceivedRequestFrom(profile.user_id);
                             const sentRequest = getSentRequestTo(profile.user_id);
@@ -433,8 +433,8 @@ export default function Friends() {
                               <div
                                 key={profile.user_id}
                                 style={{
-                                  display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px',
-                                  borderRadius: 12, background: 'rgba(0,0,0,0.03)',
+                                  display: 'flex', alignItems: 'center', gap: 12, padding: '13px 0',
+                                  borderBottom: '1px solid rgba(0,0,0,0.05)',
                                 }}
                               >
                                 <img
@@ -536,7 +536,7 @@ export default function Friends() {
                     </div>
                   </div>
                   <div style={{ padding: '10px 16px 16px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
                       {receivedRequests.map((request) => {
                         const profile = getProfileById(request.user_id);
                         if (!profile) return null;
@@ -545,8 +545,8 @@ export default function Friends() {
                           <div
                             key={request.id}
                             style={{
-                              display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px',
-                              borderRadius: 12, background: 'rgba(0,0,0,0.03)',
+                              display: 'flex', alignItems: 'center', gap: 12, padding: '13px 0',
+                              borderBottom: '1px solid rgba(0,0,0,0.05)',
                             }}
                           >
                             <img

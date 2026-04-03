@@ -879,7 +879,7 @@ export default function RecentActivityPage() {
                     <span style={{ width: 100, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right', flexShrink: 0 }}>Amount</span>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
                     {filtered.map((activity, index) => {
                       const { title, description, icon: Icon, status, friendName, amount, category } = getActivityInfo(activity);
                       const catDisplay = CATEGORY_DISPLAY[category] || CATEGORY_DISPLAY.sent_offer;
@@ -890,8 +890,8 @@ export default function RecentActivityPage() {
                           key={`${activity.type}-${activity.id}-${index}`}
                           className="activity-row"
                           style={{
-                            display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px',
-                            borderRadius: 12, background: 'rgba(0,0,0,0.03)', transition: 'background 0.15s',
+                            display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0',
+                            borderBottom: index < filtered.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none',
                           }}
                         >
                           {/* Mobile layout — shown on small screens */}
