@@ -108,6 +108,14 @@ export default function Layout({ children }) {
           pointerEvents: 'none', zIndex: 57,
         }} />
       )}
+      {/* Gradient — horizontal line at top of main content area */}
+      {isDashboardStyle && (
+        <div style={{
+          position: 'fixed', top: 0, left: 240, right: 0, height: 22,
+          background: 'linear-gradient(to bottom, #03ACEA 0%, #03ACEA 1px, rgba(245,244,240,0) 22px)',
+          pointerEvents: 'none', zIndex: 57,
+        }} />
+      )}
 
       {/* TopNav handles its own fixed positioning and mobile menu — hidden on dashboard-style pages */}
       {user && !isDashboardStyle && <TopNav location={location} />}

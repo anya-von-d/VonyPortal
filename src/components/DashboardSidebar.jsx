@@ -284,20 +284,10 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
         </div>
       )}
 
-      {/* ── Blue top bar ── */}
-      <div className="home-sidebar" style={{
-        position: 'fixed', top: 0, left: 240, right: 0, height: 44,
-        background: '#03ACEA', zIndex: 58,
-        display: 'flex', alignItems: 'center',
-        padding: '0 24px',
-        fontFamily: "'DM Sans', sans-serif",
-      }}>
-      </div>
-
       {/* ── Desktop sidebar ── */}
       <aside className="home-sidebar" style={{
         position: 'fixed', left: 0, top: 0, bottom: 0, width: 240,
-        background: '#F5F4F0',
+        background: 'white',
         zIndex: 52, display: 'flex', flexDirection: 'column',
         fontFamily: "'DM Sans', sans-serif", overflowY: 'auto',
       }}>
