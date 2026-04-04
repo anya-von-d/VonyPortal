@@ -707,7 +707,7 @@ export default function YourLoans() {
                         <div style={{ fontSize: 11, color: '#787776' }}>to {otherPartyUsername}</div>
                       </>
                     ) : (
-                      <div style={{ fontSize: 13, color: '#787776' }}>—</div>
+                      <div style={{ fontSize: 13, color: '#787776' }}>N/A</div>
                     )}
                   </div>
                 </div>
@@ -751,7 +751,7 @@ export default function YourLoans() {
                         <div style={{ fontSize: 11, color: '#787776' }}>from {otherPartyUsername}</div>
                       </>
                     ) : (
-                      <div style={{ fontSize: 13, color: '#787776' }}>—</div>
+                      <div style={{ fontSize: 13, color: '#787776' }}>N/A</div>
                     )}
                   </div>
                 </div>
@@ -939,7 +939,7 @@ export default function YourLoans() {
                   const isLend = loan.lender_id === user?.id;
                   const otherParty = publicProfiles.find(p => p.user_id === (isLend ? loan.borrower_id : loan.lender_id));
                   const roleLabel = isLend ? 'Lent to' : 'Borrowed from';
-                  return (<option key={loan.id} value={loan.id}>{roleLabel} {otherParty?.full_name || 'User'} — ${loan.amount?.toLocaleString()}{loan.status === 'cancelled' ? ' · Cancelled' : ''}</option>);
+                  return (<option key={loan.id} value={loan.id}>{roleLabel} {otherParty?.full_name || 'User'} · ${loan.amount?.toLocaleString()}{loan.status === 'cancelled' ? ' · Cancelled' : ''}</option>);
                 })}
               </select>
               <div style={{ pointerEvents: 'none', position: 'absolute', top: 0, bottom: 0, right: 10, display: 'flex', alignItems: 'center' }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#82F0B9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
@@ -1022,7 +1022,7 @@ export default function YourLoans() {
                             </span>
                           </>
                         ) : (
-                          <div style={{ fontSize: 13, color: '#787776' }}>—</div>
+                          <div style={{ fontSize: 13, color: '#787776' }}>N/A</div>
                         )}
                       </div>
                     </div>
@@ -1046,7 +1046,7 @@ export default function YourLoans() {
                             </div>
                           </>
                         ) : (
-                          <div style={{ fontSize: 13, color: '#787776' }}>—</div>
+                          <div style={{ fontSize: 13, color: '#787776' }}>N/A</div>
                         )}
                       </div>
                     </div>

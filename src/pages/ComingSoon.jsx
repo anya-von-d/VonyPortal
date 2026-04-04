@@ -56,7 +56,7 @@ const products = [
     icon: Users,
     name: "Group Pools",
     tagline: "Community",
-    description: "Pool money with friends for shared goals — trips, gifts, or emergency funds.",
+    description: "Pool money with friends for shared goals: trips, gifts, or emergency funds.",
     highlights: ["Transparent contributions", "Automatic splits", "Group dashboard"],
     color: '#2563EB',
   },
@@ -81,7 +81,7 @@ const guides = [
   {
     icon: FileCheck,
     title: "Writing a Loan Agreement That Works",
-    description: "The key terms every peer loan should include — amount, schedule, what happens if things change — and how to bring it up naturally.",
+    description: "The key terms every peer loan should include: amount, schedule, what happens if things change, and how to bring it up naturally.",
     readTime: "5 min read",
     color: '#2563EB',
   },
@@ -143,7 +143,7 @@ export default function ComingSoon() {
                     What We're Building
                   </span>
                   <p style={{ fontSize: 14, color: '#5C5B5A', margin: '10px 0 0', lineHeight: 1.6 }}>
-                    New tools to make lending between friends simpler, safer, and smarter. These features are in development — we'll notify you when they launch.
+                    New tools to make lending between friends simpler, safer, and smarter. These features are in development. We'll notify you when they launch.
                   </p>
                 </motion.div>
 
@@ -214,7 +214,7 @@ export default function ComingSoon() {
                     Guides & Resources
                   </span>
                   <p style={{ fontSize: 14, color: '#5C5B5A', margin: '10px 0 0', lineHeight: 1.6 }}>
-                    Practical advice for lending and borrowing between friends — from setting terms to navigating tough conversations.
+                    Practical advice for lending and borrowing between friends: from setting terms to navigating tough conversations.
                   </p>
                 </motion.div>
 

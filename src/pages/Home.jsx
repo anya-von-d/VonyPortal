@@ -815,7 +815,7 @@ export default function Home() {
                   ) : (
                     <div style={{ paddingTop: 8 }}>
                       <div style={{ fontSize: 22, marginBottom: 4 }}>💸</div>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918' }}>All quiet on the lender front</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918' }}>No payments heading your way</div>
                     </div>
                   )}
                 </div>

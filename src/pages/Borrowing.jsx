@@ -1233,7 +1233,7 @@ export default function Borrowing() {
                                 >
                                   {manageableLoans.map((loan) => {
                                     const lender = publicProfiles.find(p => p.user_id === loan.lender_id);
-                                    return (<option key={loan.id} value={loan.id}>{lender?.full_name || 'User'} — ${loan.amount?.toLocaleString()}{loan.status === 'cancelled' ? ' · Cancelled' : ''}</option>);
+                                    return (<option key={loan.id} value={loan.id}>{lender?.full_name || 'User'} · ${loan.amount?.toLocaleString()}{loan.status === 'cancelled' ? ' · Cancelled' : ''}</option>);
                                   })}
                                 </select>
                                 <div style={{ pointerEvents: 'none', position: 'absolute', top: 0, bottom: 0, right: 10, display: 'flex', alignItems: 'center' }}>
