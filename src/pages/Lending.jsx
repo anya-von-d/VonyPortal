@@ -1489,13 +1489,13 @@ export default function Lending({ initialTab }) {
         signingAs="Lender"
       />
 
-      <div className="home-with-sidebar" style={{ minHeight: '100vh', display: 'flex', alignItems: 'flex-start', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 132, background: '#5881FE' }}>
+      <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 88, background: '#5881FE' }}>
 
         <DashboardSidebar activePage={initialTab === 'create' ? 'CreateOffer' : 'Lending'} user={currentUser} />
 
           {/* Galaxy gradient background */}
 
-          <div style={{ flex: 1, minWidth: 0, paddingRight: 24, position: 'relative', zIndex: 2, maxWidth: 1080, margin: '0 auto', padding: '0 28px' }}>
+          <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 40px', position: 'relative', zIndex: 2, maxWidth: 1080, margin: '0 auto', padding: '0 28px' }}>
           <div style={{ paddingTop: 24 }} />
 
           {/* Tab Navigation — hidden when accessed as standalone Create Loan page */}

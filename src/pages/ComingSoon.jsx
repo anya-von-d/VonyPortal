@@ -121,13 +121,30 @@ export default function ComingSoon() {
   const [activeTab, setActiveTab] = useState('shop');
 
   return (
-    <div className="home-with-sidebar" style={{ minHeight: '100vh', display: 'flex', alignItems: 'flex-start', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 132, background: '#5881FE' }}>
+    <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 88, background: '#5881FE' }}>
       <DashboardSidebar activePage="ComingSoon" user={user} tabs={[{key:'shop',label:'Shop'},{key:'learn',label:'Learn'}]} activeTab={activeTab} onTabChange={setActiveTab} />
 
-        <div style={{ flex: 1, minWidth: 0, paddingRight: 24, background: 'transparent', position: 'relative', zIndex: 2 }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 40px', background: 'transparent', position: 'relative', zIndex: 2 }}>
 
           {/* Page content */}
           <div style={{ maxWidth: 1080, margin: '0 auto', padding: '24px 40px 64px' }}>
+
+            {/* Tab switcher */}
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+              <div style={{ display: 'inline-flex', gap: 2, background: 'rgba(255,255,255,0.18)', borderRadius: 12, padding: 3, backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.3)' }}>
+                {[{key:'shop',label:'Shop'},{key:'learn',label:'Learn'}].map(tab => (
+                  <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{
+                    padding: '7px 20px', borderRadius: 9, border: 'none', cursor: 'pointer',
+                    fontSize: 13, fontFamily: "'DM Sans', sans-serif",
+                    fontWeight: activeTab === tab.key ? 600 : 500,
+                    color: activeTab === tab.key ? '#1A1918' : 'rgba(255,255,255,0.88)',
+                    background: activeTab === tab.key ? 'white' : 'transparent',
+                    boxShadow: activeTab === tab.key ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
+                    transition: 'all 0.15s',
+                  }}>{tab.label}</button>
+                ))}
+              </div>
+            </div>
 
             {/* ═══ Shop Tab ═══ */}
             {activeTab === 'shop' && (
@@ -229,7 +246,7 @@ export default function ComingSoon() {
                       className="glass-card"
                       style={{ padding: '22px 26px', cursor: 'default' }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+                      <div style={{ gap: 16 }}>
                         <div style={{ width: 40, height: 40, borderRadius: 12, background: `${guide.color}14`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
                           <guide.icon size={20} style={{ color: guide.color }} />
                         </div>

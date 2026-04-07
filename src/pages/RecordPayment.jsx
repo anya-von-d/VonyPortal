@@ -342,9 +342,9 @@ export default function RecordPayment() {
   /* ── Loading state ──────────────────────────────────────── */
   if (isLoading && !user) {
     return (
-      <div className="home-with-sidebar" style={{ minHeight: '100vh', display: 'flex', alignItems: 'flex-start', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 132, background: '#5881FE' }}>
+      <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 88, background: '#5881FE' }}>
         <DashboardSidebar activePage="RecordPayment" user={user} />
-          <div style={{ flex: 1, minWidth: 0, paddingRight: 24, maxWidth: 1080, margin: '0 auto', padding: '24px 40px 64px', position: 'relative', zIndex: 2 }}>
+          <div style={{ maxWidth: 1080, margin: '0 auto', paddingRight: 24, maxWidth: 1080, margin: '0 auto', padding: '24px 40px 64px', position: 'relative', zIndex: 2 }}>
             <div className="glass-card" style={{ padding: 40, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <div style={{ width: 32, height: 32, border: '2px solid #82F0B9', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: 12 }} />
               <p style={{ fontSize: 13, color: '#787776' }}>Loading...</p>
@@ -402,7 +402,7 @@ export default function RecordPayment() {
         )}
       </AnimatePresence>
 
-      <div className="home-with-sidebar" style={{ minHeight: '100vh', display: 'flex', alignItems: 'flex-start', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 132, background: '#5881FE' }}>
+      <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 88, background: '#5881FE' }}>
         <DashboardSidebar activePage="RecordPayment" user={user} />
 
           {/* Gradient background */}
@@ -410,7 +410,7 @@ export default function RecordPayment() {
           {/* Hero */}
 
           {/* Page content */}
-          <div style={{ flex: 1, minWidth: 0, paddingRight: 24, maxWidth: 1080, margin: '0 auto', padding: '24px 40px 64px', position: 'relative', zIndex: 2 }}>
+          <div style={{ maxWidth: 1080, margin: '0 auto', paddingRight: 24, maxWidth: 1080, margin: '0 auto', padding: '24px 40px 64px', position: 'relative', zIndex: 2 }}>
 
           {/* Two-column layout */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 16, alignItems: 'start' }}>

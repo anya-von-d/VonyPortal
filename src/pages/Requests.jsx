@@ -493,10 +493,10 @@ export default function Requests() {
   }
 
   return (
-    <div className="home-with-sidebar" style={{ minHeight: '100vh', display: 'flex', alignItems: 'flex-start', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 132, background: '#5881FE' }}>
+    <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 88, background: '#5881FE' }}>
       <DashboardSidebar activePage="Requests" user={user} />
 
-        <div style={{ flex: 1, minWidth: 0, position: 'relative', zIndex: 2 }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto', position: 'relative', zIndex: 2 }}>
           <div style={{ maxWidth: 1080, margin: '0 auto', padding: '24px 40px 64px' }}>
 
             {/* Reminders — outside white box, stacked at top */}

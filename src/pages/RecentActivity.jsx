@@ -511,9 +511,9 @@ export default function RecentActivityPage() {
   /* ── Loading / unauthenticated states ─────────────────────── */
   if (isLoading || !user) {
     return (
-      <div className="home-with-sidebar" style={{ minHeight: '100vh', display: 'flex', alignItems: 'flex-start', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 132, background: '#5881FE' }}>
+      <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 88, background: '#5881FE' }}>
         <DashboardSidebar activePage="RecentActivity" user={user} />
-          <div style={{ flex: 1, minWidth: 0, paddingRight: 24, maxWidth: 1080, margin: '0 auto', padding: '24px 40px 64px', position: 'relative', zIndex: 2 }}>
+          <div style={{ maxWidth: 1080, margin: '0 auto', paddingRight: 24, maxWidth: 1080, margin: '0 auto', padding: '24px 40px 64px', position: 'relative', zIndex: 2 }}>
             <div className="glass-card" style={{ padding: 40, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
               <div style={{ width: 32, height: 32, border: '2px solid #82F0B9', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: 12 }} />
               <p style={{ fontSize: 13, color: '#787776' }}>{isLoading ? 'Loading activity...' : 'Please log in to view activity'}</p>
@@ -768,14 +768,14 @@ export default function RecentActivityPage() {
      ══════════════════════════════════════════════════════════ */
   return (
     <>
-      <div className="home-with-sidebar" style={{ minHeight: '100vh', display: 'flex', alignItems: 'flex-start', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 132, background: '#5881FE' }}>
+      <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 88, background: '#5881FE' }}>
         <DashboardSidebar activePage="RecentActivity" user={user} />
 
           {/* Gradient background */}
 
 
           {/* Page content */}
-          <div style={{ flex: 1, minWidth: 0, paddingRight: 24, maxWidth: 1080, margin: '0 auto', padding: '24px 40px 64px', position: 'relative', zIndex: 2 }}>
+          <div style={{ maxWidth: 1080, margin: '0 auto', paddingRight: 24, maxWidth: 1080, margin: '0 auto', padding: '24px 40px 64px', position: 'relative', zIndex: 2 }}>
 
           {/* ── Search Bar + Sort + Export ───────────────────────── */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
@@ -907,7 +907,7 @@ export default function RecentActivityPage() {
                           <span className="activity-desktop-date" style={{ display: 'none', width: 80, fontSize: 12, fontWeight: 500, color: '#787776', flexShrink: 0 }}>
                             {dateDisplay}
                           </span>
-                          <div className="activity-desktop-category" style={{ display: 'none', flex: 1, minWidth: 0, alignItems: 'center', paddingLeft: 4 }}>
+                          <div className="activity-desktop-category" style={{ display: 'none', maxWidth: 1080, margin: '0 auto', alignItems: 'center', paddingLeft: 4 }}>
                             <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</span>
                           </div>
                           <div className="activity-desktop-status" style={{ display: 'none', width: 180, flexShrink: 0, alignItems: 'center', paddingLeft: 12 }}>

@@ -859,10 +859,10 @@ export default function Borrowing() {
         )}
       </AnimatePresence>
 
-      <div className="home-with-sidebar" style={{ minHeight: '100vh', display: 'flex', alignItems: 'flex-start', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 132, background: '#5881FE' }}>
+      <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 88, background: '#5881FE' }}>
         <DashboardSidebar activePage="Borrowing" user={user} tabs={[{key:'summary',label:'Summary'},{key:'details',label:'Individual Loan Details'}]} activeTab={activeTab} onTabChange={setActiveTab} />
 
-          <div style={{ flex: 1, minWidth: 0, paddingRight: 24, position: 'relative', zIndex: 2 }}>
+          <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 40px', position: 'relative', zIndex: 2 }}>
 
         {/* Page content */}
         <div style={{ maxWidth: 1080, margin: '0 auto', padding: '24px 40px 64px' }}>
@@ -1320,7 +1320,7 @@ export default function Borrowing() {
 
                               {/* Quick Actions */}
                               {manageLoanSelected && manageLoanSelected.status !== 'cancelled' && (
-                                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 20, padding: '4px 0' }}>
+                                <div style={{ justifyContent: 'center', gap: 20, padding: '4px 0' }}>
                                   <button onClick={() => handleMakePayment(manageLoanSelected)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', background: 'none', border: 'none' }}>
                                     <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(130,240,185,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#82F0B9" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
@@ -1459,7 +1459,7 @@ export default function Borrowing() {
                                   </div>
 
                                   {/* Document Icons */}
-                                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 20, padding: '4px 0' }}>
+                                  <div style={{ justifyContent: 'center', gap: 20, padding: '4px 0' }}>
                                     <button onClick={() => { const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id); if (agreement) openDocPopup('promissory', agreement); }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', background: 'none', border: 'none' }}>
                                       <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(130,240,185,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#82F0B9" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
