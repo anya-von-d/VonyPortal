@@ -2,10 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Loan, Payment, Friendship, PublicProfile } from "@/entities/all";
+import { Loan, Payment, Friendship } from "@/entities/all";
 import { useAuth } from "@/lib/AuthContext";
-import { daysUntil } from "@/components/utils/dateUtils";
-import { format } from "date-fns";
 
 const PAGE_TITLES = {
   Dashboard: null,
@@ -34,16 +32,6 @@ export default function DashboardSidebar({ activePage = "Dashboard", user, tabs,
   const settingsRef = useRef(null);
   const moreRef = useRef(null);
 
-  // Right sidebar data
-  const [notifications, setNotifications] = useState([]);
-  const [upcomingPayments, setUpcomingPayments] = useState([]);
-
-  // Reserve right sidebar space so pages center correctly
-  useEffect(() => {
-    document.body.style.paddingRight = `${RIGHT_SIDEBAR_WIDTH}px`;
-    return () => { document.body.style.paddingRight = ''; };
-  }, []);
-
   useEffect(() => { if (user?.id) fetchData(); }, [user?.id]);
 
   useEffect(() => {
@@ -57,11 +45,10 @@ export default function DashboardSidebar({ activePage = "Dashboard", user, tabs,
 
   const fetchData = async () => {
     try {
-      const [payments, loans, friendships, profiles] = await Promise.all([
+      const [payments, loans, friendships] = await Promise.all([
         Payment.list('-created_at').catch(() => []),
         Loan.list().catch(() => []),
         Friendship.list().catch(() => []),
-        PublicProfile.list().catch(() => []),
       ]);
 
       const userLoans   = loans.filter(l => l.lender_id === user.id || l.borrower_id === user.id);
@@ -74,45 +61,6 @@ export default function DashboardSidebar({ activePage = "Dashboard", user, tabs,
       const friendRequests = friendships.filter(f => f.friend_id === user.id && f.status === 'pending');
 
       setNotifCount(paymentsToConfirm.length + offersReceived.length + friendRequests.length);
-
-      // Build notifications list
-      const notifs = [];
-      paymentsToConfirm.slice(0, 3).forEach(p => {
-        const loan = userLoans.find(l => l.id === p.loan_id);
-        const otherUserId = loan ? (loan.lender_id === user.id ? loan.borrower_id : loan.lender_id) : null;
-        const profile = profiles.find(pr => pr.user_id === otherUserId);
-        const name = profile?.full_name?.split(' ')[0] || profile?.username || 'Someone';
-        notifs.push({ type: 'payment', text: `${name} recorded $${(p.amount || 0).toFixed(0)} payment`, link: createPageUrl("Requests"), color: '#82F0B9' });
-      });
-      friendRequests.slice(0, 2).forEach(f => {
-        const profile = profiles.find(pr => pr.user_id === f.user_id);
-        const name = profile?.full_name?.split(' ')[0] || profile?.username || 'Someone';
-        notifs.push({ type: 'friend', text: `${name} wants to be friends`, link: createPageUrl("Friends"), color: '#03ACEA' });
-      });
-      offersReceived.slice(0, 2).forEach(l => {
-        const profile = profiles.find(pr => pr.user_id === l.lender_id);
-        const name = profile?.full_name?.split(' ')[0] || profile?.username || 'Someone';
-        notifs.push({ type: 'offer', text: `${name} sent you a $${(l.amount || 0).toLocaleString()} loan offer`, link: createPageUrl("Requests"), color: '#7C3AED' });
-      });
-      setNotifications(notifs);
-
-      // Build upcoming payments
-      const today = new Date();
-      const upcoming = userLoans
-        .filter(l => l.status === 'active' && l.next_payment_date)
-        .map(l => {
-          const isLender = l.lender_id === user.id;
-          const otherUserId = isLender ? l.borrower_id : l.lender_id;
-          const profile = profiles.find(pr => pr.user_id === otherUserId);
-          const name = profile?.full_name?.split(' ')[0] || profile?.username || 'user';
-          const days = daysUntil(l.next_payment_date);
-          const date = new Date(l.next_payment_date + 'T12:00:00');
-          return { days, date, name, amount: l.payment_amount || 0, isLender, isOverdue: days < 0 };
-        })
-        .sort((a, b) => a.days - b.days)
-        .slice(0, 5);
-      setUpcomingPayments(upcoming);
-
     } catch (e) { console.error("Sidebar data error:", e); }
   };
 
@@ -145,13 +93,6 @@ export default function DashboardSidebar({ activePage = "Dashboard", user, tabs,
 
   const hour = new Date().getHours();
   const timeGreeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good night';
-
-  // Notification icon by type
-  const notifIcon = (type) => {
-    if (type === 'payment') return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>;
-    if (type === 'friend') return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
-    return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>;
-  };
 
   return (
     <>
@@ -277,7 +218,7 @@ export default function DashboardSidebar({ activePage = "Dashboard", user, tabs,
           </div>
 
           {/* PAGE TITLE ROW */}
-          <div style={{ position: 'fixed', top: 76, left: 8, right: RIGHT_SIDEBAR_WIDTH, zIndex: 99, pointerEvents: 'none' }}>
+          <div style={{ position: 'fixed', top: 76, left: 8, right: 8, zIndex: 99, pointerEvents: 'none' }}>
             <div style={{ maxWidth: 1080, margin: '0 auto', paddingLeft: 40, paddingRight: 40, display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 48, pointerEvents: 'auto' }}>
               <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 34, fontWeight: 600, color: '#1A1918', margin: 0, letterSpacing: '-0.01em', lineHeight: 1 }}>
                 {activePage === 'Dashboard' ? (
@@ -308,119 +249,6 @@ export default function DashboardSidebar({ activePage = "Dashboard", user, tabs,
             </div>
           </div>
 
-          {/* RIGHT SIDEBAR — continuous strip */}
-          <div style={{
-            position: 'fixed', top: 76, right: 0, bottom: 0, width: RIGHT_SIDEBAR_WIDTH,
-            zIndex: 98, overflowY: 'auto', overflowX: 'hidden',
-            background: 'rgba(255,255,255,0.97)',
-            backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-            borderLeft: '1px solid rgba(0,0,0,0.07)',
-            fontFamily: "'DM Sans', sans-serif",
-          }}>
-
-            {/* Profile */}
-            <div style={{ padding: '20px 18px 18px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                {user?.profile_picture_url ? (
-                  <div style={{ width: 46, height: 46, borderRadius: '50%', overflow: 'hidden', flexShrink: 0, border: '2px solid rgba(0,0,0,0.06)' }}>
-                    <img src={user.profile_picture_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  </div>
-                ) : (
-                  <div style={{ width: 46, height: 46, borderRadius: '50%', flexShrink: 0, background: 'linear-gradient(135deg, #03ACEA 0%, #7C3AED 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="1.8" strokeLinecap="round">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                      <circle cx="12" cy="7" r="4"/>
-                    </svg>
-                  </div>
-                )}
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.01em', lineHeight: 1.25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {user?.full_name || firstName || 'User'}
-                  </div>
-                  {user?.username && (
-                    <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 2 }}>@{user.username}</div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Divider */}
-            <div style={{ height: 1, background: 'rgba(0,0,0,0.07)', margin: '0' }} />
-
-            {/* Notifications section */}
-            <div style={{ padding: '16px 18px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                <span style={{ fontSize: 10, fontWeight: 700, color: '#B0AFAD', letterSpacing: '0.09em', textTransform: 'uppercase' }}>Notifications</span>
-                {notifCount > 0 && (
-                  <Link to={createPageUrl("Requests")} style={{ fontSize: 11, fontWeight: 500, color: '#2563EB', textDecoration: 'none' }}>View all</Link>
-                )}
-              </div>
-              <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 10 }} />
-              {notifications.length === 0 ? (
-                <div style={{ padding: '8px 0 4px', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 16 }}>✅</span>
-                  <span style={{ fontSize: 12, color: '#9B9A98' }}>All caught up!</span>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  {notifications.map((n, i) => (
-                    <Link key={i} to={n.link} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, padding: '7px 6px', borderRadius: 8, textDecoration: 'none', transition: 'background 0.12s' }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.04)'}
-                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                    >
-                      <div style={{ width: 22, height: 22, borderRadius: 6, background: `${n.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: n.color, marginTop: 1 }}>
-                        {notifIcon(n.type)}
-                      </div>
-                      <span style={{ fontSize: 11.5, color: '#1A1918', lineHeight: 1.4, fontWeight: 500 }}>{n.text}</span>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Divider */}
-            <div style={{ height: 1, background: 'rgba(0,0,0,0.07)' }} />
-
-            {/* Upcoming section */}
-            <div style={{ padding: '16px 18px 24px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                <span style={{ fontSize: 10, fontWeight: 700, color: '#B0AFAD', letterSpacing: '0.09em', textTransform: 'uppercase' }}>Upcoming</span>
-                <Link to={createPageUrl("Upcoming")} style={{ fontSize: 11, fontWeight: 500, color: '#2563EB', textDecoration: 'none' }}>See all</Link>
-              </div>
-              <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 10 }} />
-              {upcomingPayments.length === 0 ? (
-                <div style={{ padding: '8px 0 4px', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 16 }}>✨</span>
-                  <span style={{ fontSize: 12, color: '#9B9A98' }}>Nothing coming up</span>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  {upcomingPayments.map((p, i) => {
-                    const daysLabel = p.isOverdue ? `${Math.abs(p.days)}d late` : p.days === 0 ? 'Today' : `${p.days}d`;
-                    return (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 0', borderBottom: i < upcomingPayments.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none' }}>
-                        <div style={{ minWidth: 0, flex: 1 }}>
-                          <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {p.isLender ? `From ${p.name}` : `To ${p.name}`}
-                          </div>
-                          <div style={{ fontSize: 10, color: '#9B9A98', marginTop: 2 }}>{format(p.date, 'MMM d')}</div>
-                        </div>
-                        <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 8 }}>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: p.isOverdue ? '#E8726E' : p.isLender ? '#35B276' : '#2563EB' }}>
-                            {p.isLender ? '+' : '-'}${(p.amount || 0).toLocaleString()}
-                          </div>
-                          <div style={{ fontSize: 9, fontWeight: 700, color: p.isOverdue ? '#E8726E' : '#9B9A98', background: p.isOverdue ? 'rgba(232,114,110,0.1)' : 'rgba(0,0,0,0.05)', borderRadius: 4, padding: '1px 5px', marginTop: 3, display: 'inline-block' }}>
-                            {daysLabel}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-          </div>
         </>,
         document.body
       )}

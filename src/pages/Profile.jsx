@@ -271,7 +271,7 @@ export default function Profile() {
   // Loading state
   if (isLoading) {
     return (
-      <div style={{ minHeight: '100vh', background: '#5881FE', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ minHeight: '100vh', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: 32, height: 32, border: '2px solid #82F0B9', borderTopColor: 'transparent', borderRadius: '50%', margin: '0 auto 16px' }} className="animate-spin" />
           <p style={{ fontSize: 14, color: '#787776', fontFamily: "'DM Sans', sans-serif" }}>Loading profile...</p>
@@ -283,7 +283,7 @@ export default function Profile() {
   // Error state for initial load failure
   if (error && !user) {
     return (
-      <div style={{ minHeight: '100vh', background: '#5881FE', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ minHeight: '100vh', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div className="glass-card" style={{ padding: 32, maxWidth: 400 }}>
           <div style={{ textAlign: 'center' }}>
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -303,7 +303,7 @@ export default function Profile() {
   if (!user) return null;
 
   return (
-    <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 132, background: '#5881FE' }}>
+    <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 132, background: 'transparent' }}>
       <DashboardSidebar activePage="Profile" user={user} />
 
         <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 40px', position: 'relative', zIndex: 2, maxWidth: 900, margin: '0 auto', padding: '0 28px' }}>
