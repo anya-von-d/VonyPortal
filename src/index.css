@@ -187,7 +187,7 @@ input[type="date"] {
 /* Wrap any glass-card in this to get a 1px gradient border */
 .gradient-border-wrapper {
   padding: 1px;
-  background: linear-gradient(135deg, rgba(3, 172, 234, 0.55) 0%, rgba(124, 58, 237, 0.45) 100%);
+  background: rgba(3, 172, 234, 0.45);
   border-radius: 17px;
   transition: transform 0.22s ease, box-shadow 0.22s ease;
 }

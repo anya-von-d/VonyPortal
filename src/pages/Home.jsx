@@ -704,7 +704,7 @@ export default function Home() {
 
         {/* Top row grid: quick actions + snapshot cards */}
         <div style={{ marginTop: 0 }}>
-          <div className="home-top-row" style={{ display: 'grid', gridTemplateColumns: '1.75fr 1fr', columnGap: 20, rowGap: 20, alignItems: 'start' }}>
+          <div className="home-top-row" style={{ display: 'grid', gridTemplateColumns: '2fr 0.82fr', columnGap: 20, rowGap: 20, alignItems: 'start' }}>
 
             {/* LEFT SECTION: sub-grid for left two columns */}
             <div style={{ display: 'grid', gridTemplateColumns: '0.75fr 1fr', gap: 20, alignItems: 'start' }}>
@@ -748,7 +748,8 @@ export default function Home() {
 
             {/* Left sub-col: Next Payment Due */}
             <div className="glow-wrapper glow-blue">
-            <div className="galaxy-border-card">
+            <div className="gradient-border-wrapper" style={{ borderRadius: 17 }}>
+            <div className="glass-card" style={{ borderRadius: 16 }}>
               <div style={{ padding: '14px 16px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Next payment due</div>
                 {nextBorrowerPayment && (() => {
@@ -779,9 +780,11 @@ export default function Home() {
               </div>
             </div>
             </div>
+            </div>{/* /glow-blue */}
 
             {/* Right sub-col: Next Payment Incoming (moved) */}
             <div className="glow-wrapper glow-purple">
+            <div className="gradient-border-wrapper">
             <div className="glass-card" style={{ overflow: 'hidden' }}>
               <div style={{ padding: '14px 16px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Next payment incoming</div>
@@ -813,9 +816,11 @@ export default function Home() {
               </div>
             </div>
             </div>
+            </div>{/* /glow-purple */}
 
             {/* Left sub-col: Upcoming Payments (moved from right sub-col) */}
             <CardEntrance delay={0.05}>
+            <div className="gradient-border-wrapper">
             <div className="glass-card" style={{ overflow: 'hidden' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 0' }}>
                 <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Upcoming payments</div>
@@ -860,10 +865,12 @@ export default function Home() {
                 )}
               </div>
             </div>
+            </div>
             </CardEntrance>
 
             {/* Right sub-col: Loans Over Time (swapped from right main col) */}
             <CardEntrance delay={0.17}>
+            <div className="gradient-border-wrapper">
             <div className="glass-card" style={{ overflow: 'hidden' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 0' }}>
                 <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Loans over time</div>
@@ -919,6 +926,7 @@ export default function Home() {
                 )}
               </div>
             </div>
+            </div>
             </CardEntrance>
 
             {/* Your Active Loans — spans both sub-columns */}
@@ -928,6 +936,7 @@ export default function Home() {
               transition={{ duration: 0.4, delay: 0.19, ease: 'easeOut' }}
               style={{ gridColumn: '1 / 3' }}
             >
+            <div className="gradient-border-wrapper">
             <div className="glass-card" style={{ overflow: 'hidden' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0, padding: '14px 16px 0' }}>
                 <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Your active loans</div>
@@ -968,6 +977,7 @@ export default function Home() {
                 </div>
               )}
             </div>
+            </div>
             </motion.div>
 
             </div>{/* end LEFT SECTION sub-grid */}
@@ -975,52 +985,35 @@ export default function Home() {
             {/* Right column: Loan Progress + How [Month] is Going + Recent Activity */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-              {/* Loan Progress */}
+              {/* Owed to You */}
               <CardEntrance delay={0.1}>
+              <div className="gradient-border-wrapper">
               <div className="glass-card" style={{ overflow: 'hidden' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 0' }}>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Loan progress</div>
-                  <Link to={createPageUrl("Lending")} style={{ fontSize: 12, fontWeight: 500, color: '#2563EB', textDecoration: 'none' }}>Manage</Link>
+                <div style={{ padding: '14px 16px 16px' }}>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif", marginBottom: 8 }}>Owed to You</div>
+                  <div style={{ fontSize: '2rem', fontWeight: 800, color: '#35B276', letterSpacing: '-0.04em', lineHeight: 1, fontFamily: "'DM Sans', sans-serif" }}>{formatMoney(lentRemaining)}</div>
+                  <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 6 }}>outstanding balance</div>
                 </div>
-                <div style={{ padding: '12px 16px 14px', display: 'flex', flexDirection: 'column', gap: 18 }}>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 6 }}>
-                      <div>
-                        <div style={{ fontSize: 10, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 2 }}>Lending</div>
-                        <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#35B276', letterSpacing: '-0.03em', lineHeight: 1, fontFamily: "'DM Sans', sans-serif" }}>{formatMoney(totalLentAmount)}</div>
-                      </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: '#35B276' }}>{percentRepaid}%</div>
-                        <div style={{ fontSize: 10, color: '#9B9A98' }}>repaid</div>
-                      </div>
-                    </div>
-                    <div style={{ width: '100%', height: 6, borderRadius: 3, background: 'rgba(130,240,185,0.2)', overflow: 'hidden' }}>
-                      <div style={{ height: '100%', borderRadius: 3, background: 'linear-gradient(90deg, #82F0B9, #35B276)', width: `${percentRepaid}%`, transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
-                    </div>
-                    <div style={{ fontSize: 10, color: '#9B9A98', marginTop: 4 }}>{formatMoney(totalRepaid)} repaid · {formatMoney(lentRemaining)} remaining</div>
-                  </div>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 6 }}>
-                      <div>
-                        <div style={{ fontSize: 10, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 2 }}>Borrowing</div>
-                        <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#2563EB', letterSpacing: '-0.03em', lineHeight: 1, fontFamily: "'DM Sans', sans-serif" }}>{formatMoney(totalBorrowedAmount)}</div>
-                      </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: '#2563EB' }}>{percentPaid}%</div>
-                        <div style={{ fontSize: 10, color: '#9B9A98' }}>paid back</div>
-                      </div>
-                    </div>
-                    <div style={{ width: '100%', height: 6, borderRadius: 3, background: 'rgba(37,99,235,0.15)', overflow: 'hidden' }}>
-                      <div style={{ height: '100%', borderRadius: 3, background: 'linear-gradient(90deg, #2563EB, #7C3AED)', width: `${percentPaid}%`, transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
-                    </div>
-                    <div style={{ fontSize: 10, color: '#9B9A98', marginTop: 4 }}>{formatMoney(totalPaidBack)} paid · {formatMoney(borrowedRemaining)} remaining</div>
-                  </div>
+              </div>
+              </div>
+              </CardEntrance>
+
+              {/* You Owe */}
+              <CardEntrance delay={0.13}>
+              <div className="gradient-border-wrapper">
+              <div className="glass-card" style={{ overflow: 'hidden' }}>
+                <div style={{ padding: '14px 16px 16px' }}>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif", marginBottom: 8 }}>You Owe</div>
+                  <div style={{ fontSize: '2rem', fontWeight: 800, color: '#2563EB', letterSpacing: '-0.04em', lineHeight: 1, fontFamily: "'DM Sans', sans-serif" }}>{formatMoney(borrowedRemaining)}</div>
+                  <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 6 }}>outstanding balance</div>
                 </div>
+              </div>
               </div>
               </CardEntrance>
 
               {/* How [Month] is Going (swapped from left section) */}
               <CardEntrance delay={0.12}>
+              <div className="gradient-border-wrapper">
               <div className="glass-card" style={{ overflow: 'hidden' }}>
                 <div style={{ padding: '14px 16px 0' }}>
                   <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>How {format(today, 'MMMM')} is going</div>
@@ -1046,10 +1039,12 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+              </div>
               </CardEntrance>
 
               {/* Recent Activity */}
               <CardEntrance delay={0.24}>
+              <div className="gradient-border-wrapper">
               <div className="glass-card" style={{ overflow: 'hidden' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 0' }}>
                   <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Recent activity</div>
@@ -1084,6 +1079,7 @@ export default function Home() {
                     ))
                   )}
                 </div>
+              </div>
               </div>
               </CardEntrance>
             </div>
