@@ -716,7 +716,7 @@ export default function Home() {
       <div style={{
         margin: '8px 10px 0',
         height: 168,
-        background: '#6587F9',
+        background: '#7EC0EA',
         borderRadius: 18,
         display: 'flex',
         flexDirection: 'column',
@@ -787,25 +787,28 @@ export default function Home() {
 
             {/* Left sub-col: Next Payment Due */}
             <div className="glow-wrapper glow-blue">
-            <DashboardCard title="Next payment due" headerRight={nextBorrowerPayment && (() => {
+            <DashboardCard title="Next payment due">
+              <div style={{ padding: '6px 16px 16px' }}>
+                {nextBorrowerPayment ? (() => {
                   const days = Math.ceil((nextBorrowerPayment.date.getTime() - Date.now()) / 86400000);
                   const isLate = days < 0;
                   const label = isLate ? `${Math.abs(days)}d late` : days === 0 ? 'today' : `in ${days}d`;
                   return (
-                    <span style={{ fontSize: 10, fontWeight: 700, color: 'white', background: isLate ? '#E8726E' : '#03ACEA', borderRadius: 20, padding: '3px 9px', whiteSpace: 'nowrap', letterSpacing: '0.02em' }}>{label}</span>
+                    <>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                        <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#1A1918', letterSpacing: '-0.03em', lineHeight: 1, fontFamily: "'DM Sans', sans-serif" }}>
+                          {format(nextBorrowerPayment.date, 'MMM d')}
+                        </div>
+                        <span style={{ fontSize: 10, fontWeight: 700, color: isLate ? '#E8726E' : '#2563EB', background: isLate ? 'rgba(232,114,110,0.1)' : 'rgba(37,99,235,0.10)', borderRadius: 6, padding: '2px 7px', whiteSpace: 'nowrap' }}>
+                          {label}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 12, color: '#5C5B5A' }}>
+                        {formatMoney(nextBorrowerPayment.payment_amount || 0)} · to {nextBorrowerPayment.firstName}
+                      </div>
+                    </>
                   );
-                })()}>
-              <div style={{ padding: '6px 16px 16px' }}>
-                {nextBorrowerPayment ? (
-                  <>
-                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#1A1918', letterSpacing: '-0.03em', lineHeight: 1, marginBottom: 6, fontFamily: "'DM Sans', sans-serif" }}>
-                      {format(nextBorrowerPayment.date, 'MMM d')}
-                    </div>
-                    <div style={{ fontSize: 12, color: '#5C5B5A' }}>
-                      {formatMoney(nextBorrowerPayment.payment_amount || 0)} · to {nextBorrowerPayment.firstName}
-                    </div>
-                  </>
-                ) : (
+                })() : (
                   <div style={{ paddingTop: 8 }}>
                     <div style={{ fontSize: 22, marginBottom: 4 }}>🎉</div>
                     <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918' }}>Nothing due right now</div>
@@ -817,25 +820,28 @@ export default function Home() {
 
             {/* Right sub-col: Next Payment Incoming (moved) */}
             <div className="glow-wrapper glow-purple">
-            <DashboardCard title="Next payment incoming" headerRight={nextLenderPayment && (() => {
+            <DashboardCard title="Next payment incoming">
+              <div style={{ padding: '6px 16px 16px' }}>
+                {nextLenderPayment ? (() => {
                   const days = Math.ceil((nextLenderPayment.date.getTime() - Date.now()) / 86400000);
                   const isLate = days < 0;
                   const label = isLate ? `${Math.abs(days)}d late` : days === 0 ? 'today' : `in ${days}d`;
                   return (
-                    <span style={{ fontSize: 10, fontWeight: 700, color: 'white', background: isLate ? '#E8726E' : '#35B276', borderRadius: 20, padding: '3px 9px', whiteSpace: 'nowrap', letterSpacing: '0.02em' }}>{label}</span>
+                    <>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                        <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#1A1918', letterSpacing: '-0.03em', lineHeight: 1, fontFamily: "'DM Sans', sans-serif" }}>
+                          {format(nextLenderPayment.date, 'MMM d')}
+                        </div>
+                        <span style={{ fontSize: 10, fontWeight: 700, color: isLate ? '#E8726E' : '#35B276', background: isLate ? 'rgba(232,114,110,0.1)' : 'rgba(53,178,118,0.10)', borderRadius: 6, padding: '2px 7px', whiteSpace: 'nowrap' }}>
+                          {label}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 12, color: '#5C5B5A' }}>
+                        {formatMoney(nextLenderPayment.payment_amount || 0)} · from {nextLenderPayment.firstName}
+                      </div>
+                    </>
                   );
-                })()}>
-              <div style={{ padding: '6px 16px 16px' }}>
-                {nextLenderPayment ? (
-                  <>
-                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#1A1918', letterSpacing: '-0.03em', lineHeight: 1, marginBottom: 6, fontFamily: "'DM Sans', sans-serif" }}>
-                      {format(nextLenderPayment.date, 'MMM d')}
-                    </div>
-                    <div style={{ fontSize: 12, color: '#5C5B5A' }}>
-                      {formatMoney(nextLenderPayment.payment_amount || 0)} · from {nextLenderPayment.firstName}
-                    </div>
-                  </>
-                ) : (
+                })() : (
                   <div style={{ paddingTop: 8 }}>
                     <div style={{ fontSize: 22, marginBottom: 4 }}>💸</div>
                     <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918' }}>No payments heading your way</div>

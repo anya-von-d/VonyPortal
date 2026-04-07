@@ -97,7 +97,7 @@ export default function DashboardSidebar({ activePage = "Dashboard", user, tabs,
         zIndex: 100, padding: '0 40px', pointerEvents: 'none',
         fontFamily: "'DM Sans', sans-serif",
       }}>
-        <div style={{ maxWidth: 1080, margin: '0 auto', pointerEvents: 'auto' }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto', pointerEvents: 'auto' }}>
           <div style={{
             display: 'flex', alignItems: 'center', height: 50,
             background: 'rgba(255,255,255,0.72)',
@@ -114,10 +114,8 @@ export default function DashboardSidebar({ activePage = "Dashboard", user, tabs,
               fontFamily: "'Playfair Display', Georgia, serif",
               fontWeight: 400, fontStyle: 'italic', fontSize: '1.3rem',
               letterSpacing: '-0.02em', color: '#1A1918', textDecoration: 'none',
-              flexShrink: 0, marginRight: 10,
+              flexShrink: 0, marginRight: 14,
             }}>Vony</Link>
-
-            <div style={{ width: 1, height: 16, background: 'rgba(0,0,0,0.1)', marginRight: 10, flexShrink: 0 }} />
 
             {/* Nav links */}
             <nav style={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1, justifyContent: 'center' }}>
@@ -193,24 +191,8 @@ export default function DashboardSidebar({ activePage = "Dashboard", user, tabs,
               </div>
             </nav>
 
-            <div style={{ width: 1, height: 16, background: 'rgba(0,0,0,0.1)', marginRight: 10, flexShrink: 0 }} />
-
-            {/* Right: Profile + Bell */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
-
-              {/* Profile */}
-              <Link to={createPageUrl("Profile")} style={{ ...linkStyle('Profile'), padding: '4px 10px 4px 5px' }}>
-                {user?.profile_picture_url ? (
-                  <div style={{ width: 26, height: 26, borderRadius: 7, overflow: 'hidden', flexShrink: 0, border: '1.5px solid rgba(0,0,0,0.08)' }}>
-                    <img src={user.profile_picture_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  </div>
-                ) : (
-                  <div style={{ width: 26, height: 26, borderRadius: 7, background: 'linear-gradient(135deg, #03ACEA, #7C3AED)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                  </div>
-                )}
-                <span>{firstName || 'Profile'}</span>
-              </Link>
+            {/* Right: Bell + Round Profile */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
 
               {/* Notifications bell */}
               <Link to={createPageUrl("Requests")} style={{
@@ -226,12 +208,27 @@ export default function DashboardSidebar({ activePage = "Dashboard", user, tabs,
                 </svg>
                 {notifCount > 0 && (
                   <span style={{
-                    position: 'absolute', top: 4, right: 4,
+                    position: 'absolute', top: 3, right: 3,
                     fontSize: 9, fontWeight: 700, color: 'white', background: '#E8726E',
                     borderRadius: 10, padding: '1px 4px', minWidth: 14, textAlign: 'center', lineHeight: 1.5,
                   }}>
                     {notifCount > 99 ? '99+' : notifCount}
                   </span>
+                )}
+              </Link>
+
+              {/* Profile — round avatar */}
+              <Link to={createPageUrl("Profile")} style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none', borderRadius: '50%' }}>
+                {user?.profile_picture_url ? (
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', overflow: 'hidden', flexShrink: 0, border: '2px solid rgba(255,255,255,0.8)', boxShadow: '0 0 0 1.5px rgba(0,0,0,0.08)' }}>
+                    <img src={user.profile_picture_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                ) : (
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg, #6587F9, #7C3AED)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '2px solid rgba(255,255,255,0.8)', boxShadow: '0 0 0 1.5px rgba(0,0,0,0.08)' }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: 'white', fontFamily: "'DM Sans', sans-serif" }}>
+                      {(user?.full_name || 'U').charAt(0).toUpperCase()}
+                    </span>
+                  </div>
                 )}
               </Link>
 
