@@ -93,7 +93,7 @@ export default function DashboardSidebar({ activePage = "Dashboard", user, tabs,
     <>
       {/* ── Floating top nav bar ── */}
       <div style={{
-        position: 'fixed', top: 12, left: 0, right: 0,
+        position: 'fixed', top: 20, left: 0, right: 0,
         zIndex: 100, padding: '0 40px', pointerEvents: 'none',
         fontFamily: "'DM Sans', sans-serif",
       }}>
@@ -243,7 +243,7 @@ export default function DashboardSidebar({ activePage = "Dashboard", user, tabs,
       {/* Page title row — non-dashboard pages */}
       {activePage !== 'Dashboard' && (
         <div style={{
-          position: 'fixed', top: 74, left: 0, right: 0,
+          position: 'fixed', top: 82, left: 0, right: 0,
           zIndex: 99, padding: '0 52px', pointerEvents: 'none',
         }}>
           <div style={{
