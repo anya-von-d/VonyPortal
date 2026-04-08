@@ -758,16 +758,12 @@ export default function Home() {
       <div style={{
         margin: '8px 10px 0',
         height: 168,
-        background: '#FDF9F7',
-        borderRadius: 18,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'flex-end',
         paddingBottom: 24,
-        overflow: 'hidden',
         position: 'relative',
-        boxShadow: '0px 50px 40px rgba(0,0,0,0.01), 0px 50px 40px rgba(0,0,0,0.02), 0px 20px 40px rgba(0,0,0,0.05), 0px 3px 10px rgba(0,0,0,0.08)',
       }}>
         {/* Paper texture overlay */}
         {/* Subtle star field */}
@@ -794,7 +790,7 @@ export default function Home() {
       <div style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 40px 64px', position: 'relative', zIndex: 1 }}>
 
         {/* Top row grid: quick actions + snapshot cards */}
-        <div style={{ marginTop: 0, border: '1.5px solid #1A1918', borderRadius: 18, padding: 20 }}>
+        <div style={{ marginTop: 0, background: '#1A1918', borderRadius: 18, padding: 20 }}>
           <div className="home-top-row" style={{ display: 'grid', gridTemplateColumns: '2fr 0.82fr', columnGap: 20, rowGap: 20, alignItems: 'start' }}>
 
             {/* LEFT SECTION: sub-grid for left two columns */}
