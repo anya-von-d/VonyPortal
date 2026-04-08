@@ -732,17 +732,27 @@ export default function Home() {
   const alertTotal = overdueReminders.length;
   overdueCountRef.current = alertTotal;
 
-  // Card wrapper: blue border frame, white box inside with title at top
-  const DashboardCard = ({ title, headerRight, children, style }) => (
-    <div style={{ background: '#9AD3EF', borderRadius: 14, padding: 5, ...style }}>
-      <div style={{ background: 'white', borderRadius: 10, overflow: 'hidden' }}>
-        <div style={{ padding: '10px 16px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+  // Card wrapper: white box with subtle border, title at top
+  const DashboardCard = ({ title, headerRight, children, style, highlight }) => (
+    highlight ? (
+      <div style={{ background: '#9AD3EF', borderRadius: 14, padding: 5, ...style }}>
+        <div style={{ background: 'white', borderRadius: 10, overflow: 'hidden' }}>
+          <div style={{ padding: '9px 14px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
+            {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
+          </div>
+          {children}
+        </div>
+      </div>
+    ) : (
+      <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E8E2DC', overflow: 'hidden', ...style }}>
+        <div style={{ padding: '9px 14px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
           {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
         </div>
         {children}
       </div>
-    </div>
+    )
   );
 
   return (
@@ -797,7 +807,7 @@ export default function Home() {
             {/* Inbox — spans both sub-columns */}
             <div style={{ gridColumn: '1 / 3' }}>
               <CardEntrance delay={0}>
-              <DashboardCard title="Inbox" headerRight={notifCount > 0 ? <Link to={createPageUrl("Requests")} style={{ fontSize: 12, fontWeight: 500, color: '#7EC0EA', textDecoration: 'none' }}>View all</Link> : null}>
+              <DashboardCard title="Inbox" headerRight={notifCount > 0 ? <Link to={createPageUrl("Requests")} style={{ fontSize: 12, fontWeight: 500, color: '#9B9A98', textDecoration: 'none' }}>View all</Link> : null}>
                 <div style={{ padding: '10px 16px 12px' }}>
                   {notifCount === 0 ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -825,7 +835,7 @@ export default function Home() {
 
             {/* Left sub-col: Next Payment Due */}
             <div className="glow-wrapper glow-blue">
-            <DashboardCard title="Next payment due">
+            <DashboardCard title="Next payment due" highlight>
               <div style={{ padding: '12px 16px' }}>
                 {nextBorrowerPayment ? (() => {
                   const days = Math.ceil((nextBorrowerPayment.date.getTime() - Date.now()) / 86400000);
@@ -858,7 +868,7 @@ export default function Home() {
 
             {/* Right sub-col: Next Payment Incoming (moved) */}
             <div className="glow-wrapper glow-purple">
-            <DashboardCard title="Next payment incoming">
+            <DashboardCard title="Next payment incoming" highlight>
               <div style={{ padding: '12px 16px' }}>
                 {nextLenderPayment ? (() => {
                   const days = Math.ceil((nextLenderPayment.date.getTime() - Date.now()) / 86400000);
@@ -891,7 +901,7 @@ export default function Home() {
 
             {/* Left sub-col: Upcoming Payments (moved from right sub-col) */}
             <CardEntrance delay={0.05}>
-            <DashboardCard title="Upcoming payments" headerRight={<Link to={createPageUrl("YourLoans")} style={{ fontSize: 12, fontWeight: 500, color: '#7EC0EA', textDecoration: 'none' }}>Full schedule</Link>}>
+            <DashboardCard title="Upcoming payments" headerRight={<Link to={createPageUrl("YourLoans")} style={{ fontSize: 12, fontWeight: 500, color: '#9B9A98', textDecoration: 'none' }}>Full schedule</Link>}>
               <div style={{ padding: '12px 16px 16px', minHeight: 200 }}>
                 {combinedPaymentEvents.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '32px 0' }}>
@@ -995,7 +1005,7 @@ export default function Home() {
               transition={{ duration: 0.4, delay: 0.19, ease: 'easeOut' }}
               style={{ gridColumn: '1 / 3' }}
             >
-            <DashboardCard title="Your active loans" headerRight={<Link to={createPageUrl("YourLoans")} style={{ fontSize: 12, fontWeight: 500, color: '#7EC0EA', textDecoration: 'none' }}>Manage</Link>}>
+            <DashboardCard title="Your active loans" headerRight={<Link to={createPageUrl("YourLoans")} style={{ fontSize: 12, fontWeight: 500, color: '#9B9A98', textDecoration: 'none' }}>Manage</Link>}>
               {myLoans.filter(l => l && l.status === 'active').length === 0 ? (
                 <div style={{ padding: '20px 16px', textAlign: 'center' }}>
                   <div style={{ fontSize: 28, marginBottom: 6 }}>🤝</div>
@@ -1086,7 +1096,7 @@ export default function Home() {
 
               {/* Recent Activity */}
               <CardEntrance delay={0.24}>
-              <DashboardCard title="Recent activity" headerRight={<Link to={createPageUrl("RecentActivity")} style={{ fontSize: 12, fontWeight: 500, color: '#7EC0EA', textDecoration: 'none' }}>View all</Link>}>
+              <DashboardCard title="Recent activity" headerRight={<Link to={createPageUrl("RecentActivity")} style={{ fontSize: 12, fontWeight: 500, color: '#9B9A98', textDecoration: 'none' }}>View all</Link>}>
                 <div style={{ padding: '12px 16px 16px' }}>
                   {recentActivity.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '20px 0' }}>
