@@ -274,7 +274,7 @@ export default function DashboardSidebar({ activePage = "Dashboard", user, tabs,
         const spacing = 120;
         const startY = 140;
         return (
-          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
+          <div className="side-icons-container" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
             {icons.map(({ color, svg }, i) => {
               const y = startY + i * spacing;
               const boxStyle = (rotation) => ({

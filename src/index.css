@@ -376,4 +376,40 @@ input[type="date"] {
   .dash-loans-time   { order: 6; }
   .dash-active-loans { order: 7; }
   .dash-recent       { order: 8; }
+
+  /* Hide decorative side icons */
+  .side-icons-container {
+    display: none !important;
+  }
+
+  /* Content wrapper: reduce outer padding so grey box nearly fills screen */
+  .dashboard-content-wrap {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+
+  /* Grey container fills almost full width */
+  .dashboard-grey-box {
+    border-radius: 14px !important;
+  }
+
+  /* Cards inside grey box fill available width */
+  .dash-next-pair,
+  .dash-balance-pair {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Footer: stack links vertically */
+  .dashboard-footer {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    padding: 12px 14px !important;
+  }
+
+  .dashboard-footer-links {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px !important;
+  }
 }
