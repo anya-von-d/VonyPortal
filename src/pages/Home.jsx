@@ -734,7 +734,7 @@ export default function Home() {
 
   const SHADOW = '0px 50px 40px rgba(0,0,0,0.01), 0px 50px 40px rgba(0,0,0,0.02), 0px 20px 40px rgba(0,0,0,0.05), 0px 3px 10px rgba(0,0,0,0.08)';
   const DashboardCard = ({ title, headerRight, children, style, highlight }) => {
-    const outerBg = highlight ? '#9AD3EF' : '#F4F4F5';
+    const outerBg = highlight ? '#7BBDE8' : '#EAEAEB';
     return (
       <div style={{ background: outerBg, borderRadius: 14, overflow: 'hidden', boxShadow: SHADOW, ...style }}>
         <div style={{ padding: '6px 14px 5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -757,7 +757,7 @@ export default function Home() {
       <div style={{
         margin: '8px 10px 0',
         height: 168,
-        background: '#7EC0EA',
+        background: '#5AADD6',
         borderRadius: 18,
         display: 'flex',
         flexDirection: 'column',
