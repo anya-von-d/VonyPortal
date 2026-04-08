@@ -237,39 +237,30 @@ export default function DashboardSidebar({ activePage = "Dashboard", user, tabs,
         </div>
       </div>
 
-      {/* Page title row — non-dashboard pages */}
-      {activePage !== 'Dashboard' && (
+      {/* Tab bar row — non-dashboard pages with tabs */}
+      {activePage !== 'Dashboard' && tabs && tabs.length > 0 && onTabChange && (
         <div style={{
           position: 'fixed', top: 82, left: 0, right: 0,
           zIndex: 99, padding: '0 52px', pointerEvents: 'none',
         }}>
           <div style={{
             maxWidth: 1080, margin: '0 auto',
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
             height: 48, pointerEvents: 'auto',
           }}>
-            <h1 style={{
-              fontFamily: "'Cormorant Garamond', Georgia, serif",
-              fontSize: 34, fontWeight: 600, color: '#1A1918',
-              margin: 0, letterSpacing: '-0.01em', lineHeight: 1,
-            }}>
-              <span style={{ fontStyle: 'italic' }}>{PAGE_TITLES[activePage] || activePage}</span>
-            </h1>
-            {tabs && tabs.length > 0 && onTabChange && (
-              <div style={{ display: 'inline-flex', gap: 2, background: 'rgba(0,0,0,0.05)', borderRadius: 10, padding: 3 }}>
-                {tabs.map(tab => (
-                  <button key={tab.key} onClick={() => onTabChange(tab.key)} style={{
-                    padding: '6px 16px', borderRadius: 8, border: 'none', cursor: 'pointer',
-                    fontSize: 13, fontFamily: "'DM Sans', sans-serif",
-                    fontWeight: activeTab === tab.key ? 600 : 500,
-                    color: activeTab === tab.key ? '#1A1918' : '#787776',
-                    background: activeTab === tab.key ? 'white' : 'transparent',
-                    boxShadow: activeTab === tab.key ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
-                    transition: 'all 0.15s', whiteSpace: 'nowrap',
-                  }}>{tab.label}</button>
-                ))}
-              </div>
-            )}
+            <div style={{ display: 'inline-flex', gap: 2, background: 'rgba(0,0,0,0.05)', borderRadius: 10, padding: 3 }}>
+              {tabs.map(tab => (
+                <button key={tab.key} onClick={() => onTabChange(tab.key)} style={{
+                  padding: '6px 16px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                  fontSize: 13, fontFamily: "'DM Sans', sans-serif",
+                  fontWeight: activeTab === tab.key ? 600 : 500,
+                  color: activeTab === tab.key ? '#1A1918' : '#787776',
+                  background: activeTab === tab.key ? 'white' : 'transparent',
+                  boxShadow: activeTab === tab.key ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
+                  transition: 'all 0.15s', whiteSpace: 'nowrap',
+                }}>{tab.label}</button>
+              ))}
+            </div>
           </div>
         </div>
       )}
