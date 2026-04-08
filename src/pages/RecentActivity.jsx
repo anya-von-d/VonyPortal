@@ -4,17 +4,7 @@ import { Activity, ArrowUpRight, ArrowDownRight, Send, Check, X, Ban, ChevronDow
 import { format, subDays, subMonths, subYears } from "date-fns";
 import DashboardSidebar from "@/components/DashboardSidebar";
 
-const STAR_CIRCLES = [
-  {cx:82,cy:45,o:0.7},{cx:195,cy:112,o:0.5},{cx:310,cy:28,o:0.8},{cx:420,cy:198,o:0.4},
-  {cx:530,cy:67,o:0.65},{cx:640,cy:245,o:0.55},{cx:755,cy:88,o:0.75},{cx:860,cy:156,o:0.45},
-  {cx:970,cy:34,o:0.7},{cx:1085,cy:201,o:0.6},{cx:1190,cy:78,o:0.5},{cx:1300,cy:267,o:0.7},
-  {cx:1410,cy:45,o:0.55},{cx:1520,cy:134,o:0.65},{cx:48,cy:189,o:0.4},{cx:158,cy:278,o:0.6},
-  {cx:268,cy:156,o:0.5},{cx:378,cy:89,o:0.7},{cx:488,cy:234,o:0.45},{cx:598,cy:145,o:0.6},
-  {cx:708,cy:312,o:0.35},{cx:818,cy:56,o:0.75},{cx:928,cy:223,o:0.5},{cx:1038,cy:98,o:0.65},
-  {cx:1148,cy:289,o:0.4},{cx:1258,cy:167,o:0.7},{cx:1368,cy:234,o:0.55},{cx:1478,cy:78,o:0.6},
-  {cx:1560,cy:256,o:0.45},{cx:125,cy:312,o:0.5},{cx:345,cy:267,o:0.6},{cx:565,cy:34,o:0.75},
-];
-
+const SHADOW = '0px 50px 40px rgba(0,0,0,0.02), 0px 50px 40px rgba(0,0,0,0.04), 0px 20px 40px rgba(0,0,0,0.08), 0px 3px 10px rgba(0,0,0,0.12)';
 
 const CATEGORY_OPTIONS = [
   { id: 'sent_offer', label: 'You sent a loan offer to' },
@@ -37,7 +27,6 @@ const DATE_OPTIONS = [
   { id: '1y', label: 'Last Year' },
   { id: 'older', label: 'Older' },
 ];
-
 
 const AMOUNT_MODES = [
   { id: 'all', label: 'All amounts' },
@@ -396,10 +385,6 @@ function ExportDropdown({ filteredCount, totalCount, hasAnyFilter, onExport }) {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const activeFilterCount = hasAnyFilter
-    ? [true].length // we'll pass the actual count
-    : 0;
-
   return (
     <div ref={ref} style={{ position: 'relative' }}>
       <button
@@ -511,23 +496,15 @@ export default function RecentActivityPage() {
   /* ── Loading / unauthenticated states ─────────────────────── */
   if (isLoading || !user) {
     return (
-      <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 88, background: 'transparent' }}>
+      <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 0, background: 'transparent' }}>
         <DashboardSidebar activePage="RecentActivity" user={user} />
-          <div style={{ maxWidth: 1080, margin: '0 auto', paddingRight: 24, maxWidth: 1080, margin: '0 auto', padding: '24px 40px 64px', position: 'relative', zIndex: 2 }}>
-            <div className="glass-card" style={{ padding: 40, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-              <div style={{ width: 32, height: 32, border: '2px solid #82F0B9', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: 12 }} />
-              <p style={{ fontSize: 13, color: '#787776' }}>{isLoading ? 'Loading activity...' : 'Please log in to view activity'}</p>
-            </div>
-          <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-              <span style={{ fontSize: 11, color: '#787776' }}>Terms of Service</span>
-              <span style={{ fontSize: 11, color: '#787776' }}>Privacy Center</span>
-              <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
-            </div>
-          </div>
+        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 40px 64px', position: 'relative', zIndex: 1 }}>
+          <div style={{ background: '#F4F4F5', borderRadius: 14, overflow: 'hidden', boxShadow: SHADOW, padding: 40, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 32, height: 32, border: '2px solid #82F0B9', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: 12 }} />
+            <p style={{ fontSize: 13, color: '#787776' }}>{isLoading ? 'Loading activity...' : 'Please log in to view activity'}</p>
           </div>
         </div>
+      </div>
     );
   }
 
@@ -763,19 +740,41 @@ export default function RecentActivityPage() {
     URL.revokeObjectURL(url);
   };
 
+  /* ── PageCard component ──────────────────────────────────── */
+  const PageCard = ({ title, headerRight, children, style }) => (
+    <div style={{ background: '#F4F4F5', borderRadius: 14, overflow: 'hidden', boxShadow: SHADOW, ...style }}>
+      <div style={{ padding: '6px 14px 5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
+        {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
+      </div>
+      <div style={{ background: '#ffffff', margin: '0 5px 5px', borderRadius: 10, overflow: 'hidden' }}>
+        {children}
+      </div>
+    </div>
+  );
+
   /* ══════════════════════════════════════════════════════════
      RENDER
      ══════════════════════════════════════════════════════════ */
   return (
     <>
-      <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 88, background: 'transparent' }}>
+      <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 0, background: 'transparent' }}>
         <DashboardSidebar activePage="RecentActivity" user={user} />
 
-          {/* Gradient background */}
+        {/* Hero */}
+        <div style={{ margin: '8px 10px 0', height: 168, background: '#54A6CF', borderRadius: 18, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 24, overflow: 'hidden', position: 'relative', boxShadow: '0px 50px 40px rgba(0,0,0,0.01), 0px 50px 40px rgba(0,0,0,0.02), 0px 20px 40px rgba(0,0,0,0.05), 0px 3px 10px rgba(0,0,0,0.08)' }}>
+          <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.15, pointerEvents: 'none', zIndex: 0 }} viewBox="0 0 1200 168" preserveAspectRatio="xMidYMid slice">
+            {[{cx:80,cy:40},{cx:200,cy:110},{cx:320,cy:25},{cx:430,cy:160},{cx:540,cy:70},{cx:660,cy:130},{cx:770,cy:35},{cx:890,cy:175},{cx:1000,cy:80},{cx:1100,cy:140},{cx:150,cy:185},{cx:480,cy:100},{cx:720,cy:180},{cx:950,cy:55},{cx:280,cy:195},{cx:620,cy:48},{cx:1050,cy:195}].map((s, i) => (
+              <circle key={i} cx={s.cx} cy={s.cy} r={i % 3 === 0 ? 2.5 : 1.5} fill="white" />
+            ))}
+          </svg>
+          <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 38, fontWeight: 600, color: '#1A1918', margin: 0, letterSpacing: '-0.01em', lineHeight: 1, textAlign: 'center', position: 'relative', zIndex: 1 }}>
+            <span style={{ fontStyle: 'italic' }}>Recent Activity</span>
+          </h1>
+        </div>
 
-
-          {/* Page content */}
-          <div style={{ maxWidth: 1080, margin: '0 auto', paddingRight: 24, maxWidth: 1080, margin: '0 auto', padding: '24px 40px 64px', position: 'relative', zIndex: 2 }}>
+        {/* Page content */}
+        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 40px 64px', position: 'relative', zIndex: 1 }}>
 
           {/* ── Search Bar + Sort + Export ───────────────────────── */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
@@ -806,8 +805,8 @@ export default function RecentActivityPage() {
           </div>
 
           {/* ── Filter Bar ─────────────────────────────────────── */}
-          <div className="glass-card" style={{ padding: '16px 22px', marginBottom: 20, overflow: 'visible', position: 'relative', zIndex: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+          <PageCard title="Filters" style={{ marginBottom: 20, overflow: 'visible', position: 'relative', zIndex: 20 }}>
+            <div style={{ padding: '11px 9px', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
               <SingleSelectDropdown options={DATE_OPTIONS} selected={dateFilter} onChange={setDateFilter} />
               <MultiSelectDropdown label="All Categories" options={CATEGORY_OPTIONS} selected={categoryFilter} onChange={setCategoryFilter} />
               {friendOptions.length > 0 && (
@@ -840,11 +839,11 @@ export default function RecentActivityPage() {
                 Clear Filters
               </button>
             </div>
-          </div>
+          </PageCard>
 
           {/* ── Activity List ──────────────────────────────────── */}
-          <div className="glass-card" style={{ overflow: 'hidden' }}>
-            <div style={{ padding: '14px 16px 16px' }}>
+          <PageCard title="Activity">
+            <div style={{ padding: '14px 9px 9px' }}>
               {filtered.length === 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 0', color: '#C7C6C4' }}>
                   <Activity size={32} style={{ opacity: 0.4, marginBottom: 8 }} />
@@ -855,7 +854,7 @@ export default function RecentActivityPage() {
                 <>
                   {/* Desktop table header — aligned to row columns */}
                   <div className="activity-table-header" style={{
-                    display: 'none', alignItems: 'center', padding: '0 14px 12px',
+                    display: 'none', alignItems: 'center', padding: '0 5px 12px',
                     borderBottom: '1px solid rgba(0,0,0,0.06)', marginBottom: 8,
                   }}>
                     <span style={{ width: 80, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', flexShrink: 0 }}>Date</span>
@@ -875,7 +874,7 @@ export default function RecentActivityPage() {
                           key={`${activity.type}-${activity.id}-${index}`}
                           className="activity-row"
                           style={{
-                            display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0',
+                            display: 'flex', alignItems: 'center', gap: 12, padding: '12px 5px',
                             borderBottom: index < filtered.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none',
                           }}
                         >
@@ -912,13 +911,13 @@ export default function RecentActivityPage() {
                           </div>
                           <div className="activity-desktop-status" style={{ display: 'none', width: 180, flexShrink: 0, alignItems: 'center', paddingLeft: 12 }}>
                             {(status === 'pending_confirmation' && activity.type === 'payment') && (
-                              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 8px', borderRadius: 6, background: 'white', border: '1px solid rgba(0,0,0,0.06)' }}>
+                              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 8px', borderRadius: 6, background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.06)' }}>
                                 <Clock size={11} style={{ color: '#787776' }} />
                                 <span style={{ fontSize: 10, fontWeight: 600, color: '#787776', whiteSpace: 'nowrap' }}>Pending confirmation</span>
                               </div>
                             )}
                             {(status === 'pending' && activity.type === 'loan' && (activity.status === 'pending' || activity.status === 'pending_borrower_approval')) && (
-                              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 8px', borderRadius: 6, background: 'white', border: '1px solid rgba(0,0,0,0.06)' }}>
+                              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 8px', borderRadius: 6, background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.06)' }}>
                                 <Clock size={11} style={{ color: '#787776' }} />
                                 <span style={{ fontSize: 10, fontWeight: 600, color: '#787776', whiteSpace: 'nowrap' }}>Pending approval</span>
                               </div>
@@ -934,7 +933,7 @@ export default function RecentActivityPage() {
                 </>
               )}
             </div>
-          </div>
+          </PageCard>
 
           {/* Desktop table responsive styles */}
           <style>{`
@@ -951,16 +950,15 @@ export default function RecentActivityPage() {
             }
           `}</style>
 
-
-        <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-            <span style={{ fontSize: 11, color: '#787776' }}>Terms of Service</span>
-            <span style={{ fontSize: 11, color: '#787776' }}>Privacy Center</span>
-            <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
+          <div style={{ padding: '20px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+              <span style={{ fontSize: 11, color: '#787776' }}>Terms of Service</span>
+              <span style={{ fontSize: 11, color: '#787776' }}>Privacy Center</span>
+              <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
+            </div>
           </div>
         </div>
-          </div>
       </div>
     </>
   );

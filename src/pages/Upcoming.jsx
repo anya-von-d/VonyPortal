@@ -8,16 +8,7 @@ import { formatMoney } from "@/components/utils/formatMoney";
 import { daysUntil as daysUntilDate } from "@/components/utils/dateUtils";
 import DashboardSidebar from "@/components/DashboardSidebar";
 
-const STAR_CIRCLES = [
-  {cx:82,cy:45,o:0.7},{cx:195,cy:112,o:0.5},{cx:310,cy:28,o:0.8},{cx:420,cy:198,o:0.4},
-  {cx:530,cy:67,o:0.65},{cx:640,cy:245,o:0.55},{cx:755,cy:88,o:0.75},{cx:860,cy:156,o:0.45},
-  {cx:970,cy:34,o:0.7},{cx:1085,cy:201,o:0.6},{cx:1190,cy:78,o:0.5},{cx:1300,cy:267,o:0.7},
-  {cx:1410,cy:45,o:0.55},{cx:1520,cy:134,o:0.65},{cx:48,cy:189,o:0.4},{cx:158,cy:278,o:0.6},
-  {cx:268,cy:156,o:0.5},{cx:378,cy:89,o:0.7},{cx:488,cy:234,o:0.45},{cx:598,cy:145,o:0.6},
-  {cx:708,cy:312,o:0.35},{cx:818,cy:56,o:0.75},{cx:928,cy:223,o:0.5},{cx:1038,cy:98,o:0.65},
-  {cx:1148,cy:289,o:0.4},{cx:1258,cy:167,o:0.7},{cx:1368,cy:234,o:0.55},{cx:1478,cy:78,o:0.6},
-  {cx:1560,cy:256,o:0.45},{cx:125,cy:312,o:0.5},{cx:345,cy:267,o:0.6},{cx:565,cy:34,o:0.75},
-];
+const SHADOW = '0px 50px 40px rgba(0,0,0,0.02), 0px 50px 40px rgba(0,0,0,0.04), 0px 20px 40px rgba(0,0,0,0.08), 0px 3px 10px rgba(0,0,0,0.12)';
 
 // ── Mini calendar widget for Summary view ──
 function MiniCalendar({ today, paymentDates }) {
@@ -145,7 +136,7 @@ export default function Upcoming() {
   if (!user) {
     return (
       <div style={{ minHeight: '100vh', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-        <div className="glass-card" style={{ padding: 32, textAlign: 'center', maxWidth: 400 }}>
+        <div style={{ background: '#F4F4F5', borderRadius: 14, overflow: 'hidden', boxShadow: SHADOW, padding: 32, textAlign: 'center', maxWidth: 400 }}>
           <h1 style={{ fontSize: '1.8rem', fontWeight: 700, color: '#1A1918', marginBottom: 8, fontFamily: "'DM Sans', sans-serif" }}>
             Sign in to view upcoming
           </h1>
@@ -323,45 +314,71 @@ export default function Upcoming() {
     );
   };
 
+  const PageCard = ({ title, headerRight, children, style }) => (
+    <div style={{ background: '#F4F4F5', borderRadius: 14, overflow: 'hidden', boxShadow: SHADOW, ...style }}>
+      <div style={{ padding: '6px 14px 5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
+        {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
+      </div>
+      <div style={{ background: '#ffffff', margin: '0 5px 5px', borderRadius: 10, overflow: 'hidden' }}>
+        {children}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 88, background: 'transparent' }}>
+    <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 0, background: 'transparent' }}>
 
       <DashboardSidebar activePage="Upcoming" user={user} tabs={[{key:'summary',label:'Summary'},{key:'calendar',label:'Calendar'}]} activeTab={activeTab} onTabChange={setActiveTab} />
 
-        {/* ── Content ── */}
-        <div style={{ maxWidth: 1080, margin: '0 auto', paddingRight: 24, maxWidth: 1080, margin: '0 auto', padding: '24px 40px 64px', position: 'relative', zIndex: 2 }}>
+      {/* Hero */}
+      <div style={{ margin: '8px 10px 0', height: 168, background: '#54A6CF', borderRadius: 18, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 24, overflow: 'hidden', position: 'relative', boxShadow: '0px 50px 40px rgba(0,0,0,0.01), 0px 50px 40px rgba(0,0,0,0.02), 0px 20px 40px rgba(0,0,0,0.05), 0px 3px 10px rgba(0,0,0,0.08)' }}>
+        <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.15, pointerEvents: 'none', zIndex: 0 }} viewBox="0 0 1200 168" preserveAspectRatio="xMidYMid slice">
+          {[{cx:80,cy:40},{cx:200,cy:110},{cx:320,cy:25},{cx:430,cy:160},{cx:540,cy:70},{cx:660,cy:130},{cx:770,cy:35},{cx:890,cy:175},{cx:1000,cy:80},{cx:1100,cy:140},{cx:150,cy:185},{cx:480,cy:100},{cx:720,cy:180},{cx:950,cy:55},{cx:280,cy:195},{cx:620,cy:48},{cx:1050,cy:195}].map((s, i) => (
+            <circle key={i} cx={s.cx} cy={s.cy} r={i % 3 === 0 ? 2.5 : 1.5} fill="white" />
+          ))}
+        </svg>
+        <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 38, fontWeight: 600, color: '#1A1918', margin: 0, letterSpacing: '-0.01em', lineHeight: 1, textAlign: 'center', position: 'relative', zIndex: 1 }}>
+          <span style={{ fontStyle: 'italic' }}>Upcoming</span>
+        </h1>
+      </div>
+
+      {/* ── Content ── */}
+      <div style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 40px 64px', position: 'relative', zIndex: 1 }}>
 
         {activeTab === 'summary' ? (
           /* ════════ SUMMARY VIEW ════════ */
           <div className="upcoming-summary-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 24, alignItems: 'start' }}>
 
             {/* Left column: Payment lists */}
-            <div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {/* Overdue section */}
               {overdue.length > 0 && (
-                <div className="glass-card" style={{ marginBottom: 12 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 0' }}>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: '#E8726E', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Overdue</span>
+                <PageCard
+                  title="Overdue"
+                  headerRight={
                     <span style={{ fontSize: 11, color: '#E8726E', fontWeight: 500, fontFamily: "'DM Sans', sans-serif" }}>
                       {overdue.length} payment{overdue.length !== 1 ? 's' : ''} · {formatMoney(overdue.reduce((s, e) => s + e.amount, 0))}
                     </span>
-                  </div>
+                  }
+                >
                   <div style={{ padding: '6px 16px 14px' }}>
                     {overdue.map((event, idx) => (
                       <PaymentRow key={event.loanId + '-ov'} event={event} showBorder={idx < overdue.length - 1} />
                     ))}
                   </div>
-                </div>
+                </PageCard>
               )}
 
               {/* Next 7 Days */}
-              <div className="glass-card">
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 0' }}>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Next 7 Days</span>
+              <PageCard
+                title="Next 7 Days"
+                headerRight={
                   <span style={{ fontSize: 11, color: '#9B9A98', fontWeight: 500, fontFamily: "'DM Sans', sans-serif" }}>
                     {next7Count} payment{next7Count !== 1 ? 's' : ''} · {formatMoney(next7Total)}
                   </span>
-                </div>
+                }
+              >
                 <div style={{ padding: '6px 16px 14px' }}>
                   {next7Days.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '24px 0', color: '#787776', fontSize: 13 }}>No payments in the next 7 days</div>
@@ -371,16 +388,17 @@ export default function Upcoming() {
                     ))
                   )}
                 </div>
-              </div>
+              </PageCard>
 
               {/* Coming Later */}
-              <div className="glass-card" style={{ marginTop: 12 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 0' }}>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Coming Later</span>
+              <PageCard
+                title="Coming Later"
+                headerRight={
                   <span style={{ fontSize: 11, color: '#9B9A98', fontWeight: 500, fontFamily: "'DM Sans', sans-serif" }}>
                     {laterCount} payment{laterCount !== 1 ? 's' : ''} · {formatMoney(laterTotal)}
                   </span>
-                </div>
+                }
+              >
                 <div style={{ padding: '6px 16px 14px' }}>
                   {comingLater.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '24px 0', color: '#787776', fontSize: 13 }}>No payments coming up</div>
@@ -390,129 +408,134 @@ export default function Upcoming() {
                     ))
                   )}
                 </div>
-              </div>
+              </PageCard>
             </div>
 
             {/* Right column: Mini calendar */}
             <div>
-              <div className="glass-card" style={{ padding: '14px 16px' }}>
-                <MiniCalendar today={today} paymentDates={miniCalPaymentDates} />
-              </div>
+              <PageCard title="This Month">
+                <div style={{ padding: '14px 16px' }}>
+                  <MiniCalendar today={today} paymentDates={miniCalPaymentDates} />
+                </div>
+              </PageCard>
             </div>
           </div>
         ) : (
           /* ════════ CALENDAR VIEW ════════ */
-          <div className="glass-card" style={{ overflow: 'hidden', padding: '28px 32px' }}>
-            {/* Month header */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
-              <button onClick={() => setCalendarMonth(addMonths(calendarMonth, -1))} style={{
-                width: 36, height: 36, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.08)',
-                background: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#787776" strokeWidth="2" strokeLinecap="round"><polyline points="15 18 9 12 15 6" /></svg>
-              </button>
-              <h2 style={{ fontSize: '1.4rem', fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>
-                {format(calendarMonth, 'MMMM yyyy')}
-              </h2>
-              <button onClick={() => setCalendarMonth(addMonths(calendarMonth, 1))} style={{
-                width: 36, height: 36, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.08)',
-                background: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#787776" strokeWidth="2" strokeLinecap="round"><polyline points="9 18 15 12 9 6" /></svg>
-              </button>
-            </div>
+          <PageCard title={format(calendarMonth, 'MMMM yyyy')}>
+            <div style={{ padding: '28px 32px' }}>
+              {/* Month header */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
+                <button onClick={() => setCalendarMonth(addMonths(calendarMonth, -1))} style={{
+                  width: 36, height: 36, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.08)',
+                  background: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#787776" strokeWidth="2" strokeLinecap="round"><polyline points="15 18 9 12 15 6" /></svg>
+                </button>
+                <h2 style={{ fontSize: '1.4rem', fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>
+                  {format(calendarMonth, 'MMMM yyyy')}
+                </h2>
+                <button onClick={() => setCalendarMonth(addMonths(calendarMonth, 1))} style={{
+                  width: 36, height: 36, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.08)',
+                  background: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#787776" strokeWidth="2" strokeLinecap="round"><polyline points="9 18 15 12 9 6" /></svg>
+                </button>
+              </div>
 
-            {/* Day of week headers */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderBottom: '1px solid rgba(0,0,0,0.06)', marginBottom: 4 }}>
-              {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => (
-                <div key={d} style={{ textAlign: 'center', fontSize: 12, fontWeight: 600, color: '#787776', padding: '10px 0' }}>{d}</div>
-              ))}
-            </div>
+              {/* Day of week headers */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderBottom: '1px solid rgba(0,0,0,0.06)', marginBottom: 4 }}>
+                {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => (
+                  <div key={d} style={{ textAlign: 'center', fontSize: 12, fontWeight: 600, color: '#787776', padding: '10px 0' }}>{d}</div>
+                ))}
+              </div>
 
-            {/* Calendar grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
-              {calendarDays.map((day, i) => {
-                const inMonth = isSameMonth(day, calendarMonth);
-                const isToday = isSameDay(day, new Date());
-                const key = format(day, 'yyyy-MM-dd');
-                const dayEvents = calendarEvents[key] || [];
-                const hasIncoming = dayEvents.some(e => e.isLender);
-                const hasOutgoing = dayEvents.some(e => !e.isLender);
+              {/* Calendar grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
+                {calendarDays.map((day, i) => {
+                  const inMonth = isSameMonth(day, calendarMonth);
+                  const isToday = isSameDay(day, new Date());
+                  const key = format(day, 'yyyy-MM-dd');
+                  const dayEvents = calendarEvents[key] || [];
+                  const hasIncoming = dayEvents.some(e => e.isLender);
+                  const hasOutgoing = dayEvents.some(e => !e.isLender);
 
-                let cellBg = 'transparent';
-                if (hasIncoming && hasOutgoing) cellBg = 'rgba(130,240,185,0.06)';
-                else if (hasIncoming) cellBg = 'rgba(106,212,120,0.08)';
-                else if (hasOutgoing) cellBg = 'rgba(130,240,185,0.06)';
+                  let cellBg = 'transparent';
+                  if (hasIncoming && hasOutgoing) cellBg = 'rgba(130,240,185,0.06)';
+                  else if (hasIncoming) cellBg = 'rgba(106,212,120,0.08)';
+                  else if (hasOutgoing) cellBg = 'rgba(130,240,185,0.06)';
 
-                return (
-                  <div key={i} style={{
-                    minHeight: 100, padding: '8px 10px', borderRadius: 10,
-                    background: inMonth ? cellBg : 'transparent',
-                    opacity: inMonth ? 1 : 0.3,
-                    border: isToday ? '2px solid #82F0B9' : '1px solid transparent',
-                  }}>
-                    {/* Date number */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                      <span style={{
-                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: isToday ? 26 : 'auto', height: isToday ? 26 : 'auto',
-                        borderRadius: '50%', fontSize: 12, fontWeight: isToday ? 700 : 500,
-                        color: isToday ? 'white' : inMonth ? '#1A1918' : '#C7C6C4',
-                        background: isToday ? '#82F0B9' : 'transparent',
-                      }}>
-                        {format(day, 'd')}
-                      </span>
-                      {/* Show amounts */}
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
-                        {dayEvents.filter(e => e.isLender).length > 0 && (
-                          <span style={{ fontSize: 11, fontWeight: 600, color: '#4CAF50' }}>
-                            +{formatMoney(dayEvents.filter(e => e.isLender).reduce((s, e) => s + e.amount, 0))}
-                          </span>
-                        )}
-                        {dayEvents.filter(e => !e.isLender).length > 0 && (
-                          <span style={{ fontSize: 11, fontWeight: 600, color: '#82F0B9' }}>
-                            {formatMoney(dayEvents.filter(e => !e.isLender).reduce((s, e) => s + e.amount, 0))}
-                          </span>
-                        )}
+                  return (
+                    <div key={i} style={{
+                      minHeight: 100, padding: '8px 10px', borderRadius: 10,
+                      background: inMonth ? cellBg : 'transparent',
+                      opacity: inMonth ? 1 : 0.3,
+                      border: isToday ? '2px solid #82F0B9' : '1px solid transparent',
+                    }}>
+                      {/* Date number */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                        <span style={{
+                          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                          width: isToday ? 26 : 'auto', height: isToday ? 26 : 'auto',
+                          borderRadius: '50%', fontSize: 12, fontWeight: isToday ? 700 : 500,
+                          color: isToday ? 'white' : inMonth ? '#1A1918' : '#C7C6C4',
+                          background: isToday ? '#82F0B9' : 'transparent',
+                        }}>
+                          {format(day, 'd')}
+                        </span>
+                        {/* Show amounts */}
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
+                          {dayEvents.filter(e => e.isLender).length > 0 && (
+                            <span style={{ fontSize: 11, fontWeight: 600, color: '#4CAF50' }}>
+                              +{formatMoney(dayEvents.filter(e => e.isLender).reduce((s, e) => s + e.amount, 0))}
+                            </span>
+                          )}
+                          {dayEvents.filter(e => !e.isLender).length > 0 && (
+                            <span style={{ fontSize: 11, fontWeight: 600, color: '#82F0B9' }}>
+                              {formatMoney(dayEvents.filter(e => !e.isLender).reduce((s, e) => s + e.amount, 0))}
+                            </span>
+                          )}
+                        </div>
                       </div>
+                      {/* Avatar circles */}
+                      {dayEvents.length > 0 && (
+                        <div style={{ display: 'flex', gap: 4, marginTop: 'auto', paddingTop: 8 }}>
+                          {dayEvents.slice(0, 3).map((ev, j) => (
+                            <div key={j} style={{
+                              width: 24, height: 24, borderRadius: '50%', fontSize: 10, fontWeight: 600,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              background: ev.isLender ? '#4CAF50' : '#82F0B9', color: 'white',
+                            }}>
+                              {ev.initial}
+                            </div>
+                          ))}
+                          {dayEvents.length > 3 && (
+                            <div style={{
+                              width: 24, height: 24, borderRadius: '50%', fontSize: 9, fontWeight: 600,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              background: 'rgba(0,0,0,0.06)', color: '#787776',
+                            }}>+{dayEvents.length - 3}</div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    {/* Avatar circles */}
-                    {dayEvents.length > 0 && (
-                      <div style={{ display: 'flex', gap: 4, marginTop: 'auto', paddingTop: 8 }}>
-                        {dayEvents.slice(0, 3).map((ev, j) => (
-                          <div key={j} style={{
-                            width: 24, height: 24, borderRadius: '50%', fontSize: 10, fontWeight: 600,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            background: ev.isLender ? '#4CAF50' : '#82F0B9', color: 'white',
-                          }}>
-                            {ev.initial}
-                          </div>
-                        ))}
-                        {dayEvents.length > 3 && (
-                          <div style={{
-                            width: 24, height: 24, borderRadius: '50%', fontSize: 9, fontWeight: 600,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            background: 'rgba(0,0,0,0.06)', color: '#787776',
-                          }}>+{dayEvents.length - 3}</div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
 
-            {/* Legend */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(0,0,0,0.06)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#787776' }}>
-                <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#4CAF50' }} /> Owed to you
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#787776' }}>
-                <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#82F0B9' }} /> You owe
+              {/* Legend */}
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#787776' }}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#4CAF50' }} /> Owed to you
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#787776' }}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#82F0B9' }} /> You owe
+                </div>
               </div>
             </div>
-          </div>
+          </PageCard>
         )}
+
         <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
@@ -521,7 +544,7 @@ export default function Upcoming() {
             <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
           </div>
         </div>
-        </div>
+      </div>
     </div>
   );
 }

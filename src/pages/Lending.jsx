@@ -1398,6 +1398,20 @@ export default function Lending({ initialTab }) {
     { id: 'active', label: 'Manage Loans' },
   ];
 
+  const SHADOW = '0px 50px 40px rgba(0,0,0,0.02), 0px 50px 40px rgba(0,0,0,0.04), 0px 20px 40px rgba(0,0,0,0.08), 0px 3px 10px rgba(0,0,0,0.12)';
+
+  const PageCard = ({ title, headerRight, children, style }) => (
+    <div style={{ background: '#F4F4F5', borderRadius: 14, overflow: 'hidden', boxShadow: SHADOW, ...style }}>
+      <div style={{ padding: '6px 14px 5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
+        {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
+      </div>
+      <div style={{ background: '#ffffff', margin: '0 5px 5px', borderRadius: 10, overflow: 'hidden' }}>
+        {children}
+      </div>
+    </div>
+  );
+
   return (
     <>
       {/* Loan Sent Modal */}
@@ -1489,14 +1503,23 @@ export default function Lending({ initialTab }) {
         signingAs="Lender"
       />
 
-      <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 88, background: 'transparent' }}>
+      <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 0, background: 'transparent' }}>
 
         <DashboardSidebar activePage={initialTab === 'create' ? 'CreateOffer' : 'Lending'} user={currentUser} />
 
-          {/* Galaxy gradient background */}
+        {/* Hero Section */}
+        <div style={{ margin: '8px 10px 0', height: 168, background: '#54A6CF', borderRadius: 18, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 24, overflow: 'hidden', position: 'relative', boxShadow: '0px 50px 40px rgba(0,0,0,0.01), 0px 50px 40px rgba(0,0,0,0.02), 0px 20px 40px rgba(0,0,0,0.05), 0px 3px 10px rgba(0,0,0,0.08)' }}>
+          <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.15, pointerEvents: 'none', zIndex: 0 }} viewBox="0 0 1200 168" preserveAspectRatio="xMidYMid slice">
+            {[{cx:80,cy:40},{cx:200,cy:110},{cx:320,cy:25},{cx:430,cy:160},{cx:540,cy:70},{cx:660,cy:130},{cx:770,cy:35},{cx:890,cy:175},{cx:1000,cy:80},{cx:1100,cy:140},{cx:150,cy:185},{cx:480,cy:100},{cx:720,cy:180},{cx:950,cy:55},{cx:280,cy:195},{cx:620,cy:48},{cx:1050,cy:195}].map((s, i) => (
+              <circle key={i} cx={s.cx} cy={s.cy} r={i % 3 === 0 ? 2.5 : 1.5} fill="white" />
+            ))}
+          </svg>
+          <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 38, fontWeight: 600, color: '#1A1918', margin: 0, letterSpacing: '-0.01em', lineHeight: 1, textAlign: 'center', position: 'relative', zIndex: 1 }}>
+            <span style={{ fontStyle: 'italic' }}>Your Lending</span>
+          </h1>
+        </div>
 
-          <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 40px', position: 'relative', zIndex: 2, maxWidth: 1080, margin: '0 auto', padding: '0 28px' }}>
-          <div style={{ paddingTop: 24 }} />
+          <div style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 40px 64px', position: 'relative', zIndex: 1 }}>
 
           {/* Tab Navigation — hidden when accessed as standalone Create Loan page */}
           {!initialTab && (
@@ -1530,11 +1553,8 @@ export default function Lending({ initialTab }) {
                 className="space-y-7"
               >
                 {/* Lending Overview Section */}
-                <div className="glass-card rounded-2xl p-4">
-                  <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-3" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                    Lending Overview
-                  </p>
-
+                <PageCard title="Lending Overview">
+                  <div className="p-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Pie Chart */}
                     <div className="rounded-xl p-3 flex flex-col items-center justify-center" style={{ backgroundColor: 'rgba(130,240,185,0.08)' }}>
@@ -1594,7 +1614,8 @@ export default function Lending({ initialTab }) {
                       </CardContent>
                     </Card>
                   </div>
-                </div>
+                  </div>
+                </PageCard>
 
                 {/* Quick Record Payment - only show when there are active loans */}
                 {renderRecordPaymentBox()}
@@ -1602,10 +1623,8 @@ export default function Lending({ initialTab }) {
                 {/* Upcoming Payments + Individual Loan Progress */}
                 <div className="grid md:grid-cols-2 gap-4">
                   {/* Upcoming Payments - Left */}
-                  <div className="glass-card rounded-2xl p-5 border-0">
-                    <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                      Upcoming Payments
-                    </p>
+                  <PageCard title="Upcoming Payments">
+                  <div className="p-4">
                     {activeLoans.filter(l => l.next_payment_date).length === 0 ? (
                       <p className="text-slate-500 text-sm">No upcoming payments</p>
                     ) : (
@@ -1638,12 +1657,10 @@ export default function Lending({ initialTab }) {
                       </div>
                     )}
                   </div>
+                  </PageCard>
 
                   {/* Total Active Lending */}
-                  <div className="glass-card rounded-2xl border-0" style={{ overflow: 'hidden' }}>
-                    <div style={{ padding: '20px 22px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Total Active Lending</span>
-                    </div>
+                  <PageCard title="Total Active Lending">
                     <div style={{ padding: '14px 22px 20px', display: 'flex', flexDirection: 'column', gap: 18 }}>
                       {activeLoans.length === 0 ? (
                         <p style={{ fontSize: 13, color: '#787776' }}>No active loans</p>
@@ -1665,13 +1682,10 @@ export default function Lending({ initialTab }) {
                         );
                       })()}
                     </div>
-                  </div>
+                  </PageCard>
 
                   {/* Your Lending */}
-                  <div className="glass-card rounded-2xl border-0" style={{ overflow: 'hidden' }}>
-                    <div style={{ padding: '20px 22px 0' }}>
-                      <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Your Lending</span>
-                    </div>
+                  <PageCard title="Your Lending">
                     <div style={{ padding: '14px 22px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
                       {activeLoans.length === 0 ? (
                         <p style={{ fontSize: 13, color: '#787776' }}>No active loans to track</p>
@@ -1708,7 +1722,7 @@ export default function Lending({ initialTab }) {
                         </>
                       )}
                     </div>
-                  </div>
+                  </PageCard>
                 </div>
 
                 {/* Month Repayment + Loan History */}
@@ -1769,45 +1783,41 @@ export default function Lending({ initialTab }) {
                     })()}
 
                     {/* Month Repayment Overview Box */}
-                    <div className="glass-card rounded-2xl p-5">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="relative">
-                      <button
-                        onClick={() => setShowMonthDropdown(!showMonthDropdown)}
-                        className="flex items-center gap-2 text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium hover:text-slate-800 transition-colors"
-                        style={{ fontFamily: 'IBM Plex Mono, monospace' }}
-                      >
-                        {format(selectedMonth, 'MMMM')} Repayment Overview
-                        <ChevronDown className={`w-4 h-4 transition-transform ${showMonthDropdown ? 'rotate-180' : ''}`} />
-                      </button>
-
-                      {showMonthDropdown && (
-                        <>
-                          <div className="fixed inset-0 z-10" onClick={() => setShowMonthDropdown(false)} />
-                          <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-lg border z-20 py-2 min-w-[160px] max-h-[120px] overflow-y-auto">
-                            {Array.from({ length: 12 }, (_, i) => {
-                              const monthDate = new Date(new Date().getFullYear(), i, 1);
-                              return (
-                                <button
-                                  key={i}
-                                  onClick={() => {
-                                    setSelectedMonth(monthDate);
-                                    setShowMonthDropdown(false);
-                                  }}
-                                  className={`w-full px-4 py-2 text-left text-sm hover:bg-[#2563EB]/10 transition-colors ${
-                                    isSameMonth(monthDate, selectedMonth) ? 'bg-[#2563EB]/10 font-medium text-[#82F0B9]' : 'text-slate-700'
-                                  }`}
-                                >
-                                  {format(monthDate, 'MMMM')}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-
+                    <PageCard title={`${format(selectedMonth, 'MMMM')} Repayment Overview`} headerRight={
+                      <div className="relative">
+                        <button
+                          onClick={() => setShowMonthDropdown(!showMonthDropdown)}
+                          className="flex items-center gap-1 text-[10px] text-slate-500 uppercase tracking-wider font-medium hover:text-slate-700 transition-colors"
+                        >
+                          <ChevronDown className={`w-3 h-3 transition-transform ${showMonthDropdown ? 'rotate-180' : ''}`} />
+                        </button>
+                        {showMonthDropdown && (
+                          <>
+                            <div className="fixed inset-0 z-10" onClick={() => setShowMonthDropdown(false)} />
+                            <div className="absolute top-full right-0 mt-2 bg-white rounded-xl shadow-lg border z-20 py-2 min-w-[160px] max-h-[120px] overflow-y-auto">
+                              {Array.from({ length: 12 }, (_, i) => {
+                                const monthDate = new Date(new Date().getFullYear(), i, 1);
+                                return (
+                                  <button
+                                    key={i}
+                                    onClick={() => {
+                                      setSelectedMonth(monthDate);
+                                      setShowMonthDropdown(false);
+                                    }}
+                                    className={`w-full px-4 py-2 text-left text-sm hover:bg-[#2563EB]/10 transition-colors ${
+                                      isSameMonth(monthDate, selectedMonth) ? 'bg-[#2563EB]/10 font-medium text-[#82F0B9]' : 'text-slate-700'
+                                    }`}
+                                  >
+                                    {format(monthDate, 'MMMM')}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    }>
+                    <div className="p-4">
                   <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1" style={{
                     maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
                     WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)'
@@ -1905,14 +1915,13 @@ export default function Lending({ initialTab }) {
                       ));
                     })()}
                   </div>
-                </div>
+                  </div>
+                  </PageCard>
                   </div>
 
                   {/* Loan History - Right */}
-                  <div className="glass-card rounded-2xl p-5 border-0">
-                    <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                      Loan History
-                    </p>
+                  <PageCard title="Loan History">
+                    <div className="p-4">
                     <div className="space-y-3">
                       {/* Total Amount Lent */}
                       <div className="rounded-xl p-4 flex items-center gap-3" style={{ backgroundColor: 'rgba(130,240,185,0.06)' }}>
@@ -1959,7 +1968,8 @@ export default function Lending({ initialTab }) {
                         </div>
                       </div>
                     </div>
-                  </div>
+                    </div>
+                  </PageCard>
 
                 </div>
               </motion.div>
@@ -1975,12 +1985,8 @@ export default function Lending({ initialTab }) {
               >
                 {/* Form */}
                 <div className="lg:col-span-2">
-                  <div className="glass-card" style={{ overflow: 'visible', padding: '14px 16px 20px' }}>
-                    <div style={{ marginBottom: 16 }}>
-                      <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>
-                        {loanType === 'flexible' ? 'Create Quick Payment Request' : (isUserBorrower ? 'Request a Loan' : 'Create Loan Offer')}
-                      </span>
-                    </div>
+                  <PageCard title={loanType === 'flexible' ? 'Create Quick Payment Request' : (isUserBorrower ? 'Request a Loan' : 'Create Loan Offer')} style={{ overflow: 'visible' }}>
+                  <div style={{ padding: '14px 16px 20px' }}>
                       <form onSubmit={handleSubmit} className="space-y-5">
                         {/* No Friends Banner */}
                         {!isLoadingUsers && friends.length === 0 && (
@@ -2454,6 +2460,7 @@ export default function Lending({ initialTab }) {
                         </Button>
                       </form>
                   </div>
+                  </PageCard>
 
                   {/* Will Your Payment Request Repeat? Info Box - Only show for Quick Payment Request */}
                   {loanType === 'flexible' && (
@@ -2473,7 +2480,8 @@ export default function Lending({ initialTab }) {
                 {/* Summary Sidebar */}
                 <div className="space-y-4">
                   {/* Loan Type Toggle - Always First */}
-                  <div className="glass-card" style={{ padding: '14px 16px' }}>
+                  <PageCard title="Loan Type">
+                  <div style={{ padding: '10px 16px 14px' }}>
                     <div className="flex items-center justify-center gap-3">
                       <span className={`text-xs font-medium ${loanType === 'scheduled' ? 'text-[#82F0B9]' : 'text-slate-400'}`}>
                         Loan
@@ -2509,24 +2517,17 @@ export default function Lending({ initialTab }) {
                             : "Offer money that will be paid back gradually with a structured payment plan")}
                     </p>
                   </div>
+                  </PageCard>
 
                   {/* Borrower Payment Box - Only for Loan type, always visible */}
                   {loanType === 'scheduled' && (
-                    <div className="glass-card">
-                      <div style={{ padding: '14px 16px 0' }}>
-                        <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>
-                          {isUserBorrower ? (
-                            'Your payment'
-                          ) : formData.borrower_username ? (
-                            (() => {
-                              const selectedUser = users.find(u => u.username === formData.borrower_username);
-                              return `${selectedUser?.full_name || formData.borrower_username}'s payment`;
-                            })()
-                          ) : (
-                            'Borrower payment'
-                          )}
-                        </div>
-                      </div>
+                    <PageCard title={
+                      isUserBorrower ? 'Your payment' :
+                      formData.borrower_username ? (() => {
+                        const selectedUser = users.find(u => u.username === formData.borrower_username);
+                        return `${selectedUser?.full_name || formData.borrower_username}'s payment`;
+                      })() : 'Borrower payment'
+                    }>
                       <div style={{ padding: '10px 16px 12px' }}>
                         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
                           <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', lineHeight: 1 }}>
@@ -2537,14 +2538,12 @@ export default function Lending({ initialTab }) {
                           {formData.payment_frequency || '_'} after interest
                         </div>
                       </div>
-                    </div>
+                    </PageCard>
                   )}
 
                   {/* Loan Summary - Always Last */}
-                  <div className="glass-card" style={{ padding: '14px 16px 16px', position: 'sticky', top: 6 }}>
-                    <div style={{ marginBottom: 14 }}>
-                      <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Loan Summary</span>
-                    </div>
+                  <PageCard title="Loan Summary" style={{ position: 'sticky', top: 6 }}>
+                  <div style={{ padding: '12px 16px 16px' }}>
                     <div className="space-y-3">
                       <div className="pb-2 border-b border-[#82F0B9]/20 flex items-baseline gap-1">
                         <span className="text-slate-600 text-sm flex-shrink-0">For:</span>
@@ -2598,6 +2597,7 @@ export default function Lending({ initialTab }) {
                       )}
                     </div>
                   </div>
+                  </PageCard>
 
                   {/* Friends-only message */}
                   <p className="text-xs text-slate-500 flex items-center justify-center gap-1.5">
@@ -2621,7 +2621,8 @@ export default function Lending({ initialTab }) {
                     <div className="w-8 h-8 border-2 border-[#82F0B9] border-t-transparent rounded-full animate-spin mx-auto" />
                   </div>
                 ) : manageableLoans.length === 0 ? (
-                  <div className="glass-card rounded-2xl p-8 border-0">
+                  <PageCard title="Loans">
+                  <div className="p-8">
                     <div className="flex flex-col items-center text-center">
                       <div className="w-16 h-16 bg-[#82F0B9]/8 rounded-full flex items-center justify-center mb-4">
                         <CheckCircle className="w-8 h-8 text-[#82F0B9]" />
@@ -2638,13 +2639,12 @@ export default function Lending({ initialTab }) {
                       </Button>
                     </div>
                   </div>
+                  </PageCard>
                 ) : (
                   <div className="space-y-4">
                     {/* Loan Selector Dropdown */}
-                    <div className="glass-card rounded-2xl p-5 border-0">
-                      <p className="text-[11px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                        Your Loans
-                      </p>
+                    <PageCard title="Your Loans">
+                    <div className="p-4">
                         <Select
                           value={manageLoanSelected?.id || ''}
                           onValueChange={(value) => {
@@ -2702,22 +2702,23 @@ export default function Lending({ initialTab }) {
                           </SelectContent>
                         </Select>
                     </div>
+                    </PageCard>
 
                     {/* Loan Details - Below Dropdown */}
                     {!manageLoanSelected ? (
-                      <div className="glass-card rounded-2xl p-5 border-0 flex items-center justify-center py-16">
+                      <PageCard title="Loan Details">
+                      <div className="flex items-center justify-center py-16">
                         <div className="text-center text-[#787776]">
                           <BarChart3 className="w-12 h-12 mx-auto mb-3 opacity-50" />
                           <p>Select a loan above to view details</p>
                         </div>
                       </div>
+                      </PageCard>
                     ) : (
                       <>
                           {/* Loan Information Box */}
-                          <div className="glass-card rounded-2xl p-5">
-                            <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                              Loan Information
-                            </p>
+                          <PageCard title="Loan Information">
+                          <div className="p-4">
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                               <div className="bg-[#82F0B9]/8 rounded-xl p-4">
                                 <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Amount</p>
@@ -2745,6 +2746,7 @@ export default function Lending({ initialTab }) {
                               </div>
                             </div>
                           </div>
+                          </PageCard>
 
                           {/* Progress Pie Chart + Next Payment + Payment Amount */}
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -2840,10 +2842,8 @@ export default function Lending({ initialTab }) {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Interest Box + Loan Amounts - Left */}
                             <div className="space-y-4">
-                              <div className="glass-card rounded-2xl p-5">
-                                <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                                  Interest
-                                </p>
+                              <PageCard title="Interest">
+                              <div className="p-4">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                   <div className="bg-[#82F0B9]/8 rounded-xl p-4">
                                     <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Interest Accrued</p>
@@ -2870,11 +2870,10 @@ export default function Lending({ initialTab }) {
                                   </div>
                                 </div>
                               </div>
+                              </PageCard>
                               {/* Loan Progress Box */}
-                              <div className="glass-card rounded-2xl p-5">
-                                <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                                  Loan Progress
-                                </p>
+                              <PageCard title="Loan Progress">
+                              <div className="p-4">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                   <div className="bg-[#82F0B9]/10 rounded-xl p-4">
                                     <p className="text-[10px] text-slate-600 uppercase tracking-wide font-medium mb-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>Amount Paid</p>
@@ -2897,13 +2896,12 @@ export default function Lending({ initialTab }) {
                                   </div>
                                 </div>
                               </div>
+                              </PageCard>
                             </div>
 
                             {/* Document Center Box - Right */}
-                            <div className="glass-card rounded-2xl p-5">
-                              <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                                Document Center
-                              </p>
+                            <PageCard title="Document Center">
+                            <div className="p-4">
                               {(() => {
                                 const agreement = getAgreementForLoan(manageLoanSelected.id);
                                 if (!agreement) {
@@ -2991,14 +2989,13 @@ export default function Lending({ initialTab }) {
                                 );
                               })()}
                             </div>
+                            </PageCard>
                           </div>
 
                           {/* Actions Box - only show for active loans */}
                           {manageLoanSelected.status !== 'cancelled' && (
-                          <div className="glass-card rounded-2xl p-5">
-                            <p className="text-[10px] text-slate-600 uppercase tracking-[0.12em] font-medium mb-4" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                              Actions
-                            </p>
+                          <PageCard title="Loan Actions">
+                          <div className="p-4">
                             <div className="flex flex-col sm:flex-row gap-3">
                               <button
                                 onClick={() => handleMakePayment(manageLoanSelected)}
@@ -3035,6 +3032,7 @@ export default function Lending({ initialTab }) {
                               </button>
                             </div>
                           </div>
+                          </PageCard>
                           )}
 
                           {/* Cancelled notice */}
@@ -3064,7 +3062,7 @@ export default function Lending({ initialTab }) {
             <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
           </div>
         </div>
-          </div>
+        </div>
       </div>
 
       {/* Modals */}

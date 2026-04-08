@@ -27,16 +27,7 @@ import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import DashboardSidebar from "@/components/DashboardSidebar";
 
-const STAR_CIRCLES = [
-  {cx:82,cy:45,o:0.7},{cx:195,cy:112,o:0.5},{cx:310,cy:28,o:0.8},{cx:420,cy:198,o:0.4},
-  {cx:530,cy:67,o:0.65},{cx:640,cy:245,o:0.55},{cx:755,cy:88,o:0.75},{cx:860,cy:156,o:0.45},
-  {cx:970,cy:34,o:0.7},{cx:1085,cy:201,o:0.6},{cx:1190,cy:78,o:0.5},{cx:1300,cy:267,o:0.7},
-  {cx:1410,cy:45,o:0.55},{cx:1520,cy:134,o:0.65},{cx:48,cy:189,o:0.4},{cx:158,cy:278,o:0.6},
-  {cx:268,cy:156,o:0.5},{cx:378,cy:89,o:0.7},{cx:488,cy:234,o:0.45},{cx:598,cy:145,o:0.6},
-  {cx:708,cy:312,o:0.35},{cx:818,cy:56,o:0.75},{cx:928,cy:223,o:0.5},{cx:1038,cy:98,o:0.65},
-  {cx:1148,cy:289,o:0.4},{cx:1258,cy:167,o:0.7},{cx:1368,cy:234,o:0.55},{cx:1478,cy:78,o:0.6},
-  {cx:1560,cy:256,o:0.45},{cx:125,cy:312,o:0.5},{cx:345,cy:267,o:0.6},{cx:565,cy:34,o:0.75},
-];
+const SHADOW = '0px 50px 40px rgba(0,0,0,0.02), 0px 50px 40px rgba(0,0,0,0.04), 0px 20px 40px rgba(0,0,0,0.08), 0px 3px 10px rgba(0,0,0,0.12)';
 
 // Helper function to sync public profile, moved here to adhere to file structure rules
 const syncPublicProfile = async (userData) => {
@@ -268,6 +259,18 @@ export default function Profile() {
     }
   };
 
+  const PageCard = ({ title, headerRight, children, style }) => (
+    <div style={{ background: '#F4F4F5', borderRadius: 14, overflow: 'hidden', boxShadow: SHADOW, ...style }}>
+      <div style={{ padding: '6px 14px 5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
+        {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
+      </div>
+      <div style={{ background: '#ffffff', margin: '0 5px 5px', borderRadius: 10, overflow: 'hidden' }}>
+        {children}
+      </div>
+    </div>
+  );
+
   // Loading state
   if (isLoading) {
     return (
@@ -284,7 +287,7 @@ export default function Profile() {
   if (error && !user) {
     return (
       <div style={{ minHeight: '100vh', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="glass-card" style={{ padding: 32, maxWidth: 400 }}>
+        <div style={{ background: '#F4F4F5', borderRadius: 14, overflow: 'hidden', boxShadow: SHADOW, padding: 32, maxWidth: 400 }}>
           <div style={{ textAlign: 'center' }}>
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <XCircle className="w-8 h-8 text-red-600" />
@@ -303,12 +306,53 @@ export default function Profile() {
   if (!user) return null;
 
   return (
-    <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 88, background: 'transparent' }}>
+    <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 0, background: 'transparent' }}>
       <DashboardSidebar activePage="Profile" user={user} />
 
-        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 40px', position: 'relative', zIndex: 2, maxWidth: 900, margin: '0 auto', padding: '0 28px' }}>
-          {/* Hero - Profile Photo + Name */}
-          <div style={{ paddingTop: 80, paddingBottom: 30, textAlign: 'center' }}>
+      {/* Hero */}
+      <div style={{ margin: '8px 10px 0', height: 168, background: '#54A6CF', borderRadius: 18, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 24, overflow: 'hidden', position: 'relative', boxShadow: '0px 50px 40px rgba(0,0,0,0.01), 0px 50px 40px rgba(0,0,0,0.02), 0px 20px 40px rgba(0,0,0,0.05), 0px 3px 10px rgba(0,0,0,0.08)' }}>
+        <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.15, pointerEvents: 'none', zIndex: 0 }} viewBox="0 0 1200 168" preserveAspectRatio="xMidYMid slice">
+          {[{cx:80,cy:40},{cx:200,cy:110},{cx:320,cy:25},{cx:430,cy:160},{cx:540,cy:70},{cx:660,cy:130},{cx:770,cy:35},{cx:890,cy:175},{cx:1000,cy:80},{cx:1100,cy:140},{cx:150,cy:185},{cx:480,cy:100},{cx:720,cy:180},{cx:950,cy:55},{cx:280,cy:195},{cx:620,cy:48},{cx:1050,cy:195}].map((s, i) => (
+            <circle key={i} cx={s.cx} cy={s.cy} r={i % 3 === 0 ? 2.5 : 1.5} fill="white" />
+          ))}
+        </svg>
+        <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 38, fontWeight: 600, color: '#1A1918', margin: 0, letterSpacing: '-0.01em', lineHeight: 1, textAlign: 'center', position: 'relative', zIndex: 1 }}>
+          <span style={{ fontStyle: 'italic' }}>Your Profile</span>
+        </h1>
+      </div>
+
+      <div style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 40px 64px', position: 'relative', zIndex: 1 }}>
+
+        {/* Coming Soon Modal */}
+        <Dialog open={showComingSoonModal} onOpenChange={setShowComingSoonModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-xl">
+                <Clock className="w-6 h-6" style={{ color: '#82F0B9' }} />
+                Feature Coming Soon
+              </DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <p style={{ color: '#787776' }}>
+                Bank account connections via Plaid & Dwolla are coming soon! This feature will enable secure bank transfers directly through Vony.
+              </p>
+              <p className="text-sm mt-3" style={{ color: '#787776' }}>
+                In the meantime, you can use Venmo, Cash App, PayPal, or Zelle for payments.
+              </p>
+            </div>
+            <Button
+              onClick={() => setShowComingSoonModal(false)}
+              className="w-full text-white hover:opacity-90"
+              style={{ background: '#82F0B9' }}
+            >
+              Got it!
+            </Button>
+          </DialogContent>
+        </Dialog>
+
+        {/* Profile avatar card */}
+        <PageCard title="Profile" style={{ marginBottom: 16 }}>
+          <div style={{ padding: '24px 20px', textAlign: 'center' }}>
             {/* Error Alert */}
             {error && (
               <motion.div
@@ -324,7 +368,7 @@ export default function Profile() {
               </motion.div>
             )}
 
-            <div className="relative inline-block group">
+            <div className="relative inline-block group" style={{ position: 'relative', display: 'inline-block' }}>
               <img
                 src={formData.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((user.full_name || 'User').charAt(0))}&background=678AFB&color=fff&size=128`}
                 alt="Profile"
@@ -386,58 +430,72 @@ export default function Profile() {
                 </motion.div>
               )}
             </div>
-            <h1 style={{ color: '#1A1918', fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '2.4rem', fontWeight: 600, marginTop: 16 }}>
+            <h2 style={{ color: '#1A1918', fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '2rem', fontWeight: 600, marginTop: 16, marginBottom: 4 }}>
               {formData.full_name || user.full_name}
-            </h1>
-            <p style={{ color: '#787776', fontSize: 13 }}>
+            </h2>
+            <p style={{ color: '#787776', fontSize: 13, margin: '0 0 16px' }}>
               Member since {user.created_at ? new Date(user.created_at).getFullYear() : new Date().getFullYear()}
             </p>
             <button
               onClick={() => setShowPhotoMenu(!showPhotoMenu)}
               disabled={isSaving}
-              style={{ background: 'rgba(0,0,0,0.05)', backdropFilter: 'blur(10px)', color: '#1A1918', border: '1px solid rgba(0,0,0,0.1)', borderRadius: 10, padding: '8px 20px', fontSize: 13, fontWeight: 600, cursor: 'pointer', marginTop: 16 }}
+              style={{ background: 'rgba(0,0,0,0.05)', backdropFilter: 'blur(10px)', color: '#1A1918', border: '1px solid rgba(0,0,0,0.1)', borderRadius: 10, padding: '8px 20px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
             >
               Edit Profile Photo
             </button>
           </div>
+        </PageCard>
 
-          {/* Coming Soon Modal */}
-          <Dialog open={showComingSoonModal} onOpenChange={setShowComingSoonModal}>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2 text-xl">
-                  <Clock className="w-6 h-6" style={{ color: '#82F0B9' }} />
-                  Feature Coming Soon
-                </DialogTitle>
-              </DialogHeader>
-              <div className="py-4">
-                <p style={{ color: '#787776' }}>
-                  Bank account connections via Plaid & Dwolla are coming soon! This feature will enable secure bank transfers directly through Vony.
-                </p>
-                <p className="text-sm mt-3" style={{ color: '#787776' }}>
-                  In the meantime, you can use Venmo, Cash App, PayPal, or Zelle for payments.
-                </p>
-              </div>
-              <Button
-                onClick={() => setShowComingSoonModal(false)}
-                className="w-full text-white hover:opacity-90"
-                style={{ background: '#82F0B9' }}
-              >
-                Got it!
-              </Button>
-            </DialogContent>
-          </Dialog>
-
-          {/* Page Content */}
-          <div className="grid lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8 w-full" style={{ paddingBottom: 40 }}>
-            {/* Profile Info */}
-            <div className="lg:col-span-2 space-y-4 md:space-y-6 min-w-0 w-full">
-              {/* Personal Information - First */}
-              <div className="glass-card" style={{ padding: '16px 16px' }}>
-                <p style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 16 }}>
-                  Personal Information
-                </p>
-
+        {/* Page Content */}
+        <div className="grid lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8 w-full" style={{ paddingBottom: 40 }}>
+          {/* Profile Info */}
+          <div className="lg:col-span-2 space-y-4 md:space-y-6 min-w-0 w-full">
+            {/* Personal Information */}
+            <PageCard
+              title="Personal Information"
+              headerRight={
+                isEditing ? (
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setIsEditing(false);
+                        setFormData({
+                          full_name: user?.full_name || '',
+                          username: user?.username || '',
+                          phone: user?.phone || '',
+                          location: user?.location || '',
+                          profile_picture_url: user?.profile_picture_url || '',
+                          theme_preference: user?.theme_preference || 'morning'
+                        });
+                        setUsernameError(null);
+                      }}
+                      className="bg-white hover:bg-slate-50"
+                      style={{ fontSize: 12, padding: '4px 12px', height: 'auto' }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleSave}
+                      disabled={isSaving || usernameError || isCheckingUsername}
+                      className="text-white font-semibold hover:opacity-90"
+                      style={{ background: '#82F0B9', fontSize: 12, padding: '4px 12px', height: 'auto' }}
+                    >
+                      {isSaving ? 'Saving...' : 'Save Changes'}
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={() => setIsEditing(true)}
+                    className="text-white font-semibold hover:opacity-90"
+                    style={{ background: '#82F0B9', fontSize: 12, padding: '4px 12px', height: 'auto' }}
+                  >
+                    Edit
+                  </Button>
+                )
+              }
+            >
+              <div style={{ padding: '16px 16px' }}>
                 {/* Inner box with fields */}
                 <div className="space-y-4" style={{ background: 'rgba(130,240,185,0.06)', borderRadius: 12, padding: 16 }}>
                   <div className="grid md:grid-cols-2 gap-3 md:gap-4">
@@ -521,58 +579,15 @@ export default function Profile() {
                     </div>
                   </div>
                 </div>
-
-                {/* Edit button below inner box, right-aligned */}
-                <div className="flex justify-end mt-4">
-                  {isEditing ? (
-                    <div className="flex gap-3">
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setIsEditing(false);
-                          setFormData({
-                            full_name: user?.full_name || '',
-                            username: user?.username || '',
-                            phone: user?.phone || '',
-                            location: user?.location || '',
-                            profile_picture_url: user?.profile_picture_url || '',
-                            theme_preference: user?.theme_preference || 'morning'
-                          });
-                          setUsernameError(null);
-                        }}
-                        className="bg-white hover:bg-slate-50"
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        onClick={handleSave}
-                        disabled={isSaving || usernameError || isCheckingUsername}
-                        className="text-white font-semibold hover:opacity-90"
-                        style={{ background: '#82F0B9' }}
-                      >
-                        {isSaving ? 'Saving...' : 'Save Changes'}
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button
-                      onClick={() => setIsEditing(true)}
-                      className="text-white font-semibold hover:opacity-90"
-                      style={{ background: '#82F0B9' }}
-                    >
-                      Edit Personal Information
-                    </Button>
-                  )}
-                </div>
               </div>
-            </div>
+            </PageCard>
+          </div>
 
-            {/* Stats & Verification */}
-            <div className="space-y-4 md:space-y-6 min-w-0 w-full">
-              {/* Bank Account Connection */}
-              <div className="glass-card" style={{ padding: '16px 16px' }}>
-                <p style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 16 }}>
-                  Bank Account
-                </p>
+          {/* Stats & Verification */}
+          <div className="space-y-4 md:space-y-6 min-w-0 w-full">
+            {/* Bank Account Connection */}
+            <PageCard title="Bank Account">
+              <div style={{ padding: '16px 16px' }}>
                 <div className="space-y-4">
                   <p className="text-sm" style={{ color: '#787776' }}>
                     Securely connect your bank account using Plaid & Dwolla to enable bank transfers.
@@ -590,12 +605,11 @@ export default function Profile() {
                   </p>
                 </div>
               </div>
+            </PageCard>
 
-              {/* Verification Status */}
-              <div className="glass-card" style={{ padding: '16px 16px' }}>
-                <p style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 16 }}>
-                  Verification
-                </p>
+            {/* Verification Status */}
+            <PageCard title="Verification">
+              <div style={{ padding: '16px 16px' }}>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Email Verified</span>
@@ -632,17 +646,16 @@ export default function Profile() {
                   </div>
                 </div>
               </div>
-
-            </div>
+            </PageCard>
           </div>
+        </div>
 
-          <div style={{ marginTop: 32, display: 'flex', justifyContent: 'center', paddingBottom: 40 }}>
-            <Button variant="ghost" onClick={handleLogout} className="hover:text-red-500" style={{ color: '#787776' }}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Log Out
-            </Button>
-          </div>
-
+        <div style={{ marginTop: 8, display: 'flex', justifyContent: 'center', paddingBottom: 24 }}>
+          <Button variant="ghost" onClick={handleLogout} className="hover:text-red-500" style={{ color: '#787776' }}>
+            <LogOut className="w-4 h-4 mr-2" />
+            Log Out
+          </Button>
+        </div>
 
         <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
@@ -652,7 +665,7 @@ export default function Profile() {
             <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
           </div>
         </div>
-        </div>
+      </div>
     </div>
   );
 }

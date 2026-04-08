@@ -563,11 +563,8 @@ export default function YourLoans() {
           {/* Left Column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {/* Loan Progress */}
-            <div className="glass-card">
-              <div style={{ padding: '14px 16px 0' }}>
-                <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Loan Progress</span>
-              </div>
-              <div style={{ padding: '10px 16px 16px' }}>
+            <PageCard title="Loan Progress">
+              <div style={{ padding: '10px 14px 14px' }}>
                 {activeLoans.length === 0 ? (
                   <p style={{ fontSize: 13, color: '#787776' }}>No active loans to track</p>
                 ) : (
@@ -589,15 +586,12 @@ export default function YourLoans() {
                   })()
                 )}
               </div>
-            </div>
+            </PageCard>
 
             {/* Your Active Loans */}
             {activeLoans.length > 0 && (
-              <div className="glass-card">
-                <div style={{ padding: '14px 16px 0' }}>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Your Active Loans</span>
-                </div>
-                <div style={{ padding: '10px 16px 16px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <PageCard title="Your Active Loans">
+                <div style={{ padding: '10px 14px 14px', display: 'flex', flexDirection: 'column', gap: 14 }}>
                   {activeLoans.slice(0, 5).map(loan => {
                     const otherParty = publicProfiles.find(p => p.user_id === (isLending ? loan.borrower_id : loan.lender_id));
                     const loanTotalOwed = loan.total_amount || loan.amount || 0;
@@ -623,24 +617,22 @@ export default function YourLoans() {
                     );
                   })}
                 </div>
-              </div>
+              </PageCard>
             )}
 
             {/* Loans Ranked By — borrowing left column */}
             {!isLending && activeLoans.length > 0 && (
-              <div className="glass-card">
-                <div style={{ padding: '14px 16px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Loans Ranked By</span>
-                  <Select value={rankingFilter} onValueChange={setRankingFilter}>
-                    <SelectTrigger className="w-auto h-7 px-2 border-0 text-xs font-medium rounded-lg" style={{ background: accentLight, color: accentColor }}><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="highest_interest">Highest Interest</SelectItem>
-                      <SelectItem value="highest_payment">Highest Payment</SelectItem>
-                      <SelectItem value="soonest_deadline">Soonest Deadline</SelectItem>
-                    </SelectContent>
+              <PageCard title="Loans Ranked By" headerRight={
+                <Select value={rankingFilter} onValueChange={setRankingFilter}>
+                  <SelectTrigger className="w-auto h-7 px-2 border-0 text-xs font-medium rounded-lg" style={{ background: accentLight, color: accentColor }}><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="highest_interest">Highest Interest</SelectItem>
+                    <SelectItem value="highest_payment">Highest Payment</SelectItem>
+                    <SelectItem value="soonest_deadline">Soonest Deadline</SelectItem>
+                  </SelectContent>
                   </Select>
-                </div>
-                <div style={{ padding: '10px 16px 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                }>
+                <div style={{ padding: '10px 14px 14px', display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {(() => {
                     const sorted = [...activeLoans].sort((a, b) => {
                       if (rankingFilter === 'highest_interest') return (b.interest_rate || 0) - (a.interest_rate || 0);
@@ -661,7 +653,7 @@ export default function YourLoans() {
                     });
                   })()}
                 </div>
-              </div>
+              </PageCard>
             )}
           </div>
 
@@ -694,11 +686,8 @@ export default function YourLoans() {
                   </div>
                 </div>
                 {/* Card 2: Amount + to/from name */}
-                <div className="glass-card" style={{ display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ padding: '14px 16px 0' }}>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Next payment amount</div>
-                  </div>
-                  <div style={{ padding: '10px 16px 16px', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+                <PageCard title="Next payment amount" style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ padding: '10px 14px 14px', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
                     {nextPaymentLoan ? (
                       <>
                         <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', lineHeight: 1 }}>
@@ -710,7 +699,7 @@ export default function YourLoans() {
                       <div style={{ fontSize: 13, color: '#787776' }}>N/A</div>
                     )}
                   </div>
-                </div>
+                </PageCard>
               </div>
             )}
 
@@ -738,11 +727,8 @@ export default function YourLoans() {
                   </div>
                 </div>
                 {/* Card 2: Amount + from name */}
-                <div className="glass-card" style={{ display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ padding: '14px 16px 0' }}>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Next payment amount</div>
-                  </div>
-                  <div style={{ padding: '10px 16px 16px', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+                <PageCard title="Next payment amount" style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ padding: '10px 14px 14px', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
                     {nextPaymentLoan ? (
                       <>
                         <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', lineHeight: 1 }}>
@@ -754,7 +740,7 @@ export default function YourLoans() {
                       <div style={{ fontSize: 13, color: '#787776' }}>N/A</div>
                     )}
                   </div>
-                </div>
+                </PageCard>
               </div>
             )}
 
@@ -774,11 +760,8 @@ export default function YourLoans() {
               const upcomingLoans = allPaymentLoans.filter(l => l.days >= 0).slice(0, 5);
               const combinedLoans = [...overdueLoans, ...upcomingLoans];
               return (
-                <div className="glass-card">
-                  <div style={{ padding: '14px 16px 0' }}>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Upcoming Payments</span>
-                  </div>
-                  <div style={{ padding: '10px 16px 16px' }}>
+                <PageCard title="Upcoming Payments">
+                  <div style={{ padding: '10px 14px 14px' }}>
                     {combinedLoans.length === 0 ? (
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 0', color: '#787776' }}>
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ opacity: 0.4, marginBottom: 6 }}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
@@ -815,7 +798,7 @@ export default function YourLoans() {
                       </div>
                     )}
                   </div>
-                </div>
+                </PageCard>
               );
             })()}
 
@@ -835,11 +818,8 @@ export default function YourLoans() {
               const upcomingLoans = allPaymentLoans.filter(l => l.days >= 0).slice(0, 5);
               const combinedLoans = [...overdueLoans, ...upcomingLoans];
               return (
-                <div className="glass-card">
-                  <div style={{ padding: '14px 16px 0' }}>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Upcoming Payments</span>
-                  </div>
-                  <div style={{ padding: '10px 16px 16px' }}>
+                <PageCard title="Upcoming Payments">
+                  <div style={{ padding: '10px 14px 14px' }}>
                     {combinedLoans.length === 0 ? (
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 0', color: '#787776' }}>
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ opacity: 0.4, marginBottom: 6 }}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
@@ -876,7 +856,7 @@ export default function YourLoans() {
                       </div>
                     )}
                   </div>
-                </div>
+                </PageCard>
               );
             })()}
           </div>
@@ -889,9 +869,9 @@ export default function YourLoans() {
   const renderDetailsTab = () => {
     if (allManageableLoans.length === 0) {
       return (
-        <div className="glass-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 200, padding: 26 }}>
-          <div style={{ textAlign: 'center' }}><ClipboardList style={{ width: 40, height: 40, margin: '0 auto 8px', color: '#C7C6C4' }} /><p style={{ fontSize: 13, color: '#787776' }}>No loans to display</p></div>
-        </div>
+        <PageCard title="Loan Details" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 200 }}>
+          <div style={{ textAlign: 'center', padding: 26 }}><ClipboardList style={{ width: 40, height: 40, margin: '0 auto 8px', color: '#C7C6C4' }} /><p style={{ fontSize: 13, color: '#787776' }}>No loans to display</p></div>
+        </PageCard>
       );
     }
 
@@ -930,9 +910,8 @@ export default function YourLoans() {
     return (
       <div>
         {/* Select a Loan */}
-        <div className="glass-card" style={{ marginBottom: 16 }}>
-          <div style={{ padding: '14px 16px 0' }}><span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Select a Loan to Learn More</span></div>
-          <div style={{ padding: '10px 16px 16px' }}>
+        <PageCard title="Select a Loan to Learn More" style={{ marginBottom: 16 }}>
+          <div style={{ padding: '10px 14px 14px' }}>
             <div style={{ position: 'relative' }}>
               <select value={manageLoanSelected?.id || ''} onChange={(e) => { const selected = allManageableLoans.find(l => l.id === e.target.value); if (selected) setManageLoanSelected(selected); }} style={{ width: '100%', appearance: 'none', borderRadius: 10, padding: '8px 12px', fontSize: 12, fontWeight: 600, color: '#1A1918', background: 'rgba(130,240,185,0.08)', cursor: 'pointer', border: '1px solid rgba(130,240,185,0.2)', outline: 'none', fontFamily: "'DM Sans', sans-serif" }}>
                 {allManageableLoans.map((loan) => {
@@ -945,7 +924,7 @@ export default function YourLoans() {
               <div style={{ pointerEvents: 'none', position: 'absolute', top: 0, bottom: 0, right: 10, display: 'flex', alignItems: 'center' }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#82F0B9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
             </div>
           </div>
-        </div>
+        </PageCard>
 
         {/* Summary bar */}
         {manageLoanSelected && (() => {
@@ -986,8 +965,8 @@ export default function YourLoans() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 12 }}>
                   {/* Payment Progress circle card */}
                   <div className="glow-wrapper glow-purple">
-                  <div className="glass-card" style={{ padding: '14px 14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 8, whiteSpace: 'nowrap' }}>Payment Progress</span>
+                  <PageCard title="Payment Progress" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{ padding: '10px 14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
                       <circle cx={dCx} cy={dCy} r={(outerR + innerR) / 2} fill="none" stroke="#E5E4E2" strokeWidth={outerR - innerR} />
                       {paidPct > 0 && paidPct < 100 && (<path d={`M ${dCx} ${dCy - outerR} A ${outerR} ${outerR} 0 ${largeArc} 1 ${paidEndXo} ${paidEndYo} L ${paidEndXi} ${paidEndYi} A ${innerR} ${innerR} 0 ${largeArc} 0 ${dCx} ${dCy - innerR} Z`} fill="#82F0B9" />)}
@@ -999,7 +978,8 @@ export default function YourLoans() {
                       ${totalPaidAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       <span style={{ color: '#787776', fontWeight: 400 }}> / ${totalOwedNow.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </p>
-                  </div>
+                    </div>
+                  </PageCard>
                   </div>{/* /glow-wrapper glow-purple */}
                   {/* Stacked: next payment date + amount */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -1029,13 +1009,8 @@ export default function YourLoans() {
                     </div>{/* /glow-wrapper glow-blue */}
                     {/* Next payment amount card */}
                     <div className="glow-wrapper glow-blue">
-                    <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                      <div style={{ padding: '14px 16px 0' }}>
-                        <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>
-                          Next payment amount
-                        </div>
-                      </div>
-                      <div style={{ padding: '10px 16px 16px', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+                    <PageCard title="Next payment amount" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                      <div style={{ padding: '10px 14px 14px', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
                         {nextPmtDate ? (
                           <>
                             <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', lineHeight: 1 }}>
@@ -1049,7 +1024,7 @@ export default function YourLoans() {
                           <div style={{ fontSize: 13, color: '#787776' }}>N/A</div>
                         )}
                       </div>
-                    </div>
+                    </PageCard>
                     </div>{/* /glow-wrapper glow-blue */}
                   </div>
                 </div>
@@ -1057,9 +1032,8 @@ export default function YourLoans() {
             })()}
 
             {/* Payment History Chart */}
-            <div className="glass-card">
-              <div style={{ padding: '14px 16px 0' }}><span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Payment History</span></div>
-              <div style={{ padding: '10px 16px 16px' }}>
+            <PageCard title="Payment History">
+              <div style={{ padding: '10px 14px 14px' }}>
               {!manageLoanSelected ? (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: chartHeight }}><p style={{ fontSize: 12, color: '#C7C6C4' }}>Select a loan to view chart</p></div>
               ) : chartData.length === 0 ? (
@@ -1118,13 +1092,12 @@ export default function YourLoans() {
                 </div>
               )}
               </div>
-            </div>
+            </PageCard>
 
             {/* Activity Timeline */}
             {manageLoanSelected && (
-            <div className="glass-card" style={{ overflow: 'hidden' }}>
-              <div style={{ padding: '14px 16px 0' }}><p style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 10 }}>Activity</p></div>
-              <div style={{ padding: '10px 16px 16px' }}>
+            <PageCard title="Activity">
+              <div style={{ padding: '10px 14px 14px' }}>
               {(() => {
                 const ag = loanAgreements.find(a => a.loan_id === manageLoanSelected.id);
                 const loanPmts = allPayments.filter(p => p.loan_id === manageLoanSelected.id);
@@ -1179,22 +1152,21 @@ export default function YourLoans() {
                 );
               })()}
               </div>
-            </div>
+            </PageCard>
             )}
           </div>
 
           {/* Right Column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {!manageLoanSelected ? (
-              <div className="glass-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 200, padding: 26 }}>
-                <div style={{ textAlign: 'center' }}><ClipboardList style={{ width: 40, height: 40, margin: '0 auto 8px', color: '#C7C6C4' }} /><p style={{ fontSize: 13, color: '#787776' }}>Select a loan to view details</p></div>
-              </div>
+              <PageCard title="Loan Details" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 200 }}>
+                <div style={{ textAlign: 'center', padding: 26 }}><ClipboardList style={{ width: 40, height: 40, margin: '0 auto 8px', color: '#C7C6C4' }} /><p style={{ fontSize: 13, color: '#787776' }}>Select a loan to view details</p></div>
+              </PageCard>
             ) : (
               <>
                 {/* Loan Terms */}
-                <div className="glass-card">
-                  <div style={{ padding: '14px 16px 0' }}><span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Loan Terms</span></div>
-                  <div style={{ padding: '10px 16px 16px' }}>
+                <PageCard title="Loan Terms">
+                  <div style={{ padding: '10px 14px 14px' }}>
                   {(() => {
                     const amount = manageLoanSelected.amount || 0;
                     const interestRate = manageLoanSelected.interest_rate || 0;
@@ -1214,7 +1186,7 @@ export default function YourLoans() {
                     );
                   })()}
                   </div>
-                </div>
+                </PageCard>
 
                 {/* Document Icons */}
                 <div style={{ justifyContent: 'center', gap: 20, padding: '4px 0' }}>
@@ -1239,9 +1211,8 @@ export default function YourLoans() {
                 </div>
 
                 {/* Loan Progress Stats */}
-                <div className="glass-card">
-                  <div style={{ padding: '14px 16px 0' }}><span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Loan Progress</span></div>
-                  <div style={{ padding: '10px 16px 16px' }}>
+                <PageCard title="Loan Progress">
+                  <div style={{ padding: '10px 14px 14px' }}>
                   {(() => {
                     const repaymentPeriod = manageLoanSelected.repayment_period || 0;
                     const paymentFrequency = manageLoanSelected.payment_frequency || 'monthly';
@@ -1263,12 +1234,11 @@ export default function YourLoans() {
                     );
                   })()}
                   </div>
-                </div>
+                </PageCard>
 
                 {/* Payments */}
-                <div className="glass-card">
-                  <div style={{ padding: '14px 16px 0' }}><span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Payments</span></div>
-                  <div style={{ padding: '10px 16px 16px' }}>
+                <PageCard title="Payments">
+                  <div style={{ padding: '10px 14px 14px' }}>
                   {(() => {
                     const paymentAmt = manageLoanSelected.payment_amount || 0;
                     let firstRecordFound = false;
@@ -1329,7 +1299,7 @@ export default function YourLoans() {
                     );
                   })()}
                   </div>
-                </div>
+                </PageCard>
 
                 {manageLoanSelected.status === 'cancelled' && (
                   <div className="bg-red-50 rounded-xl px-4 py-3 shadow-sm border border-red-200"><p className="text-sm text-red-600 font-medium">This loan has been cancelled.</p></div>
@@ -1341,6 +1311,20 @@ export default function YourLoans() {
       </div>
     );
   };
+
+  const SHADOW = '0px 50px 40px rgba(0,0,0,0.02), 0px 50px 40px rgba(0,0,0,0.04), 0px 20px 40px rgba(0,0,0,0.08), 0px 3px 10px rgba(0,0,0,0.12)';
+
+  const PageCard = ({ title, headerRight, children, style }) => (
+    <div style={{ background: '#F4F4F5', borderRadius: 14, overflow: 'hidden', boxShadow: SHADOW, ...style }}>
+      <div style={{ padding: '6px 14px 5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
+        {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
+      </div>
+      <div style={{ background: '#ffffff', margin: '0 5px 5px', borderRadius: 10, overflow: 'hidden' }}>
+        {children}
+      </div>
+    </div>
+  );
 
   if (isLoading) {
     return (
@@ -1381,14 +1365,23 @@ export default function YourLoans() {
         )}
       </AnimatePresence>
 
-      <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 88, background: 'transparent' }}>
+      <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 0, background: 'transparent' }}>
         <DashboardSidebar activePage="YourLoans" user={user} tabs={[{key:'lending',label:'Lending'},{key:'borrowing',label:'Borrowing'},{key:'details',label:'Individual Loan Details'}]} activeTab={activeTab} onTabChange={setActiveTab} />
 
-          {/* Hero + page content */}
-          <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 40px', position: 'relative', zIndex: 2 }}>
+          {/* Hero */}
+          <div style={{ margin: '8px 10px 0', height: 168, background: '#54A6CF', borderRadius: 18, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 24, overflow: 'hidden', position: 'relative', boxShadow: '0px 50px 40px rgba(0,0,0,0.01), 0px 50px 40px rgba(0,0,0,0.02), 0px 20px 40px rgba(0,0,0,0.05), 0px 3px 10px rgba(0,0,0,0.08)' }}>
+            <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.15, pointerEvents: 'none', zIndex: 0 }} viewBox="0 0 1200 168" preserveAspectRatio="xMidYMid slice">
+              {[{cx:80,cy:40},{cx:200,cy:110},{cx:320,cy:25},{cx:430,cy:160},{cx:540,cy:70},{cx:660,cy:130},{cx:770,cy:35},{cx:890,cy:175},{cx:1000,cy:80},{cx:1100,cy:140},{cx:150,cy:185},{cx:480,cy:100},{cx:720,cy:180},{cx:950,cy:55},{cx:280,cy:195},{cx:620,cy:48},{cx:1050,cy:195}].map((s, i) => (
+                <circle key={i} cx={s.cx} cy={s.cy} r={i % 3 === 0 ? 2.5 : 1.5} fill="white" />
+              ))}
+            </svg>
+            <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 38, fontWeight: 600, color: '#1A1918', margin: 0, letterSpacing: '-0.01em', lineHeight: 1, textAlign: 'center', position: 'relative', zIndex: 1 }}>
+              <span style={{ fontStyle: 'italic' }}>Your Loans</span>
+            </h1>
+          </div>
 
             {/* Page content */}
-            <div style={{ maxWidth: 1080, margin: '0 auto', padding: '24px 40px 64px' }}>
+            <div style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 40px 64px', position: 'relative', zIndex: 1 }}>
               {(() => {
                 const isLendingTab = activeTab === 'lending';
                 const allOverdue = isLendingTab
@@ -1397,7 +1390,7 @@ export default function YourLoans() {
                 if (allOverdue.length === 0) return null;
                 const clampedSlide = reminderSlide % allOverdue.length;
                 return (
-                  <div className="glass-card" style={{ marginBottom: 20, overflow: 'hidden' }}>
+                  <PageCard title="Overdue Payments" style={{ marginBottom: 20 }}>
                     {/* Carousel viewport */}
                     <div style={{ overflow: 'hidden' }}>
                       <div style={{ display: 'flex', transition: 'transform 0.5s cubic-bezier(0.4,0,0.2,1)', transform: `translateX(-${clampedSlide * 100}%)` }}>
@@ -1450,7 +1443,7 @@ export default function YourLoans() {
                         ))}
                       </div>
                     )}
-                  </div>
+                  </PageCard>
                 );
               })()}
 
@@ -1468,7 +1461,6 @@ export default function YourLoans() {
           </div>
           </div>
           </div>
-      </div>
 
       {/* Modals */}
       {showDetailsModal && selectedLoanDetails && (

@@ -13,16 +13,7 @@ import DashboardSidebar from "@/components/DashboardSidebar";
 import confetti from "canvas-confetti";
 import { AnimatedCheckmark } from "@/components/ui/animations";
 
-const STAR_CIRCLES = [
-  {cx:82,cy:45,o:0.7},{cx:195,cy:112,o:0.5},{cx:310,cy:28,o:0.8},{cx:420,cy:198,o:0.4},
-  {cx:530,cy:67,o:0.65},{cx:640,cy:245,o:0.55},{cx:755,cy:88,o:0.75},{cx:860,cy:156,o:0.45},
-  {cx:970,cy:34,o:0.7},{cx:1085,cy:201,o:0.6},{cx:1190,cy:78,o:0.5},{cx:1300,cy:267,o:0.7},
-  {cx:1410,cy:45,o:0.55},{cx:1520,cy:134,o:0.65},{cx:48,cy:189,o:0.4},{cx:158,cy:278,o:0.6},
-  {cx:268,cy:156,o:0.5},{cx:378,cy:89,o:0.7},{cx:488,cy:234,o:0.45},{cx:598,cy:145,o:0.6},
-  {cx:708,cy:312,o:0.35},{cx:818,cy:56,o:0.75},{cx:928,cy:223,o:0.5},{cx:1038,cy:98,o:0.65},
-  {cx:1148,cy:289,o:0.4},{cx:1258,cy:167,o:0.7},{cx:1368,cy:234,o:0.55},{cx:1478,cy:78,o:0.6},
-  {cx:1560,cy:256,o:0.45},{cx:125,cy:312,o:0.5},{cx:345,cy:267,o:0.6},{cx:565,cy:34,o:0.75},
-];
+const SHADOW = '0px 50px 40px rgba(0,0,0,0.02), 0px 50px 40px rgba(0,0,0,0.04), 0px 20px 40px rgba(0,0,0,0.08), 0px 3px 10px rgba(0,0,0,0.12)';
 
 const PAYMENT_METHODS = [
   { id: 'venmo', label: 'Venmo', icon: Smartphone, color: '#3b82f6' },
@@ -128,7 +119,7 @@ export default function RecordPayment() {
 
   useEffect(() => { if (user?.id) loadData(); }, [user?.id]);
 
-  // 🎉 Confetti when payment is successfully recorded
+  // Confetti when payment is successfully recorded
   useEffect(() => {
     if (isSuccess) {
       confetti({
@@ -339,17 +330,30 @@ export default function RecordPayment() {
     return p.full_name || p.username;
   };
 
+  /* ── PageCard component ──────────────────────────────────── */
+  const PageCard = ({ title, headerRight, children, style }) => (
+    <div style={{ background: '#F4F4F5', borderRadius: 14, overflow: 'hidden', boxShadow: SHADOW, ...style }}>
+      <div style={{ padding: '6px 14px 5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
+        {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
+      </div>
+      <div style={{ background: '#ffffff', margin: '0 5px 5px', borderRadius: 10, overflow: 'hidden' }}>
+        {children}
+      </div>
+    </div>
+  );
+
   /* ── Loading state ──────────────────────────────────────── */
   if (isLoading && !user) {
     return (
-      <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 88, background: 'transparent' }}>
+      <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 0, background: 'transparent' }}>
         <DashboardSidebar activePage="RecordPayment" user={user} />
-          <div style={{ maxWidth: 1080, margin: '0 auto', paddingRight: 24, maxWidth: 1080, margin: '0 auto', padding: '24px 40px 64px', position: 'relative', zIndex: 2 }}>
-            <div className="glass-card" style={{ padding: 40, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ width: 32, height: 32, border: '2px solid #82F0B9', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: 12 }} />
-              <p style={{ fontSize: 13, color: '#787776' }}>Loading...</p>
-            </div>
-          <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 40px 64px', position: 'relative', zIndex: 1 }}>
+          <div style={{ background: '#F4F4F5', borderRadius: 14, overflow: 'hidden', boxShadow: SHADOW, padding: 40, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ width: 32, height: 32, border: '2px solid #82F0B9', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: 12 }} />
+            <p style={{ fontSize: 13, color: '#787776' }}>Loading...</p>
+          </div>
+          <div style={{ padding: '20px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
               <span style={{ fontSize: 11, color: '#787776' }}>Terms of Service</span>
@@ -357,8 +361,8 @@ export default function RecordPayment() {
               <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
             </div>
           </div>
-          </div>
         </div>
+      </div>
     );
   }
 
@@ -402,15 +406,23 @@ export default function RecordPayment() {
         )}
       </AnimatePresence>
 
-      <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 88, background: 'transparent' }}>
+      <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 0, background: 'transparent' }}>
         <DashboardSidebar activePage="RecordPayment" user={user} />
 
-          {/* Gradient background */}
+        {/* Hero */}
+        <div style={{ margin: '8px 10px 0', height: 168, background: '#54A6CF', borderRadius: 18, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 24, overflow: 'hidden', position: 'relative', boxShadow: '0px 50px 40px rgba(0,0,0,0.01), 0px 50px 40px rgba(0,0,0,0.02), 0px 20px 40px rgba(0,0,0,0.05), 0px 3px 10px rgba(0,0,0,0.08)' }}>
+          <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.15, pointerEvents: 'none', zIndex: 0 }} viewBox="0 0 1200 168" preserveAspectRatio="xMidYMid slice">
+            {[{cx:80,cy:40},{cx:200,cy:110},{cx:320,cy:25},{cx:430,cy:160},{cx:540,cy:70},{cx:660,cy:130},{cx:770,cy:35},{cx:890,cy:175},{cx:1000,cy:80},{cx:1100,cy:140},{cx:150,cy:185},{cx:480,cy:100},{cx:720,cy:180},{cx:950,cy:55},{cx:280,cy:195},{cx:620,cy:48},{cx:1050,cy:195}].map((s, i) => (
+              <circle key={i} cx={s.cx} cy={s.cy} r={i % 3 === 0 ? 2.5 : 1.5} fill="white" />
+            ))}
+          </svg>
+          <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 38, fontWeight: 600, color: '#1A1918', margin: 0, letterSpacing: '-0.01em', lineHeight: 1, textAlign: 'center', position: 'relative', zIndex: 1 }}>
+            <span style={{ fontStyle: 'italic' }}>Record a Payment</span>
+          </h1>
+        </div>
 
-          {/* Hero */}
-
-          {/* Page content */}
-          <div style={{ maxWidth: 1080, margin: '0 auto', paddingRight: 24, maxWidth: 1080, margin: '0 auto', padding: '24px 40px 64px', position: 'relative', zIndex: 2 }}>
+        {/* Page content */}
+        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 40px 64px', position: 'relative', zIndex: 1 }}>
 
           {/* Two-column layout */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 16, alignItems: 'start' }}>
@@ -419,302 +431,307 @@ export default function RecordPayment() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, order: 2 }}>
 
               {/* Record Payment Form */}
-              <div className="glass-card" style={{ padding: '26px', overflow: 'visible' }}>
-                {currentStep === 0 && !selectedLoan && (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 0', color: '#C7C6C4' }}>
-                    <p style={{ fontSize: 15, fontWeight: 500, color: '#787776', margin: 0 }}>Select a loan to get started</p>
-                    <p style={{ fontSize: 12, color: '#C7C6C4', margin: '4px 0 0' }}>Choose from your active loans on the left</p>
-                  </div>
-                )}
-
-                {currentStep === 1 && selectedLoan && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                    {/* Loan sentence */}
-                    <div style={{ background: 'rgba(130,240,185,0.06)', borderRadius: 14, padding: 16 }}>
-                      <p style={{ fontSize: 15, fontWeight: 500, color: '#1A1918', margin: 0, lineHeight: 1.6 }}>
-                        {nameOrYouCapitalized(isUserLender(selectedLoan) ? selectedLoan.borrower_id : user?.id)} paid {nameOrYou(isUserLender(selectedLoan) ? user?.id : selectedLoan.lender_id)}{' '}
-                        {amount && parseFloat(amount) > 0
-                          ? <strong>${parseFloat(amount).toFixed(2)}</strong>
-                          : <span style={{ color: '#2563EB', borderBottom: '2px solid #2563EB', paddingBottom: 1, fontWeight: 600, letterSpacing: '0.04em' }}>$__</span>
-                        }{' '}for {selectedLoan.purpose || 'this loan'}
-                      </p>
+              <PageCard title={
+                currentStep === 0 ? 'Payment Details' :
+                currentStep === 1 ? 'Payment Details' :
+                currentStep === 2 ? 'Confirm Payment' :
+                'Payment Recorded'
+              }>
+                <div style={{ padding: '16px', overflow: 'visible' }}>
+                  {currentStep === 0 && !selectedLoan && (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 0', color: '#C7C6C4' }}>
+                      <p style={{ fontSize: 15, fontWeight: 500, color: '#787776', margin: 0 }}>Select a loan to get started</p>
+                      <p style={{ fontSize: 12, color: '#C7C6C4', margin: '4px 0 0' }}>Choose from your active loans on the left</p>
                     </div>
+                  )}
 
-                    {/* Amount */}
-                    <div>
-                      <label style={{ fontSize: 12, fontWeight: 600, color: '#787776', marginBottom: 6, display: 'block' }}>Payment Amount</label>
-                      <div style={{ position: 'relative' }}>
-                        <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 15, fontWeight: 600, color: '#1A1918' }}>$</span>
-                        <input
-                          type="number" step="0.01" min="0" value={amount}
-                          onChange={e => { setAmount(e.target.value); setError(''); }}
-                          style={{
-                            width: '100%', padding: '12px 14px 12px 28px', borderRadius: 12,
-                            border: '1px solid rgba(0,0,0,0.08)', background: 'white',
-                            fontSize: 15, fontWeight: 500, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", outline: 'none',
-                          }}
-                          onFocus={e => e.target.style.borderColor = 'rgba(130,240,185,0.4)'}
-                          onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.08)'}
-                        />
-                      </div>
-                      {selectedLoan && (
-                        <p style={{ fontSize: 11, color: '#787776', margin: '6px 0 0' }}>Remaining balance: ${getRemainingBalance(selectedLoan).toFixed(2)}</p>
-                      )}
-                    </div>
-
-                    {/* Payment Method */}
-                    <div>
-                      <label style={{ fontSize: 12, fontWeight: 600, color: '#787776', marginBottom: 8, display: 'block' }}>Payment Method</label>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-                        {PAYMENT_METHODS.map(method => {
-                          const Icon = method.icon;
-                          const isSelected = paymentMethod === method.id;
-                          return (
-                            <motion.button
-                              key={method.id}
-                              onClick={() => { setPaymentMethod(method.id); setError(''); }}
-                              whileHover={{ scale: 1.03, y: -1 }}
-                              whileTap={{ scale: 0.94 }}
-                              animate={isSelected ? { scale: [1, 1.08, 1] } : { scale: 1 }}
-                              transition={{ type: 'spring', stiffness: 420, damping: 18 }}
-                              style={{
-                                display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', borderRadius: 12,
-                                border: isSelected ? '2px solid #82F0B9' : '1px solid rgba(0,0,0,0.08)',
-                                background: isSelected ? 'rgba(130,240,185,0.1)' : 'white',
-                                cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", fontSize: 12, fontWeight: 500, color: '#1A1918',
-                                boxShadow: isSelected ? '0 0 0 3px rgba(130,240,185,0.2)' : 'none',
-                              }}
-                            >
-                              <Icon size={16} style={{ color: isSelected ? '#35B276' : method.color }} />
-                              {method.label}
-                            </motion.button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Payment Date */}
-                    <div>
-                      <label style={{ fontSize: 12, fontWeight: 600, color: '#787776', marginBottom: 6, display: 'block' }}>Payment Date</label>
-                      <input
-                        type="date" value={paymentDate} max={format(new Date(), 'yyyy-MM-dd')}
-                        onChange={e => setPaymentDate(e.target.value)}
-                        style={{
-                          width: '100%', padding: '10px 14px', borderRadius: 12,
-                          border: '1px solid rgba(0,0,0,0.08)', background: 'white',
-                          fontSize: 13, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", outline: 'none',
-                        }}
-                      />
-                    </div>
-
-                    {error && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 10, background: 'rgba(232,114,110,0.08)' }}>
-                        <AlertCircle size={14} style={{ color: '#E8726E', flexShrink: 0 }} />
-                        <span style={{ fontSize: 12, color: '#E8726E' }}>{error}</span>
-                      </div>
-                    )}
-
-                    <button onClick={handleContinue} style={{
-                      width: '100%', padding: '12px 0', borderRadius: 12, border: 'none',
-                      background: '#82F0B9', color: 'white', fontSize: 14, fontWeight: 600,
-                      cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                    }}>
-                      Continue <ArrowRight size={16} />
-                    </button>
-                  </div>
-                )}
-
-                {currentStep === 2 && selectedLoan && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                    <div style={{ textAlign: 'center', paddingBottom: 16 }}>
-                      <h3 style={{ fontSize: 18, fontWeight: 600, color: '#1A1918', margin: 0 }}>Confirm Payment</h3>
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                      <div style={{ background: 'rgba(130,240,185,0.06)', borderRadius: 12, padding: 14 }}>
-                        <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>Amount</p>
-                        <p style={{ fontSize: 20, fontWeight: 700, color: '#1A1918', margin: '4px 0 0' }}>${parseFloat(amount).toFixed(2)}</p>
-                      </div>
-                      <div style={{ background: 'rgba(37,99,235,0.08)', borderRadius: 12, padding: 14 }}>
-                        <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>Method</p>
-                        <p style={{ fontSize: 15, fontWeight: 600, color: '#1A1918', margin: '4px 0 0' }}>{PAYMENT_METHODS.find(m => m.id === paymentMethod)?.label}</p>
-                      </div>
-                      <div style={{ background: 'rgba(130,240,185,0.06)', borderRadius: 12, padding: 14 }}>
-                        <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>Date</p>
-                        <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: '4px 0 0' }}>{format(new Date(paymentDate + 'T12:00:00'), 'MMM d, yyyy')}</p>
-                      </div>
-                      <div style={{ background: 'rgba(37,99,235,0.08)', borderRadius: 12, padding: 14 }}>
-                        <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>To</p>
-                        <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: '4px 0 0' }}>
-                          {nameOrYouCapitalized(isUserLender(selectedLoan) ? selectedLoan.borrower_id : selectedLoan.lender_id)}
+                  {currentStep === 1 && selectedLoan && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                      {/* Loan sentence */}
+                      <div style={{ background: 'rgba(130,240,185,0.06)', borderRadius: 14, padding: 16 }}>
+                        <p style={{ fontSize: 15, fontWeight: 500, color: '#1A1918', margin: 0, lineHeight: 1.6 }}>
+                          {nameOrYouCapitalized(isUserLender(selectedLoan) ? selectedLoan.borrower_id : user?.id)} paid {nameOrYou(isUserLender(selectedLoan) ? user?.id : selectedLoan.lender_id)}{' '}
+                          {amount && parseFloat(amount) > 0
+                            ? <strong>${parseFloat(amount).toFixed(2)}</strong>
+                            : <span style={{ color: '#2563EB', borderBottom: '2px solid #2563EB', paddingBottom: 1, fontWeight: 600, letterSpacing: '0.04em' }}>$__</span>
+                          }{' '}for {selectedLoan.purpose || 'this loan'}
                         </p>
                       </div>
-                    </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 10, background: 'rgba(130,240,185,0.06)' }}>
-                      <Clock size={14} style={{ color: '#82F0B9', flexShrink: 0 }} />
-                      <span style={{ fontSize: 12, color: '#82F0B9' }}>
-                        {getOtherParty(selectedLoan).full_name || getOtherParty(selectedLoan).username} will need to confirm this payment
-                      </span>
-                    </div>
-
-                    {error && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 10, background: 'rgba(232,114,110,0.08)' }}>
-                        <AlertCircle size={14} style={{ color: '#E8726E', flexShrink: 0 }} />
-                        <span style={{ fontSize: 12, color: '#E8726E' }}>{error}</span>
-                      </div>
-                    )}
-
-                    <div style={{ display: 'flex', gap: 12 }}>
-                      <button onClick={() => setCurrentStep(1)} style={{
-                        flex: 1, padding: '12px 0', borderRadius: 12, border: '1px solid rgba(0,0,0,0.08)',
-                        background: 'white', fontSize: 13, fontWeight: 600, color: '#787776', cursor: 'pointer',
-                        fontFamily: "'DM Sans', sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                      }}>
-                        <ArrowLeft size={14} /> Back
-                      </button>
-                      <button onClick={handleConfirmPayment} disabled={isProcessing} style={{
-                        flex: 2, padding: '12px 0', borderRadius: 12, border: 'none',
-                        background: isProcessing ? '#a0b8f8' : '#82F0B9', color: 'white', fontSize: 14, fontWeight: 600,
-                        cursor: isProcessing ? 'default' : 'pointer', fontFamily: "'DM Sans', sans-serif",
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                      }}>
-                        {isProcessing ? (
-                          <div style={{ width: 18, height: 18, border: '2px solid white', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                        ) : (
-                          <><CheckCircle size={16} /> Confirm Payment</>
+                      {/* Amount */}
+                      <div>
+                        <label style={{ fontSize: 12, fontWeight: 600, color: '#787776', marginBottom: 6, display: 'block' }}>Payment Amount</label>
+                        <div style={{ position: 'relative' }}>
+                          <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 15, fontWeight: 600, color: '#1A1918' }}>$</span>
+                          <input
+                            type="number" step="0.01" min="0" value={amount}
+                            onChange={e => { setAmount(e.target.value); setError(''); }}
+                            style={{
+                              width: '100%', padding: '12px 14px 12px 28px', borderRadius: 12,
+                              border: '1px solid rgba(0,0,0,0.08)', background: 'white',
+                              fontSize: 15, fontWeight: 500, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", outline: 'none',
+                            }}
+                            onFocus={e => e.target.style.borderColor = 'rgba(130,240,185,0.4)'}
+                            onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.08)'}
+                          />
+                        </div>
+                        {selectedLoan && (
+                          <p style={{ fontSize: 11, color: '#787776', margin: '6px 0 0' }}>Remaining balance: ${getRemainingBalance(selectedLoan).toFixed(2)}</p>
                         )}
+                      </div>
+
+                      {/* Payment Method */}
+                      <div>
+                        <label style={{ fontSize: 12, fontWeight: 600, color: '#787776', marginBottom: 8, display: 'block' }}>Payment Method</label>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+                          {PAYMENT_METHODS.map(method => {
+                            const Icon = method.icon;
+                            const isSelected = paymentMethod === method.id;
+                            return (
+                              <motion.button
+                                key={method.id}
+                                onClick={() => { setPaymentMethod(method.id); setError(''); }}
+                                whileHover={{ scale: 1.03, y: -1 }}
+                                whileTap={{ scale: 0.94 }}
+                                animate={isSelected ? { scale: [1, 1.08, 1] } : { scale: 1 }}
+                                transition={{ type: 'spring', stiffness: 420, damping: 18 }}
+                                style={{
+                                  display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', borderRadius: 12,
+                                  border: isSelected ? '2px solid #82F0B9' : '1px solid rgba(0,0,0,0.08)',
+                                  background: isSelected ? 'rgba(130,240,185,0.1)' : 'white',
+                                  cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", fontSize: 12, fontWeight: 500, color: '#1A1918',
+                                  boxShadow: isSelected ? '0 0 0 3px rgba(130,240,185,0.2)' : 'none',
+                                }}
+                              >
+                                <Icon size={16} style={{ color: isSelected ? '#35B276' : method.color }} />
+                                {method.label}
+                              </motion.button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Payment Date */}
+                      <div>
+                        <label style={{ fontSize: 12, fontWeight: 600, color: '#787776', marginBottom: 6, display: 'block' }}>Payment Date</label>
+                        <input
+                          type="date" value={paymentDate} max={format(new Date(), 'yyyy-MM-dd')}
+                          onChange={e => setPaymentDate(e.target.value)}
+                          style={{
+                            width: '100%', padding: '10px 14px', borderRadius: 12,
+                            border: '1px solid rgba(0,0,0,0.08)', background: 'white',
+                            fontSize: 13, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", outline: 'none',
+                          }}
+                        />
+                      </div>
+
+                      {error && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 10, background: 'rgba(232,114,110,0.08)' }}>
+                          <AlertCircle size={14} style={{ color: '#E8726E', flexShrink: 0 }} />
+                          <span style={{ fontSize: 12, color: '#E8726E' }}>{error}</span>
+                        </div>
+                      )}
+
+                      <button onClick={handleContinue} style={{
+                        width: '100%', padding: '12px 0', borderRadius: 12, border: 'none',
+                        background: '#82F0B9', color: 'white', fontSize: 14, fontWeight: 600,
+                        cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                      }}>
+                        Continue <ArrowRight size={16} />
                       </button>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {currentStep === 3 && isSuccess && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-                    style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 0', gap: 16 }}
-                  >
-                    <AnimatedCheckmark size="xl" delay={0.1} />
-                    <motion.h3
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.35 }}
-                      style={{ fontSize: 22, fontWeight: 700, color: '#1A1918', margin: 0 }}
+                  {currentStep === 2 && selectedLoan && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                        <div style={{ background: 'rgba(130,240,185,0.06)', borderRadius: 12, padding: 14 }}>
+                          <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>Amount</p>
+                          <p style={{ fontSize: 20, fontWeight: 700, color: '#1A1918', margin: '4px 0 0' }}>${parseFloat(amount).toFixed(2)}</p>
+                        </div>
+                        <div style={{ background: 'rgba(37,99,235,0.08)', borderRadius: 12, padding: 14 }}>
+                          <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>Method</p>
+                          <p style={{ fontSize: 15, fontWeight: 600, color: '#1A1918', margin: '4px 0 0' }}>{PAYMENT_METHODS.find(m => m.id === paymentMethod)?.label}</p>
+                        </div>
+                        <div style={{ background: 'rgba(130,240,185,0.06)', borderRadius: 12, padding: 14 }}>
+                          <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>Date</p>
+                          <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: '4px 0 0' }}>{format(new Date(paymentDate + 'T12:00:00'), 'MMM d, yyyy')}</p>
+                        </div>
+                        <div style={{ background: 'rgba(37,99,235,0.08)', borderRadius: 12, padding: 14 }}>
+                          <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>To</p>
+                          <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: '4px 0 0' }}>
+                            {nameOrYouCapitalized(isUserLender(selectedLoan) ? selectedLoan.borrower_id : selectedLoan.lender_id)}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 10, background: 'rgba(130,240,185,0.06)' }}>
+                        <Clock size={14} style={{ color: '#82F0B9', flexShrink: 0 }} />
+                        <span style={{ fontSize: 12, color: '#82F0B9' }}>
+                          {getOtherParty(selectedLoan).full_name || getOtherParty(selectedLoan).username} will need to confirm this payment
+                        </span>
+                      </div>
+
+                      {error && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 10, background: 'rgba(232,114,110,0.08)' }}>
+                          <AlertCircle size={14} style={{ color: '#E8726E', flexShrink: 0 }} />
+                          <span style={{ fontSize: 12, color: '#E8726E' }}>{error}</span>
+                        </div>
+                      )}
+
+                      <div style={{ display: 'flex', gap: 12 }}>
+                        <button onClick={() => setCurrentStep(1)} style={{
+                          flex: 1, padding: '12px 0', borderRadius: 12, border: '1px solid rgba(0,0,0,0.08)',
+                          background: 'white', fontSize: 13, fontWeight: 600, color: '#787776', cursor: 'pointer',
+                          fontFamily: "'DM Sans', sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                        }}>
+                          <ArrowLeft size={14} /> Back
+                        </button>
+                        <button onClick={handleConfirmPayment} disabled={isProcessing} style={{
+                          flex: 2, padding: '12px 0', borderRadius: 12, border: 'none',
+                          background: isProcessing ? '#a0b8f8' : '#82F0B9', color: 'white', fontSize: 14, fontWeight: 600,
+                          cursor: isProcessing ? 'default' : 'pointer', fontFamily: "'DM Sans', sans-serif",
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                        }}>
+                          {isProcessing ? (
+                            <div style={{ width: 18, height: 18, border: '2px solid white', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                          ) : (
+                            <><CheckCircle size={16} /> Confirm Payment</>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {currentStep === 3 && isSuccess && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+                      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 0', gap: 16 }}
                     >
-                      Payment Recorded! 🎉
-                    </motion.h3>
-                    <motion.p
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.45 }}
-                      style={{ fontSize: 13, color: '#787776', margin: 0, textAlign: 'center' }}
-                    >
-                      Your payment of ${parseFloat(amount).toFixed(2)} has been sent for confirmation
-                    </motion.p>
-                    {transactionId && (
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.55 }}
-                        style={{ background: 'rgba(0,0,0,0.03)', borderRadius: 10, padding: '8px 16px' }}
+                      <AnimatedCheckmark size="xl" delay={0.1} />
+                      <motion.h3
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.35 }}
+                        style={{ fontSize: 22, fontWeight: 700, color: '#1A1918', margin: 0 }}
                       >
-                        <span style={{ fontSize: 11, color: '#787776' }}>Ref: </span>
-                        <span style={{ fontSize: 11, fontWeight: 600, color: '#1A1918', fontFamily: 'monospace' }}>{transactionId}</span>
-                      </motion.div>
-                    )}
-                    <motion.button
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.6 }}
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
-                      onClick={() => { setSelectedLoan(null); setCurrentStep(0); setAmount(''); setPaymentMethod(''); setIsSuccess(false); setTransactionId(''); }} style={{
-                      marginTop: 8, padding: '10px 24px', borderRadius: 12, border: 'none',
-                      background: 'linear-gradient(135deg, #03ACEA, #7C3AED)', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-                    }}>
-                      Record Another Payment
-                    </motion.button>
-                  </motion.div>
-                )}
-              </div>
+                        Payment Recorded! 🎉
+                      </motion.h3>
+                      <motion.p
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.45 }}
+                        style={{ fontSize: 13, color: '#787776', margin: 0, textAlign: 'center' }}
+                      >
+                        Your payment of ${parseFloat(amount).toFixed(2)} has been sent for confirmation
+                      </motion.p>
+                      {transactionId && (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.55 }}
+                          style={{ background: 'rgba(0,0,0,0.03)', borderRadius: 10, padding: '8px 16px' }}
+                        >
+                          <span style={{ fontSize: 11, color: '#787776' }}>Ref: </span>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: '#1A1918', fontFamily: 'monospace' }}>{transactionId}</span>
+                        </motion.div>
+                      )}
+                      <motion.button
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.6 }}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => { setSelectedLoan(null); setCurrentStep(0); setAmount(''); setPaymentMethod(''); setIsSuccess(false); setTransactionId(''); }} style={{
+                        marginTop: 8, padding: '10px 24px', borderRadius: 12, border: 'none',
+                        background: 'linear-gradient(135deg, #03ACEA, #7C3AED)', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+                      }}>
+                        Record Another Payment
+                      </motion.button>
+                    </motion.div>
+                  )}
+                </div>
+              </PageCard>
 
             </div>
 
             {/* ── Right Column: Select Your Loan (visually left after swap) ── */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, order: 1 }}>
-            <div className="glass-card" style={{ overflow: 'visible' }}>
-              {/* Title row with Clear Filters */}
-              <div style={{ padding: '20px 22px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Select Your Loan</span>
-                <button onClick={clearFilters} style={{
-                  padding: '4px 10px', borderRadius: 8, border: 'none',
-                  background: 'transparent', fontSize: 11, fontWeight: 500,
-                  color: hasAnyFilter ? '#E8726E' : '#C7C6C4',
-                  cursor: hasAnyFilter ? 'pointer' : 'default',
-                  fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap',
-                }}>Clear Filters</button>
-              </div>
 
-              {/* Filters */}
-              <div style={{ padding: '10px 22px 0', display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center', overflow: 'visible', position: 'relative', zIndex: 20 }}>
-                <SingleSelectDropdown options={ROLE_OPTIONS} selected={roleFilter} onChange={setRoleFilter} />
-                <SingleSelectDropdown options={friendOptions} selected={friendFilter} onChange={setFriendFilter} />
-              </div>
+              {/* Select Loan card */}
+              <PageCard
+                title="Select Your Loan"
+                headerRight={
+                  <button onClick={clearFilters} style={{
+                    padding: '4px 10px', borderRadius: 8, border: 'none',
+                    background: 'transparent', fontSize: 11, fontWeight: 500,
+                    color: hasAnyFilter ? '#E8726E' : '#C7C6C4',
+                    cursor: hasAnyFilter ? 'pointer' : 'default',
+                    fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap',
+                  }}>Clear Filters</button>
+                }
+                style={{ overflow: 'visible' }}
+              >
+                {/* Filters */}
+                <div style={{ padding: '10px 9px 0', display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center', overflow: 'visible', position: 'relative', zIndex: 20 }}>
+                  <SingleSelectDropdown options={ROLE_OPTIONS} selected={roleFilter} onChange={setRoleFilter} />
+                  <SingleSelectDropdown options={friendOptions} selected={friendFilter} onChange={setFriendFilter} />
+                </div>
 
-              {/* Loan List */}
-              <div style={{ padding: '12px 22px 22px', maxHeight: 310, overflowY: 'auto' }}>
-                {filteredLoans.length === 0 ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 0', color: '#C7C6C4' }}>
-                    <FileText size={28} style={{ opacity: 0.3, marginBottom: 8 }} />
-                    <p style={{ fontSize: 12, color: '#787776', margin: 0 }}>No active loans found</p>
-                  </div>
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    {filteredLoans.map(loan => {
-                      const other = getOtherParty(loan);
-                      const remaining = getRemainingBalance(loan);
-                      const isSelected = selectedLoan?.id === loan.id;
-                      return (
-                        <button key={loan.id} onClick={() => handleSelectLoan(loan)} style={{
-                          display: 'block', width: '100%', textAlign: 'left', padding: '13px 0',
-                          background: isSelected ? 'rgba(1,173,233,0.05)' : 'transparent',
-                          cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", transition: 'all 0.15s',
-                        }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <div style={{
-                              width: 28, height: 28, borderRadius: '50%', background: 'rgba(130,240,185,0.1)',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden',
-                            }}>
-                              {other.profile_picture_url ? (
-                                <img src={other.profile_picture_url} alt="" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-                              ) : (
-                                <span style={{ fontSize: 12, fontWeight: 600, color: '#82F0B9' }}>{(other.full_name || '?').charAt(0).toUpperCase()}</span>
-                              )}
+                {/* Loan List */}
+                <div style={{ padding: '12px 9px 9px', maxHeight: 310, overflowY: 'auto' }}>
+                  {filteredLoans.length === 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 0', color: '#C7C6C4' }}>
+                      <FileText size={28} style={{ opacity: 0.3, marginBottom: 8 }} />
+                      <p style={{ fontSize: 12, color: '#787776', margin: 0 }}>No active loans found</p>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      {filteredLoans.map(loan => {
+                        const other = getOtherParty(loan);
+                        const remaining = getRemainingBalance(loan);
+                        const isSelected = selectedLoan?.id === loan.id;
+                        return (
+                          <button key={loan.id} onClick={() => handleSelectLoan(loan)} style={{
+                            display: 'block', width: '100%', textAlign: 'left', padding: '13px 0',
+                            background: isSelected ? 'rgba(1,173,233,0.05)' : 'transparent',
+                            cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", transition: 'all 0.15s',
+                            border: 'none',
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                              <div style={{
+                                width: 28, height: 28, borderRadius: '50%', background: 'rgba(130,240,185,0.1)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden',
+                              }}>
+                                {other.profile_picture_url ? (
+                                  <img src={other.profile_picture_url} alt="" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                                ) : (
+                                  <span style={{ fontSize: 12, fontWeight: 600, color: '#82F0B9' }}>{(other.full_name || '?').charAt(0).toUpperCase()}</span>
+                                )}
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  ${(loan.amount || 0).toLocaleString()} loan {isUserLender(loan) ? 'to' : 'from'} {other.full_name || other.username}
+                                </p>
+                                <p style={{ fontSize: 11, color: '#787776', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {loan.purpose || 'No reason'} · ${remaining.toFixed(2)} remaining
+                                </p>
+                              </div>
                             </div>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                ${(loan.amount || 0).toLocaleString()} loan {isUserLender(loan) ? 'to' : 'from'} {other.full_name || other.username}
-                              </p>
-                              <p style={{ fontSize: 11, color: '#787776', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                {loan.purpose || 'No reason'} · ${remaining.toFixed(2)} remaining
-                              </p>
-                            </div>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </PageCard>
 
               {/* Recommended Payment */}
               {selectedLoan && currentStep <= 1 && (
-                <div className="glass-card" style={{ padding: '14px 16px' }}>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Recommended Payment</span>
-                  <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <PageCard title="Recommended Payment">
+                  <div style={{ padding: '12px 9px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div>
                       <p style={{ fontSize: 22, fontWeight: 700, color: '#82F0B9', margin: 0 }}>${getSuggestedPayment(selectedLoan).toFixed(2)}</p>
                       {selectedLoan.next_payment_date && (
@@ -729,116 +746,116 @@ export default function RecordPayment() {
                       Use Recommended
                     </button>
                   </div>
-                </div>
+                </PageCard>
               )}
+
+              {/* Payments Waiting for Approval */}
+              {(paymentsToConfirm.length > 0 || paymentsYouRecorded.length > 0) && (
+                <PageCard
+                  title="Payments Waiting for Approval"
+                  headerRight={
+                    <span style={{ fontSize: 12, color: '#787776' }}>{pendingPayments.length} pending</span>
+                  }
+                >
+                  <div style={{ padding: '10px 9px 9px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      {/* Payments needing your response */}
+                      {paymentsToConfirm.map(payment => {
+                        const loan = getPaymentLoan(payment);
+                        if (!loan) return null;
+                        const recorder = getUserById(payment.recorded_by);
+                        const otherId = loan.lender_id === payment.recorded_by ? loan.borrower_id : loan.lender_id;
+                        const recorderPic = recorder.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((recorder.full_name || recorder.username || 'U').charAt(0))}&background=678AFB&color=fff&size=64`;
+                        const methodLabel = PAYMENT_METHODS.find(m => m.id === payment.payment_method)?.label || payment.payment_method || '';
+                        return (
+                          <div key={payment.id} style={{
+                            display: 'flex', alignItems: 'center', gap: 12, padding: '13px 0',
+                          }}>
+                            <img src={recorderPic} alt="" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, background: 'rgba(103,138,251,0.1)' }} />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0 }}>
+                                {nameOrYouCapitalized(payment.recorded_by)} paid {nameOrYou(otherId)} ${payment.amount?.toFixed(2)} for {loan.purpose || 'this loan'}{methodLabel ? ` using ${methodLabel}` : ''}
+                              </p>
+                              <p style={{ fontSize: 11, color: '#787776', margin: '2px 0 0' }}>
+                                {payment.payment_date ? format(new Date(payment.payment_date + 'T12:00:00'), 'MMM d') : 'No date'}
+                              </p>
+                            </div>
+                            <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                              <button
+                                onClick={() => handleApprovePayment(payment)}
+                                disabled={processingId === payment.id}
+                                style={{
+                                  padding: '6px 14px', borderRadius: 10, border: 'none',
+                                  background: '#82F0B9', fontSize: 11, fontWeight: 600, color: 'white',
+                                  cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+                                  opacity: processingId === payment.id ? 0.5 : 1,
+                                }}
+                              >
+                                {processingId === payment.id ? 'Confirming...' : 'Confirm'}
+                              </button>
+                              <button
+                                onClick={() => setConfirmingDeny(payment)}
+                                disabled={processingId === payment.id}
+                                style={{
+                                  padding: '6px 14px', borderRadius: 10, border: 'none',
+                                  background: 'rgba(232,114,110,0.08)', fontSize: 11, fontWeight: 600, color: '#E8726E',
+                                  cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+                                }}
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+
+                      {/* Payments you recorded (pending) */}
+                      {paymentsYouRecorded.map(payment => {
+                        const loan = getPaymentLoan(payment);
+                        if (!loan) return null;
+                        const otherId = loan.lender_id === user?.id ? loan.borrower_id : loan.lender_id;
+                        const otherParty = getUserById(otherId);
+                        const otherPic = otherParty.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((otherParty.full_name || otherParty.username || 'U').charAt(0))}&background=678AFB&color=fff&size=64`;
+                        const methodLabel = PAYMENT_METHODS.find(m => m.id === payment.payment_method)?.label || payment.payment_method || '';
+                        return (
+                          <div key={payment.id} style={{
+                            display: 'flex', alignItems: 'center', gap: 12, padding: '13px 0',
+                          }}>
+                            <img src={otherPic} alt="" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, background: 'rgba(103,138,251,0.1)' }} />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0 }}>
+                                {nameOrYouCapitalized(user?.id)} paid {nameOrYou(otherId)} ${payment.amount?.toFixed(2)} for {loan.purpose || 'this loan'}{methodLabel ? ` using ${methodLabel}` : ''}
+                              </p>
+                              <p style={{ fontSize: 11, color: '#787776', margin: '2px 0 0' }}>
+                                {payment.payment_date ? format(new Date(payment.payment_date + 'T12:00:00'), 'MMM d') : 'No date'}
+                              </p>
+                            </div>
+                            <span style={{
+                              padding: '4px 12px', borderRadius: 8, fontSize: 11, fontWeight: 600,
+                              background: 'rgba(120,119,118,0.08)', color: '#787776',
+                            }}>
+                              Pending
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </PageCard>
+              )}
+
             </div>
           </div>
 
-          {/* ── Payments Waiting for Approval ──────────────── */}
-          {(paymentsToConfirm.length > 0 || paymentsYouRecorded.length > 0) && (
-            <div className="glass-card" style={{ marginTop: 16, overflow: 'hidden' }}>
-              <div style={{ padding: '14px 16px 0' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Payments Waiting for Approval</span>
-                  <span style={{ fontSize: 12, color: '#787776' }}>{pendingPayments.length} pending</span>
-                </div>
-              </div>
-              <div style={{ padding: '10px 16px 16px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  {/* Payments needing your response */}
-                  {paymentsToConfirm.map(payment => {
-                    const loan = getPaymentLoan(payment);
-                    if (!loan) return null;
-                    const recorder = getUserById(payment.recorded_by);
-                    const otherId = loan.lender_id === payment.recorded_by ? loan.borrower_id : loan.lender_id;
-                    const recorderPic = recorder.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((recorder.full_name || recorder.username || 'U').charAt(0))}&background=678AFB&color=fff&size=64`;
-                    const methodLabel = PAYMENT_METHODS.find(m => m.id === payment.payment_method)?.label || payment.payment_method || '';
-                    return (
-                      <div key={payment.id} style={{
-                        display: 'flex', alignItems: 'center', gap: 12, padding: '13px 0',
-                      }}>
-                        <img src={recorderPic} alt="" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, background: 'rgba(103,138,251,0.1)' }} />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0 }}>
-                            {nameOrYouCapitalized(payment.recorded_by)} paid {nameOrYou(otherId)} ${payment.amount?.toFixed(2)} for {loan.purpose || 'this loan'}{methodLabel ? ` using ${methodLabel}` : ''}
-                          </p>
-                          <p style={{ fontSize: 11, color: '#787776', margin: '2px 0 0' }}>
-                            {payment.payment_date ? format(new Date(payment.payment_date + 'T12:00:00'), 'MMM d') : 'No date'}
-                          </p>
-                        </div>
-                        <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-                          <button
-                            onClick={() => handleApprovePayment(payment)}
-                            disabled={processingId === payment.id}
-                            style={{
-                              padding: '6px 14px', borderRadius: 10, border: 'none',
-                              background: '#82F0B9', fontSize: 11, fontWeight: 600, color: 'white',
-                              cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-                              opacity: processingId === payment.id ? 0.5 : 1,
-                            }}
-                          >
-                            {processingId === payment.id ? 'Confirming...' : 'Confirm'}
-                          </button>
-                          <button
-                            onClick={() => setConfirmingDeny(payment)}
-                            disabled={processingId === payment.id}
-                            style={{
-                              padding: '6px 14px', borderRadius: 10, border: 'none',
-                              background: 'rgba(232,114,110,0.08)', fontSize: 11, fontWeight: 600, color: '#E8726E',
-                              cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-                            }}
-                          >
-                            Reject
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-
-                  {/* Payments you recorded (pending) */}
-                  {paymentsYouRecorded.map(payment => {
-                    const loan = getPaymentLoan(payment);
-                    if (!loan) return null;
-                    const otherId = loan.lender_id === user?.id ? loan.borrower_id : loan.lender_id;
-                    const otherParty = getUserById(otherId);
-                    const otherPic = otherParty.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((otherParty.full_name || otherParty.username || 'U').charAt(0))}&background=678AFB&color=fff&size=64`;
-                    const methodLabel = PAYMENT_METHODS.find(m => m.id === payment.payment_method)?.label || payment.payment_method || '';
-                    return (
-                      <div key={payment.id} style={{
-                        display: 'flex', alignItems: 'center', gap: 12, padding: '13px 0',
-                      }}>
-                        <img src={otherPic} alt="" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, background: 'rgba(103,138,251,0.1)' }} />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0 }}>
-                            {nameOrYouCapitalized(user?.id)} paid {nameOrYou(otherId)} ${payment.amount?.toFixed(2)} for {loan.purpose || 'this loan'}{methodLabel ? ` using ${methodLabel}` : ''}
-                          </p>
-                          <p style={{ fontSize: 11, color: '#787776', margin: '2px 0 0' }}>
-                            {payment.payment_date ? format(new Date(payment.payment_date + 'T12:00:00'), 'MMM d') : 'No date'}
-                          </p>
-                        </div>
-                        <span style={{
-                          padding: '4px 12px', borderRadius: 8, fontSize: 11, fontWeight: 600,
-                          background: 'rgba(120,119,118,0.08)', color: '#787776',
-                        }}>
-                          Pending
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+          <div style={{ padding: '20px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+              <span style={{ fontSize: 11, color: '#787776' }}>Terms of Service</span>
+              <span style={{ fontSize: 11, color: '#787776' }}>Privacy Center</span>
+              <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
             </div>
-          )}
-
-        <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-            <span style={{ fontSize: 11, color: '#787776' }}>Terms of Service</span>
-            <span style={{ fontSize: 11, color: '#787776' }}>Privacy Center</span>
-            <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
           </div>
         </div>
-          </div>
       </div>
     </>
   );

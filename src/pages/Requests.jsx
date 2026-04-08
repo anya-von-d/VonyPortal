@@ -47,16 +47,7 @@ const PAYMENT_METHOD_ICONS = {
   other: { icon: DollarSign, color: 'text-gray-500', label: 'Other' },
 };
 
-const STAR_CIRCLES = [
-  {cx:82,cy:45,o:0.7},{cx:195,cy:112,o:0.5},{cx:310,cy:28,o:0.8},{cx:420,cy:198,o:0.4},
-  {cx:530,cy:67,o:0.65},{cx:640,cy:245,o:0.55},{cx:755,cy:88,o:0.75},{cx:860,cy:156,o:0.45},
-  {cx:970,cy:34,o:0.7},{cx:1085,cy:201,o:0.6},{cx:1190,cy:78,o:0.5},{cx:1300,cy:267,o:0.7},
-  {cx:1410,cy:45,o:0.55},{cx:1520,cy:134,o:0.65},{cx:48,cy:189,o:0.4},{cx:158,cy:278,o:0.6},
-  {cx:268,cy:156,o:0.5},{cx:378,cy:89,o:0.7},{cx:488,cy:234,o:0.45},{cx:598,cy:145,o:0.6},
-  {cx:708,cy:312,o:0.35},{cx:818,cy:56,o:0.75},{cx:928,cy:223,o:0.5},{cx:1038,cy:98,o:0.65},
-  {cx:1148,cy:289,o:0.4},{cx:1258,cy:167,o:0.7},{cx:1368,cy:234,o:0.55},{cx:1478,cy:78,o:0.6},
-  {cx:1560,cy:256,o:0.45},{cx:125,cy:312,o:0.5},{cx:345,cy:267,o:0.6},{cx:565,cy:34,o:0.75},
-];
+const SHADOW = '0px 50px 40px rgba(0,0,0,0.02), 0px 50px 40px rgba(0,0,0,0.04), 0px 20px 40px rgba(0,0,0,0.08), 0px 3px 10px rgba(0,0,0,0.12)';
 
 export default function Requests() {
   const { user: authUser, userProfile } = useAuth();
@@ -305,7 +296,7 @@ export default function Requests() {
 
       setPaymentsToConfirm(prev => prev.filter(p => p.id !== payment.id));
       loadRequests();
-      // 🎉 Celebrate the confirmed payment!
+      // Celebrate the confirmed payment!
       confetti({
         particleCount: 80,
         spread: 65,
@@ -480,7 +471,6 @@ export default function Requests() {
     setProcessingId(null);
   };
 
-
   if (isLoading) {
     return (
       <div style={{ minHeight: '100vh', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -492,191 +482,213 @@ export default function Requests() {
     );
   }
 
+  const PageCard = ({ title, headerRight, children, style }) => (
+    <div style={{ background: '#F4F4F5', borderRadius: 14, overflow: 'hidden', boxShadow: SHADOW, ...style }}>
+      <div style={{ padding: '6px 14px 5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
+        {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
+      </div>
+      <div style={{ background: '#ffffff', margin: '0 5px 5px', borderRadius: 10, overflow: 'hidden' }}>
+        {children}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 88, background: 'transparent' }}>
+    <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 0, background: 'transparent' }}>
       <DashboardSidebar activePage="Requests" user={user} />
 
-        <div style={{ maxWidth: 1080, margin: '0 auto', position: 'relative', zIndex: 2 }}>
-          <div style={{ maxWidth: 1080, margin: '0 auto', padding: '24px 40px 64px' }}>
+      {/* Hero */}
+      <div style={{ margin: '8px 10px 0', height: 168, background: '#54A6CF', borderRadius: 18, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 24, overflow: 'hidden', position: 'relative', boxShadow: '0px 50px 40px rgba(0,0,0,0.01), 0px 50px 40px rgba(0,0,0,0.02), 0px 20px 40px rgba(0,0,0,0.05), 0px 3px 10px rgba(0,0,0,0.08)' }}>
+        <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.15, pointerEvents: 'none', zIndex: 0 }} viewBox="0 0 1200 168" preserveAspectRatio="xMidYMid slice">
+          {[{cx:80,cy:40},{cx:200,cy:110},{cx:320,cy:25},{cx:430,cy:160},{cx:540,cy:70},{cx:660,cy:130},{cx:770,cy:35},{cx:890,cy:175},{cx:1000,cy:80},{cx:1100,cy:140},{cx:150,cy:185},{cx:480,cy:100},{cx:720,cy:180},{cx:950,cy:55},{cx:280,cy:195},{cx:620,cy:48},{cx:1050,cy:195}].map((s, i) => (
+            <circle key={i} cx={s.cx} cy={s.cy} r={i % 3 === 0 ? 2.5 : 1.5} fill="white" />
+          ))}
+        </svg>
+        <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 38, fontWeight: 600, color: '#1A1918', margin: 0, letterSpacing: '-0.01em', lineHeight: 1, textAlign: 'center', position: 'relative', zIndex: 1 }}>
+          <span style={{ fontStyle: 'italic' }}>Requests</span>
+        </h1>
+      </div>
 
-            {/* Reminders — outside white box, stacked at top */}
-            {reminders.length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
-                {reminders.map((reminder) => {
-                  const isOverdue = reminder.type.startsWith('overdue');
-                  return (
-                    <div key={reminder.id} className="glass-card">
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 16px 16px' }}>
-                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: isOverdue ? 'rgba(232,114,110,0.1)' : 'rgba(130,240,185,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <Clock style={{ width: 16, height: 16, color: isOverdue ? '#E8726E' : '#82F0B9' }} />
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', lineHeight: 1.5, margin: '0 0 2px' }}>{reminder.title}</p>
-                          <p style={{ fontSize: 12, color: '#787776', lineHeight: 1.5, margin: 0 }}>{reminder.subtitle}</p>
-                        </div>
-                        <Link to={createPageUrl("RecordPayment")} style={{ display: 'inline-flex', padding: '7px 14px', borderRadius: 20, background: isOverdue ? '#E8726E' : '#82F0B9', color: 'white', fontSize: 11, fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                          Record Payment
-                        </Link>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+      <div style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 40px 64px', position: 'relative', zIndex: 1 }}>
 
-            {/* People notifications white box */}
-            {(() => {
-              const allItems = [];
-
-              // Friend Requests
-              friendRequestsReceived.forEach(request => {
-                const senderProfile = profiles.find(p => p.user_id === request.user_id);
-                const name = senderProfile?.full_name || senderProfile?.username || 'Unknown';
-                allItems.push({
-                  type: 'friend',
-                  id: `friend-${request.id}`,
-                  timestamp: new Date(request.created_at || 0),
-                  data: request,
-                  name,
-                  photoUrl: senderProfile?.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=678AFB&color=fff&size=64`,
-                });
-              });
-
-              // Loan Offers Received
-              loanOffersReceived.forEach(offer => {
-                const lender = getUserById(offer.lender_id);
-                const name = lender?.full_name || lender?.username || 'Unknown';
-                allItems.push({
-                  type: 'offer_received',
-                  id: `offer-recv-${offer.id}`,
-                  timestamp: new Date(offer.created_at || 0),
-                  data: offer,
-                  name,
-                  photoUrl: lender?.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=678AFB&color=fff&size=64`,
-                  purpose: offer.purpose,
-                });
-              });
-
-              // Payment Confirmations
-              paymentsToConfirm.forEach(payment => {
-                const recorderProfile = profiles.find(p => p.user_id === payment.recorded_by);
-                const name = recorderProfile?.full_name || recorderProfile?.username || 'Unknown';
-                allItems.push({
-                  type: 'payment_confirm',
-                  id: `pmt-confirm-${payment.id}`,
-                  timestamp: new Date(payment.created_at || payment.payment_date || 0),
-                  data: payment,
-                  name,
-                  photoUrl: recorderProfile?.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=678AFB&color=fff&size=64`,
-                  amount: payment.amount,
-                });
-              });
-
-              // Term Changes
-              termChangeRequests.forEach(loan => {
-                const otherUserId = loan.lender_id === user.id ? loan.borrower_id : loan.lender_id;
-                const otherProfile = profiles.find(p => p.user_id === otherUserId);
-                const name = otherProfile?.full_name || otherProfile?.username || getLoanOtherParty(loan);
-                allItems.push({
-                  type: 'term_change',
-                  id: `term-${loan.id}`,
-                  timestamp: new Date(loan.updated_at || loan.created_at || 0),
-                  data: loan,
-                  name,
-                  photoUrl: otherProfile?.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=678AFB&color=fff&size=64`,
-                });
-              });
-
-              // Sort by most recent
-              allItems.sort((a, b) => b.timestamp - a.timestamp);
-
-              if (allItems.length === 0 && reminders.length === 0) {
+        {/* Reminders */}
+        {reminders.length > 0 && (
+          <PageCard title="Reminders" style={{ marginBottom: 16 }}>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {reminders.map((reminder, index) => {
+                const isOverdue = reminder.type.startsWith('overdue');
                 return (
-                  <div className="glass-card" style={{ padding: '20px 24px' }}>
-                    <div style={{ textAlign: 'center', padding: '32px 0' }}>
-                      <CheckCircle style={{ width: 40, height: 40, margin: '0 auto 8px', color: '#C7C6C4' }} />
-                      <p style={{ color: '#1A1918', fontWeight: 600, marginBottom: 4 }}>All caught up!</p>
-                      <p style={{ color: '#787776', fontSize: 14 }}>You have no notifications.</p>
+                  <div key={reminder.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', borderBottom: index < reminders.length - 1 ? '1px solid rgba(0,0,0,0.04)' : 'none' }}>
+                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: isOverdue ? 'rgba(232,114,110,0.1)' : 'rgba(130,240,185,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Clock style={{ width: 16, height: 16, color: isOverdue ? '#E8726E' : '#82F0B9' }} />
                     </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', lineHeight: 1.5, margin: '0 0 2px' }}>{reminder.title}</p>
+                      <p style={{ fontSize: 12, color: '#787776', lineHeight: 1.5, margin: 0 }}>{reminder.subtitle}</p>
+                    </div>
+                    <Link to={createPageUrl("RecordPayment")} style={{ display: 'inline-flex', padding: '7px 14px', borderRadius: 20, background: isOverdue ? '#E8726E' : '#82F0B9', color: 'white', fontSize: 11, fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                      Record Payment
+                    </Link>
                   </div>
                 );
-              }
-
-              if (allItems.length === 0) return null;
-
-              return (
-                <div className="glass-card" style={{ padding: '20px 24px' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    {allItems.map((item, index) => (
-                      <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: index < allItems.length - 1 ? '1px solid rgba(0,0,0,0.04)' : 'none' }}>
-                        {/* Profile photo */}
-                        <img src={item.photoUrl} alt={item.name} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-
-                        {/* Text */}
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 14, fontWeight: 500, color: '#1A1918', lineHeight: 1.4 }}>
-                            {item.type === 'friend' && `${item.name} sent you a friend request`}
-                            {item.type === 'offer_received' && `${item.name} sent you a loan offer${item.purpose ? ` for ${item.purpose}` : ''}`}
-                            {item.type === 'payment_confirm' && `${item.name} recorded a payment of $${item.amount?.toFixed(2)}`}
-                            {item.type === 'term_change' && `${item.name} sent you a loan change request`}
-                          </div>
-                          <div style={{ fontSize: 11, color: '#787776', marginTop: 3 }}>
-                            {item.timestamp && item.timestamp.getTime() > 0 ? format(item.timestamp, 'MMM d') : ''}
-                          </div>
-                        </div>
-
-                        {/* Action */}
-                        <div style={{ flexShrink: 0 }}>
-                          {item.type === 'friend' && (
-                            <Link to={createPageUrl("Friends")} style={{ fontSize: 12, fontWeight: 600, color: '#678AFB', textDecoration: 'none' }}>
-                              View friend request
-                            </Link>
-                          )}
-                          {item.type === 'offer_received' && (
-                            <button
-                              onClick={() => { setSelectedOffer(item.data); setShowSignatureModal(true); }}
-                              disabled={processingId === item.data.id}
-                              style={{ fontSize: 12, fontWeight: 600, color: '#678AFB', background: 'none', border: 'none', cursor: 'pointer', padding: 0, opacity: processingId === item.data.id ? 0.5 : 1 }}
-                            >
-                              View offer
-                            </button>
-                          )}
-                          {item.type === 'payment_confirm' && (
-                            <button
-                              onClick={() => setViewingPayment({ payment: item.data, direction: 'confirm' })}
-                              disabled={processingId === item.data.id}
-                              style={{ fontSize: 12, fontWeight: 600, color: '#678AFB', background: 'none', border: 'none', cursor: 'pointer', padding: 0, opacity: processingId === item.data.id ? 0.5 : 1 }}
-                            >
-                              Confirm payment
-                            </button>
-                          )}
-                          {item.type === 'term_change' && (
-                            <button
-                              onClick={() => setViewingPayment({ termChange: item.data, direction: 'term' })}
-                              disabled={processingId === item.data.id}
-                              style={{ fontSize: 12, fontWeight: 600, color: '#678AFB', background: 'none', border: 'none', cursor: 'pointer', padding: 0, opacity: processingId === item.data.id ? 0.5 : 1 }}
-                            >
-                              View request
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-
-          <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-              <span style={{ fontSize: 11, color: '#787776' }}>Terms of Service</span>
-              <span style={{ fontSize: 11, color: '#787776' }}>Privacy Center</span>
-              <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
+              })}
             </div>
+          </PageCard>
+        )}
+
+        {/* Notifications */}
+        {(() => {
+          const allItems = [];
+
+          // Friend Requests
+          friendRequestsReceived.forEach(request => {
+            const senderProfile = profiles.find(p => p.user_id === request.user_id);
+            const name = senderProfile?.full_name || senderProfile?.username || 'Unknown';
+            allItems.push({
+              type: 'friend',
+              id: `friend-${request.id}`,
+              timestamp: new Date(request.created_at || 0),
+              data: request,
+              name,
+              photoUrl: senderProfile?.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=678AFB&color=fff&size=64`,
+            });
+          });
+
+          // Loan Offers Received
+          loanOffersReceived.forEach(offer => {
+            const lender = getUserById(offer.lender_id);
+            const name = lender?.full_name || lender?.username || 'Unknown';
+            allItems.push({
+              type: 'offer_received',
+              id: `offer-recv-${offer.id}`,
+              timestamp: new Date(offer.created_at || 0),
+              data: offer,
+              name,
+              photoUrl: lender?.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=678AFB&color=fff&size=64`,
+              purpose: offer.purpose,
+            });
+          });
+
+          // Payment Confirmations
+          paymentsToConfirm.forEach(payment => {
+            const recorderProfile = profiles.find(p => p.user_id === payment.recorded_by);
+            const name = recorderProfile?.full_name || recorderProfile?.username || 'Unknown';
+            allItems.push({
+              type: 'payment_confirm',
+              id: `pmt-confirm-${payment.id}`,
+              timestamp: new Date(payment.created_at || payment.payment_date || 0),
+              data: payment,
+              name,
+              photoUrl: recorderProfile?.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=678AFB&color=fff&size=64`,
+              amount: payment.amount,
+            });
+          });
+
+          // Term Changes
+          termChangeRequests.forEach(loan => {
+            const otherUserId = loan.lender_id === user.id ? loan.borrower_id : loan.lender_id;
+            const otherProfile = profiles.find(p => p.user_id === otherUserId);
+            const name = otherProfile?.full_name || otherProfile?.username || getLoanOtherParty(loan);
+            allItems.push({
+              type: 'term_change',
+              id: `term-${loan.id}`,
+              timestamp: new Date(loan.updated_at || loan.created_at || 0),
+              data: loan,
+              name,
+              photoUrl: otherProfile?.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=678AFB&color=fff&size=64`,
+            });
+          });
+
+          // Sort by most recent
+          allItems.sort((a, b) => b.timestamp - a.timestamp);
+
+          if (allItems.length === 0 && reminders.length === 0) {
+            return (
+              <PageCard title="Notifications">
+                <div style={{ textAlign: 'center', padding: '32px 0' }}>
+                  <CheckCircle style={{ width: 40, height: 40, margin: '0 auto 8px', color: '#C7C6C4' }} />
+                  <p style={{ color: '#1A1918', fontWeight: 600, marginBottom: 4 }}>All caught up!</p>
+                  <p style={{ color: '#787776', fontSize: 14 }}>You have no notifications.</p>
+                </div>
+              </PageCard>
+            );
+          }
+
+          if (allItems.length === 0) return null;
+
+          return (
+            <PageCard title="Notifications">
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {allItems.map((item, index) => (
+                  <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: index < allItems.length - 1 ? '1px solid rgba(0,0,0,0.04)' : 'none' }}>
+                    {/* Profile photo */}
+                    <img src={item.photoUrl} alt={item.name} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+
+                    {/* Text */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 14, fontWeight: 500, color: '#1A1918', lineHeight: 1.4 }}>
+                        {item.type === 'friend' && `${item.name} sent you a friend request`}
+                        {item.type === 'offer_received' && `${item.name} sent you a loan offer${item.purpose ? ` for ${item.purpose}` : ''}`}
+                        {item.type === 'payment_confirm' && `${item.name} recorded a payment of $${item.amount?.toFixed(2)}`}
+                        {item.type === 'term_change' && `${item.name} sent you a loan change request`}
+                      </div>
+                      <div style={{ fontSize: 11, color: '#787776', marginTop: 3 }}>
+                        {item.timestamp && item.timestamp.getTime() > 0 ? format(item.timestamp, 'MMM d') : ''}
+                      </div>
+                    </div>
+
+                    {/* Action */}
+                    <div style={{ flexShrink: 0 }}>
+                      {item.type === 'friend' && (
+                        <Link to={createPageUrl("Friends")} style={{ fontSize: 12, fontWeight: 600, color: '#678AFB', textDecoration: 'none' }}>
+                          View friend request
+                        </Link>
+                      )}
+                      {item.type === 'offer_received' && (
+                        <button
+                          onClick={() => { setSelectedOffer(item.data); setShowSignatureModal(true); }}
+                          disabled={processingId === item.data.id}
+                          style={{ fontSize: 12, fontWeight: 600, color: '#678AFB', background: 'none', border: 'none', cursor: 'pointer', padding: 0, opacity: processingId === item.data.id ? 0.5 : 1 }}
+                        >
+                          View offer
+                        </button>
+                      )}
+                      {item.type === 'payment_confirm' && (
+                        <button
+                          onClick={() => setViewingPayment({ payment: item.data, direction: 'confirm' })}
+                          disabled={processingId === item.data.id}
+                          style={{ fontSize: 12, fontWeight: 600, color: '#678AFB', background: 'none', border: 'none', cursor: 'pointer', padding: 0, opacity: processingId === item.data.id ? 0.5 : 1 }}
+                        >
+                          Confirm payment
+                        </button>
+                      )}
+                      {item.type === 'term_change' && (
+                        <button
+                          onClick={() => setViewingPayment({ termChange: item.data, direction: 'term' })}
+                          disabled={processingId === item.data.id}
+                          style={{ fontSize: 12, fontWeight: 600, color: '#678AFB', background: 'none', border: 'none', cursor: 'pointer', padding: 0, opacity: processingId === item.data.id ? 0.5 : 1 }}
+                        >
+                          View request
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </PageCard>
+          );
+        })()}
+
+        <div style={{ padding: '20px 0 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+            <span style={{ fontSize: 11, color: '#787776' }}>Terms of Service</span>
+            <span style={{ fontSize: 11, color: '#787776' }}>Privacy Center</span>
+            <span style={{ fontSize: 11, color: '#787776' }}>Do not sell or share my personal information</span>
           </div>
         </div>
+      </div>
 
       {/* Warning Dialogs */}
       <AnimatePresence>
