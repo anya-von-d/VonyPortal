@@ -46,10 +46,6 @@ const bottomRightItems = [
     title: "Borrowing",
     url: createPageUrl("Borrowing"),
   },
-  {
-    title: "Create Loan",
-    url: createPageUrl("CreateOffer"),
-  },
 ];
 
 const allNavItems = [...bottomLeftItems, ...bottomRightItems, ...topBarItems];
