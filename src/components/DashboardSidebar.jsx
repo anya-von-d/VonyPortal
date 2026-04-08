@@ -391,10 +391,10 @@ export default function DashboardSidebar({ activePage = "Dashboard", user, tabs,
         const startY = 140;
         const badgeStyle = (color, rotation) => ({
           display: 'flex', alignItems: 'center', gap: 6,
-          padding: '5px 10px 5px 7px',
+          padding: '5px 10px 5px 8px',
           borderRadius: 8,
-          background: '#F4F4F5',
-          color,
+          background: '#EDECEA',
+          color: '#1A1918',
           transform: `rotate(${rotation}deg)`,
           fontFamily: "'DM Sans', sans-serif",
           fontSize: 11, fontWeight: 500,
@@ -404,17 +404,18 @@ export default function DashboardSidebar({ activePage = "Dashboard", user, tabs,
         });
         return (
           <div className="side-icons-container" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
-            {icons.map(({ color, label, page, svg }, i) => {
+            {icons.map(({ color, label, page }, i) => {
               const y = startY + i * spacing;
               const to = createPageUrl(page);
+              const dot = <div style={{ width: 7, height: 7, borderRadius: '50%', background: color, flexShrink: 0 }} />;
               return (
                 <div key={`side-icons-${i}`}>
                   <Link to={to} style={{ position: 'absolute', top: y, left: 10, ...badgeStyle(color, leftRots[i]) }}>
-                    <div style={{ width: 14, height: 14, flexShrink: 0 }}>{svg}</div>
+                    {dot}
                     <span>{label}</span>
                   </Link>
                   <Link to={to} style={{ position: 'absolute', top: y, right: 10, ...badgeStyle(color, rightRots[i]) }}>
-                    <div style={{ width: 14, height: 14, flexShrink: 0 }}>{svg}</div>
+                    {dot}
                     <span>{label}</span>
                   </Link>
                 </div>
