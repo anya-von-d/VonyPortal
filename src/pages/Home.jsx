@@ -608,19 +608,19 @@ export default function Home() {
       if (loan.status === 'pending' || !loan.status) {
         description = isLender ? `Sent ${amount} loan offer to ${name}` : `Received ${amount} loan offer from ${name}`;
         icon = isLender ? 'send' : 'receive';
-        color = isLender ? '#B0F1FF' : '#7EC0EA';
+        color = isLender ? '#54A6CF' : '#7C3AED';
       } else if (loan.status === 'active') {
         description = isLender ? `${name} accepted your ${amount} loan` : `You accepted ${amount} loan from ${name}`;
-        icon = 'check'; color = '#7EC0EA';
+        icon = 'check'; color = '#16A34A';
       } else if (loan.status === 'declined') {
         description = isLender ? `${name} declined your ${amount} loan` : `You declined ${amount} loan from ${name}`;
-        icon = 'x'; color = '#E8726E';
+        icon = 'x'; color = '#DC2626';
       } else if (loan.status === 'cancelled') {
         description = isLender ? `You cancelled ${amount} loan offer to ${name}` : `${name} cancelled their ${amount} loan offer`;
-        icon = 'x'; color = '#E8726E';
+        icon = 'x'; color = '#DC2626';
       } else if (loan.status === 'completed') {
         description = isLender ? `${name} fully repaid your ${amount} loan` : `You fully repaid ${amount} loan to ${name}`;
-        icon = 'check'; color = '#7EC0EA';
+        icon = 'check'; color = '#16A34A';
       } else {
         description = isLender ? `${amount} loan to ${name}` : `${amount} loan from ${name}`;
       }
@@ -646,7 +646,7 @@ export default function Home() {
         description: isBorrower ? `You made a ${amount} payment to ${name}` : `Received ${amount} payment from ${name}`,
         detail: format(new Date(p.payment_date || p.created_at), 'MMM d'),
         icon: isBorrower ? 'send' : 'receive',
-        color: isBorrower ? '#B0F1FF' : '#7EC0EA',
+        color: isBorrower ? '#54A6CF' : '#7C3AED',
         amount: isBorrower ? `-${amount}` : `+${amount}`
       });
     });
@@ -1127,7 +1127,7 @@ export default function Home() {
                   ) : (
                     recentActivity.map((item, idx) => (
                       <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '13px 0', paddingTop: idx === 0 ? 0 : 13, paddingBottom: idx === recentActivity.length - 1 ? 0 : 13 }}>
-                        <div style={{ width: 36, height: 36, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: `${item.color}20` }}>
+                        <div style={{ width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: `${item.color}20` }}>
                           {item.icon === 'send' ? (
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="2" strokeLinecap="round"><polyline points="7 13 12 18 17 13"></polyline><line x1="12" y1="18" x2="12" y2="6"></line></svg>
                           ) : item.icon === 'receive' ? (
