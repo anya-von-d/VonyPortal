@@ -735,7 +735,7 @@ export default function Home() {
   // Card wrapper: white box with subtle border, title at top
   const DashboardCard = ({ title, headerRight, children, style, highlight }) => (
     highlight ? (
-      <div style={{ background: '#9AD3EF', borderRadius: 14, padding: 5, ...style }}>
+      <div style={{ background: '#9AD3EF', borderRadius: 14, padding: 5, boxShadow: '0px 50px 40px rgba(0,0,0,0.01), 0px 50px 40px rgba(0,0,0,0.02), 0px 20px 40px rgba(0,0,0,0.05), 0px 3px 10px rgba(0,0,0,0.08)', ...style }}>
         <div style={{ background: 'white', borderRadius: 10, overflow: 'hidden' }}>
           <div style={{ padding: '9px 14px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
@@ -745,7 +745,7 @@ export default function Home() {
         </div>
       </div>
     ) : (
-      <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E8E2DC', overflow: 'hidden', ...style }}>
+      <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E8E2DC', overflow: 'hidden', boxShadow: '0px 50px 40px rgba(0,0,0,0.01), 0px 50px 40px rgba(0,0,0,0.02), 0px 20px 40px rgba(0,0,0,0.05), 0px 3px 10px rgba(0,0,0,0.08)', ...style }}>
         <div style={{ padding: '9px 14px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
           {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
@@ -773,6 +773,7 @@ export default function Home() {
         paddingBottom: 24,
         overflow: 'hidden',
         position: 'relative',
+        boxShadow: '0px 50px 40px rgba(0,0,0,0.01), 0px 50px 40px rgba(0,0,0,0.02), 0px 20px 40px rgba(0,0,0,0.05), 0px 3px 10px rgba(0,0,0,0.08)',
       }}>
         {/* Subtle star field */}
         <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.15, pointerEvents: 'none' }} viewBox="0 0 1200 168" preserveAspectRatio="xMidYMid slice">
