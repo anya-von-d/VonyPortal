@@ -774,7 +774,7 @@ export default function Home() {
         </svg>
         <h1 style={{
           fontFamily: "'Cormorant Garamond', Georgia, serif",
-          fontSize: 45, fontWeight: 600, color: '#1A1918',
+          fontSize: 40, fontWeight: 600, color: '#1A1918',
           margin: 0, letterSpacing: '-0.01em', lineHeight: 1,
           textAlign: 'center', position: 'relative', zIndex: 1,
         }}>
