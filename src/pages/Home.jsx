@@ -763,8 +763,8 @@ export default function Home() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'flex-end',
-        paddingBottom: 24,
+        justifyContent: 'flex-start',
+        paddingTop: 106,
         overflow: 'hidden',
         position: 'relative',
         boxShadow: '0px 50px 40px rgba(0,0,0,0.01), 0px 50px 40px rgba(0,0,0,0.02), 0px 20px 40px rgba(0,0,0,0.05), 0px 3px 10px rgba(0,0,0,0.08)',
@@ -788,6 +788,18 @@ export default function Home() {
             <span style={{ fontStyle: 'italic' }}>{greeting}</span>
           )}
         </h1>
+        <div style={{ display: 'inline-flex', gap: 2, background: 'rgba(0,0,0,0.12)', borderRadius: 10, padding: 3, marginTop: 14, position: 'relative', zIndex: 1 }}>
+          <Link to={createPageUrl("Lending") + "?tab=create"} style={{
+            padding: '6px 18px', borderRadius: 8, fontSize: 13, fontFamily: "'DM Sans', sans-serif",
+            fontWeight: 500, color: 'rgba(255,255,255,0.85)', background: 'transparent',
+            textDecoration: 'none', whiteSpace: 'nowrap',
+          }}>Create Loan</Link>
+          <Link to={createPageUrl("RecordPayment")} style={{
+            padding: '6px 18px', borderRadius: 8, fontSize: 13, fontFamily: "'DM Sans', sans-serif",
+            fontWeight: 500, color: 'rgba(255,255,255,0.85)', background: 'transparent',
+            textDecoration: 'none', whiteSpace: 'nowrap',
+          }}>Record Payment</Link>
+        </div>
       </div>
 
       {/* ── Main page content ── */}
