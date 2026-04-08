@@ -521,8 +521,8 @@ export default function Requests() {
                 const isOverdue = reminder.type.startsWith('overdue');
                 return (
                   <div key={reminder.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', borderBottom: index < reminders.length - 1 ? '1px solid rgba(0,0,0,0.04)' : 'none' }}>
-                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: isOverdue ? 'rgba(232,114,110,0.1)' : 'rgba(130,240,185,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <Clock style={{ width: 16, height: 16, color: isOverdue ? '#E8726E' : '#82F0B9' }} />
+                    <div style={{ width: 24, height: 24, borderRadius: 6, background: isOverdue ? 'rgba(232,114,110,0.12)' : 'rgba(3,172,234,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: isOverdue ? '#E8726E' : '#03ACEA' }}>
+                      <Clock style={{ width: 11, height: 11 }} />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', lineHeight: 1.5, margin: '0 0 2px' }}>{reminder.title}</p>
@@ -623,8 +623,20 @@ export default function Requests() {
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 {allItems.map((item, index) => (
                   <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: index < allItems.length - 1 ? '1px solid rgba(0,0,0,0.04)' : 'none' }}>
-                    {/* Profile photo */}
-                    <img src={item.photoUrl} alt={item.name} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                    {/* Type icon (left) */}
+                    {(() => {
+                      const typeIcon = {
+                        friend:          { color: '#7C3AED', bg: 'rgba(124,58,237,0.12)', svg: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
+                        offer_received:  { color: '#2563EB', bg: 'rgba(37,99,235,0.12)',  svg: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> },
+                        payment_confirm: { color: '#16A34A', bg: 'rgba(22,163,74,0.12)',  svg: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> },
+                        term_change:     { color: '#D97706', bg: 'rgba(217,119,6,0.12)',  svg: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> },
+                      }[item.type] || { color: '#9B9A98', bg: 'rgba(155,154,152,0.12)', svg: null };
+                      return (
+                        <div style={{ width: 24, height: 24, borderRadius: 6, background: typeIcon.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: typeIcon.color }}>
+                          {typeIcon.svg}
+                        </div>
+                      );
+                    })()}
 
                     {/* Text */}
                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -638,21 +650,6 @@ export default function Requests() {
                         {item.timestamp && item.timestamp.getTime() > 0 ? format(item.timestamp, 'MMM d') : ''}
                       </div>
                     </div>
-
-                    {/* Type icon */}
-                    {(() => {
-                      const typeIcon = {
-                        friend:          { color: '#7C3AED', bg: 'rgba(124,58,237,0.12)', svg: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
-                        offer_received:  { color: '#2563EB', bg: 'rgba(37,99,235,0.12)',  svg: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> },
-                        payment_confirm: { color: '#16A34A', bg: 'rgba(22,163,74,0.12)',  svg: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> },
-                        term_change:     { color: '#D97706', bg: 'rgba(217,119,6,0.12)',  svg: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> },
-                      }[item.type] || { color: '#9B9A98', bg: 'rgba(155,154,152,0.12)', svg: null };
-                      return (
-                        <div style={{ width: 28, height: 28, borderRadius: 7, background: typeIcon.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: typeIcon.color }}>
-                          {typeIcon.svg}
-                        </div>
-                      );
-                    })()}
 
                     {/* Action */}
                     <div style={{ flexShrink: 0 }}>
