@@ -732,28 +732,21 @@ export default function Home() {
   const alertTotal = overdueReminders.length;
   overdueCountRef.current = alertTotal;
 
-  // Card wrapper: white box with subtle border, title at top
-  const DashboardCard = ({ title, headerRight, children, style, highlight }) => (
-    highlight ? (
-      <div style={{ background: '#9AD3EF', borderRadius: 14, padding: 5, boxShadow: '0px 50px 40px rgba(0,0,0,0.01), 0px 50px 40px rgba(0,0,0,0.02), 0px 20px 40px rgba(0,0,0,0.05), 0px 3px 10px rgba(0,0,0,0.08)', ...style }}>
-        <div style={{ background: 'white', borderRadius: 10, overflow: 'hidden' }}>
-          <div style={{ padding: '9px 14px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
-            {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
-          </div>
-          {children}
-        </div>
-      </div>
-    ) : (
-      <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E8E2DC', overflow: 'hidden', boxShadow: '0px 50px 40px rgba(0,0,0,0.01), 0px 50px 40px rgba(0,0,0,0.02), 0px 20px 40px rgba(0,0,0,0.05), 0px 3px 10px rgba(0,0,0,0.08)', ...style }}>
+  // Card wrapper: coloured outer box (title in top area) + white inner content
+  const DashboardCard = ({ title, headerRight, children, style, highlight }) => {
+    const outerBg = highlight ? '#9AD3EF' : '#EDE8E3';
+    return (
+      <div style={{ background: outerBg, borderRadius: 14, overflow: 'hidden', boxShadow: '0px 50px 40px rgba(0,0,0,0.01), 0px 50px 40px rgba(0,0,0,0.02), 0px 20px 40px rgba(0,0,0,0.05), 0px 3px 10px rgba(0,0,0,0.08)', ...style }}>
         <div style={{ padding: '9px 14px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
           {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
         </div>
-        {children}
+        <div style={{ background: 'white', margin: '0 5px 5px', borderRadius: 10, overflow: 'hidden' }}>
+          {children}
+        </div>
       </div>
-    )
-  );
+    );
+  };
 
   return (
     <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 0, background: 'transparent' }}>
