@@ -1412,7 +1412,6 @@ export default function YourLoans() {
               {activeTab === 'borrowing' && renderSummaryTab('borrowing')}
               {activeTab === 'details' && renderDetailsTab()}
             </div>
-              </div>
 
           <div style={{ padding: '12px 28px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
@@ -1422,7 +1421,8 @@ export default function YourLoans() {
             <a href="https://www.vony-lending.com/do-not-sell" target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#787776', textDecoration: 'none' }}>Do not sell or share my personal information</a>
           </div>
           </div>
-          </div>
+            </div>
+      </div>
 
       {/* Modals */}
       {showDetailsModal && selectedLoanDetails && (
