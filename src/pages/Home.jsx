@@ -280,7 +280,7 @@ export default function Home() {
     }, { threshold: 0.1 });
     obs.observe(el);
     return () => obs.disconnect();
-  }, [dataLoaded]);
+  }, []);
 
   useEffect(() => {
     const el = activeLoansRef.current;
@@ -295,7 +295,7 @@ export default function Home() {
     }, { threshold: 0.1 });
     obs.observe(el);
     return () => obs.disconnect();
-  }, [dataLoaded]);
+  }, []);
 
   // Alert carousel auto-advance timer
   useEffect(() => {
@@ -798,10 +798,10 @@ export default function Home() {
           <div className="home-top-row" style={{ display: 'grid', gridTemplateColumns: '2fr 0.82fr', columnGap: 20, rowGap: 20, alignItems: 'start' }}>
 
             {/* LEFT SECTION: sub-grid for left two columns */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' }}>
+            <div className="dash-left-section" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' }}>
 
             {/* Inbox — spans both sub-columns */}
-            <div style={{ gridColumn: '1 / 3' }}>
+            <div className="dash-inbox" style={{ gridColumn: '1 / 3' }}>
               <CardEntrance delay={0}>
               <DashboardCard title="Inbox" headerRight={notifCount > 0 ? <Link to={createPageUrl("Requests")} style={{ fontSize: 12, fontWeight: 500, color: '#9B9A98', textDecoration: 'none' }}>View all</Link> : null}>
                 <div style={{ padding: '10px 16px 12px' }}>
@@ -829,17 +829,20 @@ export default function Home() {
               </CardEntrance>
             </div>
 
+            {/* Next Payment Due + Incoming — paired row */}
+            <div className="dash-next-pair" style={{ gridColumn: '1 / 3', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+
             {/* Left sub-col: Next Payment Due */}
             <div className="glow-wrapper glow-blue">
             <DashboardCard title="Next payment due" highlight>
-              <div style={{ padding: '12px 16px' }}>
+              <div style={{ padding: '16px 16px 20px', position: 'relative', display: 'flex', alignItems: 'center', minHeight: 48 }}>
                 {nextBorrowerPayment ? (() => {
                   const days = Math.ceil((nextBorrowerPayment.date.getTime() - Date.now()) / 86400000);
                   const isLate = days < 0;
                   const label = isLate ? `${Math.abs(days)}d late` : days === 0 ? 'today' : `${days}d`;
                   return (
                     <>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#1A1918', letterSpacing: '-0.03em', lineHeight: 1, fontFamily: "'DM Sans', sans-serif" }}>
                           {format(nextBorrowerPayment.date, 'MMM d')}
                         </div>
@@ -847,7 +850,7 @@ export default function Home() {
                           {label}
                         </span>
                       </div>
-                      <div style={{ fontSize: 12, color: '#5C5B5A', textAlign: 'right' }}>
+                      <div style={{ position: 'absolute', bottom: 6, right: 16, fontSize: 12, color: '#9B9A98' }}>
                         {formatMoney(nextBorrowerPayment.payment_amount || 0)} to {nextBorrowerPayment.firstName}
                       </div>
                     </>
@@ -860,19 +863,20 @@ export default function Home() {
                 )}
               </div>
             </DashboardCard>
+
             </div>{/* /glow-blue */}
 
             {/* Right sub-col: Next Payment Incoming (moved) */}
             <div className="glow-wrapper glow-purple">
             <DashboardCard title="Next payment incoming" highlight>
-              <div style={{ padding: '12px 16px' }}>
+              <div style={{ padding: '16px 16px 20px', position: 'relative', display: 'flex', alignItems: 'center', minHeight: 48 }}>
                 {nextLenderPayment ? (() => {
                   const days = Math.ceil((nextLenderPayment.date.getTime() - Date.now()) / 86400000);
                   const isLate = days < 0;
                   const label = isLate ? `${Math.abs(days)}d late` : days === 0 ? 'today' : `${days}d`;
                   return (
                     <>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#1A1918', letterSpacing: '-0.03em', lineHeight: 1, fontFamily: "'DM Sans', sans-serif" }}>
                           {format(nextLenderPayment.date, 'MMM d')}
                         </div>
@@ -880,7 +884,7 @@ export default function Home() {
                           {label}
                         </span>
                       </div>
-                      <div style={{ fontSize: 12, color: '#5C5B5A', textAlign: 'right' }}>
+                      <div style={{ position: 'absolute', bottom: 6, right: 16, fontSize: 12, color: '#9B9A98' }}>
                         {formatMoney(nextLenderPayment.payment_amount || 0)} from {nextLenderPayment.firstName}
                       </div>
                     </>
@@ -895,8 +899,10 @@ export default function Home() {
             </DashboardCard>
             </div>{/* /glow-purple */}
 
+            </div>{/* /dash-next-pair */}
+
             {/* Left sub-col: Upcoming Payments (moved from right sub-col) */}
-            <CardEntrance delay={0.05}>
+            <CardEntrance delay={0.05} className="dash-upcoming">
             <DashboardCard title="Upcoming payments" headerRight={<Link to={createPageUrl("YourLoans")} style={{ fontSize: 12, fontWeight: 500, color: '#9B9A98', textDecoration: 'none' }}>Full schedule</Link>}>
               <div style={{ padding: '12px 16px 16px', minHeight: 200 }}>
                 {combinedPaymentEvents.length === 0 ? (
@@ -927,7 +933,7 @@ export default function Home() {
                               {event.purpose ? `for ${event.purpose}` : format(event.date, 'MMM d')}
                             </div>
                           </div>
-                          <div style={{ fontSize: 13, fontWeight: 700, flexShrink: 0, color: event.isLender ? '#7EC0EA' : '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, flexShrink: 0, color: event.isLender ? '#54A6CF' : '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>
                             {event.isLender ? '+' : '-'}{formatMoney(event.remainingAmount)}
                           </div>
                         </div>
@@ -940,7 +946,7 @@ export default function Home() {
             </CardEntrance>
 
             {/* Right sub-col: Loans Over Time (swapped from right main col) */}
-            <CardEntrance delay={0.17}>
+            <CardEntrance delay={0.17} className="dash-loans-time">
             <DashboardCard title="Loans over time" headerRight={<span style={{ fontSize: 12, fontWeight: 500, color: '#787776' }}>6 months</span>}>
               <div ref={loansChartRef} style={{ padding: '12px 16px 16px' }}>
                 {chartData ? (() => {
@@ -963,8 +969,8 @@ export default function Home() {
                               return (
                                 <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                   <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: chartHeight }}>
-                                    <div key={`owed-${i}-${loansAnimKey}`} style={{ width: 14, borderRadius: '4px 4px 0 0', background: '#7EC0EA', opacity: d.isFuture ? 0.45 : 1, height: Math.max(owedH, owedH > 0 ? 2 : 0), transformOrigin: 'bottom', animation: `barGrowUp 0.5s ease-out ${i * 0.05}s both` }} />
-                                    <div key={`owe-${i}-${loansAnimKey}`} style={{ width: 14, borderRadius: '4px 4px 0 0', background: '#B0F1FF', opacity: d.isFuture ? 0.45 : 1, height: Math.max(oweH, oweH > 0 ? 2 : 0), transformOrigin: 'bottom', animation: `barGrowUp 0.5s ease-out ${i * 0.05 + 0.04}s both` }} />
+                                    <div key={`owed-${i}-${loansAnimKey}`} style={{ width: 14, borderRadius: '4px 4px 0 0', background: '#54A6CF', opacity: d.isFuture ? 0.45 : 1, height: Math.max(owedH, owedH > 0 ? 2 : 0), transformOrigin: 'bottom', animation: `barGrowUp 0.5s ease-out ${i * 0.05}s both` }} />
+                                    <div key={`owe-${i}-${loansAnimKey}`} style={{ width: 14, borderRadius: '4px 4px 0 0', background: '#7EC0EA', opacity: d.isFuture ? 0.45 : 1, height: Math.max(oweH, oweH > 0 ? 2 : 0), transformOrigin: 'bottom', animation: `barGrowUp 0.5s ease-out ${i * 0.05 + 0.04}s both` }} />
                                   </div>
                                 </div>
                               );
@@ -978,8 +984,8 @@ export default function Home() {
                         ))}
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 14, paddingTop: 14 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 11, color: '#787776' }}><div style={{ width: 8, height: 8, borderRadius: '50%', background: '#7EC0EA' }} /> Owed to you</div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 11, color: '#787776' }}><div style={{ width: 8, height: 8, borderRadius: '50%', background: '#B0F1FF' }} /> You owe</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 11, color: '#787776' }}><div style={{ width: 8, height: 8, borderRadius: '50%', background: '#54A6CF' }} /> Owed to you</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 11, color: '#787776' }}><div style={{ width: 8, height: 8, borderRadius: '50%', background: '#7EC0EA' }} /> You owe</div>
                       </div>
                     </>
                   );
@@ -996,6 +1002,7 @@ export default function Home() {
 
             {/* Your Active Loans — spans both sub-columns */}
             <motion.div
+              className="dash-active-loans"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.19, ease: 'easeOut' }}
@@ -1027,8 +1034,8 @@ export default function Home() {
                           </div>
                           <div style={{ fontSize: 12, color: '#787776', flexShrink: 0, marginLeft: 8 }}>{pct}%</div>
                         </div>
-                        <div style={{ width: '100%', height: 8, borderRadius: 4, background: isLender ? 'rgba(126,192,234,0.18)' : 'rgba(176,241,255,0.25)', overflow: 'hidden' }}>
-                          <div key={`active-${idx}-${activeAnimKey}`} style={{ height: '100%', borderRadius: 4, background: isLender ? '#7EC0EA' : '#B0F1FF', width: `${pct}%`, transformOrigin: 'left', animation: `barGrowRight 0.8s ease-out ${idx * 0.1}s both` }} />
+                        <div style={{ width: '100%', height: 8, borderRadius: 4, background: isLender ? 'rgba(84,166,207,0.18)' : 'rgba(126,192,234,0.22)', overflow: 'hidden' }}>
+                          <div key={`active-${idx}-${activeAnimKey}`} style={{ height: '100%', borderRadius: 4, background: isLender ? '#54A6CF' : '#7EC0EA', width: `${pct}%`, transformOrigin: 'left', animation: `barGrowRight 0.8s ease-out ${idx * 0.1}s both` }} />
                         </div>
                         <div style={{ fontSize: 11, color: '#787776', marginTop: 6 }}>{formatMoney(amountPaid)} of {formatMoney(totalAmt)} {isLender ? 'repaid' : 'paid back'}</div>
                       </div>
@@ -1042,14 +1049,17 @@ export default function Home() {
             </div>{/* end LEFT SECTION sub-grid */}
 
             {/* Right column: Loan Progress + How [Month] is Going + Recent Activity */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div className="dash-right-col" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+              {/* Owed to You + You Owe — paired row */}
+              <div className="dash-balance-pair" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
               {/* Owed to You */}
               <CardEntrance delay={0.1}>
               <DashboardCard title="Owed to You">
                 <div style={{ padding: '16px 16px 20px', position: 'relative', display: 'flex', alignItems: 'center', minHeight: 48 }}>
-                  <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#7EC0EA', letterSpacing: '-0.03em', lineHeight: 1, fontFamily: "'DM Sans', sans-serif" }}>{formatMoney(lentRemaining)}</div>
-                  <div style={{ position: 'absolute', bottom: 6, right: 16, fontSize: 11, color: '#9B9A98' }}>between {lentLoans.length} loan{lentLoans.length !== 1 ? 's' : ''}</div>
+                  <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#54A6CF', letterSpacing: '-0.03em', lineHeight: 1, fontFamily: "'DM Sans', sans-serif" }}>{formatMoney(lentRemaining)}</div>
+                  <div style={{ position: 'absolute', bottom: 6, right: 16, fontSize: 12, color: '#9B9A98' }}>between {lentLoans.length} loan{lentLoans.length !== 1 ? 's' : ''}</div>
                 </div>
               </DashboardCard>
               </CardEntrance>
@@ -1059,29 +1069,31 @@ export default function Home() {
               <DashboardCard title="You Owe">
                 <div style={{ padding: '16px 16px 20px', position: 'relative', display: 'flex', alignItems: 'center', minHeight: 48 }}>
                   <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#1A1918', letterSpacing: '-0.03em', lineHeight: 1, fontFamily: "'DM Sans', sans-serif" }}>{formatMoney(borrowedRemaining)}</div>
-                  <div style={{ position: 'absolute', bottom: 6, right: 16, fontSize: 11, color: '#9B9A98' }}>between {borrowedLoans.length} loan{borrowedLoans.length !== 1 ? 's' : ''}</div>
+                  <div style={{ position: 'absolute', bottom: 6, right: 16, fontSize: 12, color: '#9B9A98' }}>between {borrowedLoans.length} loan{borrowedLoans.length !== 1 ? 's' : ''}</div>
                 </div>
               </DashboardCard>
               </CardEntrance>
 
+              </div>{/* /dash-balance-pair */}
+
               {/* How [Month] is Going (swapped from left section) */}
-              <CardEntrance delay={0.12}>
+              <CardEntrance delay={0.12} className="dash-how-month">
               <DashboardCard title={`How ${format(today, 'MMMM')} is going`}>
                 <div style={{ padding: '10px 16px 14px' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
                     <div style={{ textAlign: 'center', padding: '0 10px 0 0', borderRight: '1px solid rgba(0,0,0,0.06)' }}>
                       <div style={{ fontSize: 10, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4 }}>Received</div>
-                      <div style={{ fontSize: '1.1rem', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1, color: '#7EC0EA', fontFamily: "'DM Sans', sans-serif" }}>{formatMoney(monthlyReceived)}</div>
-                      <div style={{ width: '100%', height: 4, borderRadius: 2, marginTop: 10, background: 'rgba(126,192,234,0.15)' }}>
-                        <div style={{ height: '100%', borderRadius: 2, background: '#7EC0EA', width: `${monthlyExpectedReceive > 0 ? Math.min((monthlyReceived / monthlyExpectedReceive) * 100, 100) : 0}%` }} />
+                      <div style={{ fontSize: '1.1rem', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1, color: '#54A6CF', fontFamily: "'DM Sans', sans-serif" }}>{formatMoney(monthlyReceived)}</div>
+                      <div style={{ width: '100%', height: 4, borderRadius: 2, marginTop: 10, background: 'rgba(84,166,207,0.15)' }}>
+                        <div style={{ height: '100%', borderRadius: 2, background: '#54A6CF', width: `${monthlyExpectedReceive > 0 ? Math.min((monthlyReceived / monthlyExpectedReceive) * 100, 100) : 0}%` }} />
                       </div>
                       <div style={{ fontSize: 10, color: '#9B9A98', marginTop: 5 }}>of {formatMoney(monthlyExpectedReceive)} expected</div>
                     </div>
                     <div style={{ textAlign: 'center', padding: '0 0 0 10px' }}>
                       <div style={{ fontSize: 10, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4 }}>Paid out</div>
                       <div style={{ fontSize: '1.1rem', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>{formatMoney(monthlyPaidOut)}</div>
-                      <div style={{ width: '100%', height: 4, borderRadius: 2, marginTop: 10, background: 'rgba(176,241,255,0.2)' }}>
-                        <div style={{ height: '100%', borderRadius: 2, background: '#B0F1FF', width: `${monthlyExpectedPay > 0 ? Math.min((monthlyPaidOut / monthlyExpectedPay) * 100, 100) : 0}%` }} />
+                      <div style={{ width: '100%', height: 4, borderRadius: 2, marginTop: 10, background: 'rgba(126,192,234,0.2)' }}>
+                        <div style={{ height: '100%', borderRadius: 2, background: '#7EC0EA', width: `${monthlyExpectedPay > 0 ? Math.min((monthlyPaidOut / monthlyExpectedPay) * 100, 100) : 0}%` }} />
                       </div>
                       <div style={{ fontSize: 10, color: '#9B9A98', marginTop: 5 }}>of {formatMoney(monthlyExpectedPay)} expected</div>
                     </div>
@@ -1091,7 +1103,7 @@ export default function Home() {
               </CardEntrance>
 
               {/* Recent Activity */}
-              <CardEntrance delay={0.24}>
+              <CardEntrance delay={0.24} className="dash-recent">
               <DashboardCard title="Recent activity" headerRight={<Link to={createPageUrl("RecentActivity")} style={{ fontSize: 12, fontWeight: 500, color: '#9B9A98', textDecoration: 'none' }}>View all</Link>}>
                 <div style={{ padding: '12px 16px 16px' }}>
                   {recentActivity.length === 0 ? (
