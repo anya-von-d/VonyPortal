@@ -524,7 +524,7 @@ export default function YourLoans() {
     const otherPartyUsername = isLending ? nextPaymentBorrowerUsername : nextPaymentLenderUsername;
     const rankingFilter = isLending ? rankingFilterLending : rankingFilterBorrowing;
     const setRankingFilter = isLending ? setRankingFilterLending : setRankingFilterBorrowing;
-    const accentColor = isLending ? '#54A6CF' : '#F5A96A';
+    const accentColor = isLending ? '#54A6CF' : '#7EC0EA';
     const accentLight = isLending ? 'rgba(84,166,207,0.10)' : 'rgba(126,192,234,0.10)';
     const accentMid = isLending ? 'rgba(84,166,207,0.18)' : 'rgba(126,192,234,0.18)';
 

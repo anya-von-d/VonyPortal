@@ -717,7 +717,7 @@ export default function RecentActivityPage() {
 
   const getIconStyle = (IconComp) => {
     if (IconComp === Send)           return { bg: 'rgba(84,166,207,0.14)',   color: '#54A6CF' };
-    if (IconComp === ArrowDownRight) return { bg: 'rgba(126,192,234,0.16)',  color: '#F5A96A' };
+    if (IconComp === ArrowDownRight) return { bg: 'rgba(126,192,234,0.16)',  color: '#7EC0EA' };
     if (IconComp === ArrowUpRight)   return { bg: 'rgba(139,92,246,0.13)',   color: '#8B5CF6' };
     if (IconComp === Check)          return { bg: 'rgba(34,197,94,0.13)',    color: '#22C55E' };
     if (IconComp === X)              return { bg: 'rgba(232,114,110,0.14)',  color: '#E8726E' };
