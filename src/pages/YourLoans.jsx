@@ -524,40 +524,12 @@ export default function YourLoans() {
     const otherPartyUsername = isLending ? nextPaymentBorrowerUsername : nextPaymentLenderUsername;
     const rankingFilter = isLending ? rankingFilterLending : rankingFilterBorrowing;
     const setRankingFilter = isLending ? setRankingFilterLending : setRankingFilterBorrowing;
-    const accentColor = isLending ? '#7C3AED' : '#2563EB';
-    const accentLight = isLending ? 'rgba(124,58,237,0.10)' : 'rgba(37,99,235,0.10)';
-    const accentMid = isLending ? 'rgba(124,58,237,0.18)' : 'rgba(37,99,235,0.18)';
+    const accentColor = isLending ? '#54A6CF' : '#7EC0EA';
+    const accentLight = isLending ? 'rgba(84,166,207,0.10)' : 'rgba(126,192,234,0.10)';
+    const accentMid = isLending ? 'rgba(84,166,207,0.18)' : 'rgba(126,192,234,0.18)';
 
     return (
       <>
-        {/* Next Payment Alert Banner — only show when not overdue (overdue is shown in carousel) */}
-        {nextPaymentLoan && nextPaymentDays !== null && nextPaymentDays >= 0 && (
-          <div className="glass-hero-alert" style={{ padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ width: 32, height: 32, borderRadius: '50%', background: nextPaymentDays < 0 ? 'rgba(232,114,110,0.1)' : accentLight, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Clock style={{ width: 16, height: 16, color: nextPaymentDays < 0 ? '#E8726E' : accentColor }} />
-              </div>
-              <p style={{ fontSize: 13, color: '#1A1918', margin: 0 }}>
-                {isLending ? (
-                  nextPaymentDays > 0
-                    ? <>Next payment from {otherPartyUsername} is due in <span style={{ fontWeight: 700 }}>{nextPaymentDays} {nextPaymentDays === 1 ? 'day' : 'days'}</span></>
-                    : nextPaymentDays === 0
-                      ? <span style={{ fontWeight: 700 }}>Payment from {otherPartyUsername} is due today</span>
-                      : <span style={{ fontWeight: 700, color: '#E8726E' }}>Payment from {otherPartyUsername} is {Math.abs(nextPaymentDays)} {Math.abs(nextPaymentDays) === 1 ? 'day' : 'days'} overdue</span>
-                ) : (
-                  nextPaymentDays > 0
-                    ? <>Your next payment is due in <span style={{ fontWeight: 700 }}>{nextPaymentDays} {nextPaymentDays === 1 ? 'day' : 'days'}</span></>
-                    : nextPaymentDays === 0
-                      ? <span style={{ fontWeight: 700 }}>Your next payment is due today</span>
-                      : <span style={{ fontWeight: 700, color: '#E8726E' }}>Your payment is {Math.abs(nextPaymentDays)} {Math.abs(nextPaymentDays) === 1 ? 'day' : 'days'} overdue</span>
-                )}
-              </p>
-            </div>
-            <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1918', margin: 0 }}>
-              ${nextPaymentAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </p>
-          </div>
-        )}
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }} className="borrowing-grid">
           {/* Left Column */}
@@ -666,10 +638,7 @@ export default function YourLoans() {
             {!isLending && (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 {/* Card 1: Date + days badge */}
-                <div className="galaxy-border-card" style={{ display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ padding: '14px 16px 0' }}>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Next payment due</div>
-                  </div>
+                <PageCard title="Next Payment Due" highlight style={{ display: 'flex', flexDirection: 'column' }}>
                   <div style={{ padding: '10px 16px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
                     {nextPaymentLoan ? (
                       <>
@@ -684,9 +653,9 @@ export default function YourLoans() {
                       <div style={{ fontSize: 13, color: '#787776' }}>No upcoming</div>
                     )}
                   </div>
-                </div>
+                </PageCard>
                 {/* Card 2: Amount + to/from name */}
-                <PageCard title="Next payment amount" style={{ display: 'flex', flexDirection: 'column' }}>
+                <PageCard title="Next Payment Amount" highlight style={{ display: 'flex', flexDirection: 'column' }}>
                   <div style={{ padding: '10px 14px 14px', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
                     {nextPaymentLoan ? (
                       <>
@@ -707,10 +676,7 @@ export default function YourLoans() {
             {isLending && (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 {/* Card 1: Date + days badge */}
-                <div className="galaxy-border-card" style={{ display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ padding: '14px 16px 0' }}>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Next payment incoming</div>
-                  </div>
+                <PageCard title="Next Payment Incoming" highlight style={{ display: 'flex', flexDirection: 'column' }}>
                   <div style={{ padding: '10px 16px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
                     {nextPaymentLoan ? (
                       <>
@@ -725,9 +691,9 @@ export default function YourLoans() {
                       <div style={{ fontSize: 13, color: '#787776' }}>No incoming</div>
                     )}
                   </div>
-                </div>
+                </PageCard>
                 {/* Card 2: Amount + from name */}
-                <PageCard title="Next payment amount" style={{ display: 'flex', flexDirection: 'column' }}>
+                <PageCard title="Next Payment Amount" highlight style={{ display: 'flex', flexDirection: 'column' }}>
                   <div style={{ padding: '10px 14px 14px', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
                     {nextPaymentLoan ? (
                       <>
@@ -926,20 +892,6 @@ export default function YourLoans() {
           </div>
         </PageCard>
 
-        {/* Summary bar */}
-        {manageLoanSelected && (() => {
-          return (
-            <div className="glass-hero-alert" style={{ padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-              <img src={otherPartyProfile?.profile_picture_url || otherPartyProfile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent((otherPartyProfile?.full_name || 'U').charAt(0))}&background=678AFB&color=fff&size=64`} alt={otherPartyProfile?.full_name || 'User'} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, background: 'white' }} />
-              <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', margin: 0 }}>
-                {isLending
-                  ? `You lent ${otherPartyUsername} $${(manageLoanSelected.amount || 0).toLocaleString()} for ${manageLoanSelected.purpose || 'personal expenses'}`
-                  : `${otherPartyUsername} lent you $${(manageLoanSelected.amount || 0).toLocaleString()} to help with ${manageLoanSelected.purpose || 'personal expenses'}`
-                }
-              </p>
-            </div>
-          );
-        })()}
 
         {/* Two-column grid */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }} className="borrowing-grid">
@@ -984,20 +936,14 @@ export default function YourLoans() {
                   {/* Stacked: next payment date + amount */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {/* Next payment date card */}
-                    <div className="glow-wrapper glow-blue">
-                    <div className="galaxy-border-card" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                      <div style={{ padding: '14px 16px 0' }}>
-                        <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>
-                          Next payment {isLending ? 'incoming' : 'due'}
-                        </div>
-                      </div>
+                    <PageCard title={isLending ? 'Next Payment Incoming' : 'Next Payment Due'} highlight style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                       <div style={{ padding: '10px 16px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
                         {nextPmtDate ? (
                           <>
                             <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', lineHeight: 1 }}>
                               {format(nextPmtDate, 'MMM d')}
                             </div>
-                            <span style={{ fontSize: 10, fontWeight: 700, color: daysUntil < 0 ? '#E8726E' : isLending ? '#7C3AED' : '#2563EB', background: daysUntil < 0 ? 'rgba(232,114,110,0.1)' : isLending ? 'rgba(124,58,237,0.08)' : 'rgba(37,99,235,0.08)', borderRadius: 6, padding: '2px 6px', whiteSpace: 'nowrap' }}>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: daysUntil < 0 ? '#E8726E' : '#54A6CF', background: daysUntil < 0 ? 'rgba(232,114,110,0.1)' : 'rgba(84,166,207,0.08)', borderRadius: 6, padding: '2px 6px', whiteSpace: 'nowrap' }}>
                               {daysUntil < 0 ? `${Math.abs(daysUntil)}d late` : daysUntil === 0 ? 'today' : `${daysUntil}d`}
                             </span>
                           </>
@@ -1005,11 +951,9 @@ export default function YourLoans() {
                           <div style={{ fontSize: 13, color: '#787776' }}>N/A</div>
                         )}
                       </div>
-                    </div>
-                    </div>{/* /glow-wrapper glow-blue */}
+                    </PageCard>
                     {/* Next payment amount card */}
-                    <div className="glow-wrapper glow-blue">
-                    <PageCard title="Next payment amount" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                    <PageCard title="Next Payment Amount" highlight style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                       <div style={{ padding: '10px 14px 14px', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
                         {nextPmtDate ? (
                           <>
@@ -1025,7 +969,6 @@ export default function YourLoans() {
                         )}
                       </div>
                     </PageCard>
-                    </div>{/* /glow-wrapper glow-blue */}
                   </div>
                 </div>
               );
@@ -1189,7 +1132,7 @@ export default function YourLoans() {
                 </PageCard>
 
                 {/* Document Icons */}
-                <div style={{ justifyContent: 'center', gap: 20, padding: '4px 0' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 20, padding: '4px 0' }}>
                   <button onClick={() => { const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id); if (agreement) openDocPopup('promissory', agreement); }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', background: 'none', border: 'none' }}>
                     <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(130,240,185,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#82F0B9" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
                     <p style={{ fontSize: 10, fontWeight: 600, color: '#1A1918', textAlign: 'center', lineHeight: 1.3 }}>Promissory<br/>Note</p>
@@ -1314,10 +1257,10 @@ export default function YourLoans() {
 
   const SHADOW = '0px 50px 40px rgba(0,0,0,0.02), 0px 50px 40px rgba(0,0,0,0.04), 0px 20px 40px rgba(0,0,0,0.08), 0px 3px 10px rgba(0,0,0,0.12)';
 
-  const PageCard = ({ title, headerRight, children, style }) => (
-    <div style={{ background: '#F4F4F5', borderRadius: 14, overflow: 'hidden', boxShadow: SHADOW, ...style }}>
+  const PageCard = ({ title, headerRight, children, style, highlight }) => (
+    <div style={{ background: highlight ? '#54A6CF' : '#F4F4F5', borderRadius: 14, overflow: 'hidden', boxShadow: SHADOW, ...style }}>
       <div style={{ padding: '6px 14px 5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
+        <span style={{ fontSize: 10, fontWeight: 700, color: highlight ? 'rgba(255,255,255,0.85)' : '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
         {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
       </div>
       <div style={{ background: '#ffffff', margin: '0 5px 5px', borderRadius: 10, overflow: 'hidden' }}>
@@ -1412,7 +1355,7 @@ export default function YourLoans() {
                           const otherParty = getUserById(isLen ? loan.borrower_id : loan.lender_id);
                           const firstName = otherParty?.full_name?.split(' ')[0] || otherParty?.username || 'User';
                           const amt = formatMoney(loan.payment_amount || 0);
-                          const accentCol = isLen ? '#7C3AED' : '#E8726E';
+                          const accentCol = isLen ? '#54A6CF' : '#E8726E';
                           return (
                             <div key={`reminder-${loan.id}`} style={{ minWidth: '100%', padding: '16px 16px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
                               <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(232,114,110,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
