@@ -1520,6 +1520,7 @@ export default function Lending({ initialTab }) {
         </div>
 
           <div style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 40px 64px', position: 'relative', zIndex: 1 }}>
+          <div style={{ background: '#EDECEA', borderRadius: 18, padding: 20 }}>
 
           {/* Tab Navigation — hidden when accessed as standalone Create Loan page */}
           {!initialTab && (
@@ -3047,6 +3048,7 @@ export default function Lending({ initialTab }) {
 
           </AnimatePresence>
 
+          </div>
         {/* Footer */}
         <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>

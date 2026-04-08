@@ -1336,6 +1336,7 @@ export default function YourLoans() {
 
             {/* Page content */}
             <div style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 40px 64px', position: 'relative', zIndex: 1 }}>
+              <div style={{ background: '#EDECEA', borderRadius: 18, padding: 20 }}>
               {activeTab !== 'details' && (() => {
                 const isLendingTab = activeTab === 'lending';
                 const allOverdue = isLendingTab
@@ -1411,6 +1412,7 @@ export default function YourLoans() {
               {activeTab === 'borrowing' && renderSummaryTab('borrowing')}
               {activeTab === 'details' && renderDetailsTab()}
             </div>
+              </div>
 
           <div style={{ padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>

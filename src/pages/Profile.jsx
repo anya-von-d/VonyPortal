@@ -322,6 +322,7 @@ export default function Profile() {
       </div>
 
       <div style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 40px 64px', position: 'relative', zIndex: 1 }}>
+        <div style={{ background: '#EDECEA', borderRadius: 18, padding: 20 }}>
 
         {/* Coming Soon Modal */}
         <Dialog open={showComingSoonModal} onOpenChange={setShowComingSoonModal}>
@@ -650,6 +651,7 @@ export default function Profile() {
           </div>
         </div>
 
+        </div>
         <div style={{ marginTop: 8, display: 'flex', justifyContent: 'center', paddingBottom: 24 }}>
           <Button variant="ghost" onClick={handleLogout} className="hover:text-red-500" style={{ color: '#787776' }}>
             <LogOut className="w-4 h-4 mr-2" />

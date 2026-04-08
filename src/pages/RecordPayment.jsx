@@ -423,6 +423,7 @@ export default function RecordPayment() {
 
         {/* Page content */}
         <div style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 40px 64px', position: 'relative', zIndex: 1 }}>
+          <div style={{ background: '#EDECEA', borderRadius: 18, padding: 20 }}>
 
           {/* Two-column layout */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 16, alignItems: 'start' }}>
@@ -848,6 +849,7 @@ export default function RecordPayment() {
             </PageCard>
           )}
 
+          </div>
           <div style={{ padding: '20px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <span style={{ fontSize: 11, color: '#787776' }}>2026 Vony, Inc. All rights reserved.</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>

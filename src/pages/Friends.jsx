@@ -293,6 +293,7 @@ export default function Friends() {
       </div>
 
       <div style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 40px 64px', position: 'relative', zIndex: 1 }}>
+        <div style={{ background: '#EDECEA', borderRadius: 18, padding: 20 }}>
 
         {/* Two-Column Layout: Friends Left, Search + Requests Right */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -591,6 +592,7 @@ export default function Friends() {
             )}
           </div>
 
+        </div>
         </div>
 
         {/* Footer */}
