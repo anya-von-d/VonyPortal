@@ -5,7 +5,7 @@ import { Loan, Payment, PublicProfile, Friendship } from "@/entities/all";
 import { useAuth } from "@/lib/AuthContext";
 
 
-import { motion, AnimatePresence, useInView } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { format, startOfMonth, endOfMonth, addMonths, addDays, isBefore, isAfter, isSameDay, differenceInDays } from "date-fns";
 import { formatMoney } from "@/components/utils/formatMoney";
 import { toLocalDate, getLocalToday, daysUntil as daysUntilDate } from "@/components/utils/dateUtils";
@@ -246,8 +246,8 @@ export default function Home() {
   const overdueCountRef = useRef(0);
   const loansChartRef = useRef(null);
   const activeLoansRef = useRef(null);
-  const loansInView = useInView(loansChartRef, { once: false, amount: 0.3 });
-  const activeLoansInView = useInView(activeLoansRef, { once: false, amount: 0.3 });
+  const [loansInView, setLoansInView] = useState(false);
+  const [activeLoansInView, setActiveLoansInView] = useState(false);
 
   // Scroll state for top bar behavior
   const [topBarHidden, setTopBarHidden] = useState(false);
@@ -262,6 +262,23 @@ export default function Home() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Bar chart viewport tracking — native IntersectionObserver (reliable across framer-motion versions)
+  useEffect(() => {
+    const el = loansChartRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => setLoansInView(e.isIntersecting), { threshold: 0.1 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const el = activeLoansRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => setActiveLoansInView(e.isIntersecting), { threshold: 0.1 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [loans]); // re-run when loan data loads so we observe the newly rendered element
 
   // Alert carousel auto-advance timer
   useEffect(() => {
@@ -700,7 +717,7 @@ export default function Home() {
 
   // Card wrapper: cream outer box with title, white inner content
   const DashboardCard = ({ title, headerRight, children, style }) => (
-    <div style={{ background: '#DBEDFE', borderRadius: 12, overflow: 'hidden', ...style }}>
+    <div style={{ background: '#A7D3F3', borderRadius: 12, overflow: 'hidden', ...style }}>
       <div style={{ padding: '9px 14px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
         {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
@@ -792,7 +809,7 @@ export default function Home() {
             {/* Left sub-col: Next Payment Due */}
             <div className="glow-wrapper glow-blue">
             <DashboardCard title="Next payment due">
-              <div style={{ padding: '6px 16px 16px', minHeight: 70, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <div style={{ padding: '12px 16px' }}>
                 {nextBorrowerPayment ? (() => {
                   const days = Math.ceil((nextBorrowerPayment.date.getTime() - Date.now()) / 86400000);
                   const isLate = days < 0;
@@ -807,8 +824,8 @@ export default function Home() {
                           {label}
                         </span>
                       </div>
-                      <div style={{ fontSize: 12, color: '#5C5B5A' }}>
-                        {formatMoney(nextBorrowerPayment.payment_amount || 0)} · to {nextBorrowerPayment.firstName}
+                      <div style={{ fontSize: 12, color: '#5C5B5A', textAlign: 'right' }}>
+                        {formatMoney(nextBorrowerPayment.payment_amount || 0)} to {nextBorrowerPayment.firstName}
                       </div>
                     </>
                   );
@@ -825,7 +842,7 @@ export default function Home() {
             {/* Right sub-col: Next Payment Incoming (moved) */}
             <div className="glow-wrapper glow-purple">
             <DashboardCard title="Next payment incoming">
-              <div style={{ padding: '6px 16px 16px', minHeight: 70, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <div style={{ padding: '12px 16px' }}>
                 {nextLenderPayment ? (() => {
                   const days = Math.ceil((nextLenderPayment.date.getTime() - Date.now()) / 86400000);
                   const isLate = days < 0;
@@ -840,8 +857,8 @@ export default function Home() {
                           {label}
                         </span>
                       </div>
-                      <div style={{ fontSize: 12, color: '#5C5B5A' }}>
-                        {formatMoney(nextLenderPayment.payment_amount || 0)} · from {nextLenderPayment.firstName}
+                      <div style={{ fontSize: 12, color: '#5C5B5A', textAlign: 'right' }}>
+                        {formatMoney(nextLenderPayment.payment_amount || 0)} from {nextLenderPayment.firstName}
                       </div>
                     </>
                   );
@@ -1013,9 +1030,9 @@ export default function Home() {
               {/* Owed to You */}
               <CardEntrance delay={0.1}>
               <DashboardCard title="Owed to You">
-                <div style={{ padding: '6px 16px 16px', minHeight: 70, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <div style={{ padding: '12px 16px' }}>
                   <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#7EC0EA', letterSpacing: '-0.03em', lineHeight: 1, fontFamily: "'DM Sans', sans-serif" }}>{formatMoney(lentRemaining)}</div>
-                  <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 6 }}>between {lentLoans.length} loan{lentLoans.length !== 1 ? 's' : ''}</div>
+                  <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 6, textAlign: 'right' }}>between {lentLoans.length} loan{lentLoans.length !== 1 ? 's' : ''}</div>
                 </div>
               </DashboardCard>
               </CardEntrance>
@@ -1023,9 +1040,9 @@ export default function Home() {
               {/* You Owe */}
               <CardEntrance delay={0.13}>
               <DashboardCard title="You Owe">
-                <div style={{ padding: '6px 16px 16px', minHeight: 70, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <div style={{ padding: '12px 16px' }}>
                   <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#1A1918', letterSpacing: '-0.03em', lineHeight: 1, fontFamily: "'DM Sans', sans-serif" }}>{formatMoney(borrowedRemaining)}</div>
-                  <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 6 }}>between {borrowedLoans.length} loan{borrowedLoans.length !== 1 ? 's' : ''}</div>
+                  <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 6, textAlign: 'right' }}>between {borrowedLoans.length} loan{borrowedLoans.length !== 1 ? 's' : ''}</div>
                 </div>
               </DashboardCard>
               </CardEntrance>
