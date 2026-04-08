@@ -248,6 +248,8 @@ export default function Home() {
   const activeLoansRef = useRef(null);
   const [loansAnimKey, setLoansAnimKey] = useState(0);
   const [activeAnimKey, setActiveAnimKey] = useState(0);
+  const loansWasOut = useRef(true);
+  const activeWasOut = useRef(true);
 
   // Scroll state for top bar behavior
   const [topBarHidden, setTopBarHidden] = useState(false);
@@ -263,14 +265,18 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Bar chart viewport tracking — increment a key counter each time the chart
-  // enters the viewport. Changing the key forces React to remount the bar elements,
-  // replaying their CSS @keyframes animation (barGrowUp / barGrowRight).
+  // Bar chart viewport tracking — only fires on out→in transitions to avoid
+  // infinite loops (remounting bars changes container size, re-triggering observer).
   useEffect(() => {
     const el = loansChartRef.current;
     if (!el) return;
     const obs = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) setLoansAnimKey(k => k + 1);
+      if (e.isIntersecting && loansWasOut.current) {
+        loansWasOut.current = false;
+        setLoansAnimKey(k => k + 1);
+      } else if (!e.isIntersecting) {
+        loansWasOut.current = true;
+      }
     }, { threshold: 0.1 });
     obs.observe(el);
     return () => obs.disconnect();
@@ -280,7 +286,12 @@ export default function Home() {
     const el = activeLoansRef.current;
     if (!el) return;
     const obs = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) setActiveAnimKey(k => k + 1);
+      if (e.isIntersecting && activeWasOut.current) {
+        activeWasOut.current = false;
+        setActiveAnimKey(k => k + 1);
+      } else if (!e.isIntersecting) {
+        activeWasOut.current = true;
+      }
     }, { threshold: 0.1 });
     obs.observe(el);
     return () => obs.disconnect();
@@ -721,14 +732,14 @@ export default function Home() {
   const alertTotal = overdueReminders.length;
   overdueCountRef.current = alertTotal;
 
-  // Card wrapper: cream outer box with title, white inner content
+  // Card wrapper: blue border frame, white box inside with title at top
   const DashboardCard = ({ title, headerRight, children, style }) => (
-    <div style={{ background: '#B0DCF4', borderRadius: 12, overflow: 'hidden', ...style }}>
-      <div style={{ padding: '9px 14px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
-        {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
-      </div>
-      <div style={{ background: 'white', margin: '0 5px 5px', borderRadius: 8, overflow: 'hidden' }}>
+    <div style={{ background: '#9AD3EF', borderRadius: 14, padding: 5, ...style }}>
+      <div style={{ background: 'white', borderRadius: 10, overflow: 'hidden' }}>
+        <div style={{ padding: '10px 16px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
+          {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
+        </div>
         {children}
       </div>
     </div>
@@ -786,7 +797,7 @@ export default function Home() {
             {/* Inbox — spans both sub-columns */}
             <div style={{ gridColumn: '1 / 3' }}>
               <CardEntrance delay={0}>
-              <DashboardCard title="Inbox" headerRight={notifCount > 0 ? <Link to={createPageUrl("Requests")} style={{ fontSize: 12, fontWeight: 500, color: '#2563EB', textDecoration: 'none' }}>View all</Link> : null}>
+              <DashboardCard title="Inbox" headerRight={notifCount > 0 ? <Link to={createPageUrl("Requests")} style={{ fontSize: 12, fontWeight: 500, color: '#7EC0EA', textDecoration: 'none' }}>View all</Link> : null}>
                 <div style={{ padding: '10px 16px 12px' }}>
                   {notifCount === 0 ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -880,7 +891,7 @@ export default function Home() {
 
             {/* Left sub-col: Upcoming Payments (moved from right sub-col) */}
             <CardEntrance delay={0.05}>
-            <DashboardCard title="Upcoming payments" headerRight={<Link to={createPageUrl("YourLoans")} style={{ fontSize: 12, fontWeight: 500, color: '#2563EB', textDecoration: 'none' }}>Full schedule</Link>}>
+            <DashboardCard title="Upcoming payments" headerRight={<Link to={createPageUrl("YourLoans")} style={{ fontSize: 12, fontWeight: 500, color: '#7EC0EA', textDecoration: 'none' }}>Full schedule</Link>}>
               <div style={{ padding: '12px 16px 16px', minHeight: 200 }}>
                 {combinedPaymentEvents.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '32px 0' }}>
@@ -984,7 +995,7 @@ export default function Home() {
               transition={{ duration: 0.4, delay: 0.19, ease: 'easeOut' }}
               style={{ gridColumn: '1 / 3' }}
             >
-            <DashboardCard title="Your active loans" headerRight={<Link to={createPageUrl("YourLoans")} style={{ fontSize: 12, fontWeight: 500, color: '#2563EB', textDecoration: 'none' }}>Manage</Link>}>
+            <DashboardCard title="Your active loans" headerRight={<Link to={createPageUrl("YourLoans")} style={{ fontSize: 12, fontWeight: 500, color: '#7EC0EA', textDecoration: 'none' }}>Manage</Link>}>
               {myLoans.filter(l => l && l.status === 'active').length === 0 ? (
                 <div style={{ padding: '20px 16px', textAlign: 'center' }}>
                   <div style={{ fontSize: 28, marginBottom: 6 }}>🤝</div>
@@ -1075,7 +1086,7 @@ export default function Home() {
 
               {/* Recent Activity */}
               <CardEntrance delay={0.24}>
-              <DashboardCard title="Recent activity" headerRight={<Link to={createPageUrl("RecentActivity")} style={{ fontSize: 12, fontWeight: 500, color: '#2563EB', textDecoration: 'none' }}>View all</Link>}>
+              <DashboardCard title="Recent activity" headerRight={<Link to={createPageUrl("RecentActivity")} style={{ fontSize: 12, fontWeight: 500, color: '#7EC0EA', textDecoration: 'none' }}>View all</Link>}>
                 <div style={{ padding: '12px 16px 16px' }}>
                   {recentActivity.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '20px 0' }}>
