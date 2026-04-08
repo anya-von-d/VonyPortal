@@ -382,15 +382,25 @@ input[type="date"] {
     display: none !important;
   }
 
-  /* Content wrapper: reduce outer padding so grey box nearly fills screen */
+  /* Content wrapper: zero out side padding so cards fill screen */
   .dashboard-content-wrap {
-    padding-left: 6px !important;
-    padding-right: 6px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 
-  /* Grey container fills almost full width */
+  /* Remove grey box: transparent, no radius, no padding, cards go edge-to-edge */
   .dashboard-grey-box {
-    border-radius: 14px !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Each direct child card fills full width with small side gaps */
+  .dashboard-grey-box > * {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
   }
 
   /* Cards inside grey box fill available width */
@@ -399,17 +409,18 @@ input[type="date"] {
     grid-template-columns: 1fr 1fr !important;
   }
 
-  /* Footer: stack links vertically */
+  /* Footer: center everything */
   .dashboard-footer {
     flex-direction: column !important;
-    align-items: flex-start !important;
+    align-items: center !important;
+    text-align: center !important;
     gap: 8px !important;
-    padding: 12px 14px !important;
+    padding: 16px 14px !important;
   }
 
   .dashboard-footer-links {
     flex-direction: column !important;
-    align-items: flex-start !important;
+    align-items: center !important;
     gap: 6px !important;
   }
 }
