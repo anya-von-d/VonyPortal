@@ -734,7 +734,7 @@ export default function Home() {
 
   const SHADOW = '0px 50px 40px rgba(0,0,0,0.02), 0px 50px 40px rgba(0,0,0,0.04), 0px 20px 40px rgba(0,0,0,0.08), 0px 3px 10px rgba(0,0,0,0.12)';
   const DashboardCard = ({ title, headerRight, children, style, highlight }) => {
-    const outerBg = highlight ? '#54A6CF' : '#F4F4F5';
+    const outerBg = highlight ? '#1A1918' : '#F4F4F5';
     const titleColor = highlight ? 'rgba(255,255,255,0.85)' : '#9B9A98';
     return (
       <div style={{ background: outerBg, borderRadius: 14, overflow: 'hidden', boxShadow: SHADOW, ...style }}>
