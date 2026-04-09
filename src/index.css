@@ -359,58 +359,47 @@ input[type="date"] {
   .home-nav-pill {
     left: 50% !important;
   }
-  /* Flex column so we can reorder cards */
-  .home-top-row {
-    display: flex !important;
-    flex-direction: column !important;
-    grid-template-columns: unset !important;
-  }
-  /* Flatten section wrappers so all cards become direct flex children */
-  .dash-left-section,
-  .dash-right-col {
-    display: contents !important;
-  }
-  /* Reorder cards */
-  .dash-inbox        { order: 1; }
-  .dash-next-pair    { order: 2; display: grid !important; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .dash-balance-pair { order: 3; display: grid !important; grid-template-columns: 1fr 1fr; gap: 12px; flex-direction: unset !important; }
-  .dash-how-month    { order: 4; }
-  .dash-upcoming     { order: 5; }
-  .dash-loans-time   { order: 6; }
-  .dash-active-loans { order: 7; }
-  .dash-recent       { order: 8; }
 
   /* Hide decorative side icons */
   .side-icons-container {
     display: none !important;
   }
 
-  /* Content wrapper: zero out side padding so cards fill screen */
+  /* Content wrapper: small side padding */
   .dashboard-content-wrap {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
   }
 
-  /* Remove grey box: transparent, no radius, no padding, cards go edge-to-edge */
+  /* Grey box: keep background but reduce radius/padding */
   .dashboard-grey-box {
-    background: transparent !important;
-    border-radius: 0 !important;
-    padding: 0 !important;
+    border-radius: 14px !important;
+    padding: 12px !important;
   }
 
-  /* Each direct child card fills full width with small side gaps */
-  .dashboard-grey-box > * {
-    width: 100% !important;
-    box-sizing: border-box !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
+  /* Main layout: stack left col + right col vertically */
+  .home-top-row {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    grid-template-columns: unset !important;
   }
 
-  /* Cards inside grey box fill available width */
-  .dash-next-pair,
-  .dash-balance-pair {
-    grid-template-columns: 1fr 1fr !important;
+  /* Flatten section wrappers so all cards become direct flex children */
+  .dash-left-section,
+  .dash-right-col {
+    display: contents !important;
   }
+
+  /* Reorder cards */
+  .dash-inbox        { order: 1; width: 100%; }
+  .dash-next-pair    { order: 2; display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 12px !important; width: 100%; }
+  .dash-balance-pair { order: 3; display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 12px !important; flex-direction: unset !important; width: 100%; }
+  .dash-how-month    { order: 4; width: 100%; }
+  .dash-upcoming     { order: 5; width: 100%; }
+  .dash-loans-time   { order: 6; width: 100%; }
+  .dash-active-loans { order: 7; width: 100%; }
+  .dash-recent       { order: 8; width: 100%; }
 
   /* Footer: center everything */
   .dashboard-footer {
@@ -425,5 +414,23 @@ input[type="date"] {
     flex-direction: column !important;
     align-items: center !important;
     gap: 6px !important;
+  }
+}
+
+/* Small mobile: collapse paired cards to single column */
+@media (max-width: 600px) {
+  .dashboard-content-wrap {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  .dashboard-grey-box {
+    border-radius: 12px !important;
+    padding: 10px !important;
+  }
+
+  .dash-next-pair,
+  .dash-balance-pair {
+    grid-template-columns: 1fr !important;
   }
 }
