@@ -122,7 +122,7 @@ export default function DashboardSidebar({ activePage = "Dashboard", user, tabs,
         fontFamily: "'DM Sans', sans-serif",
       }}>
         {/* Three-section layout: Logo | Glass Nav | Icons */}
-        <div style={{ maxWidth: 1200, margin: '0 auto', pointerEvents: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto', pointerEvents: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 
           {/* Left: Vony wordmark — outside the glass pill */}
           <Link to="/" style={{
