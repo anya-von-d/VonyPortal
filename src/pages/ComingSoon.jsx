@@ -4,6 +4,57 @@ import {
   BookOpen, Scale, Heart, Receipt, Brain, Landmark,
   ChevronRight, Lock
 } from "lucide-react";
+
+const LEARN_CATEGORIES = [
+  { id: 'lending', label: 'Lending with Friends' },
+  { id: 'basics', label: 'The Basics' },
+  { id: 'saving', label: 'Saving & Budgeting' },
+  { id: 'traditional', label: 'Traditional Loans' },
+  { id: 'debt', label: 'Managing Debt' },
+];
+
+const LEARN_ARTICLES = {
+  lending: [
+    { title: 'How to Lend Money Without Damaging a Relationship', body: 'Setting expectations, using agreements, and protecting the friendship above all else.' },
+    { title: 'Tax implications of peer lending', body: 'What the IRS expects when you lend or borrow over $10k, how gift rules apply, and when interest income matters.' },
+    { title: 'Setting Fair Loan Terms Between Friends', body: 'How to agree on interest, timelines, and what happens if things go sideways.' },
+    { title: "What to Do When a Friend Can't Pay You Back", body: 'Practical steps for having the conversation without burning the bridge.' },
+    { title: 'The Case for a Written Agreement', body: 'Why putting it in writing protects both sides, and what to include.' },
+    { title: 'How to Ask to Borrow Money Gracefully', body: 'Framing the ask, being specific, and making it easy for the other person to say yes or no.' },
+  ],
+  basics: [
+    { title: 'What Is Interest, and How Does It Work?', body: 'A plain-language breakdown of how lenders make money and what it means for you.' },
+    { title: "Gross vs. Net Income: What's the Difference?", body: 'Understanding what you actually take home, and why it matters for budgeting.' },
+    { title: 'How to Read a Bank Statement', body: 'Demystifying the numbers, codes, and fees hiding in your monthly statement.' },
+    { title: 'What Is a Credit Score?', body: 'How your score is calculated, what affects it, and why it matters.' },
+    { title: 'APR vs. Interest Rate: Which One Should You Care About?', body: 'The often-confused pair that determines how much a loan truly costs.' },
+    { title: 'How Compound Interest Can Work For (or Against) You', body: 'The eighth wonder of the world, and how to make it your ally.' },
+  ],
+  saving: [
+    { title: 'The 50/30/20 Rule, Explained', body: 'A simple framework for splitting your income into needs, wants, and savings.' },
+    { title: 'Building an Emergency Fund from Scratch', body: 'How to start saving when money is tight, and why 3–6 months of expenses is the target.' },
+    { title: 'The Psychology of Saving', body: 'Why saving feels hard even when we know we should, and how to rewire that instinct.' },
+    { title: 'High-Yield Savings Accounts, Explained', body: 'What they are, how they work, and whether you should move your money there.' },
+    { title: 'Setting Financial Goals That Actually Stick', body: 'How to make goals specific, time-bound, and woven into your everyday habits.' },
+    { title: 'Zero-Based Budgeting: Give Every Dollar a Job', body: 'A method that assigns a purpose to every dollar before the month begins.' },
+  ],
+  traditional: [
+    { title: 'How Personal Loans Work', body: 'What banks look for, how repayment schedules are structured, and what to watch out for.' },
+    { title: 'What Happens When You Miss a Loan Payment?', body: 'Late fees, credit impact, and how to communicate with your lender before things escalate.' },
+    { title: 'Secured vs. Unsecured Loans: What\'s the Risk?', body: 'Why collateral changes everything, and when each type makes sense.' },
+    { title: 'How Banks Calculate Loan Eligibility', body: 'The debt-to-income ratios, credit checks, and underwriting criteria that determine your approval.' },
+    { title: 'The True Cost of a Payday Loan', body: 'Short-term convenience, long-term trap. The math behind one of the most expensive products in finance.' },
+    { title: 'Understanding Your Credit Report', body: 'How to read it, dispute errors, and use it to your advantage.' },
+  ],
+  debt: [
+    { title: 'Debt Snowball vs. Debt Avalanche: Which Is Right for You?', body: 'Two proven strategies for paying off debt, and how to pick the one that fits your mindset.' },
+    { title: 'How to Prioritise Which Debt to Pay First', body: 'Interest rates, balances, and psychological factors: how to rank what you owe.' },
+    { title: 'When Does Debt Consolidation Make Sense?', body: 'Combining multiple debts into one. The benefits, the risks, and who it\'s right for.' },
+    { title: 'Understanding Your Debt-to-Income Ratio', body: 'The metric lenders use to size you up, and how to improve it over time.' },
+    { title: 'Negotiating with Creditors: What You Can Actually Do', body: 'Settlement offers, hardship plans, and scripts for having uncomfortable conversations.' },
+    { title: 'How Debt Affects Your Credit Score Over Time', body: 'The relationship between what you owe and how lenders perceive your risk.' },
+  ],
+};
 import { motion } from "framer-motion";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import { useAuth } from "@/lib/AuthContext";
@@ -119,6 +170,7 @@ export default function ComingSoon() {
   const { user: authUser, userProfile } = useAuth();
   const user = userProfile ? { ...userProfile, id: authUser?.id } : null;
   const [activeTab, setActiveTab] = useState('shop');
+  const [learnCategory, setLearnCategory] = useState('lending');
 
   return (
     <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', paddingTop: 88, background: 'transparent' }}>
@@ -220,54 +272,56 @@ export default function ComingSoon() {
             {/* ═══ Learn Tab ═══ */}
             {activeTab === 'learn' && (
               <div>
-                {/* Intro card */}
-                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="glass-card"
-                  style={{ padding: '24px 28px', marginBottom: 20 }}
-                >
-                  <span style={{ fontSize: 11, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 500, fontFamily: "'IBM Plex Mono', monospace" }}>
-                    Guides & Resources
-                  </span>
-                  <p style={{ fontSize: 14, color: '#5C5B5A', margin: '10px 0 0', lineHeight: 1.6 }}>
-                    Practical advice for lending and borrowing between friends: from setting terms to navigating tough conversations.
-                  </p>
-                </motion.div>
+                {/* Category bar */}
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 32 }}>
+                  <div style={{ display: 'inline-flex', gap: 2, background: 'rgba(255,255,255,0.5)', borderRadius: 14, padding: 4, border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                    {LEARN_CATEGORIES.map(cat => (
+                      <button
+                        key={cat.id}
+                        onClick={() => setLearnCategory(cat.id)}
+                        style={{
+                          padding: '8px 18px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                          fontSize: 13, fontFamily: "'DM Sans', sans-serif",
+                          fontWeight: learnCategory === cat.id ? 700 : 400,
+                          color: learnCategory === cat.id ? '#1A1918' : '#5C5B5A',
+                          background: learnCategory === cat.id ? 'white' : 'transparent',
+                          boxShadow: learnCategory === cat.id ? '0 1px 6px rgba(0,0,0,0.1)' : 'none',
+                          transition: 'all 0.15s',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-                {/* Guides list */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {guides.map((guide, index) => (
+                {/* Articles grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+                  {(LEARN_ARTICLES[learnCategory] || []).map((article, index) => (
                     <motion.div
-                      key={guide.title}
-                      initial={{ opacity: 0, y: 16 }}
+                      key={article.title}
+                      initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.06 + index * 0.06 }}
-                      className="glass-card"
-                      style={{ padding: '22px 26px', cursor: 'default' }}
+                      transition={{ delay: index * 0.05 }}
+                      style={{
+                        background: 'white', borderRadius: 18, padding: '24px 22px',
+                        boxShadow: '0 2px 12px rgba(0,0,0,0.06)', cursor: 'default',
+                        border: '1px solid rgba(0,0,0,0.05)',
+                      }}
                     >
-                      <div style={{ gap: 16 }}>
-                        <div style={{ width: 40, height: 40, borderRadius: 12, background: `${guide.color}14`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
-                          <guide.icon size={20} style={{ color: guide.color }} />
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 6 }}>
-                            <span style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.07em', textTransform: 'uppercase' }}>{guide.title}</span>
-                            <span style={{ fontSize: 10, color: '#787776', fontFamily: "'IBM Plex Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.08em', flexShrink: 0 }}>{guide.readTime}</span>
-                          </div>
-                          <p style={{ fontSize: 13, color: '#5C5B5A', lineHeight: 1.55, margin: '0 0 12px' }}>
-                            {guide.description}
-                          </p>
-                          <div style={{
-                            display: 'inline-flex', alignItems: 'center', gap: 6,
-                            padding: '7px 14px', borderRadius: 10,
-                            background: 'rgba(0,0,0,0.03)', fontSize: 11, fontWeight: 600,
-                            color: '#787776', fontFamily: "'DM Sans', sans-serif",
-                          }}>
-                            <Lock size={12} />
-                            Coming Soon
-                          </div>
-                        </div>
+                      <div style={{
+                        display: 'inline-block', fontSize: 10, fontWeight: 600, color: '#9B9A98',
+                        textTransform: 'uppercase', letterSpacing: '0.1em',
+                        background: 'rgba(0,0,0,0.05)', borderRadius: 6, padding: '3px 8px', marginBottom: 14,
+                      }}>
+                        Coming Soon
+                      </div>
+                      <div style={{ fontSize: 16, fontWeight: 700, color: '#1A1918', lineHeight: 1.35, marginBottom: 12 }}>
+                        {article.title}
+                      </div>
+                      <div style={{ fontSize: 13, color: '#787776', lineHeight: 1.6 }}>
+                        {article.body}
                       </div>
                     </motion.div>
                   ))}
