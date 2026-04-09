@@ -55,6 +55,7 @@ export default function YourLoans() {
   const [showEditLoanModal, setShowEditLoanModal] = useState(false);
   const [editLoanData, setEditLoanData] = useState(null);
   const [reminderSlide, setReminderSlide] = useState(0);
+  const [infoTooltip, setInfoTooltip] = useState(null);
 
   useEffect(() => { loadData(); }, []);
 
@@ -1067,19 +1068,28 @@ export default function YourLoans() {
                 if (ag?.cancelled_date) activities.push({ timestamp: new Date(ag.cancelled_date), type: 'cancellation', description: 'Loan was cancelled' });
                 if (manageLoanSelected.status === 'completed') activities.push({ timestamp: new Date(), type: 'completion', description: 'Loan repaid in full' });
                 activities.sort((a, b) => a.timestamp - b.timestamp);
-                const getIcon = (type) => {
-                  const strokeColor = type === 'cancellation' ? '#E8726E' : '#82F0B9';
-                  const paths = { created: 'M12 4v16m8-8H4', signature: 'M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z', payment: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1', cancellation: 'M6 18L18 6M6 6l12 12', completion: 'M5 13l4 4L19 7' };
-                  return <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke={strokeColor} strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d={paths[type] || ''} /></svg>;
+                const activityIconConfig = {
+                  created:      { bg: 'rgba(3,172,234,0.12)',   stroke: '#03ACEA',  path: 'M12 4v16m8-8H4' },
+                  signature:    { bg: 'rgba(124,58,237,0.12)',  stroke: '#7C3AED',  path: 'M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z' },
+                  payment:      { bg: 'rgba(22,163,74,0.12)',   stroke: '#16A34A',  path: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1' },
+                  cancellation: { bg: 'rgba(232,114,110,0.12)', stroke: '#E8726E',  path: 'M6 18L18 6M6 6l12 12' },
+                  completion:   { bg: 'rgba(22,163,74,0.12)',   stroke: '#16A34A',  path: 'M5 13l4 4L19 7' },
                 };
-                const getDotColor = (type) => type === 'cancellation' ? 'bg-red-50 border-[#E8726E]' : 'bg-blue-50 border-[#82F0B9]';
+                const getIcon = (type) => {
+                  const cfg = activityIconConfig[type] || activityIconConfig.created;
+                  return <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke={cfg.stroke} strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d={cfg.path} /></svg>;
+                };
+                const getDotStyle = (type) => {
+                  const cfg = activityIconConfig[type] || activityIconConfig.created;
+                  return { width: 23, height: 23, borderRadius: 6, background: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, zIndex: 10, marginTop: 2 };
+                };
                 if (activities.length === 0) return <p style={{ fontSize: 11, color: '#C7C6C4' }}>No activity recorded yet.</p>;
                 return (
                   <div className="space-y-0 max-h-[200px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
                     {activities.map((activity, idx) => (
                       <div key={idx} className="flex items-start gap-2.5 relative">
                         {idx < activities.length - 1 && <div className="absolute left-[11px] top-[22px] w-[1px]" style={{ height: 'calc(100% - 6px)', background: 'rgba(84,166,207,0.2)' }} />}
-                        <div className={`w-[23px] h-[23px] rounded-full border-[1.5px] ${getDotColor(activity.type)} flex items-center justify-center flex-shrink-0 z-10 mt-1`}>{getIcon(activity.type)}</div>
+                        <div style={getDotStyle(activity.type)}>{getIcon(activity.type)}</div>
                         <div className="flex-1 min-w-0 pb-3">
                           <div className="flex items-center gap-2 flex-wrap">
                             <p style={{ fontSize: 11, color: '#1A1918', lineHeight: 1.4 }}>{activity.description}</p>
@@ -1129,27 +1139,57 @@ export default function YourLoans() {
                   </div>
                 </PageCard>
 
-                {/* Document Icons */}
-                <div style={{ display: 'flex', justifyContent: 'center', gap: 20, padding: '4px 0' }}>
-                  <button onClick={() => { const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id); if (agreement) openDocPopup('promissory', agreement); }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', background: 'none', border: 'none' }}>
-                    <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(84,166,207,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#54A6CF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
-                    <p style={{ fontSize: 10, fontWeight: 600, color: '#1A1918', textAlign: 'center', lineHeight: 1.3 }}>Promissory<br/>Note</p>
-                  </button>
-                  <button onClick={() => { const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id); if (agreement) openDocPopup('amortization', agreement); }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', background: 'none', border: 'none' }}>
-                    <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(84,166,207,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#54A6CF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
-                    <p style={{ fontSize: 10, fontWeight: 600, color: '#1A1918', textAlign: 'center', lineHeight: 1.3 }}>Amortization<br/>Schedule</p>
-                  </button>
-                  <button onClick={() => { const agreement = loanAgreements.find(a => a.loan_id === manageLoanSelected.id); if (agreement) openDocPopup('summary', agreement); }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', background: 'none', border: 'none' }}>
-                    <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(84,166,207,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#54A6CF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
-                    <p style={{ fontSize: 10, fontWeight: 600, color: '#1A1918', textAlign: 'center', lineHeight: 1.3 }}>Loan<br/>Summary</p>
-                  </button>
-                  <Link to={createPageUrl("RecordPayment")} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, textDecoration: 'none' }}>
-                    <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(84,166,207,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <DollarSign size={20} style={{ color: '#54A6CF' }} />
+                {/* Document Buttons */}
+                {(() => {
+                  const btnBase = { display: 'inline-flex', alignItems: 'center', gap: 6, background: '#1A1918', borderRadius: 9, padding: '7px 12px', border: 'none', cursor: 'pointer' };
+                  const btnLabel = { fontSize: 11, fontWeight: 600, color: 'white', margin: 0 };
+                  const infoBadge = { width: 15, height: 15, borderRadius: '50%', background: 'white', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 };
+                  const tooltipStyle = { position: 'absolute', top: 'calc(100% + 6px)', left: 0, background: 'white', borderRadius: 9, padding: '8px 11px', boxShadow: '0 4px 16px rgba(0,0,0,0.13)', width: 190, zIndex: 200, border: '1px solid rgba(0,0,0,0.07)' };
+                  return (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '4px 0' }}>
+                      {/* Promissory Note */}
+                      <div style={{ position: 'relative' }}>
+                        <div style={btnBase}>
+                          <button onClick={() => { const ag = loanAgreements.find(a => a.loan_id === manageLoanSelected.id); if (ag) openDocPopup('promissory', ag); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                            <p style={btnLabel}>Promissory Note</p>
+                          </button>
+                          <button onClick={(e) => { e.stopPropagation(); setInfoTooltip(infoTooltip === 'promissory' ? null : 'promissory'); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
+                            <span style={infoBadge}><span style={{ fontSize: 9, fontWeight: 800, color: '#1A1918', lineHeight: 1 }}>i</span></span>
+                          </button>
+                        </div>
+                        {infoTooltip === 'promissory' && (
+                          <div style={tooltipStyle}>
+                            <p style={{ fontSize: 11, color: '#1A1918', margin: 0, lineHeight: 1.55 }}>A signed legal document where the borrower promises to repay a specific amount under agreed terms.</p>
+                          </div>
+                        )}
+                      </div>
+                      {/* Amortization Schedule */}
+                      <div style={{ position: 'relative' }}>
+                        <div style={btnBase}>
+                          <button onClick={() => { const ag = loanAgreements.find(a => a.loan_id === manageLoanSelected.id); if (ag) openDocPopup('amortization', ag); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                            <p style={btnLabel}>Amortization Schedule</p>
+                          </button>
+                          <button onClick={(e) => { e.stopPropagation(); setInfoTooltip(infoTooltip === 'amortization' ? null : 'amortization'); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
+                            <span style={infoBadge}><span style={{ fontSize: 9, fontWeight: 800, color: '#1A1918', lineHeight: 1 }}>i</span></span>
+                          </button>
+                        </div>
+                        {infoTooltip === 'amortization' && (
+                          <div style={tooltipStyle}>
+                            <p style={{ fontSize: 11, color: '#1A1918', margin: 0, lineHeight: 1.55 }}>A table showing each scheduled payment broken down into principal and interest over the life of the loan.</p>
+                          </div>
+                        )}
+                      </div>
+                      {/* Loan Summary */}
+                      <button onClick={() => { const ag = loanAgreements.find(a => a.loan_id === manageLoanSelected.id); if (ag) openDocPopup('summary', ag); }} style={{ ...btnBase }}>
+                        <p style={btnLabel}>Loan Summary</p>
+                      </button>
+                      {/* Record Payment */}
+                      <Link to={createPageUrl("RecordPayment")} style={{ ...btnBase, textDecoration: 'none' }}>
+                        <p style={btnLabel}>Record Payment</p>
+                      </Link>
                     </div>
-                    <p style={{ fontSize: 10, fontWeight: 600, color: '#1A1918', textAlign: 'center', lineHeight: 1.3, margin: 0 }}>Record<br/>Payment</p>
-                  </Link>
-                </div>
+                  );
+                })()}
 
                 {/* Loan Progress Stats */}
                 <PageCard title="Loan Progress">
@@ -1198,13 +1238,13 @@ export default function YourLoans() {
                       return { number: pr.period, date: pr.date, amount: scheduledAmount, paidAmount, paidPercentage, status };
                     }) : [];
                     const statusConfig = {
-                      completed: { label: 'Completed', bg: 'rgba(130,240,185,0.1)', text: '#82F0B9', ringColor: '#82F0B9', fillColor: '#82F0B9' },
-                      in_progress: { label: 'In Progress', bg: 'rgba(130,240,185,0.1)', text: '#82F0B9', ringColor: '#82F0B9', fillColor: '#82F0B9' },
-                      partial: { label: 'Partial', bg: 'rgba(245,158,11,0.1)', text: '#F59E0B', ringColor: '#F59E0B', fillColor: '#F59E0B' },
-                      pending: { label: 'Pending', bg: 'rgba(245,158,11,0.1)', text: '#F59E0B', ringColor: '#F59E0B', fillColor: '#F59E0B' },
-                      missed: { label: 'Missed', bg: 'rgba(232,114,110,0.1)', text: '#E8726E', ringColor: '#E8726E', fillColor: '#E8726E' },
-                      record: { label: 'Record Payment', bg: '#82F0B9', text: 'white', ringColor: '#82F0B9', fillColor: '#82F0B9' },
-                      upcoming: { label: 'Upcoming', bg: 'rgba(0,0,0,0.03)', text: '#787776', ringColor: 'rgba(130,240,185,0.3)', fillColor: 'rgba(130,240,185,0.3)' },
+                      completed:   { label: 'Completed',      bg: 'rgba(22,163,74,0.1)',   text: '#16A34A', ringColor: '#16A34A', fillColor: '#16A34A' },
+                      in_progress: { label: 'In Progress',    bg: 'rgba(3,172,234,0.1)',   text: '#03ACEA', ringColor: '#03ACEA', fillColor: '#03ACEA' },
+                      partial:     { label: 'Partial',        bg: 'rgba(245,158,11,0.1)', text: '#F59E0B', ringColor: '#F59E0B', fillColor: '#F59E0B' },
+                      pending:     { label: 'Pending',        bg: 'rgba(245,158,11,0.1)', text: '#F59E0B', ringColor: '#F59E0B', fillColor: '#F59E0B' },
+                      missed:      { label: 'Missed',         bg: 'rgba(232,114,110,0.1)', text: '#E8726E', ringColor: '#E8726E', fillColor: '#E8726E' },
+                      record:      { label: 'Record Payment', bg: '#1A1918',               text: 'white',   ringColor: '#1A1918', fillColor: '#1A1918' },
+                      upcoming:    { label: 'Upcoming',       bg: 'rgba(0,0,0,0.03)',      text: '#787776', ringColor: 'rgba(0,0,0,0.12)', fillColor: 'rgba(0,0,0,0.08)' },
                     };
                     const PieCircle = ({ percentage, ringColor, fillColor, number, size = 32 }) => {
                       const r = (size / 2) - 2; const pcx = size / 2; const pcy = size / 2;
