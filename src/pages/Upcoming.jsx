@@ -451,7 +451,7 @@ export default function Upcoming() {
               <div style={{ height: 6, borderRadius: 3, background: 'rgba(3,172,234,0.1)', overflow: 'hidden' }}>
                 <div style={{ height: '100%', borderRadius: 3, background: '#03ACEA', width: `${monthlyExpectedReceive > 0 ? Math.min((monthlyReceived / monthlyExpectedReceive) * 100, 100) : 0}%`, transition: 'width 0.8s ease-out' }} />
               </div>
-              <div style={{ fontSize: 11, color: '#C5C3C0', marginTop: 4 }}>of {formatMoney(monthlyExpectedReceive)} expected</div>
+              <div style={{ fontSize: 11, color: '#787776', marginTop: 3 }}>of {formatMoney(monthlyExpectedReceive)} expected</div>
             </div>
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
@@ -461,13 +461,13 @@ export default function Upcoming() {
               <div style={{ height: 6, borderRadius: 3, background: 'rgba(29,91,148,0.1)', overflow: 'hidden' }}>
                 <div style={{ height: '100%', borderRadius: 3, background: '#1D5B94', width: `${monthlyExpectedPay > 0 ? Math.min((monthlyPaidOut / monthlyExpectedPay) * 100, 100) : 0}%`, transition: 'width 0.8s ease-out' }} />
               </div>
-              <div style={{ fontSize: 11, color: '#C5C3C0', marginTop: 4 }}>of {formatMoney(monthlyExpectedPay)} expected</div>
+              <div style={{ fontSize: 11, color: '#787776', marginTop: 3 }}>of {formatMoney(monthlyExpectedPay)} expected</div>
             </div>
           </RightSection>
 
           {myLoans.filter(l => l && l.status === 'active').length > 0 && (
             <RightSection title="Active Loans">
-              <div ref={activeLoansRef} style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
+              <div ref={activeLoansRef} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 {myLoans.filter(l => l && l.status === 'active').slice(0, 5).map((loan, idx) => {
                   const isLender = loan.lender_id === user.id;
                   const otherProfile = safeProfiles.find(p => p.user_id === (isLender ? loan.borrower_id : loan.lender_id));
@@ -479,14 +479,14 @@ export default function Upcoming() {
                   const headerText = isLender ? `You lent ${name} ${formatMoney(totalAmt)}${purpose}` : `${name} lent you ${formatMoney(totalAmt)}${purpose}`;
                   return (
                     <div key={loan.id}>
-                      <div style={{ fontSize: 12, color: '#1A1918', fontWeight: 500, marginBottom: 8, lineHeight: 1.4 }}>{headerText}</div>
+                      <div style={{ fontSize: 12, color: '#1A1918', fontWeight: 500, marginBottom: 4, lineHeight: 1.4 }}>{headerText}</div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <div style={{ flex: 1, height: 6, borderRadius: 3, background: isLender ? 'rgba(3,172,234,0.1)' : 'rgba(29,91,148,0.1)', overflow: 'hidden' }}>
                           <div key={`al-${idx}-${activeAnimKey}`} style={{ height: '100%', borderRadius: 3, background: isLender ? '#03ACEA' : '#1D5B94', width: `${pct}%`, animation: `barGrowRight 0.8s ease-out ${idx * 0.08}s both` }} />
                         </div>
                         <span style={{ fontSize: 11, fontWeight: 700, color: '#9B9A98', flexShrink: 0 }}>{pct}%</span>
                       </div>
-                      <div style={{ fontSize: 11, color: '#C5C3C0', marginTop: 5 }}>{formatMoney(paidAmt)} of {formatMoney(totalAmt)} {isLender ? 'paid back' : 'repaid'}</div>
+                      <div style={{ fontSize: 11, color: '#787776', marginTop: 3 }}>{formatMoney(paidAmt)} of {formatMoney(totalAmt)} {isLender ? 'paid back' : 'repaid'}</div>
                     </div>
                   );
                 })}

@@ -1005,15 +1005,15 @@ export default function Home() {
               <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98' }}>No recent activity yet.</div>
             ) : recentActivity.map((item, idx) => (
               <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0' }}>
-                <div style={{ width: 28, height: 28, borderRadius: 7, background: `${item.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div style={{ width: 22, height: 22, borderRadius: 6, background: `${item.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   {item.icon === 'send' ? (
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="2.5" strokeLinecap="round"><polyline points="7 13 12 18 17 13"/><line x1="12" y1="18" x2="12" y2="6"/></svg>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="2.5" strokeLinecap="round"><polyline points="7 13 12 18 17 13"/><line x1="12" y1="18" x2="12" y2="6"/></svg>
                   ) : item.icon === 'receive' ? (
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="2.5" strokeLinecap="round"><polyline points="17 11 12 6 7 11"/><line x1="12" y1="6" x2="12" y2="18"/></svg>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="2.5" strokeLinecap="round"><polyline points="17 11 12 6 7 11"/><line x1="12" y1="6" x2="12" y2="18"/></svg>
                   ) : item.icon === 'check' ? (
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                   ) : (
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                   )}
                 </div>
                 <div style={{ flex: 1, minWidth: 0, fontSize: 13, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.description}</div>
@@ -1029,7 +1029,7 @@ export default function Home() {
                 <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Active Loans</span>
                 <Link to={createPageUrl("YourLoans")} style={{ fontSize: 11, fontWeight: 500, color: '#9B9A98', textDecoration: 'none' }}>View all →</Link>
               </div>
-              <div ref={activeLoansRef} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              <div ref={activeLoansRef} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {myLoans.filter(l => l && l.status === 'active').slice(0, 5).map((loan, idx) => {
                   const isLender = loan.lender_id === user.id;
                   const otherProfile = safeAllProfiles.find(p => p.user_id === (isLender ? loan.borrower_id : loan.lender_id));
@@ -1041,16 +1041,26 @@ export default function Home() {
                   const headerText = isLender
                     ? `You lent ${name} ${formatMoney(totalAmt)}${purpose}`
                     : `${name} lent you ${formatMoney(totalAmt)}${purpose}`;
+                  const initial = (otherProfile?.full_name || otherProfile?.username || 'U').charAt(0).toUpperCase();
                   return (
-                    <div key={loan.id} style={{ padding: '10px 0' }}>
-                      <div style={{ fontSize: 13, color: '#1A1918', fontWeight: 500, marginBottom: 8, lineHeight: 1.4 }}>{headerText}</div>
+                    <div key={loan.id} style={{ padding: '8px 0' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                        <div style={{ width: 20, height: 20, borderRadius: '50%', flexShrink: 0, overflow: 'hidden', background: 'rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {otherProfile?.profile_picture_url ? (
+                            <img src={otherProfile.profile_picture_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          ) : (
+                            <span style={{ fontSize: 9, fontWeight: 700, color: '#787776' }}>{initial}</span>
+                          )}
+                        </div>
+                        <div style={{ fontSize: 13, color: '#1A1918', fontWeight: 500, lineHeight: 1.4 }}>{headerText}</div>
+                      </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <div style={{ flex: 1, height: 6, borderRadius: 3, background: isLender ? 'rgba(3,172,234,0.1)' : 'rgba(29,91,148,0.1)', overflow: 'hidden' }}>
                           <div key={`al-${idx}-${activeAnimKey}`} style={{ height: '100%', borderRadius: 3, background: isLender ? '#03ACEA' : '#1D5B94', width: `${pct}%`, animation: `barGrowRight 0.8s ease-out ${idx * 0.08}s both` }} />
                         </div>
                         <span style={{ fontSize: 11, fontWeight: 700, color: '#9B9A98', flexShrink: 0 }}>{pct}%</span>
                       </div>
-                      <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 5 }}>{formatMoney(paidAmt)} of {formatMoney(totalAmt)} {isLender ? 'paid back' : 'repaid'}</div>
+                      <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 3 }}>{formatMoney(paidAmt)} of {formatMoney(totalAmt)} {isLender ? 'paid back' : 'repaid'}</div>
                     </div>
                   );
                 })}
@@ -1084,16 +1094,84 @@ export default function Home() {
             {/* Notifications */}
             <RightSection title="Notifications">
               {notifCount > 0 ? (
-                <Link to={createPageUrl("Requests")} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderRadius: 10, background: 'rgba(3,172,234,0.05)', border: '1px solid rgba(3,172,234,0.10)', textDecoration: 'none' }}>
-                  <div style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(3,172,234,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2" strokeLinecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>{notifCount} new</div>
-                    <div style={{ fontSize: 11, color: '#9B9A98' }}>Tap to review</div>
-                  </div>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C5C3C0" strokeWidth="2" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-                </Link>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {paymentsToConfirm.map(p => {
+                    const loan = myLoans.find(l => l.id === p.loan_id);
+                    const recorder = safeAllProfiles.find(pr => pr.user_id === p.recorded_by);
+                    const name = recorder?.full_name?.split(' ')[0] || recorder?.username || 'User';
+                    return (
+                      <Link key={p.id} to={createPageUrl("Requests")} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', textDecoration: 'none' }}>
+                        <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(3,172,234,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
+                          {recorder?.profile_picture_url ? <img src={recorder.profile_picture_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 10, fontWeight: 700, color: '#03ACEA' }}>{(recorder?.full_name || 'U').charAt(0)}</span>}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name} recorded a ${(p.amount || 0).toFixed(2)} payment</div>
+                          <div style={{ fontSize: 11, color: '#9B9A98' }}>Awaiting your confirmation</div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                  {pendingOffers.map(loan => {
+                    const lender = safeAllProfiles.find(pr => pr.user_id === loan.lender_id);
+                    const name = lender?.full_name?.split(' ')[0] || lender?.username || 'User';
+                    return (
+                      <Link key={loan.id} to={createPageUrl("Requests")} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', textDecoration: 'none' }}>
+                        <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(124,58,237,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
+                          {lender?.profile_picture_url ? <img src={lender.profile_picture_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 10, fontWeight: 700, color: '#7C3AED' }}>{(lender?.full_name || 'U').charAt(0)}</span>}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Loan offer from {name} · ${(loan.amount || 0).toLocaleString()}</div>
+                          <div style={{ fontSize: 11, color: '#9B9A98' }}>Review & accept</div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                  {friendRequestsInbox.map(f => {
+                    const sender = safeAllProfiles.find(pr => pr.user_id === f.user_id);
+                    const name = sender?.full_name?.split(' ')[0] || sender?.username || 'User';
+                    return (
+                      <Link key={f.id} to={createPageUrl("Requests")} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', textDecoration: 'none' }}>
+                        <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(82,183,136,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
+                          {sender?.profile_picture_url ? <img src={sender.profile_picture_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 10, fontWeight: 700, color: '#52B788' }}>{(sender?.full_name || 'U').charAt(0)}</span>}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Friend request from {name}</div>
+                          <div style={{ fontSize: 11, color: '#9B9A98' }}>Accept or decline</div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                  {termChanges.map(loan => {
+                    const lender = safeAllProfiles.find(pr => pr.user_id === loan.lender_id);
+                    const name = lender?.full_name?.split(' ')[0] || lender?.username || 'User';
+                    return (
+                      <Link key={`tc-${loan.id}`} to={createPageUrl("Requests")} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', textDecoration: 'none' }}>
+                        <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(245,158,11,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <span style={{ fontSize: 10, fontWeight: 700, color: '#F59E0B' }}>!</span>
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Term change from {name}</div>
+                          <div style={{ fontSize: 11, color: '#9B9A98' }}>Review changes</div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                  {extensionRequests.map(loan => {
+                    const requester = safeAllProfiles.find(pr => pr.user_id === loan.extension_requested_by);
+                    const name = requester?.full_name?.split(' ')[0] || requester?.username || 'User';
+                    return (
+                      <Link key={`ext-${loan.id}`} to={createPageUrl("Requests")} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', textDecoration: 'none' }}>
+                        <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(245,158,11,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Extension request from {name}</div>
+                          <div style={{ fontSize: 11, color: '#9B9A98' }}>Review request</div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
               ) : (
                 <div style={{ fontSize: 13, color: '#9B9A98' }}>You're all caught up</div>
               )}
