@@ -1011,14 +1011,10 @@ export default function YourLoans() {
                       <p style={{ fontSize: 10, color: '#787776', margin: 0 }}>$0</p>
                     </div>
                     <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', position: 'relative', height: '100%' }}>
-                      {plannedPaymentAmount > 0 && (
-                        <div style={{ position: 'absolute', left: 0, right: 0, borderTop: '2px dashed rgba(84,166,207,0.4)', zIndex: 10, bottom: `${(plannedPaymentAmount / maxChartVal) * 100}%` }}>
-                          <span style={{ position: 'absolute', top: -14, right: 0, fontSize: 10, fontWeight: 600, color: '#787776', background: 'rgba(255,255,255,0.88)', padding: '0 4px' }}>${plannedPaymentAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
-                        </div>
-                      )}
                       {chartData.map((d, i) => {
-                        const barHeight = maxChartVal > 0 ? (d.amount / maxChartVal) * chartHeight : 0;
-                        const scheduledBarHeight = maxChartVal > 0 && d.scheduledAmount ? (d.scheduledAmount / maxChartVal) * chartHeight : barHeight;
+                        const effectiveHeight = chartHeight - 14;
+                        const barHeight = maxChartVal > 0 ? (d.amount / maxChartVal) * effectiveHeight : 0;
+                        const scheduledBarHeight = maxChartVal > 0 && d.scheduledAmount ? (d.scheduledAmount / maxChartVal) * effectiveHeight : barHeight;
                         const isFullPmt = d.isPaid && d.isFullPayment;
                         const isPartialPmt = d.isPaid && !d.isFullPayment && !d.hasPendingOnly;
                         const isPendingOnly = d.hasPendingOnly;
@@ -1035,12 +1031,12 @@ export default function YourLoans() {
                                 <div style={{
                                   borderRadius: '4px 4px 0 0', transition: 'all 0.3s',
                                   height: Math.max(barHeight, d.amount > 0 ? 4 : 2), width: 14,
-                                  background: d.isProjected ? 'rgba(176,220,244,0.35)' : d.isMissed ? 'rgba(232,114,110,0.3)' : d.amount === 0 ? '#E5E4E2' : isPendingOnly ? 'rgba(0,0,0,0.1)' : isFullPmt ? '#03ACEA' : isPartialPmt ? 'rgba(245,158,11,0.6)' : 'rgba(3,172,234,0.25)',
-                                  border: d.isProjected ? '1px dashed #B0DCF4' : d.isMissed ? '1px dashed rgba(232,114,110,0.5)' : isPendingOnly ? '1px dashed rgba(0,0,0,0.15)' : 'none',
+                                  background: d.isProjected ? 'rgba(84,166,207,0.28)' : d.isMissed ? 'rgba(232,114,110,0.3)' : d.amount === 0 ? '#E5E4E2' : isPendingOnly ? 'rgba(0,0,0,0.1)' : isFullPmt ? '#03ACEA' : isPartialPmt ? 'rgba(245,158,11,0.6)' : 'rgba(3,172,234,0.25)',
+                                  border: d.isProjected ? '1px dashed rgba(84,166,207,0.5)' : d.isMissed ? '1px dashed rgba(232,114,110,0.5)' : isPendingOnly ? '1px dashed rgba(0,0,0,0.15)' : 'none',
                                 }} title={`${d.label}: $${d.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}${d.isProjected ? ' (expected)' : d.isMissed ? ' (missed)' : isPendingOnly ? ' (pending)' : isPartialPmt ? ' (partial)' : ''}`} />
                               )}
                             </div>
-                            <p style={{ fontSize: 10, marginTop: 4, lineHeight: 1, margin: 0, color: isInProgress ? '#03ACEA' : d.isProjected ? '#B0DCF4' : d.isMissed ? '#E8726E' : isPendingOnly ? '#9B9A98' : '#787776' }}>{d.label}</p>
+                            <p style={{ fontSize: 10, marginTop: 4, lineHeight: 1, margin: 0, color: isInProgress ? '#03ACEA' : d.isProjected ? '#54A6CF' : d.isMissed ? '#E8726E' : isPendingOnly ? '#9B9A98' : '#4B4A48' }}>{d.label}</p>
                           </div>
                         );
                       })}
@@ -1049,7 +1045,7 @@ export default function YourLoans() {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 8, paddingTop: 8, borderTop: '1px solid rgba(0,0,0,0.06)', flexWrap: 'wrap' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><div style={{ width: 10, height: 10, borderRadius: 2, background: '#03ACEA' }} /><span style={{ fontSize: 9, color: '#787776' }}>Completed</span></div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><div style={{ width: 10, height: 10, borderRadius: 2, background: 'rgba(0,0,0,0.1)', border: '1px dashed rgba(0,0,0,0.15)' }} /><span style={{ fontSize: 9, color: '#9B9A98' }}>Pending</span></div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><div style={{ width: 10, height: 10, borderRadius: 2, background: 'rgba(176,220,244,0.35)', border: '1px dashed #B0DCF4' }} /><span style={{ fontSize: 9, color: '#B0DCF4' }}>Expected</span></div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><div style={{ width: 10, height: 10, borderRadius: 2, background: 'rgba(84,166,207,0.28)', border: '1px dashed rgba(84,166,207,0.5)' }} /><span style={{ fontSize: 9, color: '#54A6CF' }}>Expected</span></div>
                   </div>
                 </div>
               )}
@@ -1277,8 +1273,14 @@ export default function YourLoans() {
                             <div key={row.number} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 8, borderRadius: 10, background: 'rgba(0,0,0,0.03)' }}>
                               <PieCircle percentage={row.paidPercentage} number={row.number} />
                               <div style={{ flex: 1, minWidth: 0 }}>
-                                <p style={{ fontSize: 11, color: '#4B4A48', margin: 0, fontWeight: 600 }}>Expected: ${row.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                                {row.paidAmount > 0 && <p style={{ fontSize: 12, fontWeight: 700, color: '#15803D', margin: '1px 0 0' }}>Paid: ${row.paidAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>}
+                                <p style={{ fontSize: 11, color: '#4B4A48', margin: 0, fontWeight: 600 }}>Amount Due for Payment {row.number}: ${row.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                                {row.status === 'partial' && row.paidAmount > 0 && (
+                                  <>
+                                    <p style={{ fontSize: 12, fontWeight: 700, color: '#15803D', margin: '1px 0 0' }}>Paid: ${row.paidAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                                    <p style={{ fontSize: 11, fontWeight: 600, color: '#E8726E', margin: '1px 0 0' }}>Remaining: ${Math.max(0, row.amount - row.paidAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                                  </>
+                                )}
+                                {row.status !== 'partial' && row.paidAmount > 0 && <p style={{ fontSize: 12, fontWeight: 700, color: '#15803D', margin: '1px 0 0' }}>Paid: ${row.paidAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>}
                                 <p style={{ fontSize: 10, color: '#C7C6C4', margin: '1px 0 0' }}>{format(row.date, 'MMM d, yyyy')}</p>
                               </div>
                               <span style={{ flexShrink: 0, padding: '4px 10px', borderRadius: 8, fontSize: 10, fontWeight: 600, background: cfg.bg, color: cfg.text }}>{cfg.label}</span>
