@@ -859,8 +859,7 @@ export default function YourLoans() {
           } else if (pr.isPast) {
             chartData.push({ label: `P${i + 1}`, amount: 0, scheduledAmount: scheduledAmt, isPaid: false, isProjected: false, isMissed: true });
           } else {
-            const projectedAmount = i > 0 && loanAnalysis.periodResults[i - 1].deficit > 0 ? recalculatedPayment + loanAnalysis.periodResults[i - 1].deficit : recalculatedPayment;
-            chartData.push({ label: `P${i + 1}`, amount: projectedAmount, scheduledAmount: scheduledAmt, isPaid: false, isProjected: true });
+            chartData.push({ label: `P${i + 1}`, amount: scheduledAmt, scheduledAmount: scheduledAmt, isPaid: false, isProjected: true });
           }
         });
       }
@@ -973,13 +972,6 @@ export default function YourLoans() {
               );
             })()}
 
-            {/* Record Payment */}
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '0 0 4px' }}>
-              <Link to={createPageUrl("RecordPayment")} style={{ display: 'inline-flex', alignItems: 'center', background: '#1A1918', borderRadius: 9, padding: '7px 12px', textDecoration: 'none' }}>
-                <p style={{ fontSize: 11, fontWeight: 600, color: 'white', margin: 0 }}>Record Payment</p>
-              </Link>
-            </div>
-
             {/* Payment History Chart */}
             <PageCard title="Payment History">
               <div style={{ padding: '10px 14px 14px' }}>
@@ -1041,6 +1033,13 @@ export default function YourLoans() {
               </div>
             </PageCard>
 
+            {/* Record Payment */}
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '0 0 4px' }}>
+              <Link to={createPageUrl("RecordPayment")} style={{ display: 'inline-flex', alignItems: 'center', background: '#1A1918', borderRadius: 9, padding: '7px 12px', textDecoration: 'none' }}>
+                <p style={{ fontSize: 11, fontWeight: 600, color: 'white', margin: 0 }}>Record Payment</p>
+              </Link>
+            </div>
+
             {/* Activity Timeline */}
             {manageLoanSelected && (
             <PageCard title="Activity">
@@ -1086,7 +1085,7 @@ export default function YourLoans() {
                 };
                 const getDotStyle = (type) => {
                   const cfg = activityIconConfig[type] || activityIconConfig.created;
-                  return { width: 23, height: 23, borderRadius: 6, background: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, zIndex: 10, marginTop: 2 };
+                  return { width: 23, height: 23, borderRadius: 6, background: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, position: 'relative', zIndex: 10, marginTop: 2 };
                 };
                 if (activities.length === 0) return <p style={{ fontSize: 11, color: '#C7C6C4' }}>No activity recorded yet.</p>;
                 return (
@@ -1223,7 +1222,6 @@ export default function YourLoans() {
                   <div style={{ padding: '10px 14px 14px' }}>
                   {(() => {
                     const paymentAmt = manageLoanSelected.payment_amount || 0;
-                    let rolledOver = 0;
                     const paymentRows = loanAnalysis ? loanAnalysis.periodResults.map((pr) => {
                       let status;
                       if (pr.hasConfirmedPayments && pr.isFullPayment) status = 'completed';
@@ -1232,15 +1230,7 @@ export default function YourLoans() {
                       else if (pr.hasPendingPayments && !pr.hasConfirmedPayments) status = 'pending';
                       else if (pr.isPast && !pr.hasAnyPayments) status = 'missed';
                       else status = 'upcoming';
-                      const base = pr.scheduledAmount || (loanAnalysis.recalcPayment > 0 ? loanAnalysis.recalcPayment : paymentAmt);
-                      let expectedAmount;
-                      if (status === 'missed') {
-                        expectedAmount = base;
-                        rolledOver += base;
-                      } else {
-                        expectedAmount = base + rolledOver;
-                        rolledOver = 0;
-                      }
+                      const expectedAmount = pr.scheduledAmount || (loanAnalysis.recalcPayment > 0 ? loanAnalysis.recalcPayment : paymentAmt);
                       const paidAmount = pr.actualPaid || 0;
                       const paidPercentage = expectedAmount > 0 ? Math.min(100, (paidAmount / expectedAmount) * 100) : 0;
                       return { number: pr.period, date: pr.date, amount: expectedAmount, paidAmount, paidPercentage, status };
