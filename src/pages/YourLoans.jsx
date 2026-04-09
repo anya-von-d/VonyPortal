@@ -926,7 +926,7 @@ export default function YourLoans() {
               let nextPmtDate = null; let daysUntil = null;
               if (manageLoanSelected.next_payment_date) { nextPmtDate = toLocalDate(manageLoanSelected.next_payment_date); daysUntil = daysUntilDate(manageLoanSelected.next_payment_date); }
               const size = 140; const dCx = size / 2; const dCy = size / 2;
-              const ringR = 54; const ringStroke = 16;
+              const ringR = 54; const ringStroke = 9;
               const ringCirc = 2 * Math.PI * ringR; const ringDash = (paidPct / 100) * ringCirc;
               return (
                 <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 12 }}>
@@ -1266,7 +1266,7 @@ export default function YourLoans() {
                       );
                     };
                     return (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 240, overflowY: 'auto', scrollbarWidth: 'thin' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, ...(paymentRows.length > 8 ? { maxHeight: 460, overflowY: 'auto', scrollbarWidth: 'thin' } : {}) }}>
                         {paymentRows.map((row) => {
                           const cfg = statusConfig[row.status];
                           return (
