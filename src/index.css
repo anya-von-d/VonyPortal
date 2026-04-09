@@ -435,6 +435,9 @@ input[type="date"] {
   }
 }
 
+/* Hide mobile-only sentence on desktop */
+.la-friend-mobile { display: none; }
+
 /* ============================================================
    MOBILE DASHBOARD PAGE IMPROVEMENTS (≤900px)
    ============================================================ */
@@ -466,16 +469,17 @@ input[type="date"] {
     display: grid !important;
     grid-template-columns: 1fr auto !important;
     grid-template-rows: auto auto !important;
-    grid-template-areas: "main main" "date status" !important;
+    grid-template-areas: "main date" "status status" !important;
     padding: 10px 5px !important;
     gap: 4px 0 !important;
-    align-items: start !important;
+    align-items: center !important;
   }
   .ra-col-date {
     grid-area: date !important;
     font-size: 11px !important;
     display: flex !important;
     align-items: center !important;
+    justify-content: flex-end !important;
   }
   .ra-col-main {
     grid-area: main !important;
@@ -486,7 +490,8 @@ input[type="date"] {
     grid-area: status !important;
     display: flex !important;
     align-items: center !important;
-    justify-content: flex-end !important;
+    justify-content: flex-start !important;
+    padding-top: 2px !important;
   }
 
   /* ── 5. Loan Agreements: row layout ── */
@@ -495,8 +500,8 @@ input[type="date"] {
     display: grid !important;
     grid-template-columns: 1fr auto !important;
     grid-template-rows: auto auto !important;
-    grid-template-areas: "friend amount" "date status" !important;
-    gap: 2px 8px !important;
+    grid-template-areas: "friend friend" "status date" !important;
+    gap: 4px 8px !important;
     padding: 12px 0 !important;
     align-items: start !important;
   }
@@ -505,20 +510,19 @@ input[type="date"] {
     width: auto !important;
     font-size: 11px !important;
     color: #787776 !important;
+    text-align: right !important;
   }
   .la-col-friend { grid-area: friend !important; flex: none !important; }
   .la-col-category { display: none !important; }
   .la-col-status {
     grid-area: status !important;
     width: auto !important;
-    justify-content: flex-end !important;
+    justify-content: flex-start !important;
   }
-  .la-col-amount {
-    grid-area: amount !important;
-    width: auto !important;
-    text-align: right !important;
-  }
+  .la-col-amount { display: none !important; }
   .la-col-arrow { display: none !important; }
+  .la-friend-desktop { display: none !important; }
+  .la-friend-mobile { display: inline !important; }
 
   /* ── 6. Learn: single-column articles, wrapping selector ── */
   .learn-articles-grid { grid-template-columns: 1fr !important; }

@@ -1142,8 +1142,13 @@ export default function LoanAgreements() {
                             </span>
                             {/* Friend */}
                             <div className="la-col-friend" style={{ display: 'flex', flex: 1.5, minWidth: 0, alignItems: 'center' }}>
-                              <span style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              <span className="la-friend-desktop" style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {otherParty.full_name}
+                              </span>
+                              <span className="la-friend-mobile" style={{ fontSize: 13, fontWeight: 500, color: '#1A1918' }}>
+                                {isLender
+                                  ? `${otherParty.full_name} borrowed ${formatMoney(agreement.total_amount)} from you`
+                                  : `You borrowed ${formatMoney(agreement.total_amount)} from ${otherParty.full_name}`}
                               </span>
                             </div>
                             {/* Category */}

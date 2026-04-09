@@ -88,7 +88,7 @@ export default function Footer() {
       <div className="px-6 md:px-10 lg:px-20 pt-6 pb-8">
         <div className="max-w-6xl mx-auto space-y-5">
           {/* Logo Row + Flag */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-3 sm:gap-0">
             <div className="flex items-center gap-3">
               <img
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/e492d87a7_Logo.png"
@@ -106,11 +106,11 @@ export default function Footer() {
           </div>
 
           {/* Legal Links */}
-          <div className="flex flex-wrap items-center gap-1 text-xs text-white/40 font-sans">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-1 text-xs text-white/40 font-sans">
             <span className="hover:text-white cursor-pointer transition-colors">Terms of Service</span>
-            <span className="mx-1">|</span>
+            <span className="hidden sm:inline mx-1">|</span>
             <span className="hover:text-white cursor-pointer transition-colors">Privacy Center</span>
-            <span className="mx-1">|</span>
+            <span className="hidden sm:inline mx-1">|</span>
             <span className="hover:text-white cursor-pointer transition-colors">Do not sell or share my personal information</span>
           </div>
 
