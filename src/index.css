@@ -434,3 +434,111 @@ input[type="date"] {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* ============================================================
+   MOBILE DASHBOARD PAGE IMPROVEMENTS (≤900px)
+   ============================================================ */
+@media (max-width: 900px) {
+
+  /* ── 1. Hero sections: reduce gap, start flush with nav ── */
+  .dash-hero {
+    margin: 0 !important;
+    height: 110px !important;
+  }
+
+  /* ── 2. RecordPayment: single column, loan selector on top ── */
+  .rp-main-grid {
+    grid-template-columns: 1fr !important;
+  }
+  /* JSX already has loan col order:1, form col order:2 */
+
+  /* ── 3. Friends: stack + reorder Search→Requests→Friends ── */
+  .friends-two-col {
+    grid-template-columns: 1fr !important;
+  }
+  .friends-left-col { order: 3 !important; }
+  .friends-right-col { order: 1 !important; }
+  .friends-card { min-height: 0 !important; }
+
+  /* ── 4. Recent Activity: row layout ── */
+  .ra-table-header { display: none !important; }
+  .ra-table-row {
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    grid-template-rows: auto auto !important;
+    grid-template-areas: "main main" "date status" !important;
+    padding: 10px 5px !important;
+    gap: 4px 0 !important;
+    align-items: start !important;
+  }
+  .ra-col-date {
+    grid-area: date !important;
+    font-size: 11px !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+  .ra-col-main {
+    grid-area: main !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+  .ra-col-status {
+    grid-area: status !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+  }
+
+  /* ── 5. Loan Agreements: row layout ── */
+  .la-table-header { display: none !important; }
+  .la-table-row {
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    grid-template-rows: auto auto !important;
+    grid-template-areas: "friend amount" "date status" !important;
+    gap: 2px 8px !important;
+    padding: 12px 0 !important;
+    align-items: start !important;
+  }
+  .la-col-date {
+    grid-area: date !important;
+    width: auto !important;
+    font-size: 11px !important;
+    color: #787776 !important;
+  }
+  .la-col-friend { grid-area: friend !important; flex: none !important; }
+  .la-col-category { display: none !important; }
+  .la-col-status {
+    grid-area: status !important;
+    width: auto !important;
+    justify-content: flex-end !important;
+  }
+  .la-col-amount {
+    grid-area: amount !important;
+    width: auto !important;
+    text-align: right !important;
+  }
+  .la-col-arrow { display: none !important; }
+
+  /* ── 6. Learn: single-column articles, wrapping selector ── */
+  .learn-articles-grid { grid-template-columns: 1fr !important; }
+  .learn-selector-wrap {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    width: 100% !important;
+  }
+  .learn-selector-wrap button { white-space: normal !important; }
+
+  /* ── 7. Loan Help: single-column cards, wrapping selector ── */
+  .lh-cards-grid { grid-template-columns: 1fr !important; }
+  .lh-selector-wrap {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    width: 100% !important;
+  }
+  .lh-selector-wrap button { white-space: normal !important; }
+}

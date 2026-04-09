@@ -640,7 +640,7 @@ export default function RecentActivityPage() {
         <DashboardSidebar activePage="RecentActivity" user={user} />
 
         {/* Hero */}
-        <div style={{ margin: '8px 10px 0', height: 168, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 24, position: 'relative' }}>
+        <div className="dash-hero" style={{ margin: '8px 10px 0', height: 168, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 24, position: 'relative' }}>
           <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.15, pointerEvents: 'none', zIndex: 0 }} viewBox="0 0 1200 168" preserveAspectRatio="xMidYMid slice">
             {[{cx:80,cy:40},{cx:200,cy:110},{cx:320,cy:25},{cx:430,cy:160},{cx:540,cy:70},{cx:660,cy:130},{cx:770,cy:35},{cx:890,cy:175},{cx:1000,cy:80},{cx:1100,cy:140},{cx:150,cy:185},{cx:480,cy:100},{cx:720,cy:180},{cx:950,cy:55},{cx:280,cy:195},{cx:620,cy:48},{cx:1050,cy:195}].map((s, i) => (
               <circle key={i} cx={s.cx} cy={s.cy} r={i % 3 === 0 ? 2.5 : 1.5} fill="white" />
@@ -723,7 +723,7 @@ export default function RecentActivityPage() {
               ) : (
                 <>
                   {/* Table header */}
-                  <div style={{
+                  <div className="ra-table-header" style={{
                     display: 'grid',
                     gridTemplateColumns: '120px 1fr 200px',
                     alignItems: 'center',
@@ -745,6 +745,7 @@ export default function RecentActivityPage() {
                       return (
                         <div
                           key={`${activity.type}-${activity.id}-${index}`}
+                          className="ra-table-row"
                           style={{
                             display: 'grid',
                             gridTemplateColumns: '120px 1fr 200px',
@@ -754,12 +755,12 @@ export default function RecentActivityPage() {
                           }}
                         >
                           {/* Col 1: Date */}
-                          <span style={{ fontSize: 12, color: '#787776', fontWeight: 500 }}>
+                          <span className="ra-col-date" style={{ fontSize: 12, color: '#787776', fontWeight: 500 }}>
                             {dateDisplay}
                           </span>
 
                           {/* Col 2: Category — icon + title */}
-                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <div className="ra-col-main" style={{ display: 'flex', alignItems: 'center' }}>
                             <div style={{ width: 24, height: 24, borderRadius: 6, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginRight: 8 }}>
                               <Icon size={12} style={{ color: iconColor }} />
                             </div>
@@ -769,7 +770,7 @@ export default function RecentActivityPage() {
                           </div>
 
                           {/* Col 3: Status badge */}
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <div className="ra-col-status" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             {renderStatusBadge(activity, status)}
                           </div>
                         </div>

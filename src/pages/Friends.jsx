@@ -244,8 +244,8 @@ export default function Friends() {
   const defaultAvatarUrl = (name) =>
     `https://ui-avatars.com/api/?name=${encodeURIComponent((name || 'U').charAt(0))}&background=678AFB&color=fff&size=128`;
 
-  const PageCard = ({ title, headerRight, children, style }) => (
-    <div style={{ background: '#F4F4F5', borderRadius: 14, overflow: 'hidden', boxShadow: SHADOW, ...style }}>
+  const PageCard = ({ title, headerRight, children, style, className }) => (
+    <div className={className} style={{ background: '#F4F4F5', borderRadius: 14, overflow: 'hidden', boxShadow: SHADOW, ...style }}>
       <div style={{ padding: '6px 14px 5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
         {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
@@ -281,7 +281,7 @@ export default function Friends() {
       <DashboardSidebar activePage="Friends" user={user} />
 
       {/* Hero */}
-      <div style={{ margin: '8px 10px 0', height: 168, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 24, position: 'relative' }}>
+      <div className="dash-hero" style={{ margin: '8px 10px 0', height: 168, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 24, position: 'relative' }}>
         <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.15, pointerEvents: 'none', zIndex: 0 }} viewBox="0 0 1200 168" preserveAspectRatio="xMidYMid slice">
           {[{cx:80,cy:40},{cx:200,cy:110},{cx:320,cy:25},{cx:430,cy:160},{cx:540,cy:70},{cx:660,cy:130},{cx:770,cy:35},{cx:890,cy:175},{cx:1000,cy:80},{cx:1100,cy:140},{cx:150,cy:185},{cx:480,cy:100},{cx:720,cy:180},{cx:950,cy:55},{cx:280,cy:195},{cx:620,cy:48},{cx:1050,cy:195}].map((s, i) => (
             <circle key={i} cx={s.cx} cy={s.cy} r={i % 3 === 0 ? 2.5 : 1.5} fill="white" />
@@ -296,10 +296,10 @@ export default function Friends() {
         <div className="dashboard-grey-box" style={{ background: '#E5E2DF', borderRadius: 18, padding: 20 }}>
 
         {/* Two-Column Layout: Friends Left, Search + Requests Right */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div className="friends-two-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
 
           {/* Left Column: Your Friends */}
-          <PageCard title="Your Friends" style={{ minHeight: 'calc(100vh - 280px)' }}>
+          <PageCard title="Your Friends" className="friends-left-col friends-card" style={{ minHeight: 'calc(100vh - 280px)' }}>
             <div style={{ padding: '10px 16px 16px' }}>
               {isLoading ? (
                 <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0' }}>
@@ -383,10 +383,10 @@ export default function Friends() {
           </PageCard>
 
           {/* Right Column: Search + Friend Requests */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div className="friends-right-col" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
             {/* Search for Friends */}
-            <PageCard title="Search for Friends" style={{ minHeight: 'calc(100vh - 280px)' }}>
+            <PageCard title="Search for Friends" className="friends-card" style={{ minHeight: 'calc(100vh - 280px)' }}>
               <div style={{ padding: '10px 16px 16px' }}>
                 {/* Search Input */}
                 <div style={{ position: 'relative', marginBottom: searchQuery.trim() ? 14 : 0 }}>

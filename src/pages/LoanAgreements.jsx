@@ -1018,7 +1018,7 @@ export default function LoanAgreements() {
         <DashboardSidebar activePage="LoanAgreements" user={user} />
 
         {/* Hero */}
-        <div style={{ margin: '8px 10px 0', height: 168, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 24, position: 'relative' }}>
+        <div className="dash-hero" style={{ margin: '8px 10px 0', height: 168, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 24, position: 'relative' }}>
           <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.15, pointerEvents: 'none', zIndex: 0 }} viewBox="0 0 1200 168" preserveAspectRatio="xMidYMid slice">
             {[{cx:80,cy:40},{cx:200,cy:110},{cx:320,cy:25},{cx:430,cy:160},{cx:540,cy:70},{cx:660,cy:130},{cx:770,cy:35},{cx:890,cy:175},{cx:1000,cy:80},{cx:1100,cy:140},{cx:150,cy:185},{cx:480,cy:100},{cx:720,cy:180},{cx:950,cy:55},{cx:280,cy:195},{cx:620,cy:48},{cx:1050,cy:195}].map((s, i) => (
               <circle key={i} cx={s.cx} cy={s.cy} r={i % 3 === 0 ? 2.5 : 1.5} fill="white" />
@@ -1099,7 +1099,7 @@ export default function LoanAgreements() {
               ) : (
                 <>
                   {/* Table header */}
-                  <div style={{
+                  <div className="la-table-header" style={{
                     display: 'flex', alignItems: 'center', gap: 12, padding: '0 0 12px',
                     borderBottom: '1px solid rgba(0,0,0,0.06)', marginBottom: 4,
                   }}>
@@ -1130,27 +1130,28 @@ export default function LoanAgreements() {
                         <div key={agreement.id} style={{ borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
                           <div
                             onClick={() => setExpandedId(isExpanded ? null : agreement.id)}
+                            className="la-table-row"
                             style={{
                               display: 'flex', alignItems: 'center', gap: 12, padding: '16px 0',
                               transition: 'background 0.15s', cursor: 'pointer',
                             }}
                           >
                             {/* Date */}
-                            <span style={{ width: 72, fontSize: 12, fontWeight: 500, color: '#787776', flexShrink: 0 }}>
+                            <span className="la-col-date" style={{ width: 72, fontSize: 12, fontWeight: 500, color: '#787776', flexShrink: 0 }}>
                               {dateFormatted}
                             </span>
                             {/* Friend */}
-                            <div style={{ display: 'flex', flex: 1.5, minWidth: 0, alignItems: 'center' }}>
+                            <div className="la-col-friend" style={{ display: 'flex', flex: 1.5, minWidth: 0, alignItems: 'center' }}>
                               <span style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {otherParty.full_name}
                               </span>
                             </div>
                             {/* Category */}
-                            <div style={{ display: 'flex', flex: 1.2, minWidth: 0, alignItems: 'center' }}>
+                            <div className="la-col-category" style={{ display: 'flex', flex: 1.2, minWidth: 0, alignItems: 'center' }}>
                               <span style={{ fontSize: 12, fontWeight: 500, color: isLender ? '#22c55e' : '#2563EB' }}>{categoryLabel}</span>
                             </div>
                             {/* Status */}
-                            <div style={{ display: 'flex', width: 110, justifyContent: 'center', flexShrink: 0 }}>
+                            <div className="la-col-status" style={{ display: 'flex', width: 110, justifyContent: 'center', flexShrink: 0 }}>
                               <span style={{
                                 ...badgeStyle, display: 'inline-flex', alignItems: 'center', padding: '4px 10px', borderRadius: 8,
                                 fontSize: 11, fontWeight: 600, textTransform: 'capitalize',
@@ -1159,12 +1160,12 @@ export default function LoanAgreements() {
                               </span>
                             </div>
                             {/* Amount */}
-                            <span style={{ width: 100, fontSize: 13, fontWeight: 600, color: '#1A1918', textAlign: 'right', flexShrink: 0 }}>
+                            <span className="la-col-amount" style={{ width: 100, fontSize: 13, fontWeight: 600, color: '#1A1918', textAlign: 'right', flexShrink: 0 }}>
                               {formatMoney(agreement.total_amount)}
                             </span>
 
                             {/* Expand arrow */}
-                            <div style={{
+                            <div className="la-col-arrow" style={{
                               width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
                               flexShrink: 0, transition: 'transform 0.2s',
                               transform: isExpanded ? 'rotate(90deg)' : 'none',
