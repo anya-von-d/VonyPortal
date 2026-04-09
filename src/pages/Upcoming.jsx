@@ -307,7 +307,7 @@ export default function Upcoming() {
           </div>
         </div>
         {/* Amount */}
-        <div style={{ fontSize: 14, fontWeight: 600, flexShrink: 0, color: '#1A1918' }}>
+        <div style={{ fontSize: 14, fontWeight: 600, flexShrink: 0, color: event.isLender ? '#54A6CF' : '#1A1918' }}>
           {event.isLender ? '+' : '-'}{formatMoney(event.amount)}
         </div>
       </div>
@@ -372,7 +372,7 @@ export default function Upcoming() {
                   highlight
                   title="Overdue"
                   headerRight={
-                    <span style={{ fontSize: 11, color: '#E8726E', fontWeight: 500, fontFamily: "'DM Sans', sans-serif" }}>
+                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)', fontWeight: 500, fontFamily: "'DM Sans', sans-serif" }}>
                       {overdue.length} payment{overdue.length !== 1 ? 's' : ''} · {formatMoney(overdue.reduce((s, e) => s + e.amount, 0))}
                     </span>
                   }
@@ -390,7 +390,7 @@ export default function Upcoming() {
                 highlight
                 title="Next 7 Days"
                 headerRight={
-                  <span style={{ fontSize: 11, color: '#9B9A98', fontWeight: 500, fontFamily: "'DM Sans', sans-serif" }}>
+                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)', fontWeight: 500, fontFamily: "'DM Sans', sans-serif" }}>
                     {next7Count} payment{next7Count !== 1 ? 's' : ''} · {formatMoney(next7Total)}
                   </span>
                 }
