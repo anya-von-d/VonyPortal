@@ -949,7 +949,7 @@ export default function YourLoans() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {/* Next payment date card */}
                     <PageCard title={isLending ? 'Next Payment Incoming' : 'Next Payment Due'} highlight style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                      <div style={{ padding: '10px 16px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
+                      <div style={{ padding: '6px 14px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
                         {nextPmtDate ? (
                           <>
                             <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', lineHeight: 1 }}>
@@ -966,7 +966,7 @@ export default function YourLoans() {
                     </PageCard>
                     {/* Next payment amount card */}
                     <PageCard title="Next Payment Amount" highlight style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                      <div style={{ padding: '10px 14px 14px', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+                      <div style={{ padding: '6px 14px 10px', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
                         {nextPmtDate ? (
                           <>
                             <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', lineHeight: 1 }}>
@@ -981,6 +981,11 @@ export default function YourLoans() {
                         )}
                       </div>
                     </PageCard>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                      <Link to={createPageUrl("RecordPayment")} style={{ display: 'inline-flex', alignItems: 'center', background: '#1A1918', borderRadius: 9, padding: '7px 12px', textDecoration: 'none' }}>
+                        <p style={{ fontSize: 11, fontWeight: 600, color: 'white', margin: 0 }}>Record Payment</p>
+                      </Link>
+                    </div>
                   </div>
                 </div>
               );
@@ -1070,7 +1075,7 @@ export default function YourLoans() {
                 if (ag?.borrower_signed_date) activities.push({ timestamp: new Date(ag.borrower_signed_date), type: 'signature', description: `${borrowerName} signed the loan agreement` });
                 if (ag?.lender_signed_date) activities.push({ timestamp: new Date(ag.lender_signed_date), type: 'signature', description: `${lenderName} signed the loan agreement` });
                 loanPmts.forEach(payment => {
-                  const isConfirmed = payment.status === 'confirmed';
+                  const isConfirmed = payment.status === 'completed' || payment.status === 'confirmed';
                   const isRecordedByUser = payment.recorded_by === user?.id;
                   const pmtAmount = `$${(payment.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                   let desc;
