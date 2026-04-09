@@ -903,8 +903,9 @@ export default function YourLoans() {
     return (
       <div>
         {/* Select a Loan */}
-        <PageCard title="Select a Loan to Learn More" style={{ marginBottom: manageLoanSelected ? 8 : 16 }}>
-          <div style={{ padding: '10px 14px 14px' }}>
+        <div style={{ background: '#F4F4F5', borderRadius: 14, overflow: 'visible', boxShadow: '0px 50px 40px rgba(0,0,0,0.02), 0px 50px 40px rgba(0,0,0,0.04), 0px 20px 40px rgba(0,0,0,0.08), 0px 3px 10px rgba(0,0,0,0.12)', marginBottom: manageLoanSelected ? 8 : 16 }}>
+          <div style={{ padding: '6px 14px 5px' }}><span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Select a Loan to Learn More</span></div>
+          <div style={{ background: '#ffffff', margin: '0 5px 5px', borderRadius: 10, overflow: 'visible', padding: '10px 14px 14px' }}>
             <div style={{ position: 'relative' }}>
               <div
                 onClick={() => setLoanDropdownOpen(o => !o)}
@@ -931,18 +932,21 @@ export default function YourLoans() {
               )}
             </div>
           </div>
-        </PageCard>
+        </div>
 
         {/* Selected loan description */}
         {manageLoanSelected && (
-          <div style={{ background: '#ffffff', borderRadius: 12, padding: '10px 16px', marginBottom: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.06)' }}>
-            <p style={{ fontSize: 14, fontWeight: 500, color: '#1A1918', margin: 0 }}>{getLoanDescription(manageLoanSelected)}{manageLoanSelected.status === 'cancelled' ? <span style={{ fontSize: 11, color: '#E8726E', marginLeft: 8 }}>Cancelled</span> : null}</p>
+          <div style={{ background: '#ffffff', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 10, padding: '8px 14px', marginBottom: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+            <div style={{ width: 24, height: 24, borderRadius: 6, background: 'rgba(3,172,234,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <span style={{ fontSize: 13, fontWeight: 500, color: '#1A1918' }}>{getLoanDescription(manageLoanSelected)}{manageLoanSelected.status === 'cancelled' ? <span style={{ fontSize: 11, color: '#E8726E', marginLeft: 8 }}>Cancelled</span> : null}</span>
           </div>
         )}
 
 
         {/* Two-column grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }} className="borrowing-grid">
+        {manageLoanSelected && <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }} className="borrowing-grid">
           {/* Left Column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {/* Payment Progress */}
@@ -973,9 +977,9 @@ export default function YourLoans() {
                       <text x={dCx} y={dCy - 7} textAnchor="middle" dominantBaseline="middle" style={{ fontSize: 20, fontWeight: 700, fill: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>{Math.round(paidPct)}%</text>
                       <text x={dCx} y={dCy + 12} textAnchor="middle" dominantBaseline="middle" style={{ fontSize: 11, fontWeight: 500, fill: '#787776', fontFamily: "'DM Sans', sans-serif" }}>repaid</text>
                     </svg>
-                    <p style={{ fontSize: 11, fontWeight: 600, color: '#1A1918', marginTop: 6, textAlign: 'center', whiteSpace: 'nowrap' }}>
-                      ${totalPaidAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      <span style={{ color: '#787776', fontWeight: 400 }}> / ${totalOwedNow.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    <p style={{ fontSize: 11, fontWeight: 500, color: '#1A1918', marginTop: 6, textAlign: 'center' }}>
+                      <span style={{ fontWeight: 700 }}>${totalPaidAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      <span style={{ color: '#787776' }}> of ${totalWithInterest.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {isLending ? 'repaid' : 'paid back'}</span>
                     </p>
                     </div>
                   </PageCard>
@@ -1115,19 +1119,19 @@ export default function YourLoans() {
                 if (manageLoanSelected.status === 'completed') activities.push({ timestamp: new Date(), type: 'completion', description: 'Loan repaid in full' });
                 activities.sort((a, b) => a.timestamp - b.timestamp);
                 const activityIconConfig = {
-                  created:      { bg: 'rgba(3,172,234,0.12)',   stroke: '#03ACEA',  path: 'M12 4v16m8-8H4' },
-                  signature:    { bg: 'rgba(124,58,237,0.12)',  stroke: '#7C3AED',  path: 'M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z' },
-                  payment:      { bg: 'rgba(22,163,74,0.12)',   stroke: '#16A34A',  path: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1' },
-                  cancellation: { bg: 'rgba(232,114,110,0.12)', stroke: '#E8726E',  path: 'M6 18L18 6M6 6l12 12' },
-                  completion:   { bg: 'rgba(22,163,74,0.12)',   stroke: '#16A34A',  path: 'M5 13l4 4L19 7' },
+                  created:      { bg: 'rgba(3,172,234,0.12)',   stroke: '#03ACEA',  path: 'M12 4v16m8-8H4',                                                                                                                                         sz: 14, sw: 2 },
+                  signature:    { bg: 'rgba(124,58,237,0.12)',  stroke: '#7C3AED',  path: 'M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z',                                                     sz: 14, sw: 2 },
+                  payment:      { bg: 'rgba(22,163,74,0.12)',   stroke: '#16A34A',  path: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1',          sz: 17, sw: 2.5 },
+                  cancellation: { bg: 'rgba(232,114,110,0.12)', stroke: '#E8726E',  path: 'M6 18L18 6M6 6l12 12',                                                                                                                                    sz: 14, sw: 2 },
+                  completion:   { bg: 'rgba(22,163,74,0.12)',   stroke: '#16A34A',  path: 'M5 13l4 4L19 7',                                                                                                                                          sz: 14, sw: 2 },
                 };
                 const getIcon = (type) => {
                   const cfg = activityIconConfig[type] || activityIconConfig.created;
-                  return <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke={cfg.stroke} strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d={cfg.path} /></svg>;
+                  return <svg width={cfg.sz} height={cfg.sz} fill="none" viewBox="0 0 24 24" stroke={cfg.stroke} strokeWidth={cfg.sw}><path strokeLinecap="round" strokeLinejoin="round" d={cfg.path} /></svg>;
                 };
                 const getDotStyle = (type) => {
                   const cfg = activityIconConfig[type] || activityIconConfig.created;
-                  return { width: 24, height: 24, borderRadius: 6, background: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, position: 'relative', zIndex: 10, marginTop: 2 };
+                  return { width: 24, height: 24, borderRadius: 6, background: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, position: 'relative', zIndex: 10, marginTop: 2, boxShadow: '0 0 0 3px white' };
                 };
                 if (activities.length === 0) return <p style={{ fontSize: 11, color: '#C7C6C4' }}>No activity recorded yet.</p>;
                 return (
@@ -1141,7 +1145,7 @@ export default function YourLoans() {
                             <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', lineHeight: 1.4 }}>{activity.description}</p>
                             {activity.isAwaitingConfirmation && <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-semibold bg-[#F59E0B]/20 text-[#F59E0B] border border-[#F59E0B]/30 whitespace-nowrap">Awaiting Confirmation</span>}
                           </div>
-                          <p style={{ fontSize: 11, color: '#9B9A98', marginTop: 2 }}>{format(activity.timestamp, 'MMM d, yyyy · h:mm a')}</p>
+                          <p style={{ fontSize: 11, color: '#5C5B5A', marginTop: 2 }}>{format(activity.timestamp, 'MMM d, yyyy · h:mm a')}</p>
                         </div>
                       </div>
                     ))}
@@ -1278,8 +1282,8 @@ export default function YourLoans() {
                       return { number: pr.period, date: pr.date, amount: expectedAmount, paidAmount, paidPercentage, status };
                     }) : [];
                     const statusConfig = {
-                      completed:   { label: 'Completed',   bg: 'rgba(3,172,234,0.1)',   text: '#03ACEA', ringColor: '#03ACEA', fillColor: '#03ACEA' },
-                      partial:     { label: 'Partial',     bg: 'rgba(245,158,11,0.1)', text: '#F59E0B', ringColor: '#F59E0B', fillColor: '#F59E0B' },
+                      completed:   { label: 'Completed',   bg: 'rgba(22,163,74,0.18)',  text: '#16A34A', ringColor: '#16A34A', fillColor: '#16A34A' },
+                      partial:     { label: 'Partial',     bg: 'rgba(3,172,234,0.18)', text: '#0288CE', ringColor: '#0288CE', fillColor: '#0288CE' },
                       pending:     { label: 'Pending',     bg: 'rgba(0,0,0,0.05)',     text: '#9B9A98', ringColor: 'rgba(0,0,0,0.15)', fillColor: 'rgba(0,0,0,0.1)' },
                       missed:      { label: 'Missed',         bg: 'rgba(232,114,110,0.1)', text: '#E8726E', ringColor: '#E8726E', fillColor: '#E8726E' },
                       upcoming:    { label: 'Upcoming',       bg: 'rgba(0,0,0,0.03)',      text: '#787776', ringColor: 'rgba(0,0,0,0.12)', fillColor: 'rgba(0,0,0,0.08)' },
@@ -1329,7 +1333,7 @@ export default function YourLoans() {
               </>
             )}
           </div>
-        </div>
+        </div>}
       </div>
     );
   };
