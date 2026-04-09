@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Loan, Payment, User, PublicProfile, Friendship } from "@/entities/all";
-import { Activity, ArrowUpRight, ArrowDownRight, Send, Check, X, Ban, ChevronDown, Clock, Search, Download } from "lucide-react";
+import { Activity, ArrowUpRight, ArrowDownRight, Send, Check, X, Ban, ChevronDown, Search, Download } from "lucide-react";
 import { format, subDays, subMonths, subYears } from "date-fns";
 import DashboardSidebar from "@/components/DashboardSidebar";
+import BorrowerSignatureModal from "@/components/loans/BorrowerSignatureModal";
 
 const SHADOW = '0px 50px 40px rgba(0,0,0,0.02), 0px 50px 40px rgba(0,0,0,0.04), 0px 20px 40px rgba(0,0,0,0.08), 0px 3px 10px rgba(0,0,0,0.12)';
 
@@ -28,19 +29,9 @@ const DATE_OPTIONS = [
   { id: 'older', label: 'Older' },
 ];
 
-const AMOUNT_MODES = [
-  { id: 'all', label: 'All amounts' },
-  { id: 'exactly', label: 'Exactly' },
-  { id: 'between', label: 'Between' },
-  { id: 'greater', label: 'Greater than' },
-  { id: 'less', label: 'Less than' },
-];
-
 const SORT_OPTIONS = [
   { id: 'date_desc', label: 'Date (Newest)' },
   { id: 'date_asc', label: 'Date (Oldest)' },
-  { id: 'amount_desc', label: 'Amount (High to Low)' },
-  { id: 'amount_asc', label: 'Amount (Low to High)' },
 ];
 
 /* ── Multi-select dropdown ─────────────────────────────────── */
@@ -164,154 +155,6 @@ function SingleSelectDropdown({ options, selected, onChange }) {
               {opt.label}
             </button>
           ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ── Amount filter dropdown ────────────────────────────────── */
-function AmountFilterDropdown({ amountMode, setAmountMode, amountVal1, setAmountVal1, amountVal2, setAmountVal2, onApply }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  const isFiltered = amountMode !== 'all';
-  const displayLabel = amountMode === 'all' ? 'All Amounts'
-    : amountMode === 'exactly' ? (amountVal1 ? `Exactly $${amountVal1}` : 'Exactly')
-    : amountMode === 'between' ? (amountVal1 && amountVal2 ? `$${amountVal1} – $${amountVal2}` : 'Between')
-    : amountMode === 'greater' ? (amountVal1 ? `> $${amountVal1}` : 'Greater than')
-    : amountMode === 'less' ? (amountVal1 ? `< $${amountVal1}` : 'Less than')
-    : 'All Amounts';
-
-  const modeDescriptions = {
-    all: '',
-    exactly: 'Search for an exact transaction amount.',
-    between: 'Search for transactions between two number amounts.',
-    greater: 'Search for transactions above a certain amount.',
-    less: 'Search for transactions below a certain amount.',
-  };
-
-  return (
-    <div ref={ref} style={{ position: 'relative' }}>
-      <button
-        onClick={() => setOpen(!open)}
-        style={{
-          display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10,
-          border: '1px solid rgba(0,0,0,0.08)', background: isFiltered ? 'rgba(130,240,185,0.08)' : 'white',
-          fontSize: 13, fontWeight: 500, color: '#1A1918', cursor: 'pointer',
-          fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap', transition: 'background 0.15s',
-        }}
-      >
-        {displayLabel}
-        <ChevronDown size={14} style={{ opacity: 0.5, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
-      </button>
-      {open && (
-        <div style={{
-          position: 'absolute', top: 'calc(100% + 6px)', left: 0, minWidth: 380,
-          background: 'white', borderRadius: 12, border: '1px solid rgba(0,0,0,0.08)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.08)', zIndex: 50, display: 'flex', overflow: 'hidden',
-        }}>
-          {/* Left: mode list */}
-          <div style={{ borderRight: '1px solid rgba(0,0,0,0.06)', padding: '8px 0', minWidth: 140 }}>
-            {AMOUNT_MODES.map(mode => (
-              <button
-                key={mode.id}
-                onClick={() => { setAmountMode(mode.id); if (mode.id === 'all') { setAmountVal1(''); setAmountVal2(''); } }}
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  width: '100%', textAlign: 'left', padding: '10px 16px', border: 'none', cursor: 'pointer',
-                  fontSize: 13, color: '#1A1918', fontFamily: "'DM Sans', sans-serif",
-                  background: amountMode === mode.id ? 'rgba(0,0,0,0.03)' : 'transparent',
-                  fontWeight: amountMode === mode.id ? 600 : 400,
-                  transition: 'background 0.1s',
-                }}
-                onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.03)'}
-                onMouseLeave={e => { if (amountMode !== mode.id) e.currentTarget.style.background = 'transparent'; }}
-              >
-                {mode.label}
-                {amountMode === mode.id && (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1A1918" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-                )}
-              </button>
-            ))}
-          </div>
-          {/* Right: inputs */}
-          <div style={{ flex: 1, padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {amountMode === 'all' ? (
-              <p style={{ fontSize: 13, color: '#787776', margin: 0 }}>Showing transactions of any amount.</p>
-            ) : (
-              <>
-                <p style={{ fontSize: 13, color: '#787776', margin: 0 }}>{modeDescriptions[amountMode]}</p>
-                {amountMode === 'between' ? (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <span style={{ fontSize: 14, color: '#787776', fontWeight: 500 }}>$</span>
-                      <input
-                        type="number"
-                        placeholder="0"
-                        value={amountVal1}
-                        onChange={e => setAmountVal1(e.target.value)}
-                        style={{
-                          width: 70, padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.1)',
-                          fontSize: 14, fontFamily: "'DM Sans', sans-serif", outline: 'none',
-                        }}
-                        onFocus={e => e.target.style.borderColor = '#82F0B9'}
-                        onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.1)'}
-                      />
-                    </div>
-                    <span style={{ fontSize: 13, color: '#787776' }}>›</span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <span style={{ fontSize: 14, color: '#787776', fontWeight: 500 }}>$</span>
-                      <input
-                        type="number"
-                        placeholder="0"
-                        value={amountVal2}
-                        onChange={e => setAmountVal2(e.target.value)}
-                        style={{
-                          width: 70, padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.1)',
-                          fontSize: 14, fontFamily: "'DM Sans', sans-serif", outline: 'none',
-                        }}
-                        onFocus={e => e.target.style.borderColor = '#82F0B9'}
-                        onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.1)'}
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <span style={{ fontSize: 14, color: '#787776', fontWeight: 500 }}>$</span>
-                    <input
-                      type="number"
-                      placeholder="0"
-                      value={amountVal1}
-                      onChange={e => setAmountVal1(e.target.value)}
-                      style={{
-                        width: 100, padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.1)',
-                        fontSize: 14, fontFamily: "'DM Sans', sans-serif", outline: 'none',
-                      }}
-                      onFocus={e => e.target.style.borderColor = '#82F0B9'}
-                      onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.1)'}
-                    />
-                  </div>
-                )}
-                <button
-                  onClick={() => { onApply(); setOpen(false); }}
-                  style={{
-                    padding: '8px 18px', borderRadius: 20, border: 'none', cursor: 'pointer',
-                    background: '#1A1918', color: 'white', fontSize: 13, fontWeight: 600,
-                    fontFamily: "'DM Sans', sans-serif", alignSelf: 'flex-start',
-                  }}
-                >
-                  Set Amount
-                </button>
-              </>
-            )}
-          </div>
         </div>
       )}
     </div>
@@ -444,14 +287,14 @@ export default function RecentActivityPage() {
   const [dateFilter, setDateFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState([]);
   const [friendFilter, setFriendFilter] = useState([]);
-  const [amountMode, setAmountMode] = useState('all');
-  const [amountVal1, setAmountVal1] = useState('');
-  const [amountVal2, setAmountVal2] = useState('');
-  const [amountApplied, setAmountApplied] = useState(false);
 
   // Search & sort
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('date_desc');
+
+  // Loan offer view modal
+  const [viewingLoanOffer, setViewingLoanOffer] = useState(null);
+  const [showSignModal, setShowSignModal] = useState(false);
 
   useEffect(() => { loadData(); }, []);
 
@@ -572,67 +415,6 @@ export default function RecentActivityPage() {
 
   const totalCount = allActivities.length;
 
-  /* ── Apply filters ────────────────────────────────────────── */
-  let filtered = allActivities;
-
-  // Search
-  if (searchQuery.trim()) {
-    const q = searchQuery.trim().toLowerCase();
-    filtered = filtered.filter(a => {
-      const info = getActivityInfo(a);
-      const catLabel = (CATEGORY_DISPLAY[info.category]?.label || '').toLowerCase();
-      return info.title.toLowerCase().includes(q) || info.friendName.toLowerCase().includes(q) || info.amount.toLowerCase().includes(q) || catLabel.includes(q);
-    });
-  }
-
-  // Date filter
-  if (dateFilter !== 'all') {
-    const now = new Date();
-    if (dateFilter === '7d') filtered = filtered.filter(a => new Date(a.date) >= subDays(now, 7));
-    else if (dateFilter === '30d') filtered = filtered.filter(a => new Date(a.date) >= subDays(now, 30));
-    else if (dateFilter === '3m') filtered = filtered.filter(a => new Date(a.date) >= subMonths(now, 3));
-    else if (dateFilter === '6m') filtered = filtered.filter(a => new Date(a.date) >= subMonths(now, 6));
-    else if (dateFilter === '1y') filtered = filtered.filter(a => new Date(a.date) >= subYears(now, 1));
-    else if (dateFilter === 'older') filtered = filtered.filter(a => new Date(a.date) < subYears(now, 1));
-  }
-
-  // Friend filter (multi-select — union)
-  if (friendFilter.length > 0) {
-    filtered = filtered.filter(a => a._otherPartyId && friendFilter.includes(a._otherPartyId));
-  }
-
-  // Category filter (multi-select — union)
-  if (categoryFilter.length > 0) {
-    filtered = filtered.filter(a => categoryFilter.includes(a._category));
-  }
-
-  // Amount filter
-  if (amountMode !== 'all' && amountApplied) {
-    const v1 = parseFloat(amountVal1) || 0;
-    const v2 = parseFloat(amountVal2) || 0;
-    filtered = filtered.filter(a => {
-      const amt = a.amount || 0;
-      if (amountMode === 'exactly') return amt === v1;
-      if (amountMode === 'between') return amt >= Math.min(v1, v2) && amt <= Math.max(v1, v2);
-      if (amountMode === 'greater') return amt > v1;
-      if (amountMode === 'less') return amt < v1;
-      return true;
-    });
-  }
-
-  // Sort
-  if (sortBy === 'date_desc') filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-  else if (sortBy === 'date_asc') filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
-  else if (sortBy === 'amount_desc') filtered.sort((a, b) => (b.amount || 0) - (a.amount || 0));
-  else if (sortBy === 'amount_asc') filtered.sort((a, b) => (a.amount || 0) - (b.amount || 0));
-
-  const hasAnyFilter = dateFilter !== 'all' || categoryFilter.length > 0 || friendFilter.length > 0 || (amountMode !== 'all' && amountApplied) || searchQuery.trim() !== '';
-  const clearFilters = () => {
-    setDateFilter('all'); setCategoryFilter([]); setFriendFilter([]);
-    setAmountMode('all'); setAmountVal1(''); setAmountVal2('');
-    setAmountApplied(false); setSearchQuery('');
-  };
-
   /* ── Category display config ──────────────────────────────── */
   const CATEGORY_DISPLAY = {
     sent_offer: { label: 'You sent a loan offer to' },
@@ -644,19 +426,6 @@ export default function RecentActivityPage() {
     loan_defaulted: { label: 'Loan defaulted with' },
     payment_sent: { label: 'You sent a payment to' },
     payment_received: { label: 'You received a payment from' },
-  };
-
-  /* ── Format date for table display ──────────────────────────── */
-  const formatActivityDate = (dateStr) => {
-    if (!dateStr) return '';
-    const d = new Date(dateStr);
-    const now = new Date();
-    const thisYear = now.getFullYear();
-    const activityYear = d.getFullYear();
-    if (activityYear < thisYear) {
-      return format(d, 'M/d/yyyy');
-    }
-    return format(d, 'M/dd');
   };
 
   /* ── Get display info for an activity ─────────────────────── */
@@ -725,9 +494,53 @@ export default function RecentActivityPage() {
     return                                  { bg: 'rgba(155,154,152,0.13)', color: '#9B9A98' };
   };
 
+  /* ── Apply filters ────────────────────────────────────────── */
+  let filtered = allActivities;
+
+  // Search
+  if (searchQuery.trim()) {
+    const q = searchQuery.trim().toLowerCase();
+    filtered = filtered.filter(a => {
+      const info = getActivityInfo(a);
+      const catLabel = (CATEGORY_DISPLAY[info.category]?.label || '').toLowerCase();
+      return info.title.toLowerCase().includes(q) || info.friendName.toLowerCase().includes(q) || catLabel.includes(q);
+    });
+  }
+
+  // Date filter
+  if (dateFilter !== 'all') {
+    const now = new Date();
+    if (dateFilter === '7d') filtered = filtered.filter(a => new Date(a.date) >= subDays(now, 7));
+    else if (dateFilter === '30d') filtered = filtered.filter(a => new Date(a.date) >= subDays(now, 30));
+    else if (dateFilter === '3m') filtered = filtered.filter(a => new Date(a.date) >= subMonths(now, 3));
+    else if (dateFilter === '6m') filtered = filtered.filter(a => new Date(a.date) >= subMonths(now, 6));
+    else if (dateFilter === '1y') filtered = filtered.filter(a => new Date(a.date) >= subYears(now, 1));
+    else if (dateFilter === 'older') filtered = filtered.filter(a => new Date(a.date) < subYears(now, 1));
+  }
+
+  // Friend filter (multi-select — union)
+  if (friendFilter.length > 0) {
+    filtered = filtered.filter(a => a._otherPartyId && friendFilter.includes(a._otherPartyId));
+  }
+
+  // Category filter (multi-select — union)
+  if (categoryFilter.length > 0) {
+    filtered = filtered.filter(a => categoryFilter.includes(a._category));
+  }
+
+  // Sort
+  if (sortBy === 'date_desc') filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+  else if (sortBy === 'date_asc') filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  const hasAnyFilter = dateFilter !== 'all' || categoryFilter.length > 0 || friendFilter.length > 0 || searchQuery.trim() !== '';
+  const clearFilters = () => {
+    setDateFilter('all'); setCategoryFilter([]); setFriendFilter([]);
+    setSearchQuery('');
+  };
+
   /* ── Export CSV ──────────────────────────────────────────── */
   const handleExportCSV = () => {
-    const headers = ['Date', 'Friend', 'Category', 'Status', 'Amount', 'Description'];
+    const headers = ['Date', 'Friend', 'Category', 'Status', 'Description'];
     const rows = filtered.map(activity => {
       const info = getActivityInfo(activity);
       const catDisplay = CATEGORY_DISPLAY[info.category] || CATEGORY_DISPLAY.sent_offer;
@@ -736,7 +549,6 @@ export default function RecentActivityPage() {
         info.friendName,
         catDisplay.label,
         info.status || '',
-        info.amount,
         `"${info.title.replace(/"/g, '""')}"`,
       ].join(',');
     });
@@ -762,6 +574,62 @@ export default function RecentActivityPage() {
       </div>
     </div>
   );
+
+  /* ── Status badge renderer ───────────────────────────────── */
+  const renderStatusBadge = (activity, status) => {
+    // Pending payment confirmation
+    if (activity.type === 'payment' && status === 'pending_confirmation') {
+      return (
+        <div style={{
+          display: 'inline-flex', alignItems: 'center',
+          padding: '3px 10px', borderRadius: 8,
+          background: 'rgba(139,92,246,0.15)', color: '#8B5CF6',
+          border: '1px solid rgba(139,92,246,0.3)',
+          fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap',
+          fontFamily: "'DM Sans', sans-serif",
+        }}>
+          Pending payment confirmation
+        </div>
+      );
+    }
+
+    // Pending loan offer received (user is borrower)
+    if (activity.type === 'loan' && status === 'pending' && activity.lender_id !== user.id) {
+      return (
+        <button
+          onClick={() => setViewingLoanOffer(activity)}
+          style={{
+            display: 'inline-flex', alignItems: 'center',
+            padding: '4px 14px', borderRadius: 8,
+            background: 'white', border: '1px solid rgba(0,0,0,0.12)',
+            color: '#1A1918', cursor: 'pointer',
+            fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap',
+            fontFamily: "'DM Sans', sans-serif",
+          }}
+        >
+          View
+        </button>
+      );
+    }
+
+    // Pending loan offer sent (user is lender)
+    if (activity.type === 'loan' && status === 'pending' && activity.lender_id === user.id) {
+      return (
+        <div style={{
+          display: 'inline-flex', alignItems: 'center',
+          padding: '3px 10px', borderRadius: 8,
+          background: 'rgba(84,166,207,0.15)', color: '#54A6CF',
+          border: '1px solid rgba(84,166,207,0.3)',
+          fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap',
+          fontFamily: "'DM Sans', sans-serif",
+        }}>
+          Awaiting Borrower's Signature
+        </div>
+      );
+    }
+
+    return null;
+  };
 
   /* ══════════════════════════════════════════════════════════
      RENDER
@@ -823,15 +691,6 @@ export default function RecentActivityPage() {
               {friendOptions.length > 0 && (
                 <MultiSelectDropdown label="All Friends" options={friendOptions} selected={friendFilter} onChange={setFriendFilter} />
               )}
-              <AmountFilterDropdown
-                amountMode={amountMode}
-                setAmountMode={setAmountMode}
-                amountVal1={amountVal1}
-                setAmountVal1={setAmountVal1}
-                amountVal2={amountVal2}
-                setAmountVal2={setAmountVal2}
-                onApply={() => setAmountApplied(true)}
-              />
               <button
                 onClick={clearFilters}
                 style={{
@@ -863,85 +722,56 @@ export default function RecentActivityPage() {
                 </div>
               ) : (
                 <>
-                  {/* Desktop table header — aligned to row columns */}
-                  <div className="activity-table-header" style={{
-                    display: 'none', alignItems: 'center', padding: '0 5px 12px',
-                    borderBottom: '1px solid rgba(0,0,0,0.06)', marginBottom: 8,
+                  {/* Table header */}
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '120px 1fr 200px',
+                    alignItems: 'center',
+                    padding: '0 5px 12px',
+                    borderBottom: '1px solid rgba(0,0,0,0.06)',
+                    marginBottom: 8,
                   }}>
-                    <span style={{ width: 80, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', flexShrink: 0 }}>Date</span>
-                    <span style={{ flex: 1, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', minWidth: 0, paddingLeft: 4 }}>Category</span>
-                    <span style={{ width: 180, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', flexShrink: 0, paddingLeft: 12 }}>Status</span>
-                    <span style={{ width: 100, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right', flexShrink: 0 }}>Amount</span>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Date</span>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'center' }}>Category</span>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'center' }}>Status</span>
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     {filtered.map((activity, index) => {
                       const { title, description, icon: Icon, status, friendName, amount, category } = getActivityInfo(activity);
-                      const catDisplay = CATEGORY_DISPLAY[category] || CATEGORY_DISPLAY.sent_offer;
-                      const dateDisplay = formatActivityDate(activity.date);
                       const { bg: iconBg, color: iconColor } = getIconStyle(Icon);
+                      const dateDisplay = activity.date ? format(new Date(activity.date), 'MMM d, yyyy') : '';
 
                       return (
                         <div
                           key={`${activity.type}-${activity.id}-${index}`}
-                          className="activity-row"
                           style={{
-                            display: 'flex', alignItems: 'center', gap: 12, padding: '12px 5px',
+                            display: 'grid',
+                            gridTemplateColumns: '120px 1fr 200px',
+                            alignItems: 'center',
+                            padding: '12px 5px',
                             borderBottom: index < filtered.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none',
                           }}
                         >
-                          {/* Icon bubble */}
-                          <div style={{ width: 24, height: 24, borderRadius: 6, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <Icon size={12} style={{ color: iconColor }} />
-                          </div>
-                          {/* Mobile layout — shown on small screens */}
-                          <div className="activity-mobile-content" style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {title}
-                            </p>
-                            <p style={{ fontSize: 11, color: '#787776', margin: '2px 0 0' }}>
-                              {description}
-                            </p>
-                          </div>
-                          <div className="activity-mobile-status">
-                            {(status === 'pending_confirmation' && activity.type === 'payment') && (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 8, background: 'white', flexShrink: 0, border: '1px solid rgba(0,0,0,0.06)' }}>
-                                <Clock size={12} style={{ color: '#787776' }} />
-                                <span style={{ fontSize: 11, fontWeight: 600, color: '#787776', whiteSpace: 'nowrap' }}>Pending confirmation</span>
-                              </div>
-                            )}
-                            {(status === 'pending' && activity.type === 'loan' && (activity.status === 'pending' || activity.status === 'pending_borrower_approval')) && (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 8, background: 'white', flexShrink: 0, border: '1px solid rgba(0,0,0,0.06)' }}>
-                                <Clock size={12} style={{ color: '#787776' }} />
-                                <span style={{ fontSize: 11, fontWeight: 600, color: '#787776', whiteSpace: 'nowrap' }}>Pending approval</span>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Desktop layout — shown on large screens */}
-                          <span className="activity-desktop-date" style={{ display: 'none', width: 80, fontSize: 12, fontWeight: 500, color: '#787776', flexShrink: 0 }}>
+                          {/* Col 1: Date */}
+                          <span style={{ fontSize: 12, color: '#787776', fontWeight: 500 }}>
                             {dateDisplay}
                           </span>
-                          <div className="activity-desktop-category" style={{ display: 'none', maxWidth: 1080, margin: '0 auto', alignItems: 'center', paddingLeft: 4 }}>
-                            <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</span>
+
+                          {/* Col 2: Category — icon + title */}
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <div style={{ width: 24, height: 24, borderRadius: 6, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginRight: 8 }}>
+                              <Icon size={12} style={{ color: iconColor }} />
+                            </div>
+                            <span style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {title}
+                            </span>
                           </div>
-                          <div className="activity-desktop-status" style={{ display: 'none', width: 180, flexShrink: 0, alignItems: 'center', paddingLeft: 12 }}>
-                            {(status === 'pending_confirmation' && activity.type === 'payment') && (
-                              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 8px', borderRadius: 6, background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.06)' }}>
-                                <Clock size={11} style={{ color: '#787776' }} />
-                                <span style={{ fontSize: 10, fontWeight: 600, color: '#787776', whiteSpace: 'nowrap' }}>Pending confirmation</span>
-                              </div>
-                            )}
-                            {(status === 'pending' && activity.type === 'loan' && (activity.status === 'pending' || activity.status === 'pending_borrower_approval')) && (
-                              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 8px', borderRadius: 6, background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.06)' }}>
-                                <Clock size={11} style={{ color: '#787776' }} />
-                                <span style={{ fontSize: 10, fontWeight: 600, color: '#787776', whiteSpace: 'nowrap' }}>Pending approval</span>
-                              </div>
-                            )}
+
+                          {/* Col 3: Status badge */}
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {renderStatusBadge(activity, status)}
                           </div>
-                          <span className="activity-desktop-amount" style={{ display: 'none', width: 100, fontSize: 13, fontWeight: 600, color: '#1A1918', textAlign: 'right', flexShrink: 0 }}>
-                            {amount}
-                          </span>
                         </div>
                       );
                     })}
@@ -950,21 +780,6 @@ export default function RecentActivityPage() {
               )}
             </div>
           </PageCard>
-
-          {/* Desktop table responsive styles */}
-          <style>{`
-            @media (min-width: 900px) {
-              .activity-table-header { display: flex !important; }
-              .activity-row { gap: 0 !important; }
-
-              .activity-mobile-content { display: none !important; }
-              .activity-mobile-status { display: none !important; }
-              .activity-desktop-date { display: block !important; }
-              .activity-desktop-category { display: flex !important; }
-              .activity-desktop-status { display: flex !important; }
-              .activity-desktop-amount { display: block !important; }
-            }
-          `}</style>
 
           </div>
           <div style={{ padding: '20px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -977,6 +792,98 @@ export default function RecentActivityPage() {
           </div>
         </div>
       </div>
+
+      {/* ── Loan Offer View Modal ─────────────────────────────── */}
+      {viewingLoanOffer && (
+        <div
+          onClick={() => setViewingLoanOffer(null)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 50,
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: 'white', borderRadius: 16, padding: 24,
+              maxWidth: 420, width: '90%',
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1A1918', margin: '0 0 16px' }}>
+              Loan Offer from {getUserById(viewingLoanOffer.lender_id)?.full_name || 'Lender'}
+            </h2>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+              <div style={{ background: '#F4F4F5', borderRadius: 10, padding: '12px 14px' }}>
+                <p style={{ fontSize: 11, color: '#787776', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>Amount</p>
+                <p style={{ fontSize: 16, fontWeight: 700, color: '#1A1918', margin: 0 }}>${viewingLoanOffer.amount?.toLocaleString() || '0'}</p>
+              </div>
+              <div style={{ background: '#F4F4F5', borderRadius: 10, padding: '12px 14px' }}>
+                <p style={{ fontSize: 11, color: '#787776', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>Interest Rate</p>
+                <p style={{ fontSize: 16, fontWeight: 700, color: '#1A1918', margin: 0 }}>{viewingLoanOffer.interest_rate ?? '0'}%</p>
+              </div>
+              <div style={{ background: '#F4F4F5', borderRadius: 10, padding: '12px 14px' }}>
+                <p style={{ fontSize: 11, color: '#787776', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>Repayment Period</p>
+                <p style={{ fontSize: 16, fontWeight: 700, color: '#1A1918', margin: 0 }}>{viewingLoanOffer.repayment_period_months ?? viewingLoanOffer.duration_months ?? '—'} mo</p>
+              </div>
+              <div style={{ background: '#F4F4F5', borderRadius: 10, padding: '12px 14px' }}>
+                <p style={{ fontSize: 11, color: '#787776', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>Purpose</p>
+                <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{viewingLoanOffer.purpose || '—'}</p>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => {
+                  setShowSignModal(true);
+                }}
+                style={{
+                  flex: 1, padding: '12px 20px', borderRadius: 22, border: 'none', cursor: 'pointer',
+                  background: '#1A1918', color: 'white', fontSize: 14, fontWeight: 600,
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                Sign & Accept
+              </button>
+              <button
+                onClick={() => setViewingLoanOffer(null)}
+                style={{
+                  padding: '12px 20px', borderRadius: 22,
+                  border: '1px solid rgba(0,0,0,0.12)', cursor: 'pointer',
+                  background: 'white', color: '#1A1918', fontSize: 14, fontWeight: 600,
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Borrower Signature Modal ──────────────────────────── */}
+      {showSignModal && viewingLoanOffer && (
+        <BorrowerSignatureModal
+          isOpen={showSignModal}
+          onClose={() => {
+            setShowSignModal(false);
+            setViewingLoanOffer(null);
+          }}
+          onSign={async (signature) => {
+            try {
+              await Loan.update(viewingLoanOffer.id, { status: 'active', borrower_signature: signature });
+              setShowSignModal(false);
+              setViewingLoanOffer(null);
+              loadData();
+            } catch (e) {
+              console.error('Failed to sign loan:', e);
+            }
+          }}
+          loanDetails={viewingLoanOffer}
+          userFullName={user?.full_name || ''}
+          lenderName={getUserById(viewingLoanOffer.lender_id)?.full_name || 'Lender'}
+        />
+      )}
     </>
   );
 }
