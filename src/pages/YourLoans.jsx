@@ -329,42 +329,46 @@ export default function YourLoans() {
     let totalInterestAccrued = 0;
     let totalPaid = 0;
     let fullPaymentCount = 0;
-    let deficit = 0;
+    let carryover = 0; // Surplus from overpayments spills into subsequent periods
     const periodResults = [];
     for (let i = 0; i < effectivePeriods; i++) {
       const periodInterest = Math.round(remainingPrincipal * r * 100) / 100;
       totalInterestAccrued += periodInterest;
-      const scheduledAmount = originalPaymentAmount + deficit;
-      const confirmedPaidSum = periodConfirmedPayments[i].reduce((sum, p) => sum + (p.amount || 0), 0);
-      totalPaid += confirmedPaidSum;
-      const allPaidSum = periodAllPayments[i].reduce((sum, p) => sum + (p.amount || 0), 0);
-      const pendingPaidSum = allPaidSum - confirmedPaidSum;
-      const isFullPayment = confirmedPaidSum >= scheduledAmount && scheduledAmount > 0;
+      const scheduledAmount = originalPaymentAmount; // Flat contracted amount per period
+      // Actual cash received in this period's date range
+      const confirmedInPeriod = periodConfirmedPayments[i].reduce((sum, p) => sum + (p.amount || 0), 0);
+      const allInPeriod = periodAllPayments[i].reduce((sum, p) => sum + (p.amount || 0), 0);
+      const pendingInPeriod = allInPeriod - confirmedInPeriod;
+      totalPaid += confirmedInPeriod;
+      // Effective coverage = carryover from prior overpayments + this period's confirmed cash
+      const effectiveConfirmed = carryover + confirmedInPeriod;
+      const allocatedConfirmed = Math.min(effectiveConfirmed, scheduledAmount);
+      const isFullPayment = effectiveConfirmed >= scheduledAmount && scheduledAmount > 0;
       if (isFullPayment) fullPaymentCount++;
-      let periodDeficit = 0;
-      if (confirmedPaidSum < scheduledAmount) periodDeficit = Math.round((scheduledAmount - confirmedPaidSum) * 100) / 100;
-      let paymentToInterest = Math.min(confirmedPaidSum, periodInterest);
-      let paymentToPrincipal = Math.max(0, confirmedPaidSum - paymentToInterest);
+      // Carry forward any surplus to the next period
+      carryover = Math.max(0, effectiveConfirmed - scheduledAmount);
+      let paymentToInterest = Math.min(allocatedConfirmed, periodInterest);
+      let paymentToPrincipal = Math.max(0, allocatedConfirmed - paymentToInterest);
       remainingPrincipal = Math.max(0, Math.round((remainingPrincipal - paymentToPrincipal) * 100) / 100);
       const isPast = toLocalDate(scheduleDates[i]) <= getLocalToday();
       periodResults.push({
         period: i + 1, date: scheduleDates[i], scheduledAmount: Math.round(scheduledAmount * 100) / 100,
-        confirmedPaid: Math.round(confirmedPaidSum * 100) / 100, pendingPaid: Math.round(pendingPaidSum * 100) / 100,
-        actualPaid: Math.round(allPaidSum * 100) / 100, isFullPayment, isPast,
-        hasConfirmedPayments: periodConfirmedPayments[i].length > 0,
-        hasPendingPayments: periodAllPayments[i].length > periodConfirmedPayments[i].length,
-        hasAnyPayments: periodAllPayments[i].length > 0,
-        deficit: periodDeficit, interestThisPeriod: periodInterest, remainingPrincipal,
+        confirmedPaid: Math.round(allocatedConfirmed * 100) / 100,
+        pendingPaid: Math.round(pendingInPeriod * 100) / 100,
+        actualPaid: Math.round(allocatedConfirmed * 100) / 100,
+        isFullPayment, isPast,
+        hasConfirmedPayments: allocatedConfirmed > 0,
+        hasPendingPayments: pendingInPeriod > 0,
+        hasAnyPayments: allocatedConfirmed > 0 || pendingInPeriod > 0,
+        deficit: 0, interestThisPeriod: periodInterest, remainingPrincipal,
         confirmedPayments: periodConfirmedPayments[i], allPayments: periodAllPayments[i]
       });
-      deficit = periodDeficit;
     }
     const totalOwedNow = Math.max(0, Math.round((principal + totalInterestAccrued - totalPaid) * 100) / 100);
     const unpaidPeriods = totalPeriods - fullPaymentCount;
     const recalcPayment = unpaidPeriods > 0 && totalOwedNow > 0 ? Math.round((totalOwedNow / unpaidPeriods) * 100) / 100 : 0;
-    const currentPeriodIdx = periodResults.findIndex(p => !p.isPast || (p.isPast && !p.hasConfirmedPayments));
-    const nextPeriodDeficit = currentPeriodIdx > 0 ? periodResults[currentPeriodIdx - 1]?.deficit || 0 : 0;
-    const nextPaymentAmt = recalcPayment > 0 ? Math.round((recalcPayment + nextPeriodDeficit) * 100) / 100 : originalPaymentAmount;
+    const currentPeriodIdx = periodResults.findIndex(p => !p.isFullPayment);
+    const nextPaymentAmt = recalcPayment > 0 ? recalcPayment : originalPaymentAmount;
     return {
       principal, totalOwedNow, totalPaid, totalInterestAccrued, remainingPrincipal, fullPaymentCount, totalPeriods,
       recalcPayment, nextPaymentAmount: nextPaymentAmt, originalPaymentAmount, periodResults,

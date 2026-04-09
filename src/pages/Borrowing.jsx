@@ -444,7 +444,7 @@ export default function Borrowing() {
     let totalInterestAccrued = 0;
     let totalPaid = 0;
     let fullPaymentCount = 0;
-    let deficit = 0; // rollover from previous period
+    let carryover = 0; // overpayment carryover from previous period
     const periodResults = [];
 
     for (let i = 0; i < effectivePeriods; i++) {
@@ -452,33 +452,29 @@ export default function Borrowing() {
       const periodInterest = Math.round(remainingPrincipal * r * 100) / 100;
       totalInterestAccrued += periodInterest;
 
-      // Scheduled amount for this period (original + any deficit from last period)
-      const scheduledAmount = originalPaymentAmount + deficit;
+      // Scheduled amount is always the flat contracted amount (no deficit rollover)
+      const scheduledAmount = originalPaymentAmount;
 
       // Only confirmed payments impact the balance
-      const confirmedPaidSum = periodConfirmedPayments[i].reduce((sum, p) => sum + (p.amount || 0), 0);
-      totalPaid += confirmedPaidSum;
+      const confirmedInPeriod = periodConfirmedPayments[i].reduce((sum, p) => sum + (p.amount || 0), 0);
+      const allInPeriod = periodAllPayments[i].reduce((sum, p) => sum + (p.amount || 0), 0);
+      const pendingInPeriod = allInPeriod - confirmedInPeriod;
+      totalPaid += confirmedInPeriod;
 
-      // All payments in this period (for chart display)
-      const allPaidSum = periodAllPayments[i].reduce((sum, p) => sum + (p.amount || 0), 0);
-      const pendingPaidSum = allPaidSum - confirmedPaidSum;
+      // Effective confirmed = this period's payments + carryover from overpayments
+      const effectiveConfirmed = carryover + confirmedInPeriod;
+      const allocatedConfirmed = Math.min(effectiveConfirmed, scheduledAmount);
 
-      // Is this a full payment? Only confirmed payments count
-      const isFullPayment = confirmedPaidSum >= scheduledAmount && scheduledAmount > 0;
+      // Is this a full payment?
+      const isFullPayment = effectiveConfirmed >= scheduledAmount && scheduledAmount > 0;
       if (isFullPayment) fullPaymentCount++;
 
-      // Calculate new deficit or overpayment (based on confirmed only)
-      let periodDeficit = 0;
-      let periodOverpayment = 0;
-      if (confirmedPaidSum < scheduledAmount) {
-        periodDeficit = Math.round((scheduledAmount - confirmedPaidSum) * 100) / 100;
-      } else if (confirmedPaidSum > scheduledAmount) {
-        periodOverpayment = Math.round((confirmedPaidSum - scheduledAmount) * 100) / 100;
-      }
+      // Carryover for next period
+      carryover = Math.max(0, effectiveConfirmed - scheduledAmount);
 
       // Apply confirmed payment to principal: payment goes to interest first, then principal
-      let paymentToInterest = Math.min(confirmedPaidSum, periodInterest);
-      let paymentToPrincipal = Math.max(0, confirmedPaidSum - paymentToInterest);
+      let paymentToInterest = Math.min(allocatedConfirmed, periodInterest);
+      let paymentToPrincipal = Math.max(0, allocatedConfirmed - paymentToInterest);
       remainingPrincipal = Math.max(0, Math.round((remainingPrincipal - paymentToPrincipal) * 100) / 100);
 
       const isPast = toLocalDate(scheduleDates[i]) <= getLocalToday();
@@ -487,24 +483,21 @@ export default function Borrowing() {
         period: i + 1,
         date: scheduleDates[i],
         scheduledAmount: Math.round(scheduledAmount * 100) / 100,
-        confirmedPaid: Math.round(confirmedPaidSum * 100) / 100,
-        pendingPaid: Math.round(pendingPaidSum * 100) / 100,
-        actualPaid: Math.round(allPaidSum * 100) / 100,
+        confirmedPaid: Math.round(allocatedConfirmed * 100) / 100,
+        pendingPaid: Math.round(pendingInPeriod * 100) / 100,
+        actualPaid: Math.round(allocatedConfirmed * 100) / 100,
         isFullPayment,
         isPast,
-        hasConfirmedPayments: periodConfirmedPayments[i].length > 0,
-        hasPendingPayments: periodAllPayments[i].length > periodConfirmedPayments[i].length,
-        hasAnyPayments: periodAllPayments[i].length > 0,
-        deficit: periodDeficit,
-        overpayment: periodOverpayment,
+        hasConfirmedPayments: allocatedConfirmed > 0,
+        hasPendingPayments: pendingInPeriod > 0,
+        hasAnyPayments: allocatedConfirmed > 0 || pendingInPeriod > 0,
+        deficit: 0,
+        overpayment: 0,
         interestThisPeriod: periodInterest,
         remainingPrincipal,
         confirmedPayments: periodConfirmedPayments[i],
         allPayments: periodAllPayments[i]
       });
-
-      // Set deficit for next period: only carries for one period, then resets
-      deficit = periodDeficit;
     }
 
     // Calculate remaining balance and recalculated payment
