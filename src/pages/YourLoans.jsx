@@ -1346,9 +1346,9 @@ export default function YourLoans() {
   const SHADOW = '0px 50px 40px rgba(0,0,0,0.02), 0px 50px 40px rgba(0,0,0,0.04), 0px 20px 40px rgba(0,0,0,0.08), 0px 3px 10px rgba(0,0,0,0.12)';
 
   const RightSection = ({ title, children }) => (
-    <div style={{ marginBottom: 24 }}>
-      <div style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', letterSpacing: '0.01em', marginBottom: 9 }}>{title}</div>
-      <div style={{ height: 1, background: 'rgba(0,0,0,0.08)', marginBottom: 14 }} />
+    <div style={{ marginBottom: 28 }}>
+      <div style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 9 }}>{title}</div>
+      <div style={{ height: 1, background: 'rgba(0,0,0,0.07)', marginBottom: 14 }} />
       {children}
     </div>
   );
@@ -1426,107 +1426,62 @@ export default function YourLoans() {
       </AnimatePresence>
 
       {/* Three-column layout */}
-      <div className="mesh-layout" style={{ maxWidth: 1200, margin: '0 auto', padding: '88px 8px 60px 8px', display: 'grid', gridTemplateColumns: '160px 1fr 240px', gap: 0, alignItems: 'start' }}>
+      <div className="mesh-layout" style={{ minHeight: '100vh', display: 'grid', gridTemplateColumns: '180px 1fr 260px', gap: 0, fontFamily: "'DM Sans', sans-serif" }}>
 
         {/* ── LEFT: Sidebar nav ── */}
-        <div className="mesh-left" style={{ paddingRight: 20, borderRight: '1px solid rgba(0,0,0,0.07)', position: 'sticky', top: 88 }}>
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            {[
-              { label: 'Home', to: '/', active: false },
-              { label: 'Upcoming', to: createPageUrl("Upcoming"), active: false },
-              { label: 'My Loans', to: createPageUrl("YourLoans"), active: true },
-              { label: 'Friends', to: createPageUrl("Friends"), active: false },
-            ].map(({ label, to, active: isActive }) => (
-              <Link key={label} to={to} style={{
-                display: 'block', padding: '8px 10px 8px 4px', borderRadius: 9, textDecoration: 'none',
-                fontSize: 14, fontWeight: isActive ? 600 : 500,
-                color: isActive ? '#1A1918' : '#787776',
-                background: isActive ? 'rgba(0,0,0,0.05)' : 'transparent',
-                fontFamily: "'DM Sans', sans-serif", width: '100%', boxSizing: 'border-box',
-              }}>
-                {label}
-              </Link>
-            ))}
-            <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '8px 0' }} />
-            {[
-              { label: 'Recent Activity', to: createPageUrl("RecentActivity") },
-              { label: 'Documents', to: createPageUrl("LoanAgreements") },
-              { label: 'Record Payment', to: createPageUrl("RecordPayment") },
-            ].map(({ label, to }) => (
-              <Link key={label} to={to} style={{
-                display: 'block', padding: '7px 10px 7px 4px', borderRadius: 9, textDecoration: 'none',
-                fontSize: 13, fontWeight: 500, color: '#9B9A98',
-                background: 'transparent', fontFamily: "'DM Sans', sans-serif",
-                width: '100%', boxSizing: 'border-box',
-              }}>
-                {label}
-              </Link>
-            ))}
-            {/* More dropdown */}
-            <div style={{ position: 'relative' }}
-              onMouseEnter={() => {
-                if (moreNavCloseTimerRef.current) { clearTimeout(moreNavCloseTimerRef.current); moreNavCloseTimerRef.current = null; }
-                setMoreNavOpen(true);
-              }}
-              onMouseLeave={() => { moreNavCloseTimerRef.current = setTimeout(() => setMoreNavOpen(false), 150); }}
-            >
-              <button style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '7px 10px 7px 4px', borderRadius: 9, border: 'none', cursor: 'pointer',
-                fontSize: 13, fontWeight: 500, color: '#9B9A98',
-                background: 'transparent', fontFamily: "'DM Sans', sans-serif",
-                width: '100%', boxSizing: 'border-box',
-              }}>
-                More
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="6 9 12 15 18 9" /></svg>
-              </button>
-              {moreNavOpen && (
-                <div style={{
-                  position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
-                  background: 'white', borderRadius: 10, padding: '4px 0',
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06)',
-                  zIndex: 50,
-                }}>
-                  {[
-                    { label: 'Learn', to: createPageUrl("ComingSoon") },
-                    { label: 'Loan Help', to: createPageUrl("LoanHelp") },
-                  ].map(({ label, to }) => (
-                    <Link key={label} to={to} onClick={() => setMoreNavOpen(false)} style={{
-                      display: 'block', padding: '8px 14px', fontSize: 13, fontWeight: 500,
-                      color: '#1A1918', textDecoration: 'none', fontFamily: "'DM Sans', sans-serif",
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.04)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                    >
-                      {label}
-                    </Link>
-                  ))}
-                  <a href="https://www.vony-lending.com/help" target="_blank" rel="noopener noreferrer"
-                    style={{ display: 'block', padding: '8px 14px', fontSize: 13, fontWeight: 500, color: '#1A1918', textDecoration: 'none', fontFamily: "'DM Sans', sans-serif" }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.04)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                  >
-                    Help & Support
-                  </a>
-                  <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '4px 14px' }} />
-                  <button onClick={() => { setMoreNavOpen(false); logout?.(); }} style={{
-                    display: 'block', width: '100%', padding: '8px 14px', fontSize: 13, fontWeight: 500,
-                    color: '#E8726E', background: 'transparent', border: 'none', cursor: 'pointer',
-                    textAlign: 'left', fontFamily: "'DM Sans', sans-serif",
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(232,114,110,0.06)'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                  >
-                    Log Out
-                  </button>
-                </div>
-              )}
-            </div>
-          </nav>
+        <div className="mesh-left" style={{ background: '#F5F4F0', borderRight: '1px solid rgba(0,0,0,0.08)' }}>
+          <div style={{ position: 'sticky', top: 0, padding: '32px 20px 0' }}>
+            <Link to="/" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 600, fontStyle: 'italic', fontSize: '1.75rem', color: '#1A1918', textDecoration: 'none', display: 'block', marginBottom: 24 }}>Vony</Link>
+            <nav style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              {[
+                { label: 'Home', to: '/', active: false },
+                { label: 'Upcoming', to: createPageUrl("Upcoming"), active: false },
+              ].map(({ label, to, active: isActive }) => (
+                <Link key={label} to={to} style={{ display: 'block', padding: '8px 10px 8px 4px', borderRadius: 9, textDecoration: 'none', fontSize: 14, fontWeight: isActive ? 600 : 500, color: isActive ? '#1A1918' : '#787776', background: isActive ? 'rgba(0,0,0,0.05)' : 'transparent', fontFamily: "'DM Sans', sans-serif", width: '100%', boxSizing: 'border-box' }}>{label}</Link>
+              ))}
+              <Link to={createPageUrl("CreateOffer")} style={{ display: 'block', padding: '5px 10px 5px 16px', borderRadius: 7, textDecoration: 'none', fontSize: 12, fontWeight: 500, color: '#9B9A98', background: 'transparent', fontFamily: "'DM Sans', sans-serif", width: '100%', boxSizing: 'border-box' }}>Create Loan</Link>
+              <Link to={createPageUrl("RecordPayment")} style={{ display: 'block', padding: '5px 10px 5px 16px', borderRadius: 7, textDecoration: 'none', fontSize: 12, fontWeight: 500, color: '#9B9A98', background: 'transparent', fontFamily: "'DM Sans', sans-serif", width: '100%', boxSizing: 'border-box' }}>Record Payment</Link>
+              <Link to={createPageUrl("YourLoans")} style={{ display: 'block', padding: '8px 10px 8px 4px', borderRadius: 9, textDecoration: 'none', fontSize: 14, fontWeight: 600, color: '#1A1918', background: 'rgba(0,0,0,0.05)', fontFamily: "'DM Sans', sans-serif", width: '100%', boxSizing: 'border-box' }}>My Loans</Link>
+              <Link to={createPageUrl("Friends")} style={{ display: 'block', padding: '8px 10px 8px 4px', borderRadius: 9, textDecoration: 'none', fontSize: 14, fontWeight: 500, color: '#787776', background: 'transparent', fontFamily: "'DM Sans', sans-serif", width: '100%', boxSizing: 'border-box' }}>Friends</Link>
+              <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '8px 0' }} />
+              {[
+                { label: 'Recent Activity', to: createPageUrl("RecentActivity") },
+                { label: 'Documents', to: createPageUrl("LoanAgreements") },
+              ].map(({ label, to }) => (
+                <Link key={label} to={to} style={{ display: 'block', padding: '7px 10px 7px 4px', borderRadius: 9, textDecoration: 'none', fontSize: 13, fontWeight: 500, color: '#9B9A98', background: 'transparent', fontFamily: "'DM Sans', sans-serif", width: '100%', boxSizing: 'border-box' }}>{label}</Link>
+              ))}
+              {/* More dropdown */}
+              <div style={{ position: 'relative' }}
+                onMouseEnter={() => {
+                  if (moreNavCloseTimerRef.current) { clearTimeout(moreNavCloseTimerRef.current); moreNavCloseTimerRef.current = null; }
+                  setMoreNavOpen(true);
+                }}
+                onMouseLeave={() => { moreNavCloseTimerRef.current = setTimeout(() => setMoreNavOpen(false), 150); }}
+              >
+                <button style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 10px 7px 4px', borderRadius: 9, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 500, color: '#9B9A98', background: 'transparent', fontFamily: "'DM Sans', sans-serif", width: '100%', boxSizing: 'border-box' }}>
+                  More
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="6 9 12 15 18 9" /></svg>
+                </button>
+                {moreNavOpen && (
+                  <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, background: 'white', borderRadius: 10, padding: '4px 0', boxShadow: '0 4px 16px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06)', zIndex: 50 }}>
+                    {[
+                      { label: 'Learn', to: createPageUrl("ComingSoon") },
+                      { label: 'Loan Help', to: createPageUrl("LoanHelp") },
+                    ].map(({ label, to }) => (
+                      <Link key={label} to={to} onClick={() => setMoreNavOpen(false)} style={{ display: 'block', padding: '8px 14px', fontSize: 13, fontWeight: 500, color: '#1A1918', textDecoration: 'none', fontFamily: "'DM Sans', sans-serif" }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.04)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>{label}</Link>
+                    ))}
+                    <a href="https://www.vony-lending.com/help" target="_blank" rel="noopener noreferrer" style={{ display: 'block', padding: '8px 14px', fontSize: 13, fontWeight: 500, color: '#1A1918', textDecoration: 'none', fontFamily: "'DM Sans', sans-serif" }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.04)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>Help & Support</a>
+                    <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '4px 14px' }} />
+                    <button onClick={() => { setMoreNavOpen(false); logout?.(); }} style={{ display: 'block', width: '100%', padding: '8px 14px', fontSize: 13, fontWeight: 500, color: '#E8726E', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', fontFamily: "'DM Sans', sans-serif" }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(232,114,110,0.06)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>Log Out</button>
+                  </div>
+                )}
+              </div>
+            </nav>
+          </div>
         </div>
 
         {/* ── CENTER ── */}
-        <div className="mesh-center" style={{ padding: '0 32px', minHeight: 500, borderRight: '1px solid rgba(0,0,0,0.07)' }}>
+        <div className="mesh-center" style={{ background: 'white', borderRight: '1px solid rgba(0,0,0,0.08)', padding: '40px 40px 60px' }}>
 
           {/* Glass tab toggle */}
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 28 }}>
@@ -1616,35 +1571,31 @@ export default function YourLoans() {
         </div>
 
         {/* ── RIGHT PANEL ── */}
-        <div className="mesh-right" style={{ paddingLeft: 28, position: 'sticky', top: 88 }}>
-
-          {/* Action buttons */}
-          <Link to={createPageUrl("CreateOffer")} style={{
-            display: 'block', width: '100%', padding: '12px 16px', borderRadius: 10, boxSizing: 'border-box',
-            background: '#1A1918', color: 'white', textDecoration: 'none',
-            fontSize: 14, fontWeight: 600, textAlign: 'center', fontFamily: "'DM Sans', sans-serif",
-            marginBottom: 9,
-          }}>
-            Create Loan
-          </Link>
-          <Link to={createPageUrl("RecordPayment")} style={{
-            display: 'block', width: '100%', padding: '12px 16px', borderRadius: 10, boxSizing: 'border-box',
-            background: '#1A1918', color: 'white', textDecoration: 'none',
-            fontSize: 14, fontWeight: 600, textAlign: 'center', fontFamily: "'DM Sans', sans-serif",
-            marginBottom: 28,
-          }}>
-            Record Payment
-          </Link>
+        <div className="mesh-right" style={{ background: '#F5F4F0' }}>
+          <div style={{ position: 'sticky', top: 0, padding: '28px 28px 0' }}>
+          {/* Bell + Profile icons */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10, marginBottom: 24 }}>
+            <Link to={createPageUrl("Requests")} style={{ position: 'relative', textDecoration: 'none' }}>
+              <div style={{ width: 32, height: 32, borderRadius: 9, background: 'rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#787776" strokeWidth="2" strokeLinecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              </div>
+            </Link>
+            <Link to={createPageUrl("Profile")} style={{ textDecoration: 'none' }}>
+              <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(3,172,234,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              </div>
+            </Link>
+          </div>
 
           {/* Pending confirmations */}
           {pendingToConfirm.length > 0 && (
             <RightSection title="Needs Attention">
-              {pendingToConfirm.slice(0, 5).map((p, idx) => {
+              {pendingToConfirm.slice(0, 5).map((p) => {
                 const loan = allLoans.find(l => l.id === p.loan_id);
                 const borrowerProfile = loan ? publicProfiles.find(pr => pr.user_id === loan.borrower_id) : null;
                 const name = borrowerProfile?.full_name?.split(' ')[0] || 'User';
                 return (
-                  <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: idx < pendingToConfirm.slice(0,5).length - 1 ? '1px solid rgba(0,0,0,0.04)' : 'none' }}>
+                  <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0' }}>
                     <div style={{ width: 26, height: 26, borderRadius: 7, background: 'rgba(245,158,11,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
                     </div>
@@ -1686,7 +1637,7 @@ export default function YourLoans() {
           {allLoans.filter(l => l.status === 'active').length > 0 && (
             <RightSection title="Active Loans">
               <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
-                {allLoans.filter(l => l.status === 'active').slice(0, 5).map((loan, idx) => {
+                {allLoans.filter(l => l.status === 'active').slice(0, 5).map((loan) => {
                   const isLender = loan.lender_id === user?.id;
                   const otherId = isLender ? loan.borrower_id : loan.lender_id;
                   const otherProfile = publicProfiles.find(p => p.user_id === otherId);
@@ -1712,6 +1663,7 @@ export default function YourLoans() {
               </div>
             </RightSection>
           )}
+          </div>
         </div>
       </div>
 
