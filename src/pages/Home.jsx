@@ -234,7 +234,7 @@ function WeekStrip({ allPaymentEvents, today, formatMoney }) {
 }
 
 export default function Home() {
-  const { user: authUser, userProfile, isLoadingAuth, navigateToLogin } = useAuth();
+  const { user: authUser, userProfile, isLoadingAuth, navigateToLogin, logout } = useAuth();
   const [loans, setLoans] = useState([]);
   const [payments, setPayments] = useState([]);
   const [publicProfiles, setPublicProfiles] = useState([]);
@@ -243,6 +243,8 @@ export default function Home() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [alertSlide, setAlertSlide] = useState(0);
+  const [moreNavOpen, setMoreNavOpen] = useState(false);
+  const moreNavCloseTimerRef = useRef(null);
   const overdueCountRef = useRef(0);
   const loansChartRef = useRef(null);
   const activeLoansRef = useRef(null);
@@ -755,16 +757,24 @@ export default function Home() {
     <div style={{ fontSize: 10, fontWeight: 700, color: '#C5C3C0', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 12 }}>{children}</div>
   );
 
+  const RightSection = ({ title, children }) => (
+    <div style={{ marginBottom: 24 }}>
+      <div style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', letterSpacing: '0.01em', marginBottom: 9 }}>{title}</div>
+      <div style={{ height: 1, background: 'rgba(0,0,0,0.08)', marginBottom: 14 }} />
+      {children}
+    </div>
+  );
+
   return (
     <div className="home-with-sidebar" style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased', background: 'transparent' }}>
 
       <DashboardSidebar activePage="Dashboard" user={user} />
 
       {/* ── MESH THREE-COLUMN LAYOUT ── */}
-      <div className="mesh-layout" style={{ maxWidth: 1080, margin: '0 auto', padding: '88px 40px 60px', display: 'grid', gridTemplateColumns: '160px 1fr 220px', gap: 0, alignItems: 'start' }}>
+      <div className="mesh-layout" style={{ maxWidth: 1080, margin: '0 auto', padding: '88px 24px 60px 24px', display: 'grid', gridTemplateColumns: '160px 1fr 230px', gap: 0, alignItems: 'start' }}>
 
         {/* ── LEFT: Sidebar nav ── */}
-        <div className="mesh-left" style={{ paddingRight: 28, borderRight: '1px solid rgba(0,0,0,0.07)', position: 'sticky', top: 88 }}>
+        <div className="mesh-left" style={{ paddingRight: 20, borderRight: '1px solid rgba(0,0,0,0.07)', position: 'sticky', top: 88 }}>
           <nav style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             {[
               { label: 'Home', to: '/', active: true },
@@ -773,30 +783,90 @@ export default function Home() {
               { label: 'Friends', to: createPageUrl("Friends"), active: false },
             ].map(({ label, to, active: isActive }) => (
               <Link key={label} to={to} style={{
-                display: 'block', padding: '8px 12px', borderRadius: 9, textDecoration: 'none',
+                display: 'block', padding: '8px 10px 8px 4px', borderRadius: 9, textDecoration: 'none',
                 fontSize: 14, fontWeight: isActive ? 600 : 500,
                 color: isActive ? '#1A1918' : '#787776',
                 background: isActive ? 'rgba(0,0,0,0.05)' : 'transparent',
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'DM Sans', sans-serif", width: '100%', boxSizing: 'border-box',
               }}>
                 {label}
               </Link>
             ))}
-            <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '8px 12px' }} />
+            <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '8px 0' }} />
             {[
               { label: 'Recent Activity', to: createPageUrl("RecentActivity") },
               { label: 'Documents', to: createPageUrl("LoanAgreements") },
               { label: 'Record Payment', to: createPageUrl("RecordPayment") },
-              { label: 'Requests', to: createPageUrl("Requests") },
             ].map(({ label, to }) => (
               <Link key={label} to={to} style={{
-                display: 'block', padding: '7px 12px', borderRadius: 9, textDecoration: 'none',
+                display: 'block', padding: '7px 10px 7px 4px', borderRadius: 9, textDecoration: 'none',
                 fontSize: 13, fontWeight: 500, color: '#9B9A98',
                 background: 'transparent', fontFamily: "'DM Sans', sans-serif",
+                width: '100%', boxSizing: 'border-box',
               }}>
                 {label}
               </Link>
             ))}
+            {/* More dropdown */}
+            <div style={{ position: 'relative' }}
+              onMouseEnter={() => {
+                if (moreNavCloseTimerRef.current) { clearTimeout(moreNavCloseTimerRef.current); moreNavCloseTimerRef.current = null; }
+                setMoreNavOpen(true);
+              }}
+              onMouseLeave={() => { moreNavCloseTimerRef.current = setTimeout(() => setMoreNavOpen(false), 150); }}
+            >
+              <button style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '7px 10px 7px 4px', borderRadius: 9, border: 'none', cursor: 'pointer',
+                fontSize: 13, fontWeight: 500, color: '#9B9A98',
+                background: 'transparent', fontFamily: "'DM Sans', sans-serif",
+                width: '100%', boxSizing: 'border-box',
+              }}>
+                More
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="6 9 12 15 18 9" /></svg>
+              </button>
+              {moreNavOpen && (
+                <div style={{
+                  position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
+                  background: 'white', borderRadius: 10, padding: '4px 0',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06)',
+                  zIndex: 50,
+                }}>
+                  {[
+                    { label: 'Learn', to: createPageUrl("ComingSoon") },
+                    { label: 'Loan Help', to: createPageUrl("LoanHelp") },
+                  ].map(({ label, to }) => (
+                    <Link key={label} to={to} onClick={() => setMoreNavOpen(false)} style={{
+                      display: 'block', padding: '8px 14px', fontSize: 13, fontWeight: 500,
+                      color: '#1A1918', textDecoration: 'none', fontFamily: "'DM Sans', sans-serif",
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.04)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                    >
+                      {label}
+                    </Link>
+                  ))}
+                  <a href="https://www.vony-lending.com/help" target="_blank" rel="noopener noreferrer"
+                    style={{ display: 'block', padding: '8px 14px', fontSize: 13, fontWeight: 500, color: '#1A1918', textDecoration: 'none', fontFamily: "'DM Sans', sans-serif" }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.04)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                  >
+                    Help & Support
+                  </a>
+                  <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '4px 14px' }} />
+                  <button onClick={() => { setMoreNavOpen(false); logout?.(); }} style={{
+                    display: 'block', width: '100%', padding: '8px 14px', fontSize: 13, fontWeight: 500,
+                    color: '#E8726E', background: 'transparent', border: 'none', cursor: 'pointer',
+                    textAlign: 'left', fontFamily: "'DM Sans', sans-serif",
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(232,114,110,0.06)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                  >
+                    Log Out
+                  </button>
+                </div>
+              )}
+            </div>
           </nav>
         </div>
 
@@ -811,24 +881,25 @@ export default function Home() {
             <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 4 }}>{format(today, 'EEEE, MMMM d')}</div>
           </div>
 
-          {/* Three summary cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 24 }}>
+          {/* Three summary bars */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
             {/* Next payment due */}
             {(() => {
               const days = nextBorrowerPayment ? Math.ceil((nextBorrowerPayment.date.getTime() - Date.now()) / 86400000) : null;
               const isLate = days !== null && days < 0;
+              const daysLabel = days === null ? null : isLate ? `${Math.abs(days)}d late` : days === 0 ? 'today' : `${days}d`;
+              const badgeColor = isLate ? '#E8726E' : days !== null && days <= 3 ? '#F59E0B' : '#9B9A98';
+              const badgeBg = isLate ? 'rgba(232,114,110,0.08)' : days !== null && days <= 3 ? 'rgba(245,158,11,0.08)' : 'rgba(0,0,0,0.04)';
               return (
-                <div style={{ padding: '12px 14px', borderRadius: 11, background: 'white', boxShadow: SHADOW, border: `1px solid ${isLate ? 'rgba(232,114,110,0.2)' : 'rgba(0,0,0,0.05)'}` }}>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: '#C5C3C0', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>Next due</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 10, background: isLate ? 'rgba(232,114,110,0.04)' : 'rgba(0,0,0,0.02)', border: `1px solid ${isLate ? 'rgba(232,114,110,0.15)' : 'rgba(0,0,0,0.06)'}` }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: '#C5C3C0', letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0, width: 68 }}>Next due</span>
                   {nextBorrowerPayment ? (
                     <>
-                      <div style={{ fontSize: 17, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', lineHeight: 1 }}>{formatMoney(nextBorrowerPayment.payment_amount || 0)}</div>
-                      <div style={{ fontSize: 11, color: '#787776', marginTop: 3 }}>to {nextBorrowerPayment.firstName}</div>
-                      <div style={{ marginTop: 5, fontSize: 10, fontWeight: 700, color: isLate ? '#E8726E' : days <= 3 ? '#F59E0B' : '#9B9A98' }}>
-                        {isLate ? `${Math.abs(days)}d late` : days === 0 ? 'today' : `in ${days}d`}
-                      </div>
+                      <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{formatMoney(nextBorrowerPayment.payment_amount || 0)}</span>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 6, padding: '2px 7px', flexShrink: 0 }}>{daysLabel}</span>
+                      <span style={{ fontSize: 12, color: '#787776', flex: 1, textAlign: 'right' }}>to {nextBorrowerPayment.firstName}</span>
                     </>
-                  ) : <div style={{ fontSize: 12, color: '#9B9A98', marginTop: 4 }}>Nothing due</div>}
+                  ) : <span style={{ fontSize: 12, color: '#9B9A98' }}>Nothing due</span>}
                 </div>
               );
             })()}
@@ -837,33 +908,31 @@ export default function Home() {
             {(() => {
               const days = nextLenderPayment ? Math.ceil((nextLenderPayment.date.getTime() - Date.now()) / 86400000) : null;
               const isLate = days !== null && days < 0;
+              const daysLabel = days === null ? null : isLate ? `${Math.abs(days)}d late` : days === 0 ? 'today' : `${days}d`;
+              const badgeColor = isLate ? '#E8726E' : LENDER_GREEN;
+              const badgeBg = isLate ? 'rgba(232,114,110,0.08)' : 'rgba(82,183,136,0.10)';
               return (
-                <div style={{ padding: '12px 14px', borderRadius: 11, background: 'white', boxShadow: SHADOW, border: '1px solid rgba(82,183,136,0.18)' }}>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: '#C5C3C0', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>Next incoming</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 10, background: 'rgba(82,183,136,0.04)', border: '1px solid rgba(82,183,136,0.15)' }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: '#C5C3C0', letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0, width: 68 }}>Incoming</span>
                   {nextLenderPayment ? (
                     <>
-                      <div style={{ fontSize: 17, fontWeight: 800, color: LENDER_GREEN, letterSpacing: '-0.02em', lineHeight: 1 }}>{formatMoney(nextLenderPayment.payment_amount || 0)}</div>
-                      <div style={{ fontSize: 11, color: '#787776', marginTop: 3 }}>from {nextLenderPayment.firstName}</div>
-                      <div style={{ marginTop: 5, fontSize: 10, fontWeight: 700, color: isLate ? '#E8726E' : LENDER_GREEN }}>
-                        {isLate ? `${Math.abs(days)}d late` : days === 0 ? 'today' : `in ${days}d`}
-                      </div>
+                      <span style={{ fontSize: 15, fontWeight: 800, color: LENDER_GREEN, letterSpacing: '-0.02em' }}>{formatMoney(nextLenderPayment.payment_amount || 0)}</span>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 6, padding: '2px 7px', flexShrink: 0 }}>{daysLabel}</span>
+                      <span style={{ fontSize: 12, color: '#787776', flex: 1, textAlign: 'right' }}>from {nextLenderPayment.firstName}</span>
                     </>
-                  ) : <div style={{ fontSize: 12, color: '#9B9A98', marginTop: 4 }}>None incoming</div>}
+                  ) : <span style={{ fontSize: 12, color: '#9B9A98' }}>None incoming</span>}
                 </div>
               );
             })()}
 
             {/* Overview */}
-            <div style={{ padding: '12px 14px', borderRadius: 11, background: 'white', boxShadow: SHADOW, border: '1px solid rgba(0,0,0,0.05)' }}>
-              <div style={{ fontSize: 9, fontWeight: 700, color: '#C5C3C0', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>Overview</div>
-              <div style={{ marginBottom: 6 }}>
-                <div style={{ fontSize: 9, color: '#C5C3C0', marginBottom: 1 }}>Owed to you</div>
-                <div style={{ fontSize: 15, fontWeight: 800, color: LENDER_GREEN, letterSpacing: '-0.02em' }}>{formatMoney(lentRemaining)}</div>
-              </div>
-              <div>
-                <div style={{ fontSize: 9, color: '#C5C3C0', marginBottom: 1 }}>You owe</div>
-                <div style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{formatMoney(borrowedRemaining)}</div>
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 10, background: 'rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.06)' }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: '#C5C3C0', letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0, width: 68 }}>Overview</span>
+              <span style={{ fontSize: 12, color: '#787776' }}>Owed to you</span>
+              <span style={{ fontSize: 14, fontWeight: 800, color: LENDER_GREEN, letterSpacing: '-0.02em' }}>{formatMoney(lentRemaining)}</span>
+              <span style={{ fontSize: 12, color: '#C5C3C0' }}>·</span>
+              <span style={{ fontSize: 12, color: '#787776' }}>You owe</span>
+              <span style={{ fontSize: 14, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{formatMoney(borrowedRemaining)}</span>
             </div>
           </div>
 
@@ -927,7 +996,8 @@ export default function Home() {
             {recentActivity.length === 0 ? (
               <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98' }}>No recent activity yet.</div>
             ) : recentActivity.map((item, idx) => (
-              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '9px 0', borderBottom: idx < recentActivity.length - 1 ? '1px solid rgba(0,0,0,0.04)' : 'none' }}>
+              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderBottom: idx < recentActivity.length - 1 ? '1px solid rgba(0,0,0,0.04)' : 'none' }}>
+                <div style={{ width: 8, height: 8, borderRadius: 2, background: item.color, flexShrink: 0 }} />
                 <div style={{ flex: 1, minWidth: 0, fontSize: 13, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.description}</div>
                 <span style={{ fontSize: 11, color: '#9B9A98', flexShrink: 0 }}>{item.detail}</span>
               </div>
@@ -940,58 +1010,52 @@ export default function Home() {
 
           {/* Action buttons */}
           <Link to={createPageUrl("CreateOffer")} style={{
-            display: 'block', width: '100%', padding: '11px 16px', borderRadius: 10, boxSizing: 'border-box',
+            display: 'block', width: '100%', padding: '12px 16px', borderRadius: 10, boxSizing: 'border-box',
             background: '#1A1918', color: 'white', textDecoration: 'none',
-            fontSize: 13, fontWeight: 600, textAlign: 'center', fontFamily: "'DM Sans', sans-serif",
-            marginBottom: 8,
+            fontSize: 14, fontWeight: 600, textAlign: 'center', fontFamily: "'DM Sans', sans-serif",
+            marginBottom: 9,
           }}>
             Create Loan
           </Link>
           <Link to={createPageUrl("RecordPayment")} style={{
-            display: 'block', width: '100%', padding: '11px 16px', borderRadius: 10, boxSizing: 'border-box',
+            display: 'block', width: '100%', padding: '12px 16px', borderRadius: 10, boxSizing: 'border-box',
             background: '#1A1918', color: 'white', textDecoration: 'none',
-            fontSize: 13, fontWeight: 600, textAlign: 'center', fontFamily: "'DM Sans', sans-serif",
+            fontSize: 14, fontWeight: 600, textAlign: 'center', fontFamily: "'DM Sans', sans-serif",
             marginBottom: 28,
           }}>
             Record Payment
           </Link>
 
           {/* How [month] is going */}
-          <div style={{ marginBottom: 26 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: '#C5C3C0', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 14 }}>
-              How {format(today, 'MMMM')} is going
-            </div>
-
+          <RightSection title={`How ${format(today, 'MMMM')} is going`}>
             {/* Received */}
-            <div style={{ marginBottom: 14 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 5 }}>
-                <span style={{ fontSize: 11, color: '#787776' }}>Received</span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: LENDER_GREEN, letterSpacing: '-0.01em' }}>{formatMoney(monthlyReceived)}</span>
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
+                <span style={{ fontSize: 13, color: '#787776' }}>Received</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: LENDER_GREEN, letterSpacing: '-0.01em' }}>{formatMoney(monthlyReceived)}</span>
               </div>
-              <div style={{ height: 5, borderRadius: 3, background: 'rgba(82,183,136,0.12)', overflow: 'hidden' }}>
+              <div style={{ height: 6, borderRadius: 3, background: 'rgba(82,183,136,0.12)', overflow: 'hidden' }}>
                 <div style={{ height: '100%', borderRadius: 3, background: LENDER_GREEN, width: `${monthlyExpectedReceive > 0 ? Math.min((monthlyReceived / monthlyExpectedReceive) * 100, 100) : 0}%`, transition: 'width 0.8s ease-out' }} />
               </div>
-              <div style={{ fontSize: 10, color: '#C5C3C0', marginTop: 3 }}>of {formatMoney(monthlyExpectedReceive)} expected</div>
+              <div style={{ fontSize: 11, color: '#C5C3C0', marginTop: 4 }}>of {formatMoney(monthlyExpectedReceive)} expected</div>
             </div>
-
             {/* Paid out */}
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 5 }}>
-                <span style={{ fontSize: 11, color: '#787776' }}>Paid out</span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#7EC0EA', letterSpacing: '-0.01em' }}>{formatMoney(monthlyPaidOut)}</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
+                <span style={{ fontSize: 13, color: '#787776' }}>Paid out</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: '#7EC0EA', letterSpacing: '-0.01em' }}>{formatMoney(monthlyPaidOut)}</span>
               </div>
-              <div style={{ height: 5, borderRadius: 3, background: 'rgba(126,192,234,0.15)', overflow: 'hidden' }}>
+              <div style={{ height: 6, borderRadius: 3, background: 'rgba(126,192,234,0.15)', overflow: 'hidden' }}>
                 <div style={{ height: '100%', borderRadius: 3, background: '#7EC0EA', width: `${monthlyExpectedPay > 0 ? Math.min((monthlyPaidOut / monthlyExpectedPay) * 100, 100) : 0}%`, transition: 'width 0.8s ease-out' }} />
               </div>
-              <div style={{ fontSize: 10, color: '#C5C3C0', marginTop: 3 }}>of {formatMoney(monthlyExpectedPay)} expected</div>
+              <div style={{ fontSize: 11, color: '#C5C3C0', marginTop: 4 }}>of {formatMoney(monthlyExpectedPay)} expected</div>
             </div>
-          </div>
+          </RightSection>
 
           {/* Active loan bars */}
           {myLoans.filter(l => l && l.status === 'active').length > 0 && (
-            <div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: '#C5C3C0', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 14 }}>Active Loans</div>
-              <div ref={activeLoansRef} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <RightSection title="Active Loans">
+              <div ref={activeLoansRef} style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
                 {myLoans.filter(l => l && l.status === 'active').slice(0, 5).map((loan, idx) => {
                   const isLender = loan.lender_id === user.id;
                   const otherProfile = safeAllProfiles.find(p => p.user_id === (isLender ? loan.borrower_id : loan.lender_id));
@@ -1005,19 +1069,19 @@ export default function Home() {
                     : `${name} lent you ${formatMoney(totalAmt)}${purpose}`;
                   return (
                     <div key={loan.id}>
-                      <div style={{ fontSize: 11, color: '#1A1918', fontWeight: 500, marginBottom: 6, lineHeight: 1.3 }}>{headerText}</div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                        <div style={{ flex: 1, height: 5, borderRadius: 3, background: isLender ? 'rgba(82,183,136,0.12)' : 'rgba(126,192,234,0.15)', overflow: 'hidden' }}>
+                      <div style={{ fontSize: 12, color: '#1A1918', fontWeight: 500, marginBottom: 8, lineHeight: 1.4 }}>{headerText}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div style={{ flex: 1, height: 6, borderRadius: 3, background: isLender ? 'rgba(82,183,136,0.12)' : 'rgba(126,192,234,0.15)', overflow: 'hidden' }}>
                           <div key={`al-${idx}-${activeAnimKey}`} style={{ height: '100%', borderRadius: 3, background: isLender ? LENDER_GREEN : '#7EC0EA', width: `${pct}%`, animation: `barGrowRight 0.8s ease-out ${idx * 0.08}s both` }} />
                         </div>
-                        <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', flexShrink: 0 }}>{pct}%</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: '#9B9A98', flexShrink: 0 }}>{pct}%</span>
                       </div>
-                      <div style={{ fontSize: 10, color: '#C5C3C0', marginTop: 4 }}>{formatMoney(paidAmt)} of {formatMoney(totalAmt)} {isLender ? 'paid back' : 'repaid'}</div>
+                      <div style={{ fontSize: 11, color: '#C5C3C0', marginTop: 5 }}>{formatMoney(paidAmt)} of {formatMoney(totalAmt)} {isLender ? 'paid back' : 'repaid'}</div>
                     </div>
                   );
                 })}
               </div>
-            </div>
+            </RightSection>
           )}
         </div>
 
