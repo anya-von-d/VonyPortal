@@ -121,20 +121,21 @@ export default function DashboardSidebar({ activePage = "Dashboard", user, tabs,
         zIndex: 100, padding: isMobile ? '0 16px' : '0 40px', pointerEvents: 'none',
         fontFamily: "'DM Sans', sans-serif",
       }}>
-        <div style={{ maxWidth: 1000, margin: '0 auto', pointerEvents: 'auto' }}>
-          <div style={glassNavStyle}>
+        {/* Three-section layout: Logo | Glass Nav | Icons */}
+        <div style={{ maxWidth: 1200, margin: '0 auto', pointerEvents: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 
-            {/* Logo */}
-            <Link to="/" style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
-              fontWeight: 400, fontStyle: 'italic', fontSize: '1.3rem',
-              letterSpacing: '-0.02em', color: '#1A1918', textDecoration: 'none',
-              flexShrink: 0, marginRight: 14,
-            }}>Vony</Link>
+          {/* Left: Vony wordmark — outside the glass pill */}
+          <Link to="/" style={{
+            fontFamily: "'Cormorant Garamond', Georgia, serif",
+            fontWeight: 600, fontStyle: 'italic', fontSize: '1.75rem',
+            letterSpacing: '-0.01em', color: '#1A1918', textDecoration: 'none',
+            flexShrink: 0, lineHeight: 1,
+          }}>Vony</Link>
 
-            {/* Desktop: Nav links */}
-            {!isMobile && (
-              <nav style={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1, justifyContent: 'center' }}>
+          {/* Center: Glass nav pill — desktop only */}
+          {!isMobile && (
+            <div style={glassNavStyle}>
+              <nav style={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Link to="/" style={linkStyle('Dashboard')}>Home</Link>
                 <Link to={createPageUrl("Upcoming")} style={linkStyle('Upcoming')}>Upcoming</Link>
                 <Link to={createPageUrl("YourLoans")} style={linkStyle('YourLoans', 'Borrowing', 'Lending')}>My Loans</Link>
@@ -204,84 +205,82 @@ export default function DashboardSidebar({ activePage = "Dashboard", user, tabs,
                   )}
                 </div>
               </nav>
-            )}
+            </div>
+          )}
 
-            {isMobile && <div style={{ flex: 1 }} />}
+          {/* Right: Bell + Profile — outside the glass pill */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
 
-            {/* Right side */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+            {/* Notifications bell */}
+            <Link to={createPageUrl("Requests")} style={{
+              position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              width: 34, height: 34, borderRadius: 10, textDecoration: 'none',
+              color: active('Requests') ? '#1A1918' : '#787776',
+              background: active('Requests') ? 'rgba(0,0,0,0.06)' : 'transparent',
+              transition: 'background 0.2s',
+            }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              </svg>
+              {notifCount > 0 && (
+                <span style={{
+                  position: 'absolute', top: 3, right: 3,
+                  fontSize: 9, fontWeight: 700, color: 'white', background: '#E8726E',
+                  borderRadius: 10, padding: '1px 4px', minWidth: 14, textAlign: 'center', lineHeight: 1.5,
+                }}>
+                  {notifCount > 99 ? '99+' : notifCount}
+                </span>
+              )}
+            </Link>
 
-              {/* Notifications bell */}
-              <Link to={createPageUrl("Requests")} style={{
-                position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                width: 34, height: 34, borderRadius: 10, textDecoration: 'none',
-                color: active('Requests') ? '#1A1918' : '#787776',
-                background: active('Requests') ? 'rgba(0,0,0,0.06)' : 'transparent',
-                transition: 'background 0.2s',
-              }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                </svg>
-                {notifCount > 0 && (
-                  <span style={{
-                    position: 'absolute', top: 3, right: 3,
-                    fontSize: 9, fontWeight: 700, color: 'white', background: '#E8726E',
-                    borderRadius: 10, padding: '1px 4px', minWidth: 14, textAlign: 'center', lineHeight: 1.5,
-                  }}>
-                    {notifCount > 99 ? '99+' : notifCount}
-                  </span>
+            {/* Desktop: Profile avatar */}
+            {!isMobile && (
+              <Link to={createPageUrl("Profile")} style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none', borderRadius: '50%' }}>
+                {user?.profile_picture_url ? (
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', overflow: 'hidden', flexShrink: 0, border: '2px solid rgba(255,255,255,0.8)', boxShadow: '0 0 0 1.5px rgba(0,0,0,0.08)' }}>
+                    <img src={user.profile_picture_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                ) : (
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#54A6CF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '2px solid rgba(255,255,255,0.8)', boxShadow: '0 0 0 1.5px rgba(0,0,0,0.08)' }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: 'white', fontFamily: "'DM Sans', sans-serif" }}>
+                      {(user?.full_name || 'U').charAt(0).toUpperCase()}
+                    </span>
+                  </div>
                 )}
               </Link>
+            )}
 
-              {/* Desktop: Profile avatar */}
-              {!isMobile && (
-                <Link to={createPageUrl("Profile")} style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none', borderRadius: '50%' }}>
-                  {user?.profile_picture_url ? (
-                    <div style={{ width: 32, height: 32, borderRadius: '50%', overflow: 'hidden', flexShrink: 0, border: '2px solid rgba(255,255,255,0.8)', boxShadow: '0 0 0 1.5px rgba(0,0,0,0.08)' }}>
-                      <img src={user.profile_picture_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
-                  ) : (
-                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#54A6CF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '2px solid rgba(255,255,255,0.8)', boxShadow: '0 0 0 1.5px rgba(0,0,0,0.08)' }}>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: 'white', fontFamily: "'DM Sans', sans-serif" }}>
-                        {(user?.full_name || 'U').charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                  )}
-                </Link>
-              )}
-
-              {/* Mobile: Hamburger button */}
-              {isMobile && (
-                <button
-                  onClick={() => setMobileMenuOpen(o => !o)}
-                  style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    width: 44, height: 32, borderRadius: 8, border: 'none', cursor: 'pointer',
-                    background: mobileMenuOpen ? '#ECEAE6' : 'rgba(255,255,255,0.06)',
-                    backgroundImage: mobileMenuOpen ? 'none' : 'linear-gradient(179deg, rgba(255,255,255,0.8) 7%, rgba(255,255,255,0) 92%)',
-                    boxShadow: mobileMenuOpen ? 'none' : 'inset 0 -2px 3px 0 rgba(255,255,255,0.1), inset 0 -4px 12px 0 rgba(255,255,255,0.06), 0 2px 4px -2px rgba(0,0,0,0.08), 0 8px 16px -8px rgba(0,0,0,0.03)',
-                    backdropFilter: 'blur(18px) saturate(1.5)',
-                    WebkitBackdropFilter: 'blur(18px) saturate(1.5)',
-                    flexShrink: 0,
-                  }}
-                  aria-label="Menu"
-                >
-                  {mobileMenuOpen ? (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1f1f1f" strokeWidth="2" strokeLinecap="round">
-                      <line x1="18" y1="6" x2="6" y2="18"/>
-                      <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                  ) : (
-                    <svg width="20" height="14" viewBox="0 0 20 14" fill="none">
-                      <line x1="0" y1="1" x2="20" y2="1" stroke="#1f1f1f" strokeWidth="1.4" strokeLinecap="round"/>
-                      <line x1="0" y1="7" x2="20" y2="7" stroke="#1f1f1f" strokeWidth="1.4" strokeLinecap="round"/>
-                      <line x1="0" y1="13" x2="20" y2="13" stroke="#1f1f1f" strokeWidth="1.4" strokeLinecap="round"/>
-                    </svg>
-                  )}
-                </button>
-              )}
-            </div>
+            {/* Mobile: Hamburger button */}
+            {isMobile && (
+              <button
+                onClick={() => setMobileMenuOpen(o => !o)}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  width: 44, height: 32, borderRadius: 8, border: 'none', cursor: 'pointer',
+                  background: mobileMenuOpen ? '#ECEAE6' : 'rgba(255,255,255,0.06)',
+                  backgroundImage: mobileMenuOpen ? 'none' : 'linear-gradient(179deg, rgba(255,255,255,0.8) 7%, rgba(255,255,255,0) 92%)',
+                  boxShadow: mobileMenuOpen ? 'none' : 'inset 0 -2px 3px 0 rgba(255,255,255,0.1), inset 0 -4px 12px 0 rgba(255,255,255,0.06), 0 2px 4px -2px rgba(0,0,0,0.08), 0 8px 16px -8px rgba(0,0,0,0.03)',
+                  backdropFilter: 'blur(18px) saturate(1.5)',
+                  WebkitBackdropFilter: 'blur(18px) saturate(1.5)',
+                  flexShrink: 0,
+                }}
+                aria-label="Menu"
+              >
+                {mobileMenuOpen ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1f1f1f" strokeWidth="2" strokeLinecap="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                ) : (
+                  <svg width="20" height="14" viewBox="0 0 20 14" fill="none">
+                    <line x1="0" y1="1" x2="20" y2="1" stroke="#1f1f1f" strokeWidth="1.4" strokeLinecap="round"/>
+                    <line x1="0" y1="7" x2="20" y2="7" stroke="#1f1f1f" strokeWidth="1.4" strokeLinecap="round"/>
+                    <line x1="0" y1="13" x2="20" y2="13" stroke="#1f1f1f" strokeWidth="1.4" strokeLinecap="round"/>
+                  </svg>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>
