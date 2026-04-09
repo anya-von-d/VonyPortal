@@ -506,21 +506,71 @@ export default function Requests() {
           ))}
         </svg>
         <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 40, fontWeight: 600, color: '#1A1918', margin: 0, letterSpacing: '-0.01em', lineHeight: 1, textAlign: 'center', position: 'relative', zIndex: 1 }}>
-          <span style={{ fontStyle: 'normal' }}>Requests</span>
+          <span style={{ fontStyle: 'normal' }}>Notifications</span>
         </h1>
       </div>
 
       <div className="dashboard-content-wrap" style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 40px 0', position: 'relative', zIndex: 1 }}>
         <div className="dashboard-grey-box" style={{ background: '#E5E2DF', borderRadius: 18, padding: 20 }}>
 
-        {/* Reminders */}
-        {reminders.length > 0 && (
-          <PageCard title="Reminders" style={{ marginBottom: 16 }}>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {reminders.map((reminder, index) => {
+        {/* All items: reminders first, then notification requests */}
+        {(() => {
+          // Build notification items
+          const allItems = [];
+
+          friendRequestsReceived.forEach(request => {
+            const senderProfile = profiles.find(p => p.user_id === request.user_id);
+            const name = senderProfile?.full_name || senderProfile?.username || 'Unknown';
+            allItems.push({ type: 'friend', id: `friend-${request.id}`, timestamp: new Date(request.created_at || 0), data: request, name, purpose: null, amount: null });
+          });
+          loanOffersReceived.forEach(offer => {
+            const lender = getUserById(offer.lender_id);
+            const name = lender?.full_name || lender?.username || 'Unknown';
+            allItems.push({ type: 'offer_received', id: `offer-recv-${offer.id}`, timestamp: new Date(offer.created_at || 0), data: offer, name, purpose: offer.purpose, amount: null });
+          });
+          paymentsToConfirm.forEach(payment => {
+            const recorderProfile = profiles.find(p => p.user_id === payment.recorded_by);
+            const name = recorderProfile?.full_name || recorderProfile?.username || 'Unknown';
+            allItems.push({ type: 'payment_confirm', id: `pmt-confirm-${payment.id}`, timestamp: new Date(payment.created_at || payment.payment_date || 0), data: payment, name, purpose: null, amount: payment.amount });
+          });
+          termChangeRequests.forEach(loan => {
+            const otherUserId = loan.lender_id === user.id ? loan.borrower_id : loan.lender_id;
+            const otherProfile = profiles.find(p => p.user_id === otherUserId);
+            const name = otherProfile?.full_name || otherProfile?.username || getLoanOtherParty(loan);
+            allItems.push({ type: 'term_change', id: `term-${loan.id}`, timestamp: new Date(loan.updated_at || loan.created_at || 0), data: loan, name, purpose: null, amount: null });
+          });
+          allItems.sort((a, b) => b.timestamp - a.timestamp);
+
+          const typeIconMap = {
+            friend:          { color: '#7C3AED', bg: 'rgba(124,58,237,0.12)', svg: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
+            offer_received:  { color: '#2563EB', bg: 'rgba(37,99,235,0.12)',  svg: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> },
+            payment_confirm: { color: '#16A34A', bg: 'rgba(22,163,74,0.12)',  svg: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> },
+            term_change:     { color: '#D97706', bg: 'rgba(217,119,6,0.12)',  svg: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> },
+          };
+
+          const rowStyle = { background: '#ffffff', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px' };
+
+          if (reminders.length === 0 && allItems.length === 0) {
+            return (
+              <div style={rowStyle}>
+                <div style={{ width: 24, height: 24, borderRadius: 6, background: 'rgba(3,172,234,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#03ACEA' }}>
+                  <CheckCircle style={{ width: 11, height: 11 }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', margin: '0 0 2px' }}>All caught up!</p>
+                  <p style={{ fontSize: 12, color: '#787776', margin: 0 }}>You have no notifications.</p>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {/* Reminders always first */}
+              {reminders.map(reminder => {
                 const isOverdue = reminder.type.startsWith('overdue');
                 return (
-                  <div key={reminder.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', borderBottom: index < reminders.length - 1 ? '1px solid rgba(0,0,0,0.04)' : 'none' }}>
+                  <div key={reminder.id} style={rowStyle}>
                     <div style={{ width: 24, height: 24, borderRadius: 6, background: isOverdue ? 'rgba(232,114,110,0.12)' : 'rgba(3,172,234,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: isOverdue ? '#E8726E' : '#03ACEA' }}>
                       <Clock style={{ width: 11, height: 11 }} />
                     </div>
@@ -528,168 +578,59 @@ export default function Requests() {
                       <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', lineHeight: 1.5, margin: '0 0 2px' }}>{reminder.title}</p>
                       <p style={{ fontSize: 12, color: '#787776', lineHeight: 1.5, margin: 0 }}>{reminder.subtitle}</p>
                     </div>
-                    <Link to={createPageUrl("RecordPayment")} style={{ display: 'inline-flex', padding: '7px 14px', borderRadius: 20, background: isOverdue ? '#E8726E' : '#82F0B9', color: 'white', fontSize: 11, fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                    <Link to={createPageUrl("RecordPayment")} style={{ display: 'inline-flex', padding: '7px 14px', borderRadius: 20, background: isOverdue ? '#E8726E' : '#03ACEA', color: 'white', fontSize: 11, fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>
                       Record Payment
                     </Link>
                   </div>
                 );
               })}
-            </div>
-          </PageCard>
-        )}
 
-        {/* Notifications */}
-        {(() => {
-          const allItems = [];
-
-          // Friend Requests
-          friendRequestsReceived.forEach(request => {
-            const senderProfile = profiles.find(p => p.user_id === request.user_id);
-            const name = senderProfile?.full_name || senderProfile?.username || 'Unknown';
-            allItems.push({
-              type: 'friend',
-              id: `friend-${request.id}`,
-              timestamp: new Date(request.created_at || 0),
-              data: request,
-              name,
-              photoUrl: senderProfile?.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=678AFB&color=fff&size=64`,
-            });
-          });
-
-          // Loan Offers Received
-          loanOffersReceived.forEach(offer => {
-            const lender = getUserById(offer.lender_id);
-            const name = lender?.full_name || lender?.username || 'Unknown';
-            allItems.push({
-              type: 'offer_received',
-              id: `offer-recv-${offer.id}`,
-              timestamp: new Date(offer.created_at || 0),
-              data: offer,
-              name,
-              photoUrl: lender?.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=678AFB&color=fff&size=64`,
-              purpose: offer.purpose,
-            });
-          });
-
-          // Payment Confirmations
-          paymentsToConfirm.forEach(payment => {
-            const recorderProfile = profiles.find(p => p.user_id === payment.recorded_by);
-            const name = recorderProfile?.full_name || recorderProfile?.username || 'Unknown';
-            allItems.push({
-              type: 'payment_confirm',
-              id: `pmt-confirm-${payment.id}`,
-              timestamp: new Date(payment.created_at || payment.payment_date || 0),
-              data: payment,
-              name,
-              photoUrl: recorderProfile?.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=678AFB&color=fff&size=64`,
-              amount: payment.amount,
-            });
-          });
-
-          // Term Changes
-          termChangeRequests.forEach(loan => {
-            const otherUserId = loan.lender_id === user.id ? loan.borrower_id : loan.lender_id;
-            const otherProfile = profiles.find(p => p.user_id === otherUserId);
-            const name = otherProfile?.full_name || otherProfile?.username || getLoanOtherParty(loan);
-            allItems.push({
-              type: 'term_change',
-              id: `term-${loan.id}`,
-              timestamp: new Date(loan.updated_at || loan.created_at || 0),
-              data: loan,
-              name,
-              photoUrl: otherProfile?.profile_picture_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=678AFB&color=fff&size=64`,
-            });
-          });
-
-          // Sort by most recent
-          allItems.sort((a, b) => b.timestamp - a.timestamp);
-
-          if (allItems.length === 0 && reminders.length === 0) {
-            return (
-              <PageCard title="Notifications">
-                <div style={{ textAlign: 'center', padding: '32px 0' }}>
-                  <CheckCircle style={{ width: 40, height: 40, margin: '0 auto 8px', color: '#C7C6C4' }} />
-                  <p style={{ color: '#1A1918', fontWeight: 600, marginBottom: 4 }}>All caught up!</p>
-                  <p style={{ color: '#787776', fontSize: 14 }}>You have no notifications.</p>
-                </div>
-              </PageCard>
-            );
-          }
-
-          if (allItems.length === 0) return null;
-
-          return (
-            <PageCard title="Notifications">
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                {allItems.map((item, index) => (
-                  <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: index < allItems.length - 1 ? '1px solid rgba(0,0,0,0.04)' : 'none' }}>
-                    {/* Type icon (left) */}
-                    {(() => {
-                      const typeIcon = {
-                        friend:          { color: '#7C3AED', bg: 'rgba(124,58,237,0.12)', svg: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
-                        offer_received:  { color: '#2563EB', bg: 'rgba(37,99,235,0.12)',  svg: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> },
-                        payment_confirm: { color: '#16A34A', bg: 'rgba(22,163,74,0.12)',  svg: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> },
-                        term_change:     { color: '#D97706', bg: 'rgba(217,119,6,0.12)',  svg: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> },
-                      }[item.type] || { color: '#9B9A98', bg: 'rgba(155,154,152,0.12)', svg: null };
-                      return (
-                        <div style={{ width: 24, height: 24, borderRadius: 6, background: typeIcon.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: typeIcon.color }}>
-                          {typeIcon.svg}
-                        </div>
-                      );
-                    })()}
-
-                    {/* Text */}
+              {/* Notification requests underneath */}
+              {allItems.map(item => {
+                const ti = typeIconMap[item.type] || { color: '#9B9A98', bg: 'rgba(155,154,152,0.12)', svg: null };
+                return (
+                  <div key={item.id} style={rowStyle}>
+                    <div style={{ width: 24, height: 24, borderRadius: 6, background: ti.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: ti.color }}>
+                      {ti.svg}
+                    </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 14, fontWeight: 500, color: '#1A1918', lineHeight: 1.4 }}>
+                      <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', lineHeight: 1.5, margin: '0 0 2px' }}>
                         {item.type === 'friend' && `${item.name} sent you a friend request`}
                         {item.type === 'offer_received' && `${item.name} sent you a loan offer${item.purpose ? ` for ${item.purpose}` : ''}`}
                         {item.type === 'payment_confirm' && `${item.name} recorded a payment of $${item.amount?.toFixed(2)}`}
                         {item.type === 'term_change' && `${item.name} sent you a loan change request`}
-                      </div>
-                      <div style={{ fontSize: 11, color: '#787776', marginTop: 3 }}>
+                      </p>
+                      <p style={{ fontSize: 12, color: '#787776', lineHeight: 1.5, margin: 0 }}>
                         {item.timestamp && item.timestamp.getTime() > 0 ? format(item.timestamp, 'MMM d') : ''}
-                      </div>
+                      </p>
                     </div>
-
-                    {/* Action */}
                     <div style={{ flexShrink: 0 }}>
                       {item.type === 'friend' && (
-                        <Link to={createPageUrl("Friends")} style={{ fontSize: 12, fontWeight: 600, color: '#678AFB', textDecoration: 'none' }}>
-                          View friend request
-                        </Link>
+                        <Link to={createPageUrl("Friends")} style={{ fontSize: 12, fontWeight: 600, color: '#03ACEA', textDecoration: 'none' }}>View request</Link>
                       )}
                       {item.type === 'offer_received' && (
-                        <button
-                          onClick={() => { setSelectedOffer(item.data); setShowSignatureModal(true); }}
-                          disabled={processingId === item.data.id}
-                          style={{ fontSize: 12, fontWeight: 600, color: '#678AFB', background: 'none', border: 'none', cursor: 'pointer', padding: 0, opacity: processingId === item.data.id ? 0.5 : 1 }}
-                        >
+                        <button onClick={() => { setSelectedOffer(item.data); setShowSignatureModal(true); }} disabled={processingId === item.data.id}
+                          style={{ fontSize: 12, fontWeight: 600, color: '#03ACEA', background: 'none', border: 'none', cursor: 'pointer', padding: 0, opacity: processingId === item.data.id ? 0.5 : 1 }}>
                           View offer
                         </button>
                       )}
                       {item.type === 'payment_confirm' && (
-                        <button
-                          onClick={() => setViewingPayment({ payment: item.data, direction: 'confirm' })}
-                          disabled={processingId === item.data.id}
-                          style={{ fontSize: 12, fontWeight: 600, color: '#678AFB', background: 'none', border: 'none', cursor: 'pointer', padding: 0, opacity: processingId === item.data.id ? 0.5 : 1 }}
-                        >
+                        <button onClick={() => setViewingPayment({ payment: item.data, direction: 'confirm' })} disabled={processingId === item.data.id}
+                          style={{ fontSize: 12, fontWeight: 600, color: '#03ACEA', background: 'none', border: 'none', cursor: 'pointer', padding: 0, opacity: processingId === item.data.id ? 0.5 : 1 }}>
                           Confirm payment
                         </button>
                       )}
                       {item.type === 'term_change' && (
-                        <button
-                          onClick={() => setViewingPayment({ termChange: item.data, direction: 'term' })}
-                          disabled={processingId === item.data.id}
-                          style={{ fontSize: 12, fontWeight: 600, color: '#678AFB', background: 'none', border: 'none', cursor: 'pointer', padding: 0, opacity: processingId === item.data.id ? 0.5 : 1 }}
-                        >
+                        <button onClick={() => setViewingPayment({ termChange: item.data, direction: 'term' })} disabled={processingId === item.data.id}
+                          style={{ fontSize: 12, fontWeight: 600, color: '#03ACEA', background: 'none', border: 'none', cursor: 'pointer', padding: 0, opacity: processingId === item.data.id ? 0.5 : 1 }}>
                           View request
                         </button>
                       )}
                     </div>
                   </div>
-                ))}
-              </div>
-            </PageCard>
+                );
+              })}
+            </div>
           );
         })()}
 
