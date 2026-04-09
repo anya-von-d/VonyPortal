@@ -973,6 +973,13 @@ export default function YourLoans() {
               );
             })()}
 
+            {/* Record Payment */}
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '0 0 4px' }}>
+              <Link to={createPageUrl("RecordPayment")} style={{ display: 'inline-flex', alignItems: 'center', background: '#1A1918', borderRadius: 9, padding: '7px 12px', textDecoration: 'none' }}>
+                <p style={{ fontSize: 11, fontWeight: 600, color: 'white', margin: 0 }}>Record Payment</p>
+              </Link>
+            </div>
+
             {/* Payment History Chart */}
             <PageCard title="Payment History">
               <div style={{ padding: '10px 14px 14px' }}>
