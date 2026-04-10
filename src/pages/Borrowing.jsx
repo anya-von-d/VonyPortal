@@ -978,7 +978,7 @@ export default function Borrowing() {
             <>
             {/* Two blue stat boxes */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
-              <div style={{ background: 'rgba(3,172,234,0.08)', border: '1.5px solid rgba(3,172,234,0.40)', borderRadius: 14, padding: '12px 14px', boxShadow: '0 0 0 3px rgba(3,172,234,0.18), 0 0 20px rgba(3,172,234,0.16), 0 0 40px rgba(3,172,234,0.06), 0 2px 12px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(3,172,234,0.06) 60%, rgba(3,172,234,0.10) 100%)', backdropFilter: 'blur(10px) saturate(1.6)', WebkitBackdropFilter: 'blur(10px) saturate(1.6)', border: '2px solid rgba(3,172,234,0.55)', borderRadius: 14, padding: '12px 14px', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), inset 0 0 16px rgba(3,172,234,0.07), 0 0 0 4px rgba(3,172,234,0.15), 0 0 24px rgba(3,172,234,0.18), 0 0 48px rgba(3,172,234,0.08), 0 2px 12px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ width: 20, height: 20, borderRadius: 6, background: 'rgba(3,172,234,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                 </div>
@@ -986,7 +986,7 @@ export default function Borrowing() {
                 <div style={{ fontSize: 20, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em' }}>${totalBorrowed.toLocaleString()}</div>
                 <div style={{ fontSize: 10, color: '#9B9A98', marginTop: 4 }}>{activeLoans.length} active loans</div>
               </div>
-              <div style={{ background: 'rgba(3,172,234,0.08)', border: '1.5px solid rgba(3,172,234,0.40)', borderRadius: 14, padding: '12px 14px', boxShadow: '0 0 0 3px rgba(3,172,234,0.18), 0 0 20px rgba(3,172,234,0.16), 0 0 40px rgba(3,172,234,0.06), 0 2px 12px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(3,172,234,0.06) 60%, rgba(3,172,234,0.10) 100%)', backdropFilter: 'blur(10px) saturate(1.6)', WebkitBackdropFilter: 'blur(10px) saturate(1.6)', border: '2px solid rgba(3,172,234,0.55)', borderRadius: 14, padding: '12px 14px', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), inset 0 0 16px rgba(3,172,234,0.07), 0 0 0 4px rgba(3,172,234,0.15), 0 0 24px rgba(3,172,234,0.18), 0 0 48px rgba(3,172,234,0.08), 0 2px 12px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ width: 20, height: 20, borderRadius: 6, background: 'rgba(3,172,234,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
                 </div>
@@ -1360,7 +1360,7 @@ export default function Borrowing() {
                                         </p>
                                       </div>
                                       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                                        <div style={{ background: 'rgba(3,172,234,0.08)', border: '1.5px solid rgba(3,172,234,0.40)', borderRadius: 12, padding: '10px 12px', boxShadow: '0 0 0 3px rgba(3,172,234,0.18), 0 0 20px rgba(3,172,234,0.16), 0 2px 12px rgba(0,0,0,0.04)' }}>
+                                        <div style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(3,172,234,0.06) 60%, rgba(3,172,234,0.10) 100%)', backdropFilter: 'blur(10px) saturate(1.6)', WebkitBackdropFilter: 'blur(10px) saturate(1.6)', border: '2px solid rgba(3,172,234,0.55)', borderRadius: 12, padding: '10px 12px', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), inset 0 0 16px rgba(3,172,234,0.07), 0 0 0 4px rgba(3,172,234,0.15), 0 0 24px rgba(3,172,234,0.18), 0 2px 12px rgba(0,0,0,0.04)' }}>
                                           <div style={{ width: 20, height: 20, borderRadius: 6, background: 'rgba(3,172,234,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 6 }}>
                                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                                           </div>
@@ -1374,7 +1374,7 @@ export default function Borrowing() {
                                             </div>
                                           )}
                                         </div>
-                                        <div style={{ background: 'rgba(3,172,234,0.08)', border: '1.5px solid rgba(3,172,234,0.40)', borderRadius: 12, padding: '10px 12px', boxShadow: '0 0 0 3px rgba(3,172,234,0.18), 0 0 20px rgba(3,172,234,0.16), 0 2px 12px rgba(0,0,0,0.04)' }}>
+                                        <div style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(3,172,234,0.06) 60%, rgba(3,172,234,0.10) 100%)', backdropFilter: 'blur(10px) saturate(1.6)', WebkitBackdropFilter: 'blur(10px) saturate(1.6)', border: '2px solid rgba(3,172,234,0.55)', borderRadius: 12, padding: '10px 12px', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), inset 0 0 16px rgba(3,172,234,0.07), 0 0 0 4px rgba(3,172,234,0.15), 0 0 24px rgba(3,172,234,0.18), 0 2px 12px rgba(0,0,0,0.04)' }}>
                                           <div style={{ width: 20, height: 20, borderRadius: 6, background: 'rgba(3,172,234,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 6 }}>
                                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                                           </div>

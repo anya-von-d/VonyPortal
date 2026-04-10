@@ -834,7 +834,7 @@ export default function Home() {
           <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 20 }} />
 
           {/* Three summary cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 24 }}>
+          <div className="home-summary-cards" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 24 }}>
             {/* Next Payment Due */}
             {(() => {
               const days = nextBorrowerPayment ? Math.ceil((nextBorrowerPayment.date.getTime() - Date.now()) / 86400000) : null;
@@ -843,10 +843,13 @@ export default function Home() {
               const badgeColor = isLate ? '#E8726E' : days !== null && days <= 3 ? '#F59E0B' : '#9B9A98';
               const badgeBg = isLate ? 'rgba(232,114,110,0.08)' : days !== null && days <= 3 ? 'rgba(245,158,11,0.08)' : 'rgba(0,0,0,0.04)';
               return (
-                <div style={{
-                  padding: '12px 14px', borderRadius: 14, background: 'white',
-                  border: '1.5px solid rgba(3,172,234,0.40)',
-                  boxShadow: '0 0 0 3px rgba(3,172,234,0.18), 0 0 20px rgba(3,172,234,0.16), 0 0 40px rgba(3,172,234,0.06), 0 2px 12px rgba(0,0,0,0.04)',
+                <div className="home-blue-card" style={{
+                  padding: '12px 14px', borderRadius: 14,
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(3,172,234,0.06) 60%, rgba(3,172,234,0.10) 100%)',
+                  backdropFilter: 'blur(10px) saturate(1.6)',
+                  WebkitBackdropFilter: 'blur(10px) saturate(1.6)',
+                  border: '2px solid rgba(3,172,234,0.55)',
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), inset 0 0 16px rgba(3,172,234,0.07), 0 0 0 4px rgba(3,172,234,0.15), 0 0 24px rgba(3,172,234,0.18), 0 0 48px rgba(3,172,234,0.08), 0 2px 12px rgba(0,0,0,0.04)',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
                     <div style={{ width: 20, height: 20, borderRadius: 6, background: 'rgba(29,91,148,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -880,10 +883,13 @@ export default function Home() {
               const badgeColor = isLate ? '#E8726E' : '#03ACEA';
               const badgeBg = isLate ? 'rgba(232,114,110,0.08)' : 'rgba(3,172,234,0.10)';
               return (
-                <div style={{
-                  padding: '12px 14px', borderRadius: 14, background: 'white',
-                  border: '1.5px solid rgba(3,172,234,0.40)',
-                  boxShadow: '0 0 0 3px rgba(3,172,234,0.18), 0 0 20px rgba(3,172,234,0.16), 0 0 40px rgba(3,172,234,0.06), 0 2px 12px rgba(0,0,0,0.04)',
+                <div className="home-blue-card" style={{
+                  padding: '12px 14px', borderRadius: 14,
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(3,172,234,0.06) 60%, rgba(3,172,234,0.10) 100%)',
+                  backdropFilter: 'blur(10px) saturate(1.6)',
+                  WebkitBackdropFilter: 'blur(10px) saturate(1.6)',
+                  border: '2px solid rgba(3,172,234,0.55)',
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), inset 0 0 16px rgba(3,172,234,0.07), 0 0 0 4px rgba(3,172,234,0.15), 0 0 24px rgba(3,172,234,0.18), 0 0 48px rgba(3,172,234,0.08), 0 2px 12px rgba(0,0,0,0.04)',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
                     <div style={{ width: 20, height: 20, borderRadius: 6, background: 'rgba(3,172,234,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -910,20 +916,30 @@ export default function Home() {
             })()}
 
             {/* Overview */}
-            <div style={{ padding: '12px 14px', borderRadius: 14, background: 'white', boxShadow: '0 2px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.05)' }}>
+            <div className="home-overview-card" style={{ padding: '12px 14px', borderRadius: 14, background: 'white', boxShadow: '0 2px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.05)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
                 <div style={{ width: 20, height: 20, borderRadius: 6, background: 'rgba(3,172,234,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
                 </div>
                 <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Overview</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                <span style={{ fontSize: 11, color: '#787776' }}>Owed to you</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: '#03ACEA', letterSpacing: '-0.02em' }}>{formatMoney(lentRemaining)}</span>
+              {/* Desktop: two rows */}
+              <div className="overview-desktop-rows">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <span style={{ fontSize: 11, color: '#787776' }}>Owed to you</span>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: '#03ACEA', letterSpacing: '-0.02em' }}>{formatMoney(lentRemaining)}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 11, color: '#787776' }}>You owe</span>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{formatMoney(borrowedRemaining)}</span>
+                </div>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 11, color: '#787776' }}>You owe</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{formatMoney(borrowedRemaining)}</span>
+              {/* Mobile: single compact line */}
+              <div className="overview-mobile-line" style={{ display: 'none' }}>
+                <span style={{ fontSize: 11, color: '#03ACEA', fontWeight: 700 }}>{formatMoney(lentRemaining)}</span>
+                <span style={{ fontSize: 11, color: '#9B9A98', margin: '0 4px' }}>in</span>
+                <span style={{ fontSize: 11, color: '#1A1918', fontWeight: 700 }}>{formatMoney(borrowedRemaining)}</span>
+                <span style={{ fontSize: 11, color: '#9B9A98', marginLeft: 4 }}>out</span>
               </div>
             </div>
           </div>

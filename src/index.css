@@ -258,11 +258,14 @@ input[type="date"] {
 .mesh-left::after {
   content: '';
   position: fixed;
-  left: 177px;
+  /* solid strip is 3px wide at right edge (x=177..180), gradient extends 6px left (x=171..177) */
+  left: 171px;
   bottom: 0;
-  width: 3px;
-  height: 120vh;
-  background: linear-gradient(to top, #03ACEA 0%, #03ACEA 33%, rgba(250, 250, 250, 0) 100%);
+  width: 9px;
+  /* stops just below the Log Out button: leave ~480px at top */
+  height: calc(100vh - 480px);
+  /* left 67% = gradient fade, right 33% = solid #03ACEA */
+  background: linear-gradient(to right, rgba(250,250,250,0) 0%, #03ACEA 67%, #03ACEA 100%);
   pointer-events: none;
   z-index: 5;
 }
@@ -378,6 +381,10 @@ input[type="date"] {
 /* Hide mobile-only sentence on desktop */
 .la-friend-mobile { display: none; }
 
+/* Home summary cards: desktop default */
+.home-overview-card .overview-mobile-line { display: none; }
+.home-overview-card .overview-desktop-rows { display: block; }
+
 /* ============================================================
    MOBILE DASHBOARD PAGE IMPROVEMENTS (≤900px)
    ============================================================ */
@@ -485,4 +492,40 @@ input[type="date"] {
     width: 100% !important;
   }
   .lh-selector-wrap button { white-space: normal !important; }
+
+  /* ── 8. Home summary cards: reorder + resize ── */
+  .home-summary-cards {
+    /* Stack into rows: blue cards row + overview row */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 10px !important;
+  }
+  /* Blue cards row: side-by-side, full width */
+  .home-blue-card {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+  }
+  /* Wrap the two blue cards in a flex row */
+  .home-summary-cards > *:nth-child(1),
+  .home-summary-cards > *:nth-child(2) {
+    /* They're the IIFE results — width controlled below */
+  }
+  /* Make the grid row containing the two blue cards full width */
+  .home-summary-cards {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: auto auto !important;
+  }
+  /* Overview card spans full width and goes on 2nd row */
+  .home-overview-card {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+  }
+  /* Show mobile overview line, hide desktop rows */
+  .home-overview-card .overview-desktop-rows { display: none !important; }
+  .home-overview-card .overview-mobile-line {
+    display: flex !important;
+    align-items: center !important;
+  }
 }
