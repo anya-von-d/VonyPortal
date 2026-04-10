@@ -1631,7 +1631,7 @@ export default function Lending({ initialTab }) {
                   <span style={{ fontSize: 13, fontWeight: 500, color: loanType === 'flexible' ? '#1A1918' : '#9B9A98' }}>Quick Pay</span>
                 </div>
                 <p style={{ fontSize: 12, color: '#9B9A98', lineHeight: 1.5, margin: 0 }}>
-                  {loanType === 'flexible' ? 'One-time payment — perfect for splitting expenses' : 'Structured repayment plan with interest'}
+                  {loanType === 'flexible' ? 'One-time payment, perfect for splitting expenses' : 'Structured repayment plan with interest'}
                 </p>
               </div>
               {/* Borrower Will Pay */}
@@ -2154,7 +2154,11 @@ export default function Lending({ initialTab }) {
                               </button>
                               <button
                                 type="button"
-                                onClick={() => navigate(createPageUrl('Friends') + '?tab=add')}
+                                onClick={() => {
+                                  navigator.clipboard.writeText('https://lend-with-vony.com').then(() => {
+                                    alert('Link copied! Share it with your friends to invite them to Vony 🎉');
+                                  });
+                                }}
                                 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 14px', background: 'white', color: '#1A1918', fontSize: 13, fontWeight: 500, borderRadius: 10, border: '1px solid rgba(0,0,0,0.10)', cursor: 'pointer', fontFamily: "'DM Sans', system-ui, sans-serif" }}
                               >
                                 <UserPlus size={14} />
@@ -3105,7 +3109,7 @@ export default function Lending({ initialTab }) {
                     </div>
                     <p style={{ fontSize: 12, color: '#9B9A98', lineHeight: 1.5 }}>
                       {loanType === 'flexible'
-                        ? 'One-time payment — perfect for splitting expenses'
+                        ? 'One-time payment, perfect for splitting expenses'
                         : 'Structured repayment plan with interest'}
                     </p>
                   </div>

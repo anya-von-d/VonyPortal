@@ -966,6 +966,49 @@ export default function Home() {
             </div>
           </div>
 
+          {/* New user onboarding */}
+          {!hasLoans && (
+            <div style={{
+              marginBottom: 28, padding: '20px 22px', borderRadius: 14,
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(3,172,234,0.06) 60%, rgba(3,172,234,0.10) 100%)',
+              backdropFilter: 'blur(10px) saturate(1.6)', WebkitBackdropFilter: 'blur(10px) saturate(1.6)',
+              border: '2px solid #03ACEA',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 0 0 4px rgba(3,172,234,0.15), 0 0 24px rgba(3,172,234,0.18)',
+            }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 4, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                🎉 Welcome to Vony!
+              </div>
+              <div style={{ fontSize: 13, color: '#787776', lineHeight: 1.55, marginBottom: 16 }}>
+                Lending money to friends has never been this easy. Start by adding a friend, then create your first loan together.
+              </div>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <Link
+                  to={createPageUrl('Friends')}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    padding: '8px 14px', borderRadius: 10,
+                    background: '#03ACEA', color: 'white', textDecoration: 'none',
+                    fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif",
+                  }}
+                >
+                  👥 Find Friends
+                </Link>
+                <Link
+                  to={createPageUrl('CreateOffer')}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    padding: '8px 14px', borderRadius: 10,
+                    background: 'white', color: '#1A1918', textDecoration: 'none',
+                    fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif",
+                    border: '1px solid rgba(0,0,0,0.10)',
+                  }}
+                >
+                  ✨ Create a Loan
+                </Link>
+              </div>
+            </div>
+          )}
+
           {/* UPCOMING */}
           <div style={{ marginBottom: 36 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 4, borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
@@ -973,7 +1016,7 @@ export default function Home() {
               <Link to={createPageUrl("Upcoming")} style={{ fontSize: 11, fontWeight: 500, color: '#9B9A98', textDecoration: 'none' }}>Full schedule →</Link>
             </div>
             {combinedPaymentEvents.length === 0 ? (
-              <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98' }}>You're all clear — nothing coming up.</div>
+              <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98' }}>You're all clear! Nothing coming up yet.</div>
             ) : combinedPaymentEvents.map((event, idx) => {
               const isOverdue = event.days < 0;
               const daysLabel = isOverdue ? `${Math.abs(event.days)}d late` : event.days === 0 ? 'today' : `${event.days}d`;
