@@ -970,10 +970,9 @@ export default function Home() {
           {!hasLoans && (
             <div style={{
               marginBottom: 28, padding: '20px 22px', borderRadius: 14,
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(3,172,234,0.06) 60%, rgba(3,172,234,0.10) 100%)',
-              backdropFilter: 'blur(10px) saturate(1.6)', WebkitBackdropFilter: 'blur(10px) saturate(1.6)',
-              border: '2px solid #03ACEA',
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 0 0 4px rgba(3,172,234,0.15), 0 0 24px rgba(3,172,234,0.18)',
+              background: 'white',
+              border: '1px solid rgba(0,0,0,0.07)',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
             }}>
               <div style={{ fontSize: 16, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 4, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
                 🎉 Welcome to Vony!
@@ -991,7 +990,7 @@ export default function Home() {
                     fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif",
                   }}
                 >
-                  👥 Find Friends
+                  Find Friends
                 </Link>
                 <Link
                   to={createPageUrl('CreateOffer')}
@@ -1003,7 +1002,7 @@ export default function Home() {
                     border: '1px solid rgba(0,0,0,0.10)',
                   }}
                 >
-                  ✨ Create a Loan
+                  Create a Loan
                 </Link>
               </div>
             </div>
