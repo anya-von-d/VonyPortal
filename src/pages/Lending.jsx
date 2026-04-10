@@ -469,10 +469,15 @@ export default function Lending({ initialTab }) {
         payment_amount: pendingLoanData.payment_amount,
         is_fully_signed: false
       };
-      const { error: agreementError } = await supabase.functions.invoke('create-loan-agreement', {
-        body: agreementPayload,
-      });
-      if (agreementError) throw new Error(agreementError.message);
+      // Try direct insert first (works when auth.uid() = lender_id).
+      // Fall back to edge function for the borrower-initiated case.
+      const { error: directError } = await supabase.from('loan_agreements').insert(agreementPayload);
+      if (directError) {
+        const { error: fnError } = await supabase.functions.invoke('create-loan-agreement', {
+          body: agreementPayload,
+        });
+        if (fnError) throw new Error(fnError.message);
+      }
 
       setShowSignatureModal(false);
       setFormData({
