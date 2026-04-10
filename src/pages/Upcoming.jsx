@@ -9,6 +9,7 @@ import {
 } from "date-fns";
 import { formatMoney } from "@/components/utils/formatMoney";
 import { daysUntil as daysUntilDate } from "@/components/utils/dateUtils";
+import MeshMobileNav from "@/components/MeshMobileNav";
 
 export default function Upcoming() {
   const { user: authUser, userProfile, isLoadingAuth, navigateToLogin, logout } = useAuth();
@@ -239,7 +240,8 @@ export default function Upcoming() {
 
   return (
     <div style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0, minHeight: '100vh' }}>
+      <MeshMobileNav user={user} activePage="Upcoming" />
+      <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0, minHeight: '100vh' }}>
 
         {/* ── LEFT: Sidebar nav ── */}
         <div className="mesh-left" style={{ background: '#fafafa', borderRight: '1px solid rgba(0,0,0,0.06)' }}>

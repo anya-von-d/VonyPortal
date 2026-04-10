@@ -26,6 +26,7 @@ import { format, addDays, addMonths, addWeeks } from "date-fns";
 import { formatMoney } from "@/components/utils/formatMoney";
 import { toLocalDate, getLocalToday, daysUntil as daysUntilDate } from "@/components/utils/dateUtils";
 import { useAuth } from "@/lib/AuthContext";
+import MeshMobileNav from "@/components/MeshMobileNav";
 
 import LoanCard from "@/components/loans/LoanCard";
 
@@ -865,7 +866,8 @@ export default function Borrowing() {
       </AnimatePresence>
 
       <div style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", background: '#ffffff' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0, minHeight: '100vh' }}>
+        <MeshMobileNav user={user} activePage="My Loans" />
+        <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0, minHeight: '100vh' }}>
           {/* COL 1 - left nav */}
           <div className="mesh-left" style={{ background: '#fafafa', borderRight: '1px solid rgba(0,0,0,0.06)' }}>
             <div style={{ position: 'sticky', top: 0, padding: '24px 8px 0' }}>

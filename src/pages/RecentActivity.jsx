@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useAuth } from "@/lib/AuthContext";
 import BorrowerSignatureModal from "@/components/loans/BorrowerSignatureModal";
+import MeshMobileNav from "@/components/MeshMobileNav";
 
 
 const CATEGORY_OPTIONS = [
@@ -636,6 +637,7 @@ export default function RecentActivityPage() {
      ══════════════════════════════════════════════════════════ */
   return (
     <>
+      <MeshMobileNav user={user} activePage="Recent Activity" />
       <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0, minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased' }}>
 
         {/* Col 1: left nav */}

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/lib/AuthContext";
 import { Loan, Payment, PublicProfile } from "@/entities/all";
 import { formatMoney } from "@/components/utils/formatMoney";
+import MeshMobileNav from "@/components/MeshMobileNav";
 
 const CATEGORIES = [
   { id: 'student',  label: 'Student Loans' },
@@ -112,6 +113,7 @@ export default function LoanHelp() {
 
   return (
     <div className="mesh-layout" style={{ minHeight: '100vh', display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0, fontFamily: "'DM Sans', sans-serif" }}>
+      <MeshMobileNav user={user} activePage="Loan Help" />
 
       {/* ── LEFT: Sidebar nav ── */}
       <div className="mesh-left" style={{ background: '#fafafa', borderRight: '1px solid rgba(0,0,0,0.06)' }}>

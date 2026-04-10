@@ -9,6 +9,7 @@ import { createPageUrl } from "@/utils";
 import { useAuth } from "@/lib/AuthContext";
 import LoanActivity from "../components/loans/LoanActivity";
 import { formatMoney } from "@/components/utils/formatMoney";
+import MeshMobileNav from "@/components/MeshMobileNav";
 
 const ROLE_OPTIONS = [
   { id: 'all', label: 'All Categories' },
@@ -977,6 +978,7 @@ export default function LoanAgreements() {
 
   return (
     <>
+      <MeshMobileNav user={user} activePage="Documents" />
       {/* Popup Modal */}
       <AnimatePresence>
         {activePopup && popupAgreement && (

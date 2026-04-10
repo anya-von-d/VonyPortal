@@ -23,6 +23,7 @@ import { format, addMonths, differenceInDays, parseISO } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import { toLocalDate, daysUntil as daysUntilDate } from "@/components/utils/dateUtils";
+import MeshMobileNav from "@/components/MeshMobileNav";
 import BorrowerSignatureModal from "@/components/loans/BorrowerSignatureModal";
 import RecordPaymentModal from "@/components/loans/RecordPaymentModal";
 import {
@@ -484,7 +485,8 @@ export default function Requests() {
 
   return (
     <div style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", background: '#ffffff' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0, minHeight: '100vh' }}>
+      <MeshMobileNav user={user} activePage="Requests" />
+      <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0, minHeight: '100vh' }}>
 
         {/* COL 1 - left nav */}
         <div className="mesh-left" style={{ background: '#fafafa', borderRight: '1px solid rgba(0,0,0,0.06)' }}>

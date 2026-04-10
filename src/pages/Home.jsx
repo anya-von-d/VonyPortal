@@ -11,6 +11,7 @@ import { formatMoney } from "@/components/utils/formatMoney";
 import { toLocalDate, getLocalToday, daysUntil as daysUntilDate } from "@/components/utils/dateUtils";
 
 import { CardEntrance, CountUp } from "@/components/ui/animations";
+import MeshMobileNav from "@/components/MeshMobileNav";
 
 // SVG star field data — exact positions from mockup
 const STAR_CIRCLES = [
@@ -749,9 +750,10 @@ export default function Home() {
 
   return (
     <div style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased' }}>
+      <MeshMobileNav user={user} activePage="Home" />
 
       {/* ── MESH THREE-COLUMN LAYOUT ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0 }}>
+      <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0 }}>
 
         {/* ── LEFT: Sidebar nav ── */}
         <div className="mesh-left" style={{ background: '#fafafa', borderRight: '1px solid rgba(0,0,0,0.06)' }}>

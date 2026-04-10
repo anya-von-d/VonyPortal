@@ -21,6 +21,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { formatMoney } from "@/components/utils/formatMoney";
 import { toLocalDate, getLocalToday, daysUntil as daysUntilDate } from "@/components/utils/dateUtils";
 import LoanDetailsModal from "@/components/loans/LoanDetailsModal";
+import MeshMobileNav from "@/components/MeshMobileNav";
 
 export default function YourLoans() {
   const { logout } = useAuth();
@@ -1318,6 +1319,7 @@ export default function YourLoans() {
 
   return (
     <>
+      <MeshMobileNav user={user} activePage="My Loans" />
       {/* Document Popup Modal */}
       <AnimatePresence>
         {activeDocPopup && docPopupAgreement && (

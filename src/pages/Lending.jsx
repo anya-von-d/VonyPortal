@@ -36,6 +36,7 @@ import { addMonths, addWeeks, addDays, format, startOfMonth, endOfMonth, isSameM
 import { jsPDF } from "jspdf";
 import { formatMoney } from "@/components/utils/formatMoney";
 import { toLocalDate, getLocalToday, daysUntil as daysUntilDate, daysBetween } from "@/components/utils/dateUtils";
+import MeshMobileNav from "@/components/MeshMobileNav";
 
 const STAR_CIRCLES = [
   {cx:82,cy:45,o:0.7},{cx:195,cy:112,o:0.5},{cx:310,cy:28,o:0.8},{cx:420,cy:198,o:0.4},
@@ -1502,7 +1503,8 @@ export default function Lending({ initialTab }) {
       />
 
       <div style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", background: '#ffffff' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0, minHeight: '100vh' }}>
+        <MeshMobileNav user={currentUser} activePage="My Loans" />
+        <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0, minHeight: '100vh' }}>
           {/* COL 1 - left nav */}
           <div className="mesh-left" style={{ background: '#fafafa', borderRight: '1px solid rgba(0,0,0,0.06)' }}>
             <div style={{ position: 'sticky', top: 0, padding: '24px 8px 0' }}>

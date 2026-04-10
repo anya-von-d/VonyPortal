@@ -252,28 +252,22 @@ input[type="date"] {
 }
 
 /* Mesh layout responsive */
-@media (max-width: 900px) {
+@media (max-width: 768px) {
   .mesh-layout {
     grid-template-columns: 1fr !important;
-    padding: 80px 16px 40px !important;
-    gap: 32px !important;
+    gap: 0 !important;
   }
   .mesh-left {
-    border-right: none !important;
-    border-bottom: 1px solid rgba(0,0,0,0.06) !important;
-    padding-right: 0 !important;
-    padding-bottom: 28px !important;
-    position: static !important;
-  }
-  .mesh-center {
-    padding: 0 !important;
-    border-right: none !important;
-    border-bottom: 1px solid rgba(0,0,0,0.06) !important;
-    padding-bottom: 28px !important;
+    display: none !important;
   }
   .mesh-right {
-    padding-left: 0 !important;
-    position: static !important;
+    display: none !important;
+  }
+  .mesh-center {
+    padding: 72px 20px 60px !important;
+    border-right: none !important;
+    min-width: 0 !important;
+    width: 100% !important;
   }
 }
 

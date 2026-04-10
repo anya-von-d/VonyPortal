@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
+import MeshMobileNav from "@/components/MeshMobileNav";
 
 export default function Friends() {
   const { user: authUser, userProfile, logout } = useAuth();
@@ -252,7 +253,9 @@ export default function Friends() {
   );
 
   return (
-    <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0, minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased' }}>
+    <div>
+      <MeshMobileNav user={user} activePage="Friends" />
+      <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0, minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased' }}>
 
       {/* Col 1: left nav */}
       <div className="mesh-left" style={{ background: '#fafafa', borderRight: '1px solid rgba(0,0,0,0.06)' }}>
@@ -453,6 +456,7 @@ export default function Friends() {
         </div>
       </div>
 
+    </div>
     </div>
   );
 }

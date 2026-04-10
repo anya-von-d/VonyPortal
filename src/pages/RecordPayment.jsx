@@ -11,6 +11,7 @@ import { format, addMonths } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import { AnimatedCheckmark } from "@/components/ui/animations";
+import MeshMobileNav from "@/components/MeshMobileNav";
 
 const SHADOW = '0px 50px 40px rgba(0,0,0,0.02), 0px 50px 40px rgba(0,0,0,0.04), 0px 20px 40px rgba(0,0,0,0.06), 0px 3px 10px rgba(0,0,0,0.12)';
 
@@ -417,6 +418,7 @@ export default function RecordPayment() {
         )}
       </AnimatePresence>
 
+      <MeshMobileNav user={user} activePage="Record Payment" />
       <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0, minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased' }}>
 
         {/* Col 1: left nav */}

@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { Loan, Payment, PublicProfile } from "@/entities/all";
 import { format } from "date-fns";
 import { formatMoney } from "@/components/utils/formatMoney";
+import MeshMobileNav from "@/components/MeshMobileNav";
 
 const LEARN_CATEGORIES = [
   { id: 'lending', label: 'Lending with Friends' },
@@ -109,6 +110,7 @@ export default function ComingSoon() {
 
   return (
     <div className="mesh-layout" style={{ minHeight: '100vh', display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0, fontFamily: "'DM Sans', sans-serif" }}>
+      <MeshMobileNav user={user} activePage="Learn" />
 
       {/* ── LEFT: Sidebar nav ── */}
       <div className="mesh-left" style={{ background: '#fafafa', borderRight: '1px solid rgba(0,0,0,0.06)' }}>
