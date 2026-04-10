@@ -1714,29 +1714,28 @@ export default function Lending({ initialTab }) {
                       })()}
                     </div>
 
-                    {/* Stats Card - Total Lent */}
-                    <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0 rounded-xl" style={{ backgroundColor: 'rgba(3,172,234,0.08)' }}>
-                      <CardContent className="p-4 flex flex-col h-full">
-                        <p className="text-sm font-medium text-slate-600 mb-2 text-left">Total Lent</p>
-                        <p className="text-2xl font-bold text-slate-800 text-center flex-1 flex items-center justify-center">${totalLent.toLocaleString()}</p>
-                        <p className="text-xs text-slate-500 mt-1 text-right">{activeLoans.length} active loans</p>
-                      </CardContent>
-                    </Card>
+                    {/* Stats Box - Total Lent */}
+                    <div style={{ background: 'rgba(3,172,234,0.08)', border: '1.5px solid rgba(3,172,234,0.40)', borderRadius: 14, padding: '12px 14px', boxShadow: '0 0 0 3px rgba(3,172,234,0.18), 0 0 20px rgba(3,172,234,0.16), 0 0 40px rgba(3,172,234,0.06), 0 2px 12px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column' }}>
+                      <div style={{ width: 20, height: 20, borderRadius: 6, background: 'rgba(3,172,234,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                      </div>
+                      <div style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>Total Lent</div>
+                      <div style={{ fontSize: 20, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em' }}>${totalLent.toLocaleString()}</div>
+                      <div style={{ fontSize: 10, color: '#9B9A98', marginTop: 4 }}>{activeLoans.length} active loans</div>
+                    </div>
 
-                    {/* Stats Card - Expected Back */}
-                    <Card className="backdrop-blur-sm hover:shadow-xl transition-all duration-300 h-full cursor-default border-0 rounded-xl" style={{ backgroundColor: 'rgba(3,172,234,0.08)' }}>
-                      <CardContent className="p-4 flex flex-col h-full">
-                        <p className="text-sm font-medium text-slate-600 mb-2 text-left">Expected Back</p>
-                        <p className="text-2xl font-bold text-slate-800 text-center flex-1 flex items-center justify-center">${totalExpectedBack.toLocaleString()}</p>
-                        <p className="text-xs text-slate-500 mt-1 text-right">Including interest</p>
-                      </CardContent>
-                    </Card>
+                    {/* Stats Box - Expected Back */}
+                    <div style={{ background: 'rgba(3,172,234,0.08)', border: '1.5px solid rgba(3,172,234,0.40)', borderRadius: 14, padding: '12px 14px', boxShadow: '0 0 0 3px rgba(3,172,234,0.18), 0 0 20px rgba(3,172,234,0.16), 0 0 40px rgba(3,172,234,0.06), 0 2px 12px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column' }}>
+                      <div style={{ width: 20, height: 20, borderRadius: 6, background: 'rgba(3,172,234,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                      </div>
+                      <div style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>Expected Back</div>
+                      <div style={{ fontSize: 20, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em' }}>${totalExpectedBack.toLocaleString()}</div>
+                      <div style={{ fontSize: 10, color: '#9B9A98', marginTop: 4 }}>Including interest</div>
+                    </div>
                   </div>
                   </div>
                 </PageCard>
-
-                {/* Quick Record Payment - only show when there are active loans */}
-                {renderRecordPaymentBox()}
 
                 {/* Upcoming Payments + Loan Progress */}
                   {/* Upcoming Payments */}
@@ -2973,8 +2972,6 @@ export default function Lending({ initialTab }) {
                   </div>
                 )}
 
-                {/* Quick Record Payment - only show when there are active loans */}
-                {renderRecordPaymentBox('mt-4')}
               </motion.div>
             )}
 
