@@ -754,11 +754,11 @@ export default function Home() {
       <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0 }}>
 
         {/* ── LEFT: Sidebar nav ── */}
-        <div className="mesh-left" style={{ background: '#ffffff', borderRight: '1px solid rgba(0,0,0,0.06)' }}>
-          <div style={{ position: 'sticky', top: 0, padding: '32px 20px 0' }}>
+        <div className="mesh-left" style={{ background: '#fafafa', borderRight: '1px solid rgba(0,0,0,0.06)' }}>
+          <div style={{ position: 'sticky', top: 0, padding: '24px 8px 0' }}>
             {/* Vony logo */}
-            <Link to="/" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 600, fontStyle: 'italic', fontSize: '1.75rem', color: '#1A1918', textDecoration: 'none', display: 'block', marginBottom: 24, lineHeight: 1, letterSpacing: '-0.02em' }}>Vony</Link>
-            <nav style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <Link to="/" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 600, fontStyle: 'italic', fontSize: '1.3rem', color: '#1A1918', textDecoration: 'none', display: 'block', marginBottom: 16, lineHeight: 1, letterSpacing: '-0.02em', paddingLeft: 6 }}>Vony</Link>
+            <nav style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
               {[
                 { label: 'Home', to: '/', active: true },
                 { label: 'Upcoming', to: createPageUrl("Upcoming") },
@@ -768,8 +768,8 @@ export default function Home() {
                 { label: 'Friends', to: createPageUrl("Friends") },
               ].map(({ label, to, active: isActive }) => (
                 <Link key={label} to={to} style={{
-                  display: 'block', padding: '8px 10px', borderRadius: 9, textDecoration: 'none',
-                  fontSize: 14, fontWeight: isActive ? 600 : 500,
+                  display: 'block', padding: '6px 12px', borderRadius: 9, textDecoration: 'none',
+                  fontSize: 13, fontWeight: isActive ? 600 : 500,
                   color: isActive ? '#1A1918' : '#787776',
                   background: isActive ? 'rgba(0,0,0,0.05)' : 'transparent',
                   fontFamily: "'DM Sans', sans-serif", width: '100%', boxSizing: 'border-box',
@@ -777,14 +777,14 @@ export default function Home() {
                   {label}
                 </Link>
               ))}
-              <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '8px 0' }} />
+              <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '6px 0' }} />
               {[
                 { label: 'Recent Activity', to: createPageUrl("RecentActivity") },
                 { label: 'Documents', to: createPageUrl("LoanAgreements") },
               ].map(({ label, to }) => (
                 <Link key={label} to={to} style={{
-                  display: 'block', padding: '7px 10px', borderRadius: 9, textDecoration: 'none',
-                  fontSize: 13, fontWeight: 500, color: '#9B9A98',
+                  display: 'block', padding: '5px 12px', borderRadius: 9, textDecoration: 'none',
+                  fontSize: 12, fontWeight: 500, color: '#9B9A98',
                   background: 'transparent', fontFamily: "'DM Sans', sans-serif",
                   width: '100%', boxSizing: 'border-box',
                 }}>
@@ -801,8 +801,8 @@ export default function Home() {
               >
                 <button style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: '7px 10px', borderRadius: 9, border: 'none', cursor: 'pointer',
-                  fontSize: 13, fontWeight: 500, color: '#9B9A98',
+                  padding: '5px 12px', borderRadius: 9, border: 'none', cursor: 'pointer',
+                  fontSize: 12, fontWeight: 500, color: '#9B9A98',
                   background: 'transparent', fontFamily: "'DM Sans', sans-serif",
                   width: '100%', boxSizing: 'border-box',
                 }}>
@@ -860,7 +860,7 @@ export default function Home() {
 
           {/* Greeting */}
           <div style={{ marginBottom: 20 }}>
-            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 24, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.2, color: '#1A1918' }}>
+            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 20, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.2, color: '#1A1918' }}>
               {greeting}, {firstName}
             </div>
           </div>

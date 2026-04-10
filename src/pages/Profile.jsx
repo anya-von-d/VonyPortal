@@ -332,10 +332,10 @@ export default function Profile() {
       <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0, minHeight: '100vh' }}>
 
         {/* COL 1 - left nav */}
-        <div className="mesh-left" style={{ background: '#ffffff', borderRight: '1px solid rgba(0,0,0,0.06)' }}>
-          <div style={{ position: 'sticky', top: 0, padding: '32px 20px 0' }}>
-            <Link to="/" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 600, fontStyle: 'italic', fontSize: '1.75rem', color: '#1A1918', textDecoration: 'none', display: 'block', marginBottom: 28 }}>Vony</Link>
-            <nav style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <div className="mesh-left" style={{ background: '#fafafa', borderRight: '1px solid rgba(0,0,0,0.06)' }}>
+          <div style={{ position: 'sticky', top: 0, padding: '24px 8px 0' }}>
+            <Link to="/" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 600, fontStyle: 'italic', fontSize: '1.3rem', color: '#1A1918', textDecoration: 'none', display: 'block', marginBottom: 16, paddingLeft: 6 }}>Vony</Link>
+            <nav style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
               {[
                 { label: 'Home', to: '/' },
                 { label: 'Upcoming', to: createPageUrl("Upcoming") },
@@ -346,32 +346,32 @@ export default function Profile() {
               ].map(({ label, to }) => {
                 const isActive = false;
                 return (
-                  <Link key={label} to={to} style={{ fontSize: 14, fontWeight: isActive ? 600 : 500, color: isActive ? '#1A1918' : '#6B6A68', textDecoration: 'none', padding: '8px 10px', borderRadius: 8, background: isActive ? 'rgba(0,0,0,0.05)' : 'transparent' }}>{label}</Link>
+                  <Link key={label} to={to} style={{ fontSize: 13, fontWeight: isActive ? 600 : 500, color: isActive ? '#1A1918' : '#6B6A68', textDecoration: 'none', padding: '6px 12px', borderRadius: 8, background: isActive ? 'rgba(0,0,0,0.05)' : 'transparent' }}>{label}</Link>
                 );
               })}
-              <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '10px 0' }} />
+              <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '6px 0' }} />
               {[
                 { label: 'Recent Activity', to: createPageUrl("RecentActivity") },
                 { label: 'Documents', to: createPageUrl("LoanAgreements") },
               ].map(({ label, to }) => (
-                <Link key={label} to={to} style={{ fontSize: 14, fontWeight: 500, color: '#6B6A68', textDecoration: 'none', padding: '8px 10px', borderRadius: 8 }}>{label}</Link>
+                <Link key={label} to={to} style={{ fontSize: 12, fontWeight: 500, color: '#6B6A68', textDecoration: 'none', padding: '5px 12px', borderRadius: 8 }}>{label}</Link>
               ))}
-              <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '10px 0' }} />
+              <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '6px 0' }} />
               {[
                 { label: 'Learn', to: createPageUrl("ComingSoon") },
                 { label: 'Loan Help', to: createPageUrl("LoanHelp") },
                 { label: 'Help & Support', to: createPageUrl("ComingSoon") },
               ].map(({ label, to }) => (
-                <Link key={label} to={to} style={{ fontSize: 14, fontWeight: 500, color: '#6B6A68', textDecoration: 'none', padding: '8px 10px', borderRadius: 8 }}>{label}</Link>
+                <Link key={label} to={to} style={{ fontSize: 12, fontWeight: 500, color: '#6B6A68', textDecoration: 'none', padding: '5px 12px', borderRadius: 8 }}>{label}</Link>
               ))}
-              <button onClick={logout} style={{ fontSize: 14, fontWeight: 500, color: '#6B6A68', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '8px 10px', borderRadius: 8, fontFamily: 'inherit' }}>Log Out</button>
+              <button onClick={logout} style={{ fontSize: 12, fontWeight: 500, color: '#6B6A68', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '5px 12px', borderRadius: 8, fontFamily: 'inherit' }}>Log Out</button>
             </nav>
           </div>
         </div>
 
         {/* COL 2 - main content */}
         <div className="mesh-center" style={{ background: 'white', borderRight: '1px solid rgba(0,0,0,0.06)', padding: '40px 48px 80px' }}>
-          <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 24, fontWeight: 600, color: '#1A1918', marginBottom: 20, letterSpacing: '-0.02em' }}>Profile</div>
+          <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 20, fontWeight: 600, color: '#1A1918', marginBottom: 20, letterSpacing: '-0.02em' }}>Profile</div>
           <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 24 }} />
 
           {/* Error Alert */}

@@ -592,7 +592,8 @@ export default function YourLoans() {
           </Link>
         </div>
 
-        {/* 3. Loan Progress — per-loan bars, no profile photo */}
+        {/* 3. Loan Progress — lending: per-loan bars without photos; borrowing: Home-style with photos */}
+        {isLending && (
         <PageCard title="Loan Progress">
           <div style={{ padding: '10px 14px 14px' }}>
             {activeLoans.length === 0 ? (
@@ -618,7 +619,7 @@ export default function YourLoans() {
                         </div>
                         <span style={{ fontSize: 11, fontWeight: 700, color: '#9B9A98', flexShrink: 0 }}>{pct}%</span>
                       </div>
-                      <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 3 }}>{formatMoney(paidAmt)} of {formatMoney(totalAmt)} {isLending ? 'paid back' : 'repaid'}</div>
+                      <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 3 }}>{formatMoney(paidAmt)} of {formatMoney(totalAmt)} paid back</div>
                     </div>
                   );
                 })}
@@ -626,10 +627,11 @@ export default function YourLoans() {
             )}
           </div>
         </PageCard>
+        )}
 
-        {/* 4. Active Loans — Home page style with profile photos */}
+        {/* 4. Loan Progress (borrowing) / Active Loans (lending) — Home page style with profile photos */}
         {activeLoans.length > 0 && (
-          <PageCard title="Active Loans">
+          <PageCard title={isLending ? "Active Loans" : "Loan Progress"}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {activeLoans.slice(0, 5).map((loan) => {
                 const otherParty = publicProfiles.find(p => p.user_id === (isLending ? loan.borrower_id : loan.lender_id));
@@ -699,22 +701,27 @@ export default function YourLoans() {
                       const isOverdue = loan.days < 0;
                       const purpose = loan.purpose || 'loan';
                       const daysLbl = isOverdue ? `${Math.abs(loan.days)}d late` : loan.days === 0 ? 'today' : `${loan.days}d`;
+                      const amtSign = isLending ? '+' : '-';
                       return (
-                        <div key={loan.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0' }}>
-                          <div style={{ fontSize: 10, fontWeight: 600, color: isOverdue ? '#E8726E' : '#787776', letterSpacing: '0.02em', flexShrink: 0, minWidth: 46, textAlign: 'center' }}>
+                        <div key={loan.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0' }}>
+                          <div style={{
+                            minWidth: 42, textAlign: 'center', flexShrink: 0,
+                            fontSize: 10, fontWeight: 700, lineHeight: 1.2,
+                            color: isOverdue ? '#E8726E' : loan.days <= 3 ? '#F59E0B' : '#9B9A98',
+                            background: isOverdue ? 'rgba(232,114,110,0.08)' : loan.days <= 3 ? 'rgba(245,158,11,0.08)' : 'rgba(0,0,0,0.04)',
+                            borderRadius: 6, padding: '3px 6px',
+                          }}>
                             {daysLbl}
                           </div>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontSize: 13, fontWeight: 500, color: '#1A1918' }}>
-                              {isLending ? `${loan.firstName} pays you for ${purpose}` : `Pay ${loan.firstName} for ${purpose}`}
-                            </div>
-                            <div style={{ fontSize: 11, color: '#787776', marginTop: 2 }}>
-                              due {format(loan.payDate, 'do MMM')}
-                            </div>
+                          <div style={{ flex: 1, minWidth: 0, fontSize: 13, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {isLending
+                              ? <><strong>{loan.firstName}</strong> pays you</>
+                              : <>Pay <strong>{loan.firstName}</strong></>}
+                            <span style={{ color: '#9B9A98', fontWeight: 400 }}> · {purpose}</span>
                           </div>
-                          <div style={{ fontSize: 14, fontWeight: 600, flexShrink: 0, color: '#1A1918' }}>
-                            {isLending ? '+' : '-'}{formatMoney(loan.payment_amount || 0)}
-                          </div>
+                          <span style={{ fontSize: 13, fontWeight: 700, flexShrink: 0, color: isLending ? '#52B788' : '#1A1918', letterSpacing: '-0.01em' }}>
+                            {amtSign}{formatMoney(loan.payment_amount || 0)}
+                          </span>
                         </div>
                       );
                     })}
@@ -1343,10 +1350,10 @@ export default function YourLoans() {
       <div className="mesh-layout" style={{ minHeight: '100vh', display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0, fontFamily: "'DM Sans', sans-serif" }}>
 
         {/* ── LEFT: Sidebar nav ── */}
-        <div className="mesh-left" style={{ background: '#ffffff', borderRight: '1px solid rgba(0,0,0,0.06)' }}>
-          <div style={{ position: 'sticky', top: 0, padding: '32px 20px 0' }}>
-            <Link to="/" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 600, fontStyle: 'italic', fontSize: '1.75rem', color: '#1A1918', textDecoration: 'none', display: 'block', marginBottom: 24 }}>Vony</Link>
-            <nav style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <div className="mesh-left" style={{ background: '#fafafa', borderRight: '1px solid rgba(0,0,0,0.06)' }}>
+          <div style={{ position: 'sticky', top: 0, padding: '24px 8px 0' }}>
+            <Link to="/" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 600, fontStyle: 'italic', fontSize: '1.3rem', color: '#1A1918', textDecoration: 'none', display: 'block', marginBottom: 16, paddingLeft: 6 }}>Vony</Link>
+            <nav style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
               {[
                 { label: 'Home', to: '/', active: false },
                 { label: 'Upcoming', to: createPageUrl("Upcoming"), active: false },
@@ -1355,14 +1362,14 @@ export default function YourLoans() {
                 { label: 'My Loans', to: createPageUrl("YourLoans"), active: true },
                 { label: 'Friends', to: createPageUrl("Friends"), active: false },
               ].map(({ label, to, active: isActive }) => (
-                <Link key={label} to={to} style={{ display: 'block', padding: '8px 10px', borderRadius: 9, textDecoration: 'none', fontSize: 14, fontWeight: isActive ? 600 : 500, color: isActive ? '#1A1918' : '#787776', background: isActive ? 'rgba(0,0,0,0.05)' : 'transparent', fontFamily: "'DM Sans', sans-serif", width: '100%', boxSizing: 'border-box' }}>{label}</Link>
+                <Link key={label} to={to} style={{ display: 'block', padding: '6px 12px', borderRadius: 9, textDecoration: 'none', fontSize: 13, fontWeight: isActive ? 600 : 500, color: isActive ? '#1A1918' : '#787776', background: isActive ? 'rgba(0,0,0,0.05)' : 'transparent', fontFamily: "'DM Sans', sans-serif", width: '100%', boxSizing: 'border-box' }}>{label}</Link>
               ))}
-              <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '8px 0' }} />
+              <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '6px 0' }} />
               {[
                 { label: 'Recent Activity', to: createPageUrl("RecentActivity") },
                 { label: 'Documents', to: createPageUrl("LoanAgreements") },
               ].map(({ label, to }) => (
-                <Link key={label} to={to} style={{ display: 'block', padding: '7px 10px 7px 4px', borderRadius: 9, textDecoration: 'none', fontSize: 13, fontWeight: 500, color: '#9B9A98', background: 'transparent', fontFamily: "'DM Sans', sans-serif", width: '100%', boxSizing: 'border-box' }}>{label}</Link>
+                <Link key={label} to={to} style={{ display: 'block', padding: '5px 12px', borderRadius: 9, textDecoration: 'none', fontSize: 12, fontWeight: 500, color: '#9B9A98', background: 'transparent', fontFamily: "'DM Sans', sans-serif", width: '100%', boxSizing: 'border-box' }}>{label}</Link>
               ))}
               {/* More dropdown */}
               <div style={{ position: 'relative' }}
@@ -1372,7 +1379,7 @@ export default function YourLoans() {
                 }}
                 onMouseLeave={() => { moreNavCloseTimerRef.current = setTimeout(() => setMoreNavOpen(false), 150); }}
               >
-                <button style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 10px 7px 4px', borderRadius: 9, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 500, color: '#9B9A98', background: 'transparent', fontFamily: "'DM Sans', sans-serif", width: '100%', boxSizing: 'border-box' }}>
+                <button style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '5px 12px', borderRadius: 9, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 500, color: '#9B9A98', background: 'transparent', fontFamily: "'DM Sans', sans-serif", width: '100%', boxSizing: 'border-box' }}>
                   More
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="6 9 12 15 18 9" /></svg>
                 </button>
@@ -1398,7 +1405,7 @@ export default function YourLoans() {
         <div className="mesh-center" style={{ background: 'white', borderRight: '1px solid rgba(0,0,0,0.06)', padding: '40px 48px 80px' }}>
 
           {/* Page title */}
-          <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 24, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 20 }}>My Loans</div>
+          <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 20, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 20 }}>My Loans</div>
           <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 28 }} />
 
           {/* Glass tab toggle */}
