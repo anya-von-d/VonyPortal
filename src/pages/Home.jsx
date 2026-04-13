@@ -1015,7 +1015,7 @@ export default function Home() {
           )}
 
           {/* UPCOMING + HOW MONTH IS GOING */}
-          <div className="home-two-col-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 36 }}>
+          <div className="home-two-col-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, marginBottom: 36 }}>
             {/* Upcoming */}
             <div>
               <SectionHeader title="Upcoming" linkTo={createPageUrl("Upcoming")} linkLabel="Full schedule →" />
@@ -1054,7 +1054,7 @@ export default function Home() {
             <div>
               <SectionHeader title={`How ${format(today, 'MMMM')} is going`} />
               {/* Received */}
-              <div style={{ marginBottom: 16, marginTop: 4 }}>
+              <div style={{ padding: '9px 0' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
                   <span style={{ fontSize: 13, color: '#787776' }}>Received</span>
                   <span style={{ fontSize: 14, fontWeight: 700, color: '#03ACEA', letterSpacing: '-0.01em' }}>{formatMoney(monthlyReceived)}</span>
@@ -1065,7 +1065,7 @@ export default function Home() {
                 <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 4 }}>of {formatMoney(monthlyExpectedReceive)} expected</div>
               </div>
               {/* Paid out */}
-              <div>
+              <div style={{ padding: '9px 0' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
                   <span style={{ fontSize: 13, color: '#787776' }}>Paid out</span>
                   <span style={{ fontSize: 14, fontWeight: 700, color: '#1D5B94', letterSpacing: '-0.01em' }}>{formatMoney(monthlyPaidOut)}</span>
@@ -1079,7 +1079,7 @@ export default function Home() {
           </div>
 
           {/* RECENT ACTIVITY + ACTIVE LOANS */}
-          <div className="home-two-col-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 36 }}>
+          <div className="home-two-col-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, marginBottom: 36 }}>
             {/* Recent Activity */}
             <div>
               <SectionHeader title="Recent Activity" linkTo={createPageUrl("RecentActivity")} linkLabel="View all →" />
@@ -1110,7 +1110,7 @@ export default function Home() {
               {myLoans.filter(l => l && l.status === 'active').length === 0 ? (
                 <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98' }}>No active loans yet.</div>
               ) : (
-                <div ref={activeLoansRef} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div ref={activeLoansRef} style={{ display: 'flex', flexDirection: 'column' }}>
                   {myLoans.filter(l => l && l.status === 'active').slice(0, 5).map((loan, idx) => {
                     const isLender = loan.lender_id === user.id;
                     const otherProfile = safeAllProfiles.find(p => p.user_id === (isLender ? loan.borrower_id : loan.lender_id));
@@ -1124,7 +1124,7 @@ export default function Home() {
                       : `${name} lent you ${formatMoney(totalAmt)}${purpose}`;
                     const initial = (otherProfile?.full_name || otherProfile?.username || 'U').charAt(0).toUpperCase();
                     return (
-                      <div key={loan.id} style={{ padding: '8px 0' }}>
+                      <div key={loan.id} style={{ padding: '9px 0' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                           <div style={{ width: 20, height: 20, borderRadius: '50%', flexShrink: 0, overflow: 'hidden', background: 'rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             {otherProfile?.profile_picture_url ? (
