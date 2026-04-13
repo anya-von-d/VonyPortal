@@ -704,31 +704,10 @@ export default function Home() {
   const alertTotal = overdueReminders.length;
   overdueCountRef.current = alertTotal;
 
-  const LENDER_GREEN = '#52B788';
-  const DashboardCard = ({ title, headerRight, children, style }) => (
-    <div style={{
-      background: 'white',
-      borderRadius: 11, overflow: 'hidden',
-      border: '1px solid rgba(0,0,0,0.07)',
-      ...style,
-    }}>
-      <div style={{ padding: '9px 14px 5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
-        {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
-      </div>
-      {children}
-    </div>
-  );
-
-  const SectionLabel = ({ children }) => (
-    <div style={{ fontSize: 10, fontWeight: 700, color: '#C5C3C0', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 12 }}>{children}</div>
-  );
-
-  const RightSection = ({ title, children }) => (
-    <div style={{ marginBottom: 40 }}>
-      <div style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 9 }}>{title}</div>
-      <div style={{ height: 1, background: 'rgba(0,0,0,0.07)', marginBottom: 14 }} />
-      {children}
+  const SectionHeader = ({ title, linkTo, linkLabel }) => (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 4, borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+      <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{title}</span>
+      {linkTo && <Link to={linkTo} style={{ fontSize: 11, fontWeight: 500, color: '#9B9A98', textDecoration: 'none' }}>{linkLabel}</Link>}
     </div>
   );
 
@@ -737,7 +716,7 @@ export default function Home() {
       <MeshMobileNav user={user} activePage="Home" />
 
       {/* ── MESH THREE-COLUMN LAYOUT ── */}
-      <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0 }}>
+      <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 0 }}>
 
         {/* ── LEFT: Sidebar nav ── */}
         <div className="mesh-left" style={{ background: '#fafafa', borderRight: '1px solid rgba(0,0,0,0.06)' }}>
@@ -829,15 +808,54 @@ export default function Home() {
         </div>
 
         {/* ── CENTER ── */}
-        <div className="mesh-center" style={{ background: '#ffffff', borderRight: '1px solid rgba(0,0,0,0.06)', padding: '28px 48px 80px' }}>
+        <div className="mesh-center" style={{ background: '#ffffff', padding: '28px 48px 80px' }}>
 
-          {/* Greeting */}
-          <div style={{ marginBottom: 12 }}>
+          {/* Greeting + icons */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
             <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.2, color: '#1A1918' }}>
               {greeting}, {firstName}
             </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <Link to={createPageUrl("Requests")} style={{ position: 'relative', textDecoration: 'none' }}>
+                <div style={{ width: 32, height: 32, borderRadius: 9, background: 'rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#787776" strokeWidth="2" strokeLinecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                </div>
+                {notifCount > 0 && <div style={{ position: 'absolute', top: 2, right: 2, width: 7, height: 7, borderRadius: '50%', background: '#03ACEA', border: '1.5px solid #ffffff' }} />}
+              </Link>
+              <Link to={createPageUrl("Profile")} style={{ textDecoration: 'none' }}>
+                <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(3,172,234,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                  {user.profile_picture_url ? (
+                    <img src={user.profile_picture_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#03ACEA' }}>{avatarInitial}</span>
+                  )}
+                </div>
+              </Link>
+            </div>
           </div>
           <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 20 }} />
+
+          {/* Notification bar */}
+          {notifCount > 0 && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderRadius: 10,
+              background: 'rgba(3,172,234,0.06)', border: '1px solid rgba(3,172,234,0.15)',
+              marginBottom: 16,
+            }}>
+              <div style={{ width: 24, height: 24, borderRadius: 7, background: 'rgba(3,172,234,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2" strokeLinecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              </div>
+              <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>
+                You have {notifCount} new notification{notifCount !== 1 ? 's' : ''}
+              </span>
+              <Link to={createPageUrl("Requests")} style={{
+                fontSize: 12, fontWeight: 600, color: '#03ACEA', textDecoration: 'none',
+                padding: '5px 12px', borderRadius: 7, background: 'white',
+                border: '1px solid rgba(3,172,234,0.2)', flexShrink: 0,
+                fontFamily: "'DM Sans', sans-serif",
+              }}>View</Link>
+            </div>
+          )}
 
           {/* Three summary cards */}
           <div className="home-summary-cards" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 24 }}>
@@ -996,232 +1014,47 @@ export default function Home() {
             </div>
           )}
 
-          {/* UPCOMING */}
-          <div style={{ marginBottom: 36 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 4, borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
-              <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Upcoming</span>
-              <Link to={createPageUrl("Upcoming")} style={{ fontSize: 11, fontWeight: 500, color: '#9B9A98', textDecoration: 'none' }}>Full schedule →</Link>
-            </div>
-            {combinedPaymentEvents.length === 0 ? (
-              <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98' }}>You're all clear! Nothing coming up yet.</div>
-            ) : combinedPaymentEvents.map((event, idx) => {
-              const isOverdue = event.days < 0;
-              const daysLabel = isOverdue ? `${Math.abs(event.days)}d late` : event.days === 0 ? 'today' : `${event.days}d`;
-              const amtSign = event.isLender ? '+' : '-';
-              return (
-                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0' }}>
-                  {/* Day badge */}
-                  <div style={{
-                    minWidth: 42, textAlign: 'center', flexShrink: 0,
-                    fontSize: 10, fontWeight: 700, lineHeight: 1.2,
-                    color: isOverdue ? '#E8726E' : event.days <= 3 ? '#F59E0B' : '#9B9A98',
-                    background: isOverdue ? 'rgba(232,114,110,0.08)' : event.days <= 3 ? 'rgba(245,158,11,0.08)' : 'rgba(0,0,0,0.04)',
-                    borderRadius: 6, padding: '3px 6px',
-                  }}>
-                    {daysLabel}
-                  </div>
-                  {/* Name + description */}
-                  <div style={{ flex: 1, minWidth: 0, fontSize: 13, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {event.isLender
-                      ? <><strong>{event.firstName}</strong> pays you</>
-                      : <>Pay <strong>{event.firstName}</strong></>}
-                    {event.purpose && <span style={{ color: '#9B9A98', fontWeight: 400 }}> · {event.purpose}</span>}
-                  </div>
-                  {/* Amount */}
-                  <span style={{ fontSize: 13, fontWeight: 700, flexShrink: 0, color: event.isLender ? '#03ACEA' : '#1A1918', letterSpacing: '-0.01em' }}>
-                    {amtSign}{formatMoney(event.remainingAmount)}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* RECENT ACTIVITY */}
-          <div style={{ marginBottom: 36 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 4, borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
-              <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Recent Activity</span>
-              <Link to={createPageUrl("RecentActivity")} style={{ fontSize: 11, fontWeight: 500, color: '#9B9A98', textDecoration: 'none' }}>View all →</Link>
-            </div>
-            {recentActivity.length === 0 ? (
-              <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98' }}>No recent activity yet.</div>
-            ) : recentActivity.map((item, idx) => (
-              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0' }}>
-                <div style={{ width: 20, height: 20, borderRadius: 6, background: `${item.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  {item.icon === 'send' ? (
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="2.5" strokeLinecap="round"><polyline points="7 13 12 18 17 13"/><line x1="12" y1="18" x2="12" y2="6"/></svg>
-                  ) : item.icon === 'receive' ? (
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="2.5" strokeLinecap="round"><polyline points="17 11 12 6 7 11"/><line x1="12" y1="6" x2="12" y2="18"/></svg>
-                  ) : item.icon === 'check' ? (
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  ) : (
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                  )}
-                </div>
-                <div style={{ flex: 1, minWidth: 0, fontSize: 13, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.description}</div>
-                <span style={{ fontSize: 11, color: '#9B9A98', flexShrink: 0 }}>{item.detail}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* ACTIVE LOANS */}
-          {myLoans.filter(l => l && l.status === 'active').length > 0 && (
+          {/* UPCOMING + HOW MONTH IS GOING */}
+          <div className="home-two-col-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 36 }}>
+            {/* Upcoming */}
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 4, borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
-                <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Active Loans</span>
-                <Link to={createPageUrl("YourLoans")} style={{ fontSize: 11, fontWeight: 500, color: '#9B9A98', textDecoration: 'none' }}>View all →</Link>
-              </div>
-              <div ref={activeLoansRef} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {myLoans.filter(l => l && l.status === 'active').slice(0, 5).map((loan, idx) => {
-                  const isLender = loan.lender_id === user.id;
-                  const otherProfile = safeAllProfiles.find(p => p.user_id === (isLender ? loan.borrower_id : loan.lender_id));
-                  const totalAmt = loan.total_amount || loan.amount || 0;
-                  const paidAmt = loan.amount_paid || 0;
-                  const pct = totalAmt > 0 ? Math.round((paidAmt / totalAmt) * 100) : 0;
-                  const name = otherProfile?.full_name?.split(' ')[0] || otherProfile?.username || 'User';
-                  const purpose = loan.purpose ? ` for ${loan.purpose}` : '';
-                  const headerText = isLender
-                    ? `You lent ${name} ${formatMoney(totalAmt)}${purpose}`
-                    : `${name} lent you ${formatMoney(totalAmt)}${purpose}`;
-                  const initial = (otherProfile?.full_name || otherProfile?.username || 'U').charAt(0).toUpperCase();
-                  return (
-                    <div key={loan.id} style={{ padding: '8px 0' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                        <div style={{ width: 20, height: 20, borderRadius: '50%', flexShrink: 0, overflow: 'hidden', background: 'rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          {otherProfile?.profile_picture_url ? (
-                            <img src={otherProfile.profile_picture_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          ) : (
-                            <span style={{ fontSize: 9, fontWeight: 700, color: '#787776' }}>{initial}</span>
-                          )}
-                        </div>
-                        <div style={{ fontSize: 13, color: '#1A1918', fontWeight: 500, lineHeight: 1.4 }}>{headerText}</div>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div style={{ flex: 1, height: 6, borderRadius: 3, background: isLender ? 'rgba(3,172,234,0.1)' : 'rgba(29,91,148,0.1)', overflow: 'hidden' }}>
-                          <div key={`al-${idx}-${activeAnimKey}`} style={{ height: '100%', borderRadius: 3, background: isLender ? '#03ACEA' : '#1D5B94', width: `${pct}%`, animation: `barGrowRight 0.8s ease-out ${idx * 0.08}s both` }} />
-                        </div>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: '#9B9A98', flexShrink: 0 }}>{pct}%</span>
-                      </div>
-                      <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 3 }}>{formatMoney(paidAmt)} of {formatMoney(totalAmt)} {isLender ? 'paid back' : 'repaid'}</div>
+              <SectionHeader title="Upcoming" linkTo={createPageUrl("Upcoming")} linkLabel="Full schedule →" />
+              {combinedPaymentEvents.length === 0 ? (
+                <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98' }}>You're all clear! Nothing coming up yet.</div>
+              ) : combinedPaymentEvents.map((event, idx) => {
+                const isOverdue = event.days < 0;
+                const daysLabel = isOverdue ? `${Math.abs(event.days)}d late` : event.days === 0 ? 'today' : `${event.days}d`;
+                const amtSign = event.isLender ? '+' : '-';
+                return (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0' }}>
+                    <div style={{
+                      minWidth: 42, textAlign: 'center', flexShrink: 0,
+                      fontSize: 10, fontWeight: 700, lineHeight: 1.2,
+                      color: isOverdue ? '#E8726E' : event.days <= 3 ? '#F59E0B' : '#9B9A98',
+                      background: isOverdue ? 'rgba(232,114,110,0.08)' : event.days <= 3 ? 'rgba(245,158,11,0.08)' : 'rgba(0,0,0,0.04)',
+                      borderRadius: 6, padding: '3px 6px',
+                    }}>
+                      {daysLabel}
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* ── RIGHT PANEL ── */}
-        <div className="mesh-right" style={{ background: '#fafafa' }}>
-          <div style={{ position: 'sticky', top: 0, padding: '28px 28px 0' }}>
-            {/* Bell + Profile icons */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10, marginBottom: 28 }}>
-              <Link to={createPageUrl("Requests")} style={{ position: 'relative', textDecoration: 'none' }}>
-                <div style={{ width: 32, height: 32, borderRadius: 9, background: 'rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#787776" strokeWidth="2" strokeLinecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                </div>
-                {notifCount > 0 && <div style={{ position: 'absolute', top: 2, right: 2, width: 7, height: 7, borderRadius: '50%', background: '#03ACEA', border: '1.5px solid #fafafa' }} />}
-              </Link>
-              <Link to={createPageUrl("Profile")} style={{ textDecoration: 'none' }}>
-                <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(3,172,234,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                  {user.profile_picture_url ? (
-                    <img src={user.profile_picture_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    <span style={{ fontSize: 12, fontWeight: 700, color: '#03ACEA' }}>{avatarInitial}</span>
-                  )}
-                </div>
-              </Link>
+                    <div style={{ flex: 1, minWidth: 0, fontSize: 13, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {event.isLender
+                        ? <><strong>{event.firstName}</strong> pays you</>
+                        : <>Pay <strong>{event.firstName}</strong></>}
+                      {event.purpose && <span style={{ color: '#9B9A98', fontWeight: 400 }}> · {event.purpose}</span>}
+                    </div>
+                    <span style={{ fontSize: 13, fontWeight: 700, flexShrink: 0, color: event.isLender ? '#03ACEA' : '#1A1918', letterSpacing: '-0.01em' }}>
+                      {amtSign}{formatMoney(event.remainingAmount)}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
 
-            {/* Notifications */}
-            <RightSection title="Notifications">
-              {notifCount > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {paymentsToConfirm.map(p => {
-                    const loan = myLoans.find(l => l.id === p.loan_id);
-                    const recorder = safeAllProfiles.find(pr => pr.user_id === p.recorded_by);
-                    const name = recorder?.full_name?.split(' ')[0] || recorder?.username || 'User';
-                    return (
-                      <Link key={p.id} to={createPageUrl("Requests")} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', textDecoration: 'none' }}>
-                        <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'rgba(3,172,234,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
-                          {recorder?.profile_picture_url ? <img src={recorder.profile_picture_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 10, fontWeight: 700, color: '#03ACEA' }}>{(recorder?.full_name || 'U').charAt(0)}</span>}
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name} recorded a ${(p.amount || 0).toFixed(2)} payment</div>
-                          <div style={{ fontSize: 11, color: '#9B9A98' }}>Awaiting your confirmation</div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                  {pendingOffers.map(loan => {
-                    const lender = safeAllProfiles.find(pr => pr.user_id === loan.lender_id);
-                    const name = lender?.full_name?.split(' ')[0] || lender?.username || 'User';
-                    return (
-                      <Link key={loan.id} to={createPageUrl("Requests")} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', textDecoration: 'none' }}>
-                        <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'rgba(124,58,237,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
-                          {lender?.profile_picture_url ? <img src={lender.profile_picture_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 10, fontWeight: 700, color: '#7C3AED' }}>{(lender?.full_name || 'U').charAt(0)}</span>}
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Loan offer from {name} · ${(loan.amount || 0).toLocaleString()}</div>
-                          <div style={{ fontSize: 11, color: '#9B9A98' }}>Review & accept</div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                  {friendRequestsInbox.map(f => {
-                    const sender = safeAllProfiles.find(pr => pr.user_id === f.user_id);
-                    const name = sender?.full_name?.split(' ')[0] || sender?.username || 'User';
-                    return (
-                      <Link key={f.id} to={createPageUrl("Requests")} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', textDecoration: 'none' }}>
-                        <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'rgba(82,183,136,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
-                          {sender?.profile_picture_url ? <img src={sender.profile_picture_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 10, fontWeight: 700, color: '#52B788' }}>{(sender?.full_name || 'U').charAt(0)}</span>}
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Friend request from {name}</div>
-                          <div style={{ fontSize: 11, color: '#9B9A98' }}>Accept or decline</div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                  {termChanges.map(loan => {
-                    const lender = safeAllProfiles.find(pr => pr.user_id === loan.lender_id);
-                    const name = lender?.full_name?.split(' ')[0] || lender?.username || 'User';
-                    return (
-                      <Link key={`tc-${loan.id}`} to={createPageUrl("Requests")} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', textDecoration: 'none' }}>
-                        <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'rgba(245,158,11,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <span style={{ fontSize: 10, fontWeight: 700, color: '#F59E0B' }}>!</span>
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Term change from {name}</div>
-                          <div style={{ fontSize: 11, color: '#9B9A98' }}>Review changes</div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                  {extensionRequests.map(loan => {
-                    const requester = safeAllProfiles.find(pr => pr.user_id === loan.extension_requested_by);
-                    const name = requester?.full_name?.split(' ')[0] || requester?.username || 'User';
-                    return (
-                      <Link key={`ext-${loan.id}`} to={createPageUrl("Requests")} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', textDecoration: 'none' }}>
-                        <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'rgba(245,158,11,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Extension request from {name}</div>
-                          <div style={{ fontSize: 11, color: '#9B9A98' }}>Review request</div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div style={{ fontSize: 13, color: '#9B9A98' }}>You're all caught up</div>
-              )}
-            </RightSection>
-
-            {/* How [month] is going */}
-            <RightSection title={`How ${format(today, 'MMMM')} is going`}>
+            {/* How month is going */}
+            <div>
+              <SectionHeader title={`How ${format(today, 'MMMM')} is going`} />
               {/* Received */}
-              <div style={{ marginBottom: 16 }}>
+              <div style={{ marginBottom: 16, marginTop: 4 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
                   <span style={{ fontSize: 13, color: '#787776' }}>Received</span>
                   <span style={{ fontSize: 14, fontWeight: 700, color: '#03ACEA', letterSpacing: '-0.01em' }}>{formatMoney(monthlyReceived)}</span>
@@ -1242,8 +1075,79 @@ export default function Home() {
                 </div>
                 <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 4 }}>of {formatMoney(monthlyExpectedPay)} expected</div>
               </div>
-            </RightSection>
+            </div>
+          </div>
 
+          {/* RECENT ACTIVITY + ACTIVE LOANS */}
+          <div className="home-two-col-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 36 }}>
+            {/* Recent Activity */}
+            <div>
+              <SectionHeader title="Recent Activity" linkTo={createPageUrl("RecentActivity")} linkLabel="View all →" />
+              {recentActivity.length === 0 ? (
+                <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98' }}>No recent activity yet.</div>
+              ) : recentActivity.map((item, idx) => (
+                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0' }}>
+                  <div style={{ width: 20, height: 20, borderRadius: 6, background: `${item.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    {item.icon === 'send' ? (
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="2.5" strokeLinecap="round"><polyline points="7 13 12 18 17 13"/><line x1="12" y1="18" x2="12" y2="6"/></svg>
+                    ) : item.icon === 'receive' ? (
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="2.5" strokeLinecap="round"><polyline points="17 11 12 6 7 11"/><line x1="12" y1="6" x2="12" y2="18"/></svg>
+                    ) : item.icon === 'check' ? (
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    ) : (
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    )}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0, fontSize: 13, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.description}</div>
+                  <span style={{ fontSize: 11, color: '#9B9A98', flexShrink: 0 }}>{item.detail}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Active Loans */}
+            <div>
+              <SectionHeader title="Active Loans" linkTo={createPageUrl("YourLoans")} linkLabel="View all →" />
+              {myLoans.filter(l => l && l.status === 'active').length === 0 ? (
+                <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98' }}>No active loans yet.</div>
+              ) : (
+                <div ref={activeLoansRef} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  {myLoans.filter(l => l && l.status === 'active').slice(0, 5).map((loan, idx) => {
+                    const isLender = loan.lender_id === user.id;
+                    const otherProfile = safeAllProfiles.find(p => p.user_id === (isLender ? loan.borrower_id : loan.lender_id));
+                    const totalAmt = loan.total_amount || loan.amount || 0;
+                    const paidAmt = loan.amount_paid || 0;
+                    const pct = totalAmt > 0 ? Math.round((paidAmt / totalAmt) * 100) : 0;
+                    const name = otherProfile?.full_name?.split(' ')[0] || otherProfile?.username || 'User';
+                    const purpose = loan.purpose ? ` for ${loan.purpose}` : '';
+                    const headerText = isLender
+                      ? `You lent ${name} ${formatMoney(totalAmt)}${purpose}`
+                      : `${name} lent you ${formatMoney(totalAmt)}${purpose}`;
+                    const initial = (otherProfile?.full_name || otherProfile?.username || 'U').charAt(0).toUpperCase();
+                    return (
+                      <div key={loan.id} style={{ padding: '8px 0' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                          <div style={{ width: 20, height: 20, borderRadius: '50%', flexShrink: 0, overflow: 'hidden', background: 'rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {otherProfile?.profile_picture_url ? (
+                              <img src={otherProfile.profile_picture_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                              <span style={{ fontSize: 9, fontWeight: 700, color: '#787776' }}>{initial}</span>
+                            )}
+                          </div>
+                          <div style={{ fontSize: 13, color: '#1A1918', fontWeight: 500, lineHeight: 1.4 }}>{headerText}</div>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <div style={{ flex: 1, height: 6, borderRadius: 3, background: isLender ? 'rgba(3,172,234,0.1)' : 'rgba(29,91,148,0.1)', overflow: 'hidden' }}>
+                            <div key={`al-${idx}-${activeAnimKey}`} style={{ height: '100%', borderRadius: 3, background: isLender ? '#03ACEA' : '#1D5B94', width: `${pct}%`, animation: `barGrowRight 0.8s ease-out ${idx * 0.08}s both` }} />
+                          </div>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: '#9B9A98', flexShrink: 0 }}>{pct}%</span>
+                        </div>
+                        <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 3 }}>{formatMoney(paidAmt)} of {formatMoney(totalAmt)} {isLender ? 'paid back' : 'repaid'}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

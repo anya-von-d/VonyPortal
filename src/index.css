@@ -297,12 +297,8 @@ input[type="date"] {
   .mesh-left {
     display: none !important;
   }
-  .mesh-right {
-    display: none !important;
-  }
   .mesh-center {
     padding: 72px 20px 60px !important;
-    border-right: none !important;
     min-width: 0 !important;
     width: 100% !important;
   }
@@ -510,6 +506,12 @@ input[type="date"] {
     width: 100% !important;
   }
   .lh-selector-wrap button { white-space: normal !important; }
+
+  /* ── Home two-col rows: stack on mobile ── */
+  .home-two-col-row {
+    grid-template-columns: 1fr !important;
+    gap: 28px !important;
+  }
 
   /* ── 8. Home summary cards: reorder + resize ── */
   .home-summary-cards {

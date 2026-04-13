@@ -66,30 +66,51 @@ export default function MeshMobileNav({ user, activePage }) {
       {/* Fixed top bar */}
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200,
-        height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        height: 56, display: 'flex', alignItems: 'center',
         padding: '0 16px',
-        background: 'rgba(250,250,250,0.92)',
-        backdropFilter: 'blur(12px) saturate(1.5)',
-        WebkitBackdropFilter: 'blur(12px) saturate(1.5)',
-        borderBottom: '1px solid rgba(0,0,0,0.06)',
+        background: '#03ACEA',
         fontFamily: "'DM Sans', sans-serif",
       }}>
-        {/* Vony logo */}
+        {/* Left: Hamburger */}
+        <button
+          onClick={() => setMenuOpen(o => !o)}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            width: 36, height: 36, borderRadius: 10, border: 'none', cursor: 'pointer',
+            background: 'transparent', flexShrink: 0,
+          }}
+          aria-label="Menu"
+        >
+          {menuOpen ? (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          ) : (
+            <svg width="20" height="14" viewBox="0 0 20 14" fill="none">
+              <line x1="0" y1="1" x2="20" y2="1" stroke="white" strokeWidth="1.6" strokeLinecap="round"/>
+              <line x1="0" y1="7" x2="20" y2="7" stroke="white" strokeWidth="1.6" strokeLinecap="round"/>
+              <line x1="0" y1="13" x2="20" y2="13" stroke="white" strokeWidth="1.6" strokeLinecap="round"/>
+            </svg>
+          )}
+        </button>
+
+        {/* Center: Vony logo */}
         <Link to="/" onClick={() => setMenuOpen(false)} style={{
+          flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontFamily: "'Cormorant Garamond', Georgia, serif",
           fontWeight: 600, fontStyle: 'italic', fontSize: '1.4rem',
-          color: '#1A1918', textDecoration: 'none', lineHeight: 1,
+          color: 'white', textDecoration: 'none', lineHeight: 1,
           letterSpacing: '-0.02em',
         }}>Vony</Link>
 
-        {/* Right side: bell + hamburger */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {/* Right: bell + profile */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
           {/* Bell */}
           <Link to={createPageUrl("Requests")} onClick={() => setMenuOpen(false)} style={{
             position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center',
             width: 36, height: 36, borderRadius: 10, textDecoration: 'none',
           }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#787776" strokeWidth="1.8" strokeLinecap="round">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
               <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
             </svg>
@@ -97,33 +118,32 @@ export default function MeshMobileNav({ user, activePage }) {
               <span style={{
                 position: 'absolute', top: 4, right: 4,
                 width: 8, height: 8, borderRadius: '50%',
-                background: '#03ACEA', border: '1.5px solid rgba(250,250,250,0.92)',
+                background: 'white', border: '1.5px solid #03ACEA',
               }} />
             )}
           </Link>
 
-          {/* Hamburger */}
-          <button
-            onClick={() => setMenuOpen(o => !o)}
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              width: 36, height: 36, borderRadius: 10, border: 'none', cursor: 'pointer',
-              background: menuOpen ? 'rgba(0,0,0,0.06)' : 'transparent',
-            }}
-            aria-label="Menu"
-          >
-            {menuOpen ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A1918" strokeWidth="2" strokeLinecap="round">
-                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-              </svg>
+          {/* Profile */}
+          <Link to={createPageUrl("Profile")} onClick={() => setMenuOpen(false)} style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            width: 36, height: 36, borderRadius: 10, textDecoration: 'none',
+          }}>
+            {user?.avatar_url ? (
+              <img src={user.avatar_url} alt="Profile" style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', border: '1.5px solid rgba(255,255,255,0.7)' }} />
             ) : (
-              <svg width="20" height="14" viewBox="0 0 20 14" fill="none">
-                <line x1="0" y1="1" x2="20" y2="1" stroke="#1A1918" strokeWidth="1.6" strokeLinecap="round"/>
-                <line x1="0" y1="7" x2="20" y2="7" stroke="#1A1918" strokeWidth="1.6" strokeLinecap="round"/>
-                <line x1="0" y1="13" x2="20" y2="13" stroke="#1A1918" strokeWidth="1.6" strokeLinecap="round"/>
-              </svg>
+              <div style={{
+                width: 28, height: 28, borderRadius: '50%',
+                background: 'rgba(255,255,255,0.25)',
+                border: '1.5px solid rgba(255,255,255,0.7)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </div>
             )}
-          </button>
+          </Link>
         </div>
       </div>
 
