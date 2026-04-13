@@ -964,26 +964,16 @@ export default function Home() {
                 </div>
                 <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Overview</span>
               </div>
-              {/* Desktop: two rows */}
-              <div className="overview-desktop-rows">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              {/* One-line centered: Owed to you $x   You owe $y */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                   <span style={{ fontSize: 11, color: '#787776' }}>Owed to you</span>
-                  <span style={{ fontSize: 14, fontWeight: 800, color: '#03ACEA', letterSpacing: '-0.02em' }}>{formatMoney(lentRemaining)}</span>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: '#03ACEA', letterSpacing: '-0.02em' }}>{formatMoney(lentRemaining)}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ width: 1, height: 14, background: 'rgba(0,0,0,0.1)' }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                   <span style={{ fontSize: 11, color: '#787776' }}>You owe</span>
-                  <span style={{ fontSize: 14, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{formatMoney(borrowedRemaining)}</span>
-                </div>
-              </div>
-              {/* Mobile: compact two-stat line */}
-              <div className="overview-mobile-line" style={{ display: 'none', flexDirection: 'column', gap: 4 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: 11, color: '#787776' }}>Owed to you</span>
-                  <span style={{ fontSize: 12, fontWeight: 800, color: '#03ACEA', letterSpacing: '-0.02em' }}>{formatMoney(lentRemaining)}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: 11, color: '#787776' }}>You owe</span>
-                  <span style={{ fontSize: 12, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{formatMoney(borrowedRemaining)}</span>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{formatMoney(borrowedRemaining)}</span>
                 </div>
               </div>
             </div>

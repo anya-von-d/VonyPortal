@@ -395,9 +395,6 @@ input[type="date"] {
 /* Hide mobile-only sentence on desktop */
 .la-friend-mobile { display: none; }
 
-/* Home summary cards: desktop default */
-.home-overview-card .overview-mobile-line { display: none; }
-.home-overview-card .overview-desktop-rows { display: block; }
 
 /* ============================================================
    MOBILE DASHBOARD PAGE IMPROVEMENTS (≤900px)
@@ -541,11 +538,5 @@ input[type="date"] {
   .home-overview-card {
     grid-column: 1 / -1 !important;
     grid-row: 2 !important;
-  }
-  /* Show mobile overview line, hide desktop rows */
-  .home-overview-card .overview-desktop-rows { display: none !important; }
-  .home-overview-card .overview-mobile-line {
-    display: flex !important;
-    align-items: center !important;
   }
 }
