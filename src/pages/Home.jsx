@@ -762,32 +762,6 @@ export default function Home() {
                   </Link>
                 );
               })}
-              {/* Coming Soon section */}
-              <div style={{ marginTop: 16, marginBottom: 4, paddingLeft: 12 }}>
-                <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Coming Soon</span>
-              </div>
-              {[
-                { label: 'Learn', to: createPageUrl("ComingSoon") },
-                { label: 'Loan Help', to: createPageUrl("LoanHelp") },
-              ].map(({ label, to }) => {
-                const soonIcons = {
-                  'Learn': <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9B9A98" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>,
-                  'Loan Help': <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9B9A98" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></svg>,
-                };
-                return (
-                  <Link key={label} to={to} style={{
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    padding: '7px 12px', borderRadius: 9, textDecoration: 'none',
-                    fontSize: 13, fontWeight: 500, color: '#787776',
-                    background: 'transparent', fontFamily: "'DM Sans', sans-serif",
-                    width: '100%', boxSizing: 'border-box',
-                  }}>
-                    <span style={{ flexShrink: 0, width: 22, height: 22, borderRadius: 6, background: 'rgba(0,0,0,0.04)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', opacity: 0.7 }}>{soonIcons[label]}</span>
-                    <span style={{ flex: 1 }}>{label}</span>
-                    <span style={{ fontSize: 8, fontWeight: 700, color: '#9B9A98', background: 'rgba(0,0,0,0.05)', borderRadius: 4, padding: '2px 6px', letterSpacing: '0.05em', textTransform: 'uppercase', lineHeight: 1.2, flexShrink: 0 }}>SOON</span>
-                  </Link>
-                );
-              })}
             </nav>
             {/* Help & Support + Log Out at bottom */}
             <div style={{ marginTop: 24 }}>
