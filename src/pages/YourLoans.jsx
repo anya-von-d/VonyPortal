@@ -976,8 +976,54 @@ export default function YourLoans() {
             </div>
           </PageCard>
 
-          {/* 7. Payment History Chart */}
-          <PageCard title="Payment History">
+          {/* 8. Document Buttons — above the side-by-side row */}
+          {manageLoanSelected && (() => {
+            const btnBase = { display: 'inline-flex', alignItems: 'center', gap: 6, background: '#1A1918', borderRadius: 9, padding: '7px 12px', border: 'none', cursor: 'pointer' };
+            const btnLabel = { fontSize: 11, fontWeight: 600, color: 'white', margin: 0 };
+            const infoBadge = { width: 15, height: 15, borderRadius: '50%', background: 'white', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 };
+            const tooltipStyle = { position: 'absolute', top: 'calc(100% + 6px)', left: 0, background: 'white', borderRadius: 9, padding: '8px 11px', boxShadow: '0 4px 16px rgba(0,0,0,0.13)', width: 190, zIndex: 200, border: '1px solid rgba(0,0,0,0.06)' };
+            return (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '4px 0', justifyContent: 'center', marginBottom: 16 }}>
+                <div style={{ position: 'relative' }}>
+                  <div style={btnBase}>
+                    <button onClick={() => { const ag = loanAgreements.find(a => a.loan_id === manageLoanSelected.id); if (ag) openDocPopup('promissory', ag); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                      <p style={btnLabel}>Promissory Note</p>
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); setInfoTooltip(infoTooltip === 'promissory' ? null : 'promissory'); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
+                      <span style={infoBadge}><span style={{ fontSize: 9, fontWeight: 800, color: '#1A1918', lineHeight: 1 }}>i</span></span>
+                    </button>
+                  </div>
+                  {infoTooltip === 'promissory' && (
+                    <div style={tooltipStyle}>
+                      <p style={{ fontSize: 11, color: '#1A1918', margin: 0, lineHeight: 1.55 }}>A signed legal document where the borrower promises to repay a specific amount under agreed terms.</p>
+                    </div>
+                  )}
+                </div>
+                <div style={{ position: 'relative' }}>
+                  <div style={btnBase}>
+                    <button onClick={() => { const ag = loanAgreements.find(a => a.loan_id === manageLoanSelected.id); if (ag) openDocPopup('amortization', ag); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                      <p style={btnLabel}>Amortization Schedule</p>
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); setInfoTooltip(infoTooltip === 'amortization' ? null : 'amortization'); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
+                      <span style={infoBadge}><span style={{ fontSize: 9, fontWeight: 800, color: '#1A1918', lineHeight: 1 }}>i</span></span>
+                    </button>
+                  </div>
+                  {infoTooltip === 'amortization' && (
+                    <div style={tooltipStyle}>
+                      <p style={{ fontSize: 11, color: '#1A1918', margin: 0, lineHeight: 1.55 }}>A table showing each scheduled payment broken down into principal and interest over the life of the loan.</p>
+                    </div>
+                  )}
+                </div>
+                <button onClick={() => { const ag = loanAgreements.find(a => a.loan_id === manageLoanSelected.id); if (ag) openDocPopup('summary', ag); }} style={{ ...btnBase }}>
+                  <p style={btnLabel}>Loan Summary</p>
+                </button>
+              </div>
+            );
+          })()}
+
+          {/* 7+9. Payment History | Payments row */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'start', marginBottom: 24 }}>
+          <PageCard title="Payment History" style={{ marginBottom: 0 }}>
             <div style={{ padding: '10px 14px 14px' }}>
             {!manageLoanSelected ? (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: chartHeight }}><p style={{ fontSize: 12, color: '#C7C6C4' }}>Select a loan to view chart</p></div>
@@ -1033,56 +1079,7 @@ export default function YourLoans() {
             </div>
           </PageCard>
 
-          {/* 8. Document Buttons */}
-          {(() => {
-            const btnBase = { display: 'inline-flex', alignItems: 'center', gap: 6, background: '#1A1918', borderRadius: 9, padding: '7px 12px', border: 'none', cursor: 'pointer' };
-            const btnLabel = { fontSize: 11, fontWeight: 600, color: 'white', margin: 0 };
-            const infoBadge = { width: 15, height: 15, borderRadius: '50%', background: 'white', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 };
-            const tooltipStyle = { position: 'absolute', top: 'calc(100% + 6px)', left: 0, background: 'white', borderRadius: 9, padding: '8px 11px', boxShadow: '0 4px 16px rgba(0,0,0,0.13)', width: 190, zIndex: 200, border: '1px solid rgba(0,0,0,0.06)' };
-            return (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '4px 0', justifyContent: 'center', marginBottom: 16 }}>
-                {/* Promissory Note */}
-                <div style={{ position: 'relative' }}>
-                  <div style={btnBase}>
-                    <button onClick={() => { const ag = loanAgreements.find(a => a.loan_id === manageLoanSelected.id); if (ag) openDocPopup('promissory', ag); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-                      <p style={btnLabel}>Promissory Note</p>
-                    </button>
-                    <button onClick={(e) => { e.stopPropagation(); setInfoTooltip(infoTooltip === 'promissory' ? null : 'promissory'); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
-                      <span style={infoBadge}><span style={{ fontSize: 9, fontWeight: 800, color: '#1A1918', lineHeight: 1 }}>i</span></span>
-                    </button>
-                  </div>
-                  {infoTooltip === 'promissory' && (
-                    <div style={tooltipStyle}>
-                      <p style={{ fontSize: 11, color: '#1A1918', margin: 0, lineHeight: 1.55 }}>A signed legal document where the borrower promises to repay a specific amount under agreed terms.</p>
-                    </div>
-                  )}
-                </div>
-                {/* Amortization Schedule */}
-                <div style={{ position: 'relative' }}>
-                  <div style={btnBase}>
-                    <button onClick={() => { const ag = loanAgreements.find(a => a.loan_id === manageLoanSelected.id); if (ag) openDocPopup('amortization', ag); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-                      <p style={btnLabel}>Amortization Schedule</p>
-                    </button>
-                    <button onClick={(e) => { e.stopPropagation(); setInfoTooltip(infoTooltip === 'amortization' ? null : 'amortization'); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
-                      <span style={infoBadge}><span style={{ fontSize: 9, fontWeight: 800, color: '#1A1918', lineHeight: 1 }}>i</span></span>
-                    </button>
-                  </div>
-                  {infoTooltip === 'amortization' && (
-                    <div style={tooltipStyle}>
-                      <p style={{ fontSize: 11, color: '#1A1918', margin: 0, lineHeight: 1.55 }}>A table showing each scheduled payment broken down into principal and interest over the life of the loan.</p>
-                    </div>
-                  )}
-                </div>
-                {/* Loan Summary */}
-                <button onClick={() => { const ag = loanAgreements.find(a => a.loan_id === manageLoanSelected.id); if (ag) openDocPopup('summary', ag); }} style={{ ...btnBase }}>
-                  <p style={btnLabel}>Loan Summary</p>
-                </button>
-              </div>
-            );
-          })()}
-
-          {/* 9. Payments */}
-          <PageCard title="Payments">
+          <PageCard title="Payments" style={{ marginBottom: 0 }}>
             <div style={{ padding: '10px 14px 14px' }}>
             {(() => {
               const paymentAmt = manageLoanSelected.payment_amount || 0;
@@ -1144,6 +1141,7 @@ export default function YourLoans() {
             })()}
             </div>
           </PageCard>
+          </div>{/* end Payment History | Payments grid */}
 
           {/* 10. Activity Timeline */}
           <PageCard title="Activity">
