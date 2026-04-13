@@ -705,7 +705,7 @@ export default function Home() {
   overdueCountRef.current = alertTotal;
 
   const SectionHeader = ({ title, linkTo, linkLabel }) => (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 4, borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 4 }}>
       <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{title}</span>
       {linkTo && <Link to={linkTo} style={{ fontSize: 11, fontWeight: 500, color: '#9B9A98', textDecoration: 'none' }}>{linkLabel}</Link>}
     </div>
@@ -875,7 +875,7 @@ export default function Home() {
                     transform: 'translateX(-50%)',
                     width: 'calc(100% + 36px)',
                     height: 'calc(100% - 20px)',
-                    background: 'linear-gradient(225deg, rgb(50,197,255), rgb(182,32,224) 51%, rgb(247,181,0))',
+                    background: 'linear-gradient(225deg, rgb(3,172,234), rgb(29,91,148) 51%, rgb(124,58,237))',
                     filter: 'blur(12px) saturate(1.18)',
                     opacity: 0.4,
                     borderRadius: 16,
@@ -887,7 +887,7 @@ export default function Home() {
                     position: 'relative', zIndex: 1,
                     padding: '12px 14px', borderRadius: 14,
                     background: 'white',
-                    border: '1px solid rgba(0,0,0,0.07)',
+                    border: '2px solid #1D5B94',
                     boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
@@ -1095,7 +1095,7 @@ export default function Home() {
           </div>
 
           {/* RECENT ACTIVITY + ACTIVE LOANS (left) | YOUR LOANS OVER TIME (right) */}
-          <div className="home-two-col-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 48, marginBottom: 36, alignItems: 'start' }}>
+          <div className="home-two-col-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, marginBottom: 36, alignItems: 'start' }}>
             {/* Left: Recent Activity + Active Loans stacked */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
@@ -1145,7 +1145,7 @@ export default function Home() {
                     return (
                       <div key={loan.id} style={{ padding: '9px 0' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                          <div style={{ width: 20, height: 20, borderRadius: '50%', flexShrink: 0, overflow: 'hidden', background: 'rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <div style={{ width: 20, height: 20, borderRadius: 5, flexShrink: 0, overflow: 'hidden', background: 'rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             {otherProfile?.profile_picture_url ? (
                               <img src={otherProfile.profile_picture_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                             ) : (
@@ -1193,15 +1193,15 @@ export default function Home() {
                     </div>
                   </div>
                   {/* Chart */}
-                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, height: 120 }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: 14, height: 120 }}>
                     {chartData.data.map((d, i) => {
                       const lendPct = (d.owedToYou / chartData.maxVal) * 100;
                       const borPct = (d.youOwe / chartData.maxVal) * 100;
                       return (
-                        <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, height: '100%', justifyContent: 'flex-end' }}>
-                          <div style={{ width: '100%', display: 'flex', gap: 2, alignItems: 'flex-end', height: '100%' }}>
+                        <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'flex-end' }}>
+                          <div style={{ width: '100%', display: 'flex', gap: 3, alignItems: 'flex-end', height: '100%', justifyContent: 'center' }}>
                             {/* Lending bar */}
-                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '100%' }}>
+                            <div style={{ width: 8, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '100%', flexShrink: 0 }}>
                               <div style={{
                                 width: '100%',
                                 height: `${Math.max(lendPct, 2)}%`,
@@ -1212,7 +1212,7 @@ export default function Home() {
                               }} />
                             </div>
                             {/* Borrowing bar */}
-                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '100%' }}>
+                            <div style={{ width: 8, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '100%', flexShrink: 0 }}>
                               <div style={{
                                 width: '100%',
                                 height: `${Math.max(borPct, 2)}%`,
