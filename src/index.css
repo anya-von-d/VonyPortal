@@ -504,39 +504,20 @@ input[type="date"] {
   }
   .lh-selector-wrap button { white-space: normal !important; }
 
+  /* ── Home greeting icons: hidden on mobile (top bar has them) ── */
+  .home-greeting-icons { display: none !important; }
+
   /* ── Home two-col rows: stack on mobile ── */
   .home-two-col-row {
     grid-template-columns: 1fr !important;
     gap: 28px !important;
   }
 
-  /* ── 8. Home summary cards: reorder + resize ── */
-  .home-summary-cards {
-    /* Stack into rows: blue cards row + overview row */
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 10px !important;
-  }
-  /* Blue cards row: side-by-side, full width */
-  .home-blue-card {
-    flex: 1 1 0 !important;
-    min-width: 0 !important;
-  }
-  /* Wrap the two blue cards in a flex row */
-  .home-summary-cards > *:nth-child(1),
-  .home-summary-cards > *:nth-child(2) {
-    /* They're the IIFE results — width controlled below */
-  }
-  /* Make the grid row containing the two blue cards full width */
+  /* ── 8. Home summary cards: each on its own row ── */
   .home-summary-cards {
     display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    grid-template-rows: auto auto !important;
-  }
-  /* Overview card spans full width and goes on 2nd row */
-  .home-overview-card {
-    grid-column: 1 / -1 !important;
-    grid-row: 2 !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto !important;
+    align-items: stretch !important;
   }
 }
