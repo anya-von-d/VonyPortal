@@ -642,7 +642,7 @@ export default function RecentActivityPage() {
   return (
     <>
       <MeshMobileNav user={user} activePage="Recent Activity" />
-      <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0, minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased' }}>
+      <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 0, minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased' }}>
 
         {/* Col 1: left nav */}
         <div className="mesh-left" style={{ background: '#fafafa', borderRight: '1px solid rgba(0,0,0,0.06)' }}>
@@ -733,67 +733,32 @@ export default function RecentActivityPage() {
         </div>
 
         {/* Col 2: center content */}
-        <div className="mesh-center" style={{ background: 'white', borderRight: '1px solid rgba(0,0,0,0.06)', padding: '28px 48px 80px' }}>
+        <div className="mesh-center" style={{ background: 'white', padding: '28px 48px 80px' }}>
 
           {/* Page title */}
           <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em', color: '#1A1918', marginBottom: 12 }}>Recent Activity</div>
           <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 20 }} />
 
-          {/* Mobile-only filter rows */}
-          <div className="ra-mobile-filters" style={{ display: 'none', marginBottom: 16 }}>
-            {/* Sort row */}
-            <div style={{ position: 'relative' }}>
-              <button onClick={() => { setMobileSortOpen(o => !o); setMobileDateOpen(false); }} style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                width: '100%', padding: '12px 0', background: 'transparent', border: 'none',
-                borderBottom: mobileSortOpen ? 'none' : '1px solid rgba(0,0,0,0.06)', cursor: 'pointer',
-                fontFamily: "'DM Sans', sans-serif",
-              }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1 }}>
-                  <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Sort</span>
-                  <span style={{ fontSize: 13, fontWeight: 500, color: '#1A1918' }}>{SORT_OPTIONS.find(o => o.id === sortBy)?.label}</span>
-                </div>
-                <ChevronDown size={16} style={{ color: '#787776', transform: mobileSortOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }} />
-              </button>
-              {mobileSortOpen && (
-                <div style={{ borderBottom: '1px solid rgba(0,0,0,0.06)', paddingBottom: 8 }}>
-                  {SORT_OPTIONS.map(opt => (
-                    <button key={opt.id} onClick={() => { setSortBy(opt.id); setMobileSortOpen(false); }} style={{
-                      display: 'block', width: '100%', textAlign: 'left', padding: '10px 16px',
-                      background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-                      fontSize: 13, fontWeight: sortBy === opt.id ? 600 : 400,
-                      color: sortBy === opt.id ? '#03ACEA' : '#1A1918',
-                    }}>{opt.label}</button>
-                  ))}
-                </div>
-              )}
+          {/* Search & Filters */}
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 9 }}>Search & Filters</div>
+            <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 12 }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8, padding: '0 12px', background: 'rgba(0,0,0,0.03)', borderRadius: 18, border: '1px solid rgba(0,0,0,0.06)', height: 36 }}>
+                <Search size={14} style={{ color: '#787776', flexShrink: 0 }} />
+                <input type="text" placeholder="Search..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+                  style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, fontFamily: "'DM Sans', sans-serif", color: '#1A1918', background: 'transparent' }} />
+              </div>
             </div>
-            {/* Date row */}
-            <div style={{ position: 'relative' }}>
-              <button onClick={() => { setMobileDateOpen(o => !o); setMobileSortOpen(false); }} style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                width: '100%', padding: '12px 0', background: 'transparent', border: 'none',
-                borderBottom: mobileDateOpen ? 'none' : '1px solid rgba(0,0,0,0.06)', cursor: 'pointer',
-                fontFamily: "'DM Sans', sans-serif",
-              }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1 }}>
-                  <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Date Range</span>
-                  <span style={{ fontSize: 13, fontWeight: 500, color: dateFilter !== 'all' ? '#03ACEA' : '#1A1918' }}>{DATE_OPTIONS.find(o => o.id === dateFilter)?.label}</span>
-                </div>
-                <ChevronDown size={16} style={{ color: '#787776', transform: mobileDateOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }} />
-              </button>
-              {mobileDateOpen && (
-                <div style={{ borderBottom: '1px solid rgba(0,0,0,0.06)', paddingBottom: 8 }}>
-                  {DATE_OPTIONS.map(opt => (
-                    <button key={opt.id} onClick={() => { setDateFilter(opt.id); setMobileDateOpen(false); }} style={{
-                      display: 'block', width: '100%', textAlign: 'left', padding: '10px 16px',
-                      background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-                      fontSize: 13, fontWeight: dateFilter === opt.id ? 600 : 400,
-                      color: dateFilter === opt.id ? '#03ACEA' : '#1A1918',
-                    }}>{opt.label}</button>
-                  ))}
-                </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, position: 'relative', zIndex: 20 }}>
+              <SortDropdown sortBy={sortBy} onChange={setSortBy} />
+              <SingleSelectDropdown options={DATE_OPTIONS} selected={dateFilter} onChange={setDateFilter} />
+              <MultiSelectDropdown label="All Categories" options={CATEGORY_OPTIONS} selected={categoryFilter} onChange={setCategoryFilter} />
+              {friendOptions.length > 0 && (
+                <MultiSelectDropdown label="All Friends" options={friendOptions} selected={friendFilter} onChange={setFriendFilter} />
               )}
+              <ExportDropdown filteredCount={filtered.length} totalCount={totalCount} hasAnyFilter={hasAnyFilter} onExport={handleExportCSV} />
+              <button onClick={clearFilters} style={{ padding: '6px 10px', borderRadius: 8, border: hasAnyFilter ? '1px solid rgba(232,114,110,0.3)' : '1px solid rgba(0,0,0,0.08)', background: hasAnyFilter ? 'rgba(232,114,110,0.06)' : 'transparent', fontSize: 12, fontWeight: 500, color: hasAnyFilter ? '#E8726E' : '#787776', cursor: hasAnyFilter ? 'pointer' : 'default', opacity: hasAnyFilter ? 1 : 0.5, fontFamily: "'DM Sans', sans-serif" }}>Clear</button>
             </div>
           </div>
 
@@ -868,107 +833,6 @@ export default function RecentActivityPage() {
 
         </div>
 
-        {/* Col 3: right panel */}
-        <div className="mesh-right" style={{ background: '#fafafa' }}>
-          <div style={{ position: 'sticky', top: 0, padding: '28px 28px 0' }}>
-            {/* Bell + Profile icons */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10, marginBottom: 24 }}>
-              <Link to={createPageUrl("Requests")} style={{ position: 'relative', textDecoration: 'none' }}>
-                <div style={{ width: 32, height: 32, borderRadius: 9, background: 'rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#787776" strokeWidth="2" strokeLinecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                </div>
-              </Link>
-              <Link to={createPageUrl("Profile")} style={{ textDecoration: 'none' }}>
-                <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(3,172,234,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                </div>
-              </Link>
-            </div>
-          {/* ── Search + Filters ───────────────────────── */}
-          <RightSection title="Search & Filters">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-              <div style={{
-                flex: 1, display: 'flex', alignItems: 'center', gap: 8,
-                padding: '0 12px', background: 'white', borderRadius: 18,
-                border: '1px solid rgba(0,0,0,0.06)', height: 36,
-              }}>
-                <Search size={14} style={{ color: '#787776', flexShrink: 0 }} />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  style={{
-                    flex: 1, border: 'none', outline: 'none', fontSize: 13,
-                    fontFamily: "'DM Sans', sans-serif", color: '#1A1918', background: 'transparent',
-                  }}
-                />
-              </div>
-            </div>
-            <div style={{ marginBottom: 12 }}>
-              <SortDropdown sortBy={sortBy} onChange={setSortBy} />
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, position: 'relative', zIndex: 20 }}>
-              <SingleSelectDropdown options={DATE_OPTIONS} selected={dateFilter} onChange={setDateFilter} />
-              <MultiSelectDropdown label="All Categories" options={CATEGORY_OPTIONS} selected={categoryFilter} onChange={setCategoryFilter} />
-              {friendOptions.length > 0 && (
-                <MultiSelectDropdown label="All Friends" options={friendOptions} selected={friendFilter} onChange={setFriendFilter} />
-              )}
-              <div style={{ display: 'flex', gap: 8 }}>
-                <ExportDropdown
-                  filteredCount={filtered.length}
-                  totalCount={totalCount}
-                  hasAnyFilter={hasAnyFilter}
-                  onExport={handleExportCSV}
-                />
-                <button
-                  onClick={clearFilters}
-                  style={{
-                    flex: 1,
-                    padding: '6px 10px', borderRadius: 8,
-                    border: hasAnyFilter ? '1px solid rgba(232,114,110,0.3)' : '1px solid rgba(0,0,0,0.08)',
-                    background: hasAnyFilter ? 'rgba(232,114,110,0.06)' : 'transparent',
-                    fontSize: 12, fontWeight: 500,
-                    color: hasAnyFilter ? '#E8726E' : '#787776',
-                    cursor: hasAnyFilter ? 'pointer' : 'default',
-                    opacity: hasAnyFilter ? 1 : 0.5,
-                    fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap',
-                    transition: 'background 0.15s, opacity 0.15s',
-                  }}
-                >
-                  Clear
-                </button>
-              </div>
-            </div>
-          </RightSection>
-
-          <RightSection title="Notifications">
-            {pendingToConfirm.length === 0 ? (
-              <p style={{ fontSize: 12, color: '#9B9A98', margin: 0 }}>All caught up</p>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {pendingToConfirm.map(p => {
-                  const loan = safeLoans.find(l => l.id === p.loan_id);
-                  const borrower = getUserById(loan?.borrower_id);
-                  const name = borrower?.full_name?.split(' ')[0] || borrower?.username || 'User';
-                  const initial = (borrower?.full_name || borrower?.username || 'U').charAt(0).toUpperCase();
-                  return (
-                    <div key={p.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                      <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'rgba(3,172,234,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <span style={{ fontSize: 10, fontWeight: 700, color: '#03ACEA' }}>{initial}</span>
-                      </div>
-                      <div>
-                        <p style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', margin: 0 }}>{name} paid ${p.amount?.toFixed(2)}</p>
-                        <p style={{ fontSize: 11, color: '#9B9A98', margin: '2px 0 0' }}>Awaiting confirmation</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </RightSection>
-          </div>
-        </div>
 
       </div>
 

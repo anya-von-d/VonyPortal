@@ -255,7 +255,7 @@ export default function Friends() {
   return (
     <div>
       <MeshMobileNav user={user} activePage="Friends" />
-      <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0, minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased' }}>
+      <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 0, minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased' }}>
 
       {/* Col 1: left nav */}
       <div className="mesh-left" style={{ background: '#fafafa', borderRight: '1px solid rgba(0,0,0,0.06)' }}>
@@ -346,11 +346,44 @@ export default function Friends() {
       </div>
 
       {/* ── CENTER: Search for Friends + Friend Requests ── */}
-      <div className="mesh-center" style={{ background: 'white', borderRight: '1px solid rgba(0,0,0,0.06)', padding: '28px 48px 80px' }}>
+      <div className="mesh-center" style={{ background: 'white', padding: '28px 48px 80px' }}>
 
         {/* Page title */}
         <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, color: '#1A1918', marginBottom: 12, letterSpacing: '-0.02em' }}>People</div>
         <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 20 }} />
+
+        {/* Your Friends */}
+        <div style={{ marginBottom: 32 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 9 }}>Your Friends</div>
+          <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 12 }} />
+          {isLoading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '20px 0' }}>
+              <div style={{ width: 24, height: 24, border: '2px solid #03ACEA', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+            </div>
+          ) : sortedFriends.length === 0 ? (
+            <div style={{ fontSize: 12, color: '#9B9A98', padding: '12px 0' }}>No friends yet</div>
+          ) : sortedFriends.map((friendship) => {
+            const friendProfile = getFriendProfile(friendship);
+            if (!friendProfile) return null;
+            return (
+              <div key={friendship.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 0', borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(3,172,234,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
+                  {friendProfile.profile_picture_url || friendProfile.avatar_url
+                    ? <img src={friendProfile.profile_picture_url || friendProfile.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    : <span style={{ fontSize: 11, fontWeight: 600, color: '#03ACEA' }}>{(friendProfile.full_name || friendProfile.username || '?').charAt(0)}</span>
+                  }
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{friendProfile.full_name || friendProfile.username}</div>
+                  <div style={{ fontSize: 11, color: '#9B9A98' }}>@{friendProfile.username}</div>
+                </div>
+                <button onClick={() => handleToggleStar(friendship)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 3, color: friendship.is_starred ? '#F5A623' : '#C7C6C4', flexShrink: 0 }}>
+                  <Star size={14} fill={friendship.is_starred ? 'currentColor' : 'none'} />
+                </button>
+              </div>
+            );
+          })}
+        </div>
 
         {/* Search for Friends */}
         <div style={{ marginBottom: 32 }}>
@@ -438,53 +471,6 @@ export default function Friends() {
         )}
       </div>
 
-      {/* ── RIGHT: Your Friends ── */}
-      <div className="mesh-right" style={{ background: '#fafafa' }}>
-        <div style={{ position: 'sticky', top: 0, padding: '28px 28px 0' }}>
-          {/* Bell + Profile icons */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10, marginBottom: 24 }}>
-            <Link to={createPageUrl("Requests")} style={{ position: 'relative', textDecoration: 'none' }}>
-              <div style={{ width: 32, height: 32, borderRadius: 9, background: 'rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#787776" strokeWidth="2" strokeLinecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-              </div>
-            </Link>
-            <Link to={createPageUrl("Profile")} style={{ textDecoration: 'none' }}>
-              <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(3,172,234,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-              </div>
-            </Link>
-          </div>
-        <RightSection title="Your Friends">
-          {isLoading ? (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '20px 0' }}>
-              <div style={{ width: 24, height: 24, border: '2px solid #03ACEA', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-            </div>
-          ) : sortedFriends.length === 0 ? (
-            <div style={{ fontSize: 12, color: '#9B9A98', textAlign: 'center', padding: '12px 0' }}>No friends yet</div>
-          ) : sortedFriends.map((friendship) => {
-            const friendProfile = getFriendProfile(friendship);
-            if (!friendProfile) return null;
-            return (
-              <div key={friendship.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 0' }}>
-                <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(3,172,234,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
-                  {friendProfile.profile_picture_url || friendProfile.avatar_url
-                    ? <img src={friendProfile.profile_picture_url || friendProfile.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    : <span style={{ fontSize: 11, fontWeight: 600, color: '#03ACEA' }}>{(friendProfile.full_name || friendProfile.username || '?').charAt(0)}</span>
-                  }
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{friendProfile.full_name || friendProfile.username}</div>
-                  <div style={{ fontSize: 11, color: '#9B9A98' }}>@{friendProfile.username}</div>
-                </div>
-                <button onClick={() => handleToggleStar(friendship)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 3, color: friendship.is_starred ? '#F5A623' : '#C7C6C4', flexShrink: 0 }}>
-                  <Star size={14} fill={friendship.is_starred ? 'currentColor' : 'none'} />
-                </button>
-              </div>
-            );
-          })}
-        </RightSection>
-        </div>
-      </div>
 
     </div>
     </div>

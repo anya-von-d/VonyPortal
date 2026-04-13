@@ -1020,7 +1020,7 @@ export default function LoanAgreements() {
         )}
       </AnimatePresence>
 
-      <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0, minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased' }}>
+      <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 0, minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased' }}>
 
         {/* Col 1: left nav */}
         <div className="mesh-left" style={{ background: '#fafafa', borderRight: '1px solid rgba(0,0,0,0.06)' }}>
@@ -1111,11 +1111,34 @@ export default function LoanAgreements() {
         </div>
 
         {/* Col 2: center content */}
-        <div className="mesh-center" style={{ background: 'white', borderRight: '1px solid rgba(0,0,0,0.06)', padding: '28px 48px 80px' }}>
+        <div className="mesh-center" style={{ background: 'white', padding: '28px 48px 80px' }}>
 
           {/* Page title */}
           <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em', color: '#1A1918', marginBottom: 12 }}>Documents</div>
           <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 20 }} />
+
+          {/* Search & Filters */}
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 9 }}>Search & Filters</div>
+            <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 12 }} />
+            <div style={{ marginBottom: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 12px', background: 'rgba(0,0,0,0.03)', borderRadius: 18, border: '1px solid rgba(0,0,0,0.06)', height: 36 }}>
+                <Search size={14} style={{ color: '#787776', flexShrink: 0 }} />
+                <input type="text" placeholder="Search..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+                  style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, fontFamily: "'DM Sans', sans-serif", color: '#1A1918', background: 'transparent' }} />
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, position: 'relative', zIndex: 20 }}>
+              <SingleSelectDropdown options={DATE_OPTIONS} selected={dateFilter} onChange={setDateFilter} />
+              {friendOptions.length > 1 && (
+                <SingleSelectDropdown options={friendOptions} selected={friendFilter} onChange={setFriendFilter} />
+              )}
+              <SingleSelectDropdown options={ROLE_OPTIONS} selected={roleFilter} onChange={setRoleFilter} />
+              <SingleSelectDropdown options={STATUS_OPTIONS} selected={statusFilter} onChange={setStatusFilter} />
+              <AmountFilterDropdown amountMode={amountMode} setAmountMode={setAmountMode} amountVal1={amountVal1} setAmountVal1={setAmountVal1} amountVal2={amountVal2} setAmountVal2={setAmountVal2} />
+              <button onClick={clearFilters} style={{ padding: '6px 10px', borderRadius: 8, border: hasAnyFilter ? '1px solid rgba(232,114,110,0.3)' : '1px solid rgba(0,0,0,0.08)', background: hasAnyFilter ? 'rgba(232,114,110,0.06)' : 'transparent', fontSize: 12, fontWeight: 500, color: hasAnyFilter ? '#E8726E' : '#787776', cursor: hasAnyFilter ? 'pointer' : 'default', opacity: hasAnyFilter ? 1 : 0.5, fontFamily: "'DM Sans', sans-serif" }}>Clear Filters</button>
+            </div>
+          </div>
 
           {/* ── Agreements List ──────────────────────────────────── */}
           <div>
@@ -1304,97 +1327,6 @@ export default function LoanAgreements() {
 
         </div>
 
-        {/* Col 3: right panel */}
-        <div className="mesh-right" style={{ background: '#fafafa' }}>
-          <div style={{ position: 'sticky', top: 0, padding: '28px 28px 0' }}>
-            {/* Bell + Profile icons */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10, marginBottom: 24 }}>
-              <Link to={createPageUrl("Requests")} style={{ position: 'relative', textDecoration: 'none' }}>
-                <div style={{ width: 32, height: 32, borderRadius: 9, background: 'rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#787776" strokeWidth="2" strokeLinecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                </div>
-              </Link>
-              <Link to={createPageUrl("Profile")} style={{ textDecoration: 'none' }}>
-                <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(3,172,234,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                </div>
-              </Link>
-            </div>
-          {/* ── Search + Filters ───────────────────────── */}
-          <RightSection title="Search & Filters">
-            <div style={{ marginBottom: 12 }}>
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 8,
-                padding: '0 12px', background: 'white', borderRadius: 18,
-                border: '1px solid rgba(0,0,0,0.06)', height: 36,
-              }}>
-                <Search size={14} style={{ color: '#787776', flexShrink: 0 }} />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  style={{
-                    flex: 1, border: 'none', outline: 'none', fontSize: 13,
-                    fontFamily: "'DM Sans', sans-serif", color: '#1A1918', background: 'transparent',
-                  }}
-                />
-              </div>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, position: 'relative', zIndex: 20 }}>
-              <SingleSelectDropdown options={DATE_OPTIONS} selected={dateFilter} onChange={setDateFilter} />
-              {friendOptions.length > 1 && (
-                <SingleSelectDropdown options={friendOptions} selected={friendFilter} onChange={setFriendFilter} />
-              )}
-              <SingleSelectDropdown options={ROLE_OPTIONS} selected={roleFilter} onChange={setRoleFilter} />
-              <SingleSelectDropdown options={STATUS_OPTIONS} selected={statusFilter} onChange={setStatusFilter} />
-              <AmountFilterDropdown amountMode={amountMode} setAmountMode={setAmountMode} amountVal1={amountVal1} setAmountVal1={setAmountVal1} amountVal2={amountVal2} setAmountVal2={setAmountVal2} />
-              <button
-                onClick={clearFilters}
-                style={{
-                  padding: '6px 10px', borderRadius: 8,
-                  border: hasAnyFilter ? '1px solid rgba(232,114,110,0.3)' : '1px solid rgba(0,0,0,0.08)',
-                  background: hasAnyFilter ? 'rgba(232,114,110,0.06)' : 'transparent',
-                  fontSize: 12, fontWeight: 500,
-                  color: hasAnyFilter ? '#E8726E' : '#787776',
-                  cursor: hasAnyFilter ? 'pointer' : 'default',
-                  opacity: hasAnyFilter ? 1 : 0.5,
-                  fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap',
-                  transition: 'background 0.15s, opacity 0.15s',
-                }}
-              >
-                Clear Filters
-              </button>
-            </div>
-          </RightSection>
-
-          <RightSection title="Notifications">
-            {pendingToConfirm.length === 0 ? (
-              <p style={{ fontSize: 12, color: '#9B9A98', margin: 0 }}>All caught up</p>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {pendingToConfirm.map(p => {
-                  const loan = loans.find(l => l.id === p.loan_id);
-                  const borrower = getUserById(loan?.borrower_id);
-                  const name = borrower?.full_name?.split(' ')[0] || borrower?.username || 'User';
-                  const initial = (borrower?.full_name || borrower?.username || 'U').charAt(0).toUpperCase();
-                  return (
-                    <div key={p.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                      <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(3,172,234,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: '#03ACEA' }}>{initial}</span>
-                      </div>
-                      <div>
-                        <p style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', margin: 0 }}>{name} paid ${p.amount?.toFixed(2)}</p>
-                        <p style={{ fontSize: 11, color: '#9B9A98', margin: '2px 0 0' }}>Awaiting confirmation</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </RightSection>
-          </div>
-        </div>
 
       </div>
     </>
