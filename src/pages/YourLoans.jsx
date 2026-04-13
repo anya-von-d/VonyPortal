@@ -855,7 +855,7 @@ export default function YourLoans() {
 
         {/* Single-column flow */}
         {manageLoanSelected && <>
-          {/* 3. Payment Progress: donut + next payment card side by side */}
+          {/* 3. Payment Progress | NP cards + Loan Terms */}
           {(() => {
             const totalOwedNow = loanAnalysis ? loanAnalysis.totalOwedNow : (manageLoanSelected.total_amount || manageLoanSelected.amount || 0);
             const totalPaidAmt = loanAnalysis ? loanAnalysis.totalPaid : (manageLoanSelected.amount_paid || 0);
@@ -865,12 +865,48 @@ export default function YourLoans() {
             const nextPmtAmt = loanAnalysis ? loanAnalysis.nextPaymentAmount : (recalculatedPayment > 0 ? recalculatedPayment : (manageLoanSelected.payment_amount || 0));
             let nextPmtDate = null; let daysUntil = null;
             if (manageLoanSelected.next_payment_date) { nextPmtDate = toLocalDate(manageLoanSelected.next_payment_date); daysUntil = daysUntilDate(manageLoanSelected.next_payment_date); }
+            const isLate = daysUntil !== null && daysUntil < 0;
+            const dLabel = daysUntil === null ? null : isLate ? `${Math.abs(daysUntil)}d late` : daysUntil === 0 ? 'today' : `${daysUntil}d`;
+            const badgeColor = isLate ? '#E8726E' : isLending ? '#03ACEA' : (daysUntil !== null && daysUntil <= 3 ? '#F59E0B' : '#9B9A98');
+            const badgeBg = isLate ? 'rgba(232,114,110,0.08)' : isLending ? 'rgba(3,172,234,0.10)' : (daysUntil !== null && daysUntil <= 3 ? 'rgba(245,158,11,0.08)' : 'rgba(0,0,0,0.04)');
             const size = 140; const dCx = size / 2; const dCy = size / 2;
             const ringR = 54; const ringStroke = 9;
             const ringCirc = 2 * Math.PI * ringR; const ringDash = (paidPct / 100) * ringCirc;
+            // Aurora style helpers
+            const auroraGrad = isLending
+              ? 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(6,182,212) 30%, rgb(20,184,166) 60%, rgb(3,172,234) 100%)'
+              : 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(99,102,241) 25%, rgb(139,92,246) 50%, rgb(124,58,237) 75%, rgb(29,91,148) 100%)';
+            const cardBg = isLending
+              ? 'linear-gradient(160deg, rgba(255,255,255,0.97) 0%, rgba(240,252,255,0.93) 100%)'
+              : 'linear-gradient(160deg, rgba(255,255,255,0.97) 0%, rgba(245,251,255,0.93) 100%)';
+            const cardShadow = isLending
+              ? '0 2px 16px rgba(3,172,234,0.10), inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(180,230,245,0.3)'
+              : '0 2px 16px rgba(29,91,148,0.10), inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(200,220,240,0.3)';
+            const iconBg = isLending ? 'rgba(3,172,234,0.12)' : 'rgba(29,91,148,0.12)';
+            const iconColor = isLending ? '#03ACEA' : '#1D5B94';
+            const AuroraCard = ({ children }) => (
+              <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'calc(100% + 10px)', height: 'calc(100% + 10px)', background: auroraGrad, filter: 'blur(5px) saturate(1.2)', opacity: 0.35, borderRadius: 18, zIndex: 0, pointerEvents: 'none' }} />
+                <div style={{ position: 'relative', zIndex: 1, flex: 1, padding: '12px 14px', borderRadius: 14, background: cardBg, backdropFilter: 'blur(16px) saturate(1.8) brightness(1.08)', WebkitBackdropFilter: 'blur(16px) saturate(1.8) brightness(1.08)', border: '1.5px solid rgba(255,255,255,0.9)', boxShadow: cardShadow }}>
+                  {children}
+                </div>
+              </div>
+            );
+            // Loan terms items
+            const amount = manageLoanSelected.amount || 0;
+            const interestRate = manageLoanSelected.interest_rate || 0;
+            const repaymentPeriod = manageLoanSelected.repayment_period || 0;
+            const repaymentUnit = manageLoanSelected.repayment_unit || 'months';
+            const paymentFrequency = manageLoanSelected.payment_frequency || 'monthly';
+            const loanTermItems = [
+              { label: 'Loan Amount', value: `$${amount.toLocaleString()}` },
+              { label: 'Interest Rate', value: `${interestRate}%` },
+              { label: 'Term', value: `${repaymentPeriod} ${repaymentUnit}` },
+              { label: 'Frequency', value: paymentFrequency.charAt(0).toUpperCase() + paymentFrequency.slice(1) },
+            ];
             return (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 16 }}>
-                {/* Payment Progress circle card */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16, alignItems: 'start' }}>
+                {/* Left: Payment Progress */}
                 <div>
                   <PageCard title="Payment Progress" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -891,69 +927,58 @@ export default function YourLoans() {
                     </div>
                   </PageCard>
                 </div>
-                {/* Next Payment Date box */}
-                <div>
-                  {(() => {
-                    const isLate = daysUntil !== null && daysUntil < 0;
-                    const dLabel = daysUntil === null ? null : isLate ? `${Math.abs(daysUntil)}d late` : daysUntil === 0 ? 'today' : `${daysUntil}d`;
-                    const bColor = isLate ? '#E8726E' : isLending ? '#03ACEA' : '#54A6CF';
-                    const bBg = isLate ? 'rgba(232,114,110,0.08)' : isLending ? 'rgba(3,172,234,0.10)' : 'rgba(84,166,207,0.10)';
-                    return (
-                      <div style={{ padding: '14px 16px', borderRadius: 14, background: 'white', boxShadow: '0 0 0 2px rgba(3,172,234,0.25), 0 0 16px rgba(3,172,234,0.12), 0 2px 12px rgba(0,0,0,0.04)', border: '1.5px solid rgba(3,172,234,0.35)' }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>{isLending ? 'Next Payment Incoming' : 'Next Payment Due'}</div>
-                        {nextPmtDate ? (
-                          <>
-                            <span style={{ fontSize: 26, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', display: 'block' }}>{format(nextPmtDate, 'MMM d')}</span>
-                            {dLabel && <span style={{ display: 'inline-block', marginTop: 6, fontSize: 10, fontWeight: 700, color: bColor, background: bBg, borderRadius: 6, padding: '2px 8px' }}>{dLabel}</span>}
-                          </>
-                        ) : (
-                          <div style={{ fontSize: 13, color: '#9B9A98' }}>No upcoming payments</div>
-                        )}
+                {/* Right: NP Date + NP Amount, then Loan Terms */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  {/* NP Date + NP Amount side by side */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                    {/* NP Date — Home aurora style */}
+                    <AuroraCard>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
+                        <div style={{ width: 20, height: 20, borderRadius: 6, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          {isLending
+                            ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2.5" strokeLinecap="round"><polyline points="17 11 12 6 7 11"/><line x1="12" y1="6" x2="12" y2="18"/></svg>
+                            : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2.5" strokeLinecap="round"><polyline points="7 13 12 18 17 13"/><line x1="12" y1="18" x2="12" y2="6"/></svg>
+                          }
+                        </div>
+                        <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{isLending ? 'Next Payment Incoming' : 'Next Payment Due'}</span>
                       </div>
-                    );
-                  })()}
-                </div>
-                {/* Next Payment Amount box */}
-                <div>
-                  <div style={{ padding: '14px 16px', borderRadius: 14, background: 'white', boxShadow: '0 0 0 2px rgba(3,172,234,0.25), 0 0 16px rgba(3,172,234,0.12), 0 2px 12px rgba(0,0,0,0.04)', border: '1.5px solid rgba(3,172,234,0.35)' }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>Next Payment Amount</div>
-                    {nextPmtDate ? (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                        <span style={{ fontSize: 26, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{formatMoney(nextPmtAmt)}</span>
-                        <span style={{ fontSize: 11, color: '#787776', textAlign: 'right', flexShrink: 0 }}>{isLending ? `from ${otherPartyUsername}` : `to ${otherPartyUsername}`}</span>
+                      {nextPmtDate ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap', overflow: 'hidden' }}>
+                          <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{format(nextPmtDate, 'MMM d')}</span>
+                          {dLabel && <span style={{ fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '2px 6px', flexShrink: 0 }}>{dLabel}</span>}
+                        </div>
+                      ) : (
+                        <span style={{ fontSize: 13, fontWeight: 700, color: '#C5C3C0' }}>—</span>
+                      )}
+                    </AuroraCard>
+                    {/* NP Amount — same Home aurora style */}
+                    <AuroraCard>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
+                        <div style={{ width: 20, height: 20, borderRadius: 6, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        </div>
+                        <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Next Payment Amount</span>
                       </div>
-                    ) : (
-                      <div style={{ fontSize: 13, color: '#9B9A98' }}>—</div>
-                    )}
+                      {nextPmtDate ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap', overflow: 'hidden' }}>
+                          <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{formatMoney(nextPmtAmt)}</span>
+                          <span style={{ fontSize: 11, color: '#9B9A98', marginLeft: 'auto', flexShrink: 0, whiteSpace: 'nowrap' }}>{isLending ? `from ${otherPartyUsername}` : `to ${otherPartyUsername}`}</span>
+                        </div>
+                      ) : (
+                        <span style={{ fontSize: 13, fontWeight: 700, color: '#C5C3C0' }}>—</span>
+                      )}
+                    </AuroraCard>
                   </div>
+                  {/* Loan Terms */}
+                  <PageCard title="Loan Terms">
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                      {loanTermItems.map((item, idx) => (<div key={idx} style={{ textAlign: 'center' }}><p style={{ fontSize: 10, color: '#787776', fontWeight: 500, marginBottom: 2 }}>{item.label}</p><p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>{item.value}</p></div>))}
+                    </div>
+                  </PageCard>
                 </div>
               </div>
             );
           })()}
-
-          {/* 5. Loan Terms */}
-          <PageCard title="Loan Terms">
-            <div>
-            {(() => {
-              const amount = manageLoanSelected.amount || 0;
-              const interestRate = manageLoanSelected.interest_rate || 0;
-              const repaymentPeriod = manageLoanSelected.repayment_period || 0;
-              const repaymentUnit = manageLoanSelected.repayment_unit || 'months';
-              const paymentFrequency = manageLoanSelected.payment_frequency || 'monthly';
-              const items = [
-                { label: 'Loan Amount', value: `$${amount.toLocaleString()}` },
-                { label: 'Interest Rate', value: `${interestRate}%` },
-                { label: 'Term', value: `${repaymentPeriod} ${repaymentUnit}` },
-                { label: 'Frequency', value: paymentFrequency.charAt(0).toUpperCase() + paymentFrequency.slice(1) },
-              ];
-              return (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-                  {items.map((item, idx) => (<div key={idx} style={{ textAlign: 'center' }}><p style={{ fontSize: 10, color: '#787776', fontWeight: 500, marginBottom: 2 }}>{item.label}</p><p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>{item.value}</p></div>))}
-                </div>
-              );
-            })()}
-            </div>
-          </PageCard>
 
           {/* 2-col masonry: left = Payment History + Docs, right = Payments */}
           <div className="loan-details-masonry" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'start' }}>
