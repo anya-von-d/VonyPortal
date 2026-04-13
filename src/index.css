@@ -288,6 +288,18 @@ input[type="date"] {
   z-index: 5;
 }
 
+/* Loan details responsive */
+@media (max-width: 768px) {
+  .loan-details-masonry,
+  .loan-details-activity-row {
+    grid-template-columns: 1fr !important;
+  }
+  .loan-details-doc-boxes {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+  }
+}
+
 /* Mesh layout responsive */
 @media (max-width: 768px) {
   .mesh-layout {
