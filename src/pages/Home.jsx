@@ -891,8 +891,9 @@ export default function Home() {
                     WebkitBackdropFilter: 'blur(10px) saturate(1.5)',
                     border: '1.5px solid rgba(29,91,148,0.35)',
                     boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+                    display: 'flex', flexDirection: 'column', justifyContent: 'center',
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
                       <div style={{ width: 20, height: 20, borderRadius: 6, background: 'rgba(29,91,148,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1D5B94" strokeWidth="2.5" strokeLinecap="round"><polyline points="7 13 12 18 17 13"/><line x1="12" y1="18" x2="12" y2="6"/></svg>
                       </div>
@@ -902,13 +903,13 @@ export default function Home() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap', overflow: 'hidden' }}>
                         <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{format(nextBorrowerPayment.date, 'MMM d')}</span>
                         {daysLabel && <span style={{ fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '2px 6px', flexShrink: 0 }}>{daysLabel}</span>}
-                        <span style={{ fontSize: 11, color: '#9B9A98', flexShrink: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{formatMoney(nextBorrowerPayment.payment_amount || 0)} to {nextBorrowerPayment.firstName}</span>
+                        <span style={{ fontSize: 11, color: '#9B9A98', marginLeft: 'auto', flexShrink: 0, whiteSpace: 'nowrap' }}>{formatMoney(nextBorrowerPayment.payment_amount || 0)} to {nextBorrowerPayment.firstName}</span>
                       </div>
                     ) : (
-                      <>
-                        <div style={{ fontSize: 15, fontWeight: 700, color: '#C5C3C0', marginBottom: 4 }}>—</div>
-                        <div style={{ fontSize: 11, color: '#9B9A98' }}>Nothing due</div>
-                      </>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: 15, fontWeight: 700, color: '#C5C3C0' }}>—</span>
+                        <span style={{ fontSize: 11, color: '#9B9A98' }}>Nothing due</span>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -1072,7 +1073,7 @@ export default function Home() {
               {/* Received */}
               <div style={{ padding: '9px 0' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
-                  <span style={{ fontSize: 13, color: '#787776' }}>Received</span>
+                  <span style={{ fontSize: 13, color: '#1A1918' }}>Received</span>
                   <span style={{ fontSize: 14, fontWeight: 700, color: '#03ACEA', letterSpacing: '-0.01em' }}>{formatMoney(monthlyReceived)}</span>
                 </div>
                 <div style={{ height: 6, borderRadius: 3, background: 'rgba(3,172,234,0.1)', overflow: 'hidden' }}>
@@ -1083,7 +1084,7 @@ export default function Home() {
               {/* Paid out */}
               <div style={{ padding: '9px 0' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
-                  <span style={{ fontSize: 13, color: '#787776' }}>Paid out</span>
+                  <span style={{ fontSize: 13, color: '#1A1918' }}>Paid out</span>
                   <span style={{ fontSize: 14, fontWeight: 700, color: '#1D5B94', letterSpacing: '-0.01em' }}>{formatMoney(monthlyPaidOut)}</span>
                 </div>
                 <div style={{ height: 6, borderRadius: 3, background: 'rgba(29,91,148,0.1)', overflow: 'hidden' }}>
