@@ -1144,7 +1144,7 @@ export default function YourLoans() {
           </div>{/* end 2-col masonry */}
 
           {/* Activity | Loan Progress row */}
-          <div className="loan-details-activity-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'start', marginTop: 0 }}>
+          <div className="loan-details-activity-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'start', marginTop: 24 }}>
           <PageCard title="Activity">
             <div>
             {(() => {
