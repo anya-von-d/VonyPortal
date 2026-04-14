@@ -359,13 +359,13 @@ export default function Friends() {
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap',
           }}>
             <div style={{ fontSize: 13, color: '#787776', fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-              Don't see your friends on Vony? Invite them to join you.
+              🤝 Don't see your friends on Vony? Invite them to join you.
             </div>
             <div ref={inviteRef} style={{ position: 'relative', flexShrink: 0 }}>
               <button
                 type="button"
                 onClick={() => setInviteOpen(v => !v)}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10, background: '#03ACEA', color: 'white', fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif", border: 'none', cursor: 'pointer' }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 11px', borderRadius: 9, background: '#03ACEA', color: 'white', fontSize: 12, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif", border: 'none', cursor: 'pointer' }}
               >
                 Invite a Friend
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.7, transition: 'transform 0.15s', transform: inviteOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}><polyline points="6 9 12 15 18 9"/></svg>

@@ -510,18 +510,18 @@ export default function RecordPayment() {
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap',
             }}>
               <div style={{ fontSize: 13, color: '#787776', fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-                Create a loan first, then come back here to record payments.
+                💸 Nothing to record just yet! Create a loan first.
               </div>
-              <div style={{ display: 'flex', gap: 10, flexShrink: 0, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 8, flexShrink: 0, flexWrap: 'wrap' }}>
                 <Link
                   to={createPageUrl('CreateOffer')}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10, background: '#03ACEA', color: 'white', textDecoration: 'none', fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif" }}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 11px', borderRadius: 9, background: '#03ACEA', color: 'white', textDecoration: 'none', fontSize: 12, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif" }}
                 >
                   Create a Loan
                 </Link>
                 <Link
                   to={createPageUrl('Friends')}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10, background: 'white', color: '#1A1918', textDecoration: 'none', fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif", border: '1px solid rgba(0,0,0,0.10)' }}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 11px', borderRadius: 9, background: 'white', color: '#1A1918', textDecoration: 'none', fontSize: 12, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif", border: '1px solid rgba(0,0,0,0.10)' }}
                 >
                   Add Friends
                 </Link>

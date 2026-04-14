@@ -1600,12 +1600,12 @@ export default function Lending({ initialTab }) {
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap',
             }}>
               <div style={{ fontSize: 13, color: '#787776', fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-                Loan offers can only be sent to friends. Add one first to get started.
+                🌸 You'll need a friend on Vony before you can send a loan offer. Add one to get started!
               </div>
-              <div style={{ display: 'flex', gap: 10, flexShrink: 0, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 8, flexShrink: 0, flexWrap: 'wrap' }}>
                 <Link
                   to={createPageUrl('Friends')}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10, background: '#03ACEA', color: 'white', textDecoration: 'none', fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif" }}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 11px', borderRadius: 9, background: '#03ACEA', color: 'white', textDecoration: 'none', fontSize: 12, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif" }}
                 >
                   Add a Friend
                 </Link>
@@ -1613,7 +1613,7 @@ export default function Lending({ initialTab }) {
                   <button
                     type="button"
                     onClick={() => setInviteOpen(v => !v)}
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10, background: 'white', color: '#1A1918', fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif", border: '1px solid rgba(0,0,0,0.10)', cursor: 'pointer' }}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 11px', borderRadius: 9, background: 'white', color: '#1A1918', fontSize: 12, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif", border: '1px solid rgba(0,0,0,0.10)', cursor: 'pointer' }}
                   >
                     Invite a Friend
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5, transition: 'transform 0.15s', transform: inviteOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}><polyline points="6 9 12 15 18 9"/></svg>
