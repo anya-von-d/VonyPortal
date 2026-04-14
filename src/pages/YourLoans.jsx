@@ -552,8 +552,8 @@ export default function YourLoans() {
 
     return (
       <>
-        {/* 1. Two standalone top cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+        {/* 1. Three standalone top cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 20 }}>
           {/* Next Incoming / Next Payment Due — aurora card identical to Home page */}
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
             {/* Aurora glow */}
@@ -607,6 +607,56 @@ export default function YourLoans() {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: 15, fontWeight: 700, color: '#C5C3C0' }}>—</span>
                   <span style={{ fontSize: 11, color: '#9B9A98' }}>{isLending ? 'None incoming' : 'Nothing due'}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Next Payment Amount — aurora style (lending only) */}
+          <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
+            <div style={{
+              position: 'absolute', top: '50%', left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 'calc(100% + 10px)', height: 'calc(100% + 10px)',
+              background: isLending
+                ? 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(6,182,212) 30%, rgb(20,184,166) 60%, rgb(3,172,234) 100%)'
+                : 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(99,102,241) 25%, rgb(139,92,246) 50%, rgb(124,58,237) 75%, rgb(29,91,148) 100%)',
+              filter: 'blur(5px) saturate(1.2)', opacity: 0.35,
+              borderRadius: 18, zIndex: 0, pointerEvents: 'none',
+            }} />
+            <div style={{
+              position: 'relative', zIndex: 1, flex: 1,
+              padding: '12px 14px', borderRadius: 14,
+              background: isLending
+                ? 'linear-gradient(160deg, rgba(255,255,255,0.97) 0%, rgba(240,252,255,0.93) 100%)'
+                : 'linear-gradient(160deg, rgba(255,255,255,0.97) 0%, rgba(245,251,255,0.93) 100%)',
+              backdropFilter: 'blur(16px) saturate(1.8) brightness(1.08)',
+              WebkitBackdropFilter: 'blur(16px) saturate(1.8) brightness(1.08)',
+              border: '1.5px solid rgba(255,255,255,0.9)',
+              boxShadow: isLending
+                ? '0 2px 16px rgba(3,172,234,0.10), inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(180,230,245,0.3)'
+                : '0 2px 16px rgba(29,91,148,0.10), inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(200,220,240,0.3)',
+              display: 'flex', flexDirection: 'column', justifyContent: 'center',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
+                <div style={{ width: 20, height: 20, borderRadius: 6, background: isLending ? 'rgba(3,172,234,0.12)' : 'rgba(29,91,148,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={isLending ? '#03ACEA' : '#1D5B94'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Next Payment Amount</span>
+              </div>
+              {nextPaymentLoan ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'nowrap', overflow: 'hidden' }}>
+                  <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>
+                    {formatMoney(nextPaymentAmount)}
+                  </span>
+                  <span style={{ fontSize: 11, color: '#9B9A98', flexShrink: 0, whiteSpace: 'nowrap', textAlign: 'right' }}>
+                    {isLending ? 'from' : 'to'} {otherPartyUsername}
+                  </span>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: '#C5C3C0' }}>—</span>
+                  <span style={{ fontSize: 11, color: '#9B9A98' }}>No payments</span>
                 </div>
               )}
             </div>
