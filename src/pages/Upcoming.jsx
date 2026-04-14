@@ -312,7 +312,7 @@ export default function Upcoming() {
 
           {/* Page header */}
           <div style={{ marginLeft: -48, marginRight: -48, paddingLeft: 48, paddingRight: 48, paddingBottom: 12 }}>
-            <span style={{ fontSize: 14, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif", letterSpacing: '-0.02em', color: '#1A1918' }}>Upcoming</span>
+            <span style={{ fontSize: 14, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif", letterSpacing: '-0.02em', color: '#1A1918', marginBottom: 20 }}>Upcoming</span>
           </div>
 
           {/* Two-column: section boxes left, calendar right */}

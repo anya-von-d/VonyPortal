@@ -1170,7 +1170,7 @@ export default function LoanAgreements() {
         <div className="mesh-center" style={{ background: '#FBFAF9', padding: '24px 48px 80px' }}>
 
           {/* Page title */}
-          <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em', color: '#1A1918', marginBottom: 12 }}>Documents</div>
+          <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em', color: '#1A1918', marginBottom: 32 }}>Documents</div>
 
           {/* Filters */}
           <div style={{ marginBottom: 16 }}>

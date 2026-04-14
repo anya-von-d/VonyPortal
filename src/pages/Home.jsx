@@ -880,7 +880,7 @@ export default function Home() {
         <div className="mesh-center" style={{ background: '#FBFAF9', padding: '24px 48px 80px' }}>
 
           {/* Greeting + icons */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
             <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.2, color: '#1A1918' }}>
               {greeting}, {firstName}
             </div>

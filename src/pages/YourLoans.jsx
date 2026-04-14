@@ -1478,7 +1478,7 @@ export default function YourLoans() {
         <div className="mesh-center" style={{ background: '#FBFAF9', padding: '24px 48px 80px' }}>
 
           {/* Tab header */}
-          <div style={{ display: 'flex', gap: 24, alignItems: 'flex-end', marginLeft: -48, marginRight: -48, paddingLeft: 48, paddingRight: 48 }}>
+          <div style={{ display: 'flex', gap: 24, alignItems: 'flex-end', marginLeft: -48, marginRight: -48, paddingLeft: 48, paddingRight: 48, marginBottom: 20 }}>
             {[{key:'lending',label:'Lending'},{key:'borrowing',label:'Borrowing'},{key:'details',label:'Loan Details'}].map(tab => (
               <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{
                 position: 'relative', paddingBottom: 12,
