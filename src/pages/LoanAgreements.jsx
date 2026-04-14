@@ -399,7 +399,39 @@ export default function LoanAgreements() {
     doc.setFontSize(11);
     doc.setFont(undefined, 'normal');
     let yPos = 105;
-    const promiseText = `${lenderInfo.full_name} agrees to lend ${borrowerInfo.full_name} ${formatMoney(agreement.amount)}${agreement.purpose ? ` for ${agreement.purpose}` : ''}, with ${agreement.interest_rate}% interest. ${borrowerInfo.full_name} agrees to pay back ${formatMoney(agreement.total_amount)} in ${agreement.payment_frequency} payments of ${formatMoney(agreement.payment_amount)} over ${agreement.repayment_period} ${agreement.repayment_unit || 'months'}.`;
+    // Build paragraph matching the Create Loan format
+    const pdfFrequency = agreement.payment_frequency || 'monthly';
+    const pdfRepaymentPeriod = parseInt(agreement.repayment_period) || 0;
+    const pdfRepaymentUnit = agreement.repayment_unit || 'months';
+    const pdfNumPayments = pdfFrequency === 'weekly'
+      ? Math.ceil(pdfRepaymentPeriod * (pdfRepaymentUnit === 'months' ? 4 : 1))
+      : pdfRepaymentPeriod;
+    const pdfSendFundsDate = agreement.lender_send_funds_date ? new Date(agreement.lender_send_funds_date) : new Date(agreement.created_at);
+    const pdfFirstPaymentDate = agreement.first_payment_date
+      ? new Date(agreement.first_payment_date)
+      : (pdfFrequency === 'weekly' ? addWeeks(pdfSendFundsDate, 1) : addMonths(pdfSendFundsDate, 1));
+    let pdfLastPaymentDate = null;
+    if (pdfNumPayments > 0) {
+      pdfLastPaymentDate = pdfFrequency === 'weekly'
+        ? addWeeks(pdfFirstPaymentDate, pdfNumPayments - 1)
+        : addMonths(pdfFirstPaymentDate, pdfNumPayments - 1);
+    } else if (agreement.due_date) {
+      pdfLastPaymentDate = new Date(agreement.due_date);
+    }
+    const pdfDayOfMonth = agreement.loan_day_of_month ? parseInt(agreement.loan_day_of_month) : pdfFirstPaymentDate.getDate();
+    const pdfDaySuffix = pdfDayOfMonth === 1 ? 'st' : pdfDayOfMonth === 2 ? 'nd' : pdfDayOfMonth === 3 ? 'rd' : 'th';
+    const pdfDayOfWeek = agreement.loan_day_of_week || ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'][pdfFirstPaymentDate.getDay()];
+    const pdfDayOfWeekLabel = pdfDayOfWeek.charAt(0).toUpperCase() + pdfDayOfWeek.slice(1);
+    const pdfTimeStr = agreement.loan_time || '12:00';
+    const [pdfHourStr, pdfMinStr] = pdfTimeStr.split(':');
+    const pdfHour = parseInt(pdfHourStr);
+    const pdfHour12 = pdfHour === 0 ? 12 : pdfHour > 12 ? pdfHour - 12 : pdfHour;
+    const pdfAmPm = pdfHour >= 12 ? 'PM' : 'AM';
+    const pdfFormattedTime = `${pdfHour12}:${pdfMinStr || '00'} ${pdfAmPm}`;
+    const pdfTimezone = agreement.loan_timezone || 'EST';
+    const pdfDueClause = pdfFrequency === 'weekly' ? `on ${pdfDayOfWeekLabel}` : `on the ${pdfDayOfMonth}${pdfDaySuffix}`;
+
+    const promiseText = `The lender agrees to lend ${borrowerInfo.full_name} ${formatMoney(agreement.amount)} before ${format(pdfSendFundsDate, 'MMM d, yyyy')} at an interest rate of ${agreement.interest_rate}%. The loan will be repaid over ${pdfRepaymentPeriod} ${pdfRepaymentUnit} in ${pdfFrequency} payments of ${formatMoney(agreement.payment_amount)}. Payments will be due ${pdfDueClause} at ${pdfFormattedTime} ${pdfTimezone}, with the first of the ${pdfNumPayments} payments due on ${format(pdfFirstPaymentDate, 'MMM d, yyyy')} and the last payment due on ${pdfLastPaymentDate ? format(pdfLastPaymentDate, 'MMM d, yyyy') : '—'}.${agreement.purpose ? ` This loan is for ${agreement.purpose}.` : ''}`;
     const promiseLines = doc.splitTextToSize(promiseText, 170);
     doc.text(promiseLines, 20, yPos);
     yPos += promiseLines.length * 6 + 10;
@@ -684,6 +716,45 @@ export default function LoanAgreements() {
     const lenderInfo = getUserById(agreement.lender_id);
     const borrowerInfo = getUserById(agreement.borrower_id);
 
+    // Derive scheduling details from available agreement fields
+    const paymentFrequency = agreement.payment_frequency || 'monthly';
+    const repaymentPeriod = parseInt(agreement.repayment_period) || 0;
+    const repaymentUnit = agreement.repayment_unit || 'months';
+    const numPayments = paymentFrequency === 'weekly'
+      ? Math.ceil(repaymentPeriod * (repaymentUnit === 'months' ? 4 : 1))
+      : repaymentPeriod;
+
+    const sendFundsDate = agreement.lender_send_funds_date
+      ? new Date(agreement.lender_send_funds_date)
+      : new Date(agreement.created_at);
+    const firstPaymentDate = agreement.first_payment_date
+      ? new Date(agreement.first_payment_date)
+      : (paymentFrequency === 'weekly' ? addWeeks(sendFundsDate, 1) : addMonths(sendFundsDate, 1));
+    let lastPaymentDate = null;
+    if (numPayments > 0) {
+      lastPaymentDate = paymentFrequency === 'weekly'
+        ? addWeeks(firstPaymentDate, numPayments - 1)
+        : addMonths(firstPaymentDate, numPayments - 1);
+    } else if (agreement.due_date) {
+      lastPaymentDate = new Date(agreement.due_date);
+    }
+
+    const dayOfMonth = agreement.loan_day_of_month
+      ? parseInt(agreement.loan_day_of_month)
+      : firstPaymentDate.getDate();
+    const daySuffix = dayOfMonth === 1 ? 'st' : dayOfMonth === 2 ? 'nd' : dayOfMonth === 3 ? 'rd' : 'th';
+    const dayOfWeek = agreement.loan_day_of_week
+      || ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][firstPaymentDate.getDay()];
+    const dayOfWeekLabel = dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1);
+
+    const timeString = agreement.loan_time || '12:00';
+    const [hourStr, minStr] = timeString.split(':');
+    const hour = parseInt(hourStr);
+    const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const formattedTime = `${hour12}:${minStr || '00'} ${ampm}`;
+    const timezone = agreement.loan_timezone || 'EST';
+
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
         <div style={{ background: '#fafafa', borderRadius: 16, padding: 16 }}>
@@ -692,7 +763,7 @@ export default function LoanAgreements() {
         </div>
 
         <p style={{ fontSize: 13, lineHeight: 1.7, color: '#1A1918' }}>
-          <strong>{lenderInfo.full_name}</strong> agrees to lend <strong>{borrowerInfo.full_name}</strong> <strong>{formatMoney(agreement.amount)}</strong>{agreement.purpose ? <> for <strong>{agreement.purpose}</strong></> : ''}, with <strong>{agreement.interest_rate}%</strong> interest. <strong>{borrowerInfo.full_name}</strong> agrees to pay back <strong>{formatMoney(agreement.total_amount)}</strong> in <strong>{agreement.payment_frequency}</strong> payments of <strong>{formatMoney(agreement.payment_amount)}</strong> over <strong>{agreement.repayment_period} {agreement.repayment_unit || 'months'}</strong>.
+          The lender agrees to lend <strong>{borrowerInfo.full_name}</strong> <strong>{formatMoney(agreement.amount)}</strong> before <strong>{format(sendFundsDate, 'MMM d, yyyy')}</strong> at an interest rate of <strong>{agreement.interest_rate}%</strong>. The loan will be repaid over <strong>{repaymentPeriod} {repaymentUnit}</strong> in <strong>{paymentFrequency}</strong> payments of <strong>{formatMoney(agreement.payment_amount)}</strong>. Payments will be due {paymentFrequency === 'weekly' ? <>on <strong>{dayOfWeekLabel}</strong></> : <>on the <strong>{dayOfMonth}{daySuffix}</strong></>} at <strong>{formattedTime} {timezone}</strong>, with the first of the <strong>{numPayments}</strong> payments due on <strong>{format(firstPaymentDate, 'MMM d, yyyy')}</strong> and the last payment due on <strong>{lastPaymentDate ? format(lastPaymentDate, 'MMM d, yyyy') : '—'}</strong>.{agreement.purpose ? <> This loan is for <strong>{agreement.purpose}</strong>.</> : ''}
         </p>
 
         <div style={{ background: '#fafafa', borderRadius: 16, padding: 16 }}>
