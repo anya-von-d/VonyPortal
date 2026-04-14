@@ -267,6 +267,7 @@ export default function Friends() {
   );
 
   return (
+    <>
     <div>
       <MeshMobileNav user={user} activePage="Friends" />
       <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: 0, minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased' }}>
@@ -532,5 +533,6 @@ export default function Friends() {
     </div>
 
     <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} initialTab="invite" />
+    </>
   );
 }
