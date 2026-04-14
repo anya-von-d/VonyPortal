@@ -300,6 +300,13 @@ input[type="date"] {
   }
 }
 
+/* Upcoming page responsive */
+@media (max-width: 768px) {
+  .upcoming-two-col {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 /* Mesh layout responsive */
 @media (max-width: 768px) {
   .mesh-layout {

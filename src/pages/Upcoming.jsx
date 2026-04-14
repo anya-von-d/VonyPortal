@@ -333,7 +333,7 @@ export default function Upcoming() {
           <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginLeft: -48, marginRight: -48, marginBottom: 24 }} />
 
           {/* Two-column: section boxes left, calendar right */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'start' }}>
+          <div className="upcoming-two-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'start' }}>
 
             {/* Left: Overdue + Next 7 Days + Coming Later */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
