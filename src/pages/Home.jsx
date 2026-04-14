@@ -795,6 +795,63 @@ export default function Home() {
         {/* ── CENTER ── */}
         <div className="mesh-center" style={{ background: '#ffffff', padding: '28px 48px 80px' }}>
 
+          {/* New user onboarding — top of page */}
+          {!hasLoans && (
+            <div style={{
+              marginBottom: 28, padding: '20px 22px', borderRadius: 14,
+              background: 'white',
+              border: '1px solid rgba(0,0,0,0.07)',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+              textAlign: 'center',
+            }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 4, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                🎉 Welcome to Vony!
+              </div>
+              <div style={{ fontSize: 13, color: '#787776', lineHeight: 1.55, marginBottom: 16 }}>
+                Lending money to friends has never been this easy. Start by adding a friend, then create your first loan together.
+              </div>
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+                <Link
+                  to={createPageUrl('Friends')}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    padding: '8px 14px', borderRadius: 10,
+                    background: '#03ACEA', color: 'white', textDecoration: 'none',
+                    fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif",
+                  }}
+                >
+                  Find Friends
+                </Link>
+                <Link
+                  to={createPageUrl('CreateOffer')}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    padding: '8px 14px', borderRadius: 10,
+                    background: 'white', color: '#1A1918', textDecoration: 'none',
+                    fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif",
+                    border: '1px solid rgba(0,0,0,0.10)',
+                  }}
+                >
+                  Create a Loan
+                </Link>
+                <a
+                  href="https://www.vony-lending.com/guide"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    padding: '8px 14px', borderRadius: 10,
+                    background: 'white', color: '#787776', textDecoration: 'none',
+                    fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif",
+                    border: '1px solid rgba(0,0,0,0.10)',
+                  }}
+                >
+                  Guide
+                </a>
+              </div>
+            </div>
+          )}
+
           {/* Greeting + icons */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
             <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.2, color: '#1A1918' }}>
@@ -974,63 +1031,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* New user onboarding */}
-          {!hasLoans && (
-            <div style={{
-              marginBottom: 28, padding: '20px 22px', borderRadius: 14,
-              background: 'white',
-              border: '1px solid rgba(0,0,0,0.07)',
-              boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-              textAlign: 'center',
-            }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 4, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-                🎉 Welcome to Vony!
-              </div>
-              <div style={{ fontSize: 13, color: '#787776', lineHeight: 1.55, marginBottom: 16 }}>
-                Lending money to friends has never been this easy. Start by adding a friend, then create your first loan together.
-              </div>
-              <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-                <Link
-                  to={createPageUrl('Friends')}
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 6,
-                    padding: '8px 14px', borderRadius: 10,
-                    background: '#03ACEA', color: 'white', textDecoration: 'none',
-                    fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif",
-                  }}
-                >
-                  Find Friends
-                </Link>
-                <Link
-                  to={createPageUrl('CreateOffer')}
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 6,
-                    padding: '8px 14px', borderRadius: 10,
-                    background: 'white', color: '#1A1918', textDecoration: 'none',
-                    fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif",
-                    border: '1px solid rgba(0,0,0,0.10)',
-                  }}
-                >
-                  Create a Loan
-                </Link>
-                <a
-                  href="https://www.vony-lending.com/guide"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 6,
-                    padding: '8px 14px', borderRadius: 10,
-                    background: 'white', color: '#787776', textDecoration: 'none',
-                    fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif",
-                    border: '1px solid rgba(0,0,0,0.10)',
-                  }}
-                >
-                  Guide
-                </a>
-              </div>
-            </div>
-          )}
-
           {/* Masonry two-column layout */}
           <div className="home-two-col-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
             {/* Left column: Upcoming → Recent Activity → Active Lending */}
@@ -1039,10 +1039,7 @@ export default function Home() {
               <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
                 <SectionHeader title="Upcoming" linkTo={createPageUrl("Upcoming")} linkLabel="Full schedule →" />
                 {combinedPaymentEvents.length === 0 ? (
-                  <div style={{ padding: '10px 0', textAlign: 'center' }}>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', marginBottom: 2 }}>You're all clear!</div>
-                    <div style={{ fontSize: 12, color: '#9B9A98' }}>No upcoming payments. Enjoy the calm.</div>
-                  </div>
+                  <div style={{ padding: '8px 0', fontSize: 13, color: '#9B9A98', textAlign: 'center' }}>You're all caught up ✨</div>
                 ) : combinedPaymentEvents.map((event, idx) => {
                   const isOverdue = event.days < 0;
                   const daysLabel = isOverdue ? `${Math.abs(event.days)}d late` : event.days === 0 ? 'today' : `${event.days}d`;
@@ -1076,7 +1073,7 @@ export default function Home() {
               <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
                 <SectionHeader title="Recent Activity" linkTo={createPageUrl("RecentActivity")} linkLabel="View all →" />
                 {recentActivity.length === 0 ? (
-                  <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98', textAlign: 'center' }}>Nothing recent to show yet</div>
+                  <div style={{ padding: '8px 0', fontSize: 13, color: '#9B9A98', textAlign: 'center' }}>No activity yet — it'll show up here 🕊️</div>
                 ) : recentActivity.map((item, idx) => (
                   <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0' }}>
                     <div style={{ width: 20, height: 20, borderRadius: 6, background: `${item.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -1100,7 +1097,7 @@ export default function Home() {
               <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
                 <SectionHeader title="Active Lending" linkTo={createPageUrl("YourLoans")} linkLabel="View all →" />
                 {lentLoans.length === 0 ? (
-                  <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98' }}>No active lending yet 🌱</div>
+                  <div style={{ padding: '8px 0', fontSize: 13, color: '#9B9A98', textAlign: 'center' }}>No active lending yet 🌱</div>
                 ) : (
                   <div ref={activeLoansRef} style={{ display: 'flex', flexDirection: 'column' }}>
                     {lentLoans.slice(0, 5).map((loan, idx) => {
@@ -1165,7 +1162,7 @@ export default function Home() {
               <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }} ref={loansChartRef}>
                 <SectionHeader title="Your Loans Over Time" />
                 {!chartData ? (
-                  <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98' }}>No loan history yet</div>
+                  <div style={{ padding: '8px 0', fontSize: 13, color: '#9B9A98', textAlign: 'center' }}>No loan history yet 📊</div>
                 ) : (
                   <>
                     {/* Legend */}
@@ -1218,7 +1215,7 @@ export default function Home() {
               <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
                 <SectionHeader title="Active Borrowing" linkTo={createPageUrl("YourLoans")} linkLabel="View all →" />
                 {borrowedLoans.length === 0 ? (
-                  <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98' }}>No active borrowing yet</div>
+                  <div style={{ padding: '8px 0', fontSize: 13, color: '#9B9A98', textAlign: 'center' }}>No active borrowing yet 🤝</div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     {borrowedLoans.slice(0, 5).map((loan, idx) => {

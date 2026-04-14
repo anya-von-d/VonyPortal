@@ -763,8 +763,7 @@ export default function RecentActivityPage() {
             </div>
             <div style={{ padding: '0 16px' }}>
             {filtered.length === 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 0', color: '#C7C6C4' }}>
-                <Activity size={32} style={{ opacity: 0.4, marginBottom: 8 }} />
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 0' }}>
                 <p style={{ fontSize: 13, color: '#787776', margin: 0, textAlign: 'center' }}>Nothing to show here yet ✨</p>
                 {hasAnyFilter && <p style={{ fontSize: 12, color: '#C7C6C4', margin: '4px 0 0' }}>Try adjusting your filters</p>}
               </div>

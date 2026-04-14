@@ -96,6 +96,17 @@ export default function Lending({ initialTab }) {
   const [allUserLoans, setAllUserLoans] = useState([]);
   const [currentUserProfile, setCurrentUserProfile] = useState(null);
   const [showLoanSentModal, setShowLoanSentModal] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteCopied, setInviteCopied] = useState(false);
+  const inviteRef = useRef(null);
+
+  // Close invite dropdown on outside click
+  useEffect(() => {
+    if (!inviteOpen) return;
+    const handler = (e) => { if (inviteRef.current && !inviteRef.current.contains(e.target)) setInviteOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [inviteOpen]);
 
   // Typing animation for purpose placeholder
   const [purposePlaceholder, setPurposePlaceholder] = useState('');
@@ -1600,12 +1611,53 @@ export default function Lending({ initialTab }) {
                 >
                   Find Friends
                 </Link>
-                <a
-                  href="sms:?body=Hey! Join me on Vony for easy peer-to-peer lending. Sign up here: https://lend-with-vony.com"
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10, background: 'white', color: '#1A1918', textDecoration: 'none', fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif", border: '1px solid rgba(0,0,0,0.10)' }}
-                >
-                  Invite a Friend
-                </a>
+                <div ref={inviteRef} style={{ position: 'relative', display: 'inline-block' }}>
+                  <button
+                    type="button"
+                    onClick={() => setInviteOpen(v => !v)}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10, background: 'white', color: '#1A1918', fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif", border: '1px solid rgba(0,0,0,0.10)', cursor: 'pointer' }}
+                  >
+                    Invite a Friend
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5, transition: 'transform 0.15s', transform: inviteOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  {inviteOpen && (
+                    <div style={{ position: 'absolute', top: 'calc(100% + 6px)', left: '50%', transform: 'translateX(-50%)', background: 'white', borderRadius: 12, border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 200, minWidth: 180, overflow: 'hidden' }}>
+                      <a
+                        href="sms:?body=Hey! Join me on Vony — an easy way to manage loans with friends. Sign up here: https://www.vony-lending.com"
+                        onClick={() => setInviteOpen(false)}
+                        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 16px', fontSize: 13, color: '#1A1918', textDecoration: 'none', fontFamily: "'DM Sans', sans-serif", fontWeight: 500 }}
+                        onMouseEnter={e => e.currentTarget.style.background = '#f5f4f0'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                      >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#787776" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        Message
+                      </a>
+                      <a
+                        href="mailto:?subject=Join me on Vony&body=Hey!%0A%0AI've been using Vony to manage loans with friends and wanted to invite you.%0A%0ASign up here: https://www.vony-lending.com%0A%0ASee you there!"
+                        onClick={() => setInviteOpen(false)}
+                        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 16px', fontSize: 13, color: '#1A1918', textDecoration: 'none', fontFamily: "'DM Sans', sans-serif", fontWeight: 500 }}
+                        onMouseEnter={e => e.currentTarget.style.background = '#f5f4f0'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                      >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#787776" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        Email
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => { navigator.clipboard.writeText('https://www.vony-lending.com').then(() => { setInviteCopied(true); setTimeout(() => { setInviteCopied(false); setInviteOpen(false); }, 1500); }); }}
+                        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 16px', fontSize: 13, color: inviteCopied ? '#16A34A' : '#1A1918', background: inviteCopied ? 'rgba(22,163,74,0.05)' : 'transparent', fontFamily: "'DM Sans', sans-serif", fontWeight: 500, border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left' }}
+                        onMouseEnter={e => { if (!inviteCopied) e.currentTarget.style.background = '#f5f4f0'; }}
+                        onMouseLeave={e => { if (!inviteCopied) e.currentTarget.style.background = 'transparent'; }}
+                      >
+                        {inviteCopied
+                          ? <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                          : <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#787776" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        }
+                        {inviteCopied ? 'Copied!' : 'Copy Link'}
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}

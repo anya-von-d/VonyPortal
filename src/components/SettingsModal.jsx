@@ -289,7 +289,10 @@ function LegalTab() {
 
 /* ── Modal ────────────────────────────────────────────────── */
 export default function SettingsModal({ isOpen, onClose }) {
-  const { user, logout } = useAuth();
+  const { user: authUser, userProfile, logout } = useAuth();
+  const user = userProfile
+    ? { ...userProfile, id: authUser?.id, email: authUser?.email }
+    : authUser;
   const [activeTab, setActiveTab] = useState('general');
   const [isMobile, setIsMobile] = useState(window.innerWidth < 560);
   const overlayRef = useRef(null);
@@ -355,13 +358,7 @@ export default function SettingsModal({ isOpen, onClose }) {
 
           {/* User header */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: `0 ${sidebarPadH + 2}px 14px`, borderBottom: '1px solid rgba(0,0,0,0.07)', marginBottom: 10, minWidth: 0 }}>
-            {user?.profile_picture_url ? (
-              <div style={{ width: 30, height: 30, borderRadius: '50%', overflow: 'hidden', flexShrink: 0 }}>
-                <img src={user.profile_picture_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              </div>
-            ) : (
-              <UserAvatar name={user?.full_name || user?.username} size={30} />
-            )}
+            <UserAvatar name={user?.full_name || user?.username} src={user?.profile_picture_url} size={30} />
             <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
               {firstName}
             </div>
