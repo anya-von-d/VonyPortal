@@ -333,7 +333,7 @@ export default function Profile() {
         </div>
       )}
 
-      <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '180px 1fr 300px', gap: 0, minHeight: '100vh' }}>
+      <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: 0, minHeight: '100vh' }}>
 
         {/* COL 1 - left nav */}
         <div className="mesh-left" style={{ background: '#F3F2F0', borderRight: '1px solid rgba(0,0,0,0.06)' }}>
@@ -488,146 +488,149 @@ export default function Profile() {
           </div>
 
           {/* Page Content */}
-          <div className="grid lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8 w-full" style={{ paddingBottom: 40 }}>
-            {/* Profile Info */}
-            <div className="lg:col-span-2 space-y-4 md:space-y-6 min-w-0 w-full">
-              {/* Personal Information */}
-              <PageCard
-                title="Personal Information"
-                headerRight={
-                  isEditing ? (
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setIsEditing(false);
-                          setFormData({
-                            full_name: user?.full_name || '',
-                            username: user?.username || '',
-                            phone: user?.phone || '',
-                            location: user?.location || '',
-                            profile_picture_url: user?.profile_picture_url || '',
-                            theme_preference: user?.theme_preference || 'morning'
-                          });
-                          setUsernameError(null);
-                        }}
-                        className="bg-white hover:bg-slate-50"
-                        style={{ fontSize: 12, padding: '4px 12px', height: 'auto' }}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        onClick={handleSave}
-                        disabled={isSaving || usernameError || isCheckingUsername}
-                        className="text-white font-semibold hover:opacity-90"
-                        style={{ background: '#03ACEA', fontSize: 12, padding: '4px 12px', height: 'auto' }}
-                      >
-                        {isSaving ? 'Saving...' : 'Save Changes'}
-                      </Button>
-                    </div>
-                  ) : (
+          <div style={{ paddingBottom: 40 }}>
+            {/* Personal Information — full width */}
+            <div style={{ background: 'white', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', marginBottom: 20, overflow: 'hidden' }}>
+              {/* Header */}
+              <div style={{ padding: '14px 18px 12px', borderBottom: '1px solid rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>PERSONAL INFORMATION</span>
+                {isEditing ? (
+                  <div style={{ display: 'flex', gap: 8 }}>
                     <Button
-                      onClick={() => setIsEditing(true)}
+                      variant="outline"
+                      onClick={() => {
+                        setIsEditing(false);
+                        setFormData({
+                          full_name: user?.full_name || '',
+                          username: user?.username || '',
+                          phone: user?.phone || '',
+                          location: user?.location || '',
+                          profile_picture_url: user?.profile_picture_url || '',
+                          theme_preference: user?.theme_preference || 'morning'
+                        });
+                        setUsernameError(null);
+                      }}
+                      className="bg-white hover:bg-slate-50"
+                      style={{ fontSize: 12, padding: '4px 12px', height: 'auto' }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleSave}
+                      disabled={isSaving || usernameError || isCheckingUsername}
                       className="text-white font-semibold hover:opacity-90"
                       style={{ background: '#03ACEA', fontSize: 12, padding: '4px 12px', height: 'auto' }}
                     >
-                      Edit
+                      {isSaving ? 'Saving...' : 'Save Changes'}
                     </Button>
-                  )
-                }
-              >
-                <div style={{ padding: '16px 16px' }}>
-                  <div className="space-y-4" style={{ background: 'rgba(3,172,234,0.06)', borderRadius: 12, padding: 16 }}>
-                    <div className="grid md:grid-cols-2 gap-3 md:gap-4">
-                      <div className="space-y-1">
-                        <Label htmlFor="full_name" className="text-xs font-medium" style={{ color: '#787776' }}>
-                          Full Name
-                        </Label>
-                        <Input
-                          id="full_name"
-                          value={formData.full_name}
-                          disabled
-                          placeholder="Enter your full name"
-                          style={{ background: 'rgba(0,0,0,0.03)' }}
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <Label className="text-xs font-medium" style={{ color: '#787776' }}>
-                          Email
-                        </Label>
-                        <Input
-                          value={user.email || 'Not provided'}
-                          disabled
-                          style={{ background: 'rgba(0,0,0,0.03)' }}
-                        />
-                      </div>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={() => setIsEditing(true)}
+                    className="text-white font-semibold hover:opacity-90"
+                    style={{ background: '#03ACEA', fontSize: 12, padding: '4px 12px', height: 'auto' }}
+                  >
+                    Edit
+                  </Button>
+                )}
+              </div>
+              {/* Body */}
+              <div style={{ padding: '16px 18px' }}>
+                <div className="space-y-4" style={{ background: 'rgba(3,172,234,0.06)', borderRadius: 12, padding: 16 }}>
+                  <div className="grid md:grid-cols-2 gap-3 md:gap-4">
+                    <div className="space-y-1">
+                      <Label htmlFor="full_name" className="text-xs font-medium" style={{ color: '#787776' }}>
+                        Full Name
+                      </Label>
+                      <Input
+                        id="full_name"
+                        value={formData.full_name}
+                        disabled
+                        placeholder="Enter your full name"
+                        style={{ background: 'rgba(0,0,0,0.03)' }}
+                      />
                     </div>
 
                     <div className="space-y-1">
-                      <Label htmlFor="username" className="text-xs font-medium" style={{ color: '#787776' }}>
-                        Username
+                      <Label className="text-xs font-medium" style={{ color: '#787776' }}>
+                        Email
                       </Label>
                       <Input
-                        id="username"
-                        value={formData.username}
-                        onChange={(e) => handleInputChange('username', e.target.value)}
-                        disabled={!isEditing || isSaving}
-                        placeholder="Choose a unique username"
-                        className={usernameError ? 'border-red-300' : ''}
-                        style={!isEditing ? { background: 'rgba(0,0,0,0.03)' } : {}}
-                        required
+                        value={user.email || 'Not provided'}
+                        disabled
+                        style={{ background: 'rgba(0,0,0,0.03)' }}
                       />
-                      {isCheckingUsername && (
-                        <p className="text-xs text-blue-600">Checking availability...</p>
-                      )}
-                      {usernameError && (
-                        <p className="text-xs text-red-600">{usernameError}</p>
-                      )}
-                      {isEditing && !usernameError && formData.username && formData.username !== user.username && !isCheckingUsername && (
-                        <p className="text-xs text-green-600">Username is available!</p>
-                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="username" className="text-xs font-medium" style={{ color: '#787776' }}>
+                      Username
+                    </Label>
+                    <Input
+                      id="username"
+                      value={formData.username}
+                      onChange={(e) => handleInputChange('username', e.target.value)}
+                      disabled={!isEditing || isSaving}
+                      placeholder="Choose a unique username"
+                      className={usernameError ? 'border-red-300' : ''}
+                      style={!isEditing ? { background: 'rgba(0,0,0,0.03)' } : {}}
+                      required
+                    />
+                    {isCheckingUsername && (
+                      <p className="text-xs text-blue-600">Checking availability...</p>
+                    )}
+                    {usernameError && (
+                      <p className="text-xs text-red-600">{usernameError}</p>
+                    )}
+                    {isEditing && !usernameError && formData.username && formData.username !== user.username && !isCheckingUsername && (
+                      <p className="text-xs text-green-600">Username is available!</p>
+                    )}
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-3 md:gap-4">
+                    <div className="space-y-1">
+                      <Label htmlFor="phone" className="text-xs font-medium" style={{ color: '#787776' }}>
+                        Phone Number
+                      </Label>
+                      <Input
+                        id="phone"
+                        value={formData.phone}
+                        onChange={(e) => handleInputChange('phone', e.target.value)}
+                        disabled={!isEditing || isSaving}
+                        placeholder="Enter your phone number"
+                        style={!isEditing ? { background: 'rgba(0,0,0,0.03)' } : {}}
+                      />
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-3 md:gap-4">
-                      <div className="space-y-1">
-                        <Label htmlFor="phone" className="text-xs font-medium" style={{ color: '#787776' }}>
-                          Phone Number
-                        </Label>
-                        <Input
-                          id="phone"
-                          value={formData.phone}
-                          onChange={(e) => handleInputChange('phone', e.target.value)}
-                          disabled={!isEditing || isSaving}
-                          placeholder="Enter your phone number"
-                          style={!isEditing ? { background: 'rgba(0,0,0,0.03)' } : {}}
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <Label htmlFor="location" className="text-xs font-medium" style={{ color: '#787776' }}>
-                          Location
-                        </Label>
-                        <Input
-                          id="location"
-                          value={formData.location}
-                          onChange={(e) => handleInputChange('location', e.target.value)}
-                          disabled={!isEditing || isSaving}
-                          placeholder="City, State"
-                          style={!isEditing ? { background: 'rgba(0,0,0,0.03)' } : {}}
-                        />
-                      </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="location" className="text-xs font-medium" style={{ color: '#787776' }}>
+                        Location
+                      </Label>
+                      <Input
+                        id="location"
+                        value={formData.location}
+                        onChange={(e) => handleInputChange('location', e.target.value)}
+                        disabled={!isEditing || isSaving}
+                        placeholder="City, State"
+                        style={!isEditing ? { background: 'rgba(0,0,0,0.03)' } : {}}
+                      />
                     </div>
                   </div>
                 </div>
-              </PageCard>
+              </div>
             </div>
 
-            {/* Stats & Verification */}
-            <div className="space-y-4 md:space-y-6 min-w-0 w-full">
-              {/* Bank Account Connection */}
-              <PageCard title="Bank Account">
-                <div style={{ padding: '16px 16px' }}>
+            {/* Bank + Verification — 2 columns */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+              {/* Bank Account */}
+              <div style={{ background: 'white', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', marginBottom: 20, overflow: 'hidden' }}>
+                {/* Header */}
+                <div style={{ padding: '14px 18px 12px', borderBottom: '1px solid rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>BANK ACCOUNT</span>
+                </div>
+                {/* Body */}
+                <div style={{ padding: '16px 18px' }}>
                   <div className="space-y-4">
                     <p className="text-sm" style={{ color: '#787776' }}>
                       Securely connect your bank account using Plaid & Dwolla to enable bank transfers.
@@ -645,11 +648,16 @@ export default function Profile() {
                     </p>
                   </div>
                 </div>
-              </PageCard>
+              </div>
 
               {/* Verification Status */}
-              <PageCard title="Verification">
-                <div style={{ padding: '16px 16px' }}>
+              <div style={{ background: 'white', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', marginBottom: 20, overflow: 'hidden' }}>
+                {/* Header */}
+                <div style={{ padding: '14px 18px 12px', borderBottom: '1px solid rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>VERIFICATION</span>
+                </div>
+                {/* Body */}
+                <div style={{ padding: '16px 18px' }}>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Email Verified</span>
@@ -681,7 +689,7 @@ export default function Profile() {
                     </div>
                   </div>
                 </div>
-              </PageCard>
+              </div>
             </div>
           </div>
 
@@ -702,19 +710,6 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* COL 3 - right panel */}
-        <div className="mesh-right" style={{ background: '#FBFAF9' }}>
-          <div style={{ position: 'sticky', top: 0, padding: '28px 28px 0' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10, marginBottom: 28 }}>
-              <Link to={createPageUrl("Requests")} style={{ color: '#6B6A68', textDecoration: 'none' }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-              </Link>
-              <Link to={createPageUrl("Profile")} style={{ color: '#1A1918', textDecoration: 'none' }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              </Link>
-            </div>
-          </div>
-        </div>
 
       </div>
     </div>

@@ -15,11 +15,11 @@ const LEARN_CATEGORIES = [
 ];
 
 const CAT_COLORS = {
-  lending:     { bg: '#FBFDFF', badge: 'rgba(37,99,235,0.06)',   badgeText: '#1D4ED8', title: '#1E3A8A', border: 'rgba(37,99,235,0.07)' },
-  basics:      { bg: '#FAFEF9', badge: 'rgba(5,150,105,0.06)',   badgeText: '#065F46', title: '#064E3B', border: 'rgba(5,150,105,0.07)' },
-  saving:      { bg: '#FDFAFF', badge: 'rgba(124,58,237,0.06)',  badgeText: '#6D28D9', title: '#4C1D95', border: 'rgba(124,58,237,0.07)' },
-  traditional: { bg: '#FFFEFC', badge: 'rgba(217,119,6,0.06)',   badgeText: '#92400E', title: '#78350F', border: 'rgba(217,119,6,0.07)' },
-  debt:        { bg: '#FFFCFD', badge: 'rgba(225,29,72,0.06)',   badgeText: '#9F1239', title: '#881337', border: 'rgba(225,29,72,0.07)' },
+  lending:     { bg: '#FBFDFF', badge: 'rgba(37,99,235,0.06)',   badgeText: '#1D4ED8', title: '#1E3A8A', border: 'rgba(30,58,138,0.28)' },
+  basics:      { bg: '#FAFEF9', badge: 'rgba(5,150,105,0.06)',   badgeText: '#065F46', title: '#064E3B', border: 'rgba(6,78,59,0.28)' },
+  saving:      { bg: '#FDFAFF', badge: 'rgba(124,58,237,0.06)',  badgeText: '#6D28D9', title: '#4C1D95', border: 'rgba(76,29,149,0.28)' },
+  traditional: { bg: '#FFFEFC', badge: 'rgba(217,119,6,0.06)',   badgeText: '#92400E', title: '#78350F', border: 'rgba(120,53,15,0.28)' },
+  debt:        { bg: '#FFFCFD', badge: 'rgba(225,29,72,0.06)',   badgeText: '#9F1239', title: '#881337', border: 'rgba(136,19,55,0.28)' },
 };
 
 const LEARN_ARTICLES = {

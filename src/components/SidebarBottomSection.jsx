@@ -11,7 +11,7 @@ export default function SidebarBottomSection() {
         <button
           onClick={() => setSettingsOpen(true)}
           style={{
-            display: 'flex', alignItems: 'center', gap: 8, padding: '6px 8px',
+            display: 'flex', alignItems: 'center', gap: 8, padding: '7px 12px',
             borderRadius: 9, border: 'none', cursor: 'pointer', background: 'transparent',
             fontFamily: "'DM Sans', sans-serif", width: '100%', boxSizing: 'border-box',
             transition: 'background 0.15s',
