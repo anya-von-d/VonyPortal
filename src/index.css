@@ -331,6 +331,9 @@ input[type="date"] {
   /* YourLoans lending/borrowing tab: stack all cards */
   .loans-top-cards { grid-template-columns: 1fr !important; }
   .loans-bottom-row { grid-template-columns: 1fr !important; }
+  /* Friends page: stack with search on top */
+  .friends-two-col { grid-template-columns: 1fr !important; }
+  .friends-search-col { order: -1; }
 }
 
 /* Home + Dashboard pages responsive */

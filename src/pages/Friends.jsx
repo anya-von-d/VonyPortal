@@ -346,62 +346,70 @@ export default function Friends() {
         </div>
       </div>
 
-      {/* ── CENTER: Search for Friends + Friend Requests ── */}
+      {/* ── CENTER ── */}
       <div className="mesh-center" style={{ background: 'white', padding: '28px 48px 80px' }}>
 
         {/* Page title */}
-        <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, color: '#1A1918', marginBottom: 12, letterSpacing: '-0.02em' }}>People</div>
+        <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, color: '#1A1918', marginBottom: 12, letterSpacing: '-0.02em' }}>Friends</div>
         <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 20 }} />
 
-        {/* Your Friends */}
-        <div style={{ marginBottom: 32 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 9 }}>Your Friends</div>
-          <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 12 }} />
-          {isLoading ? (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '20px 0' }}>
-              <div style={{ width: 24, height: 24, border: '2px solid #03ACEA', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-            </div>
-          ) : sortedFriends.length === 0 ? (
-            <div style={{ fontSize: 12, color: '#9B9A98', padding: '12px 0' }}>No friends yet</div>
-          ) : sortedFriends.map((friendship) => {
-            const friendProfile = getFriendProfile(friendship);
-            if (!friendProfile) return null;
-            return (
-              <div key={friendship.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 0', borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
-                <UserAvatar name={friendProfile.full_name || friendProfile.username} src={friendProfile.profile_picture_url || friendProfile.avatar_url} size={28} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{friendProfile.full_name || friendProfile.username}</div>
-                  <div style={{ fontSize: 11, color: '#9B9A98' }}>@{friendProfile.username}</div>
-                </div>
-                <button onClick={() => handleToggleStar(friendship)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 3, color: friendship.is_starred ? '#F5A623' : '#C7C6C4', flexShrink: 0 }}>
-                  <Star size={14} fill={friendship.is_starred ? 'currentColor' : 'none'} />
-                </button>
-              </div>
-            );
-          })}
-        </div>
+        <div className="friends-two-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'start' }}>
 
-        {/* Search for Friends */}
-        <div style={{ marginBottom: 32 }}>
-          <div style={{ position: 'relative', marginBottom: searchQuery.trim() ? 14 : 0 }}>
-            <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#C7C6C4' }} />
-            <input type="text" placeholder="Search by name or username..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ width: '100%', padding: '10px 36px 10px 36px', borderRadius: 10, border: '1px solid rgba(0,0,0,0.06)', background: 'rgba(0,0,0,0.02)', fontSize: 13, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", outline: 'none', boxSizing: 'border-box' }}
-              onFocus={(e) => e.target.style.borderColor = 'rgba(3,172,234,0.3)'} onBlur={(e) => e.target.style.borderColor = 'rgba(0,0,0,0.06)'} />
-            {searchQuery && <button onClick={() => setSearchQuery('')} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#C7C6C4', padding: 2 }}><X size={14} /></button>}
+          {/* Left: Your Friends */}
+          <div className="friends-friends-col" style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 4, borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Your Friends</span>
+              {friends.length > 0 && <span style={{ fontSize: 11, color: '#9B9A98' }}>{friends.length}</span>}
+            </div>
+            {isLoading ? (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '20px 0' }}>
+                <div style={{ width: 24, height: 24, border: '2px solid #03ACEA', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+              </div>
+            ) : sortedFriends.length === 0 ? (
+              <div style={{ fontSize: 12, color: '#9B9A98', padding: '12px 0' }}>No friends yet</div>
+            ) : sortedFriends.map((friendship) => {
+              const friendProfile = getFriendProfile(friendship);
+              if (!friendProfile) return null;
+              return (
+                <div key={friendship.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 0', borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
+                  <UserAvatar name={friendProfile.full_name || friendProfile.username} src={friendProfile.profile_picture_url || friendProfile.avatar_url} size={28} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{friendProfile.full_name || friendProfile.username}</div>
+                    <div style={{ fontSize: 11, color: '#9B9A98' }}>@{friendProfile.username}</div>
+                  </div>
+                  <button onClick={() => handleToggleStar(friendship)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 3, color: friendship.is_starred ? '#F5A623' : '#C7C6C4', flexShrink: 0 }}>
+                    <Star size={14} fill={friendship.is_starred ? 'currentColor' : 'none'} />
+                  </button>
+                </div>
+              );
+            })}
           </div>
-          {searchQuery.trim() && (
-            <div>
-              {allSearchResults.length === 0 ? (
-                <div style={{ padding: '20px 0', color: '#9B9A98', fontSize: 13 }}>No users found</div>
+
+          {/* Right: Find Your Friends */}
+          <div className="friends-search-col" style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
+            <div style={{ paddingBottom: 10, marginBottom: 12, borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Find Your Friends</span>
+            </div>
+            {/* Search bar */}
+            <div style={{ position: 'relative', marginBottom: 14 }}>
+              <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#C7C6C4' }} />
+              <input type="text" placeholder="Search by name or username..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ width: '100%', padding: '10px 36px 10px 36px', borderRadius: 10, border: '1px solid rgba(0,0,0,0.06)', background: 'rgba(0,0,0,0.02)', fontSize: 13, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", outline: 'none', boxSizing: 'border-box' }}
+                onFocus={(e) => e.target.style.borderColor = 'rgba(3,172,234,0.3)'} onBlur={(e) => e.target.style.borderColor = 'rgba(0,0,0,0.06)'} />
+              {searchQuery && <button onClick={() => setSearchQuery('')} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#C7C6C4', padding: 2 }}><X size={14} /></button>}
+            </div>
+            {/* Search results */}
+            {searchQuery.trim() && (
+              allSearchResults.length === 0 ? (
+                <div style={{ padding: '8px 0', color: '#9B9A98', fontSize: 13 }}>No users found</div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   {allSearchResults.map((profile) => {
                     const receivedRequest = getReceivedRequestFrom(profile.user_id);
                     const sentRequest = getSentRequestTo(profile.user_id);
                     return (
-                      <div key={profile.user_id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-                        <UserAvatar name={profile.full_name || profile.username} src={profile.profile_picture_url || profile.avatar_url} size={36} />
+                      <div key={profile.user_id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+                        <UserAvatar name={profile.full_name || profile.username} src={profile.profile_picture_url || profile.avatar_url} size={32} />
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0 }}>{profile.full_name || profile.username}</p>
                           <p style={{ fontSize: 11, color: '#9B9A98', margin: '1px 0 0' }}>@{profile.username}</p>
@@ -423,38 +431,37 @@ export default function Friends() {
                     );
                   })}
                 </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Friend Requests (Received) */}
-        {receivedRequests.length > 0 && (
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 9 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Friend Requests</div>
-              <span style={{ fontSize: 11, color: '#9B9A98' }}>{receivedRequests.length} pending</span>
-            </div>
-            <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 14 }} />
-            {receivedRequests.map((request) => {
-              const profile = getProfileById(request.user_id);
-              if (!profile) return null;
-              return (
-                <div key={request.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-                  <UserAvatar name={profile.full_name || profile.username} src={profile.profile_picture_url || profile.avatar_url} size={36} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0 }}>{profile.full_name || profile.username}</p>
-                    <p style={{ fontSize: 11, color: '#9B9A98', margin: '1px 0 0' }}>@{profile.username}</p>
-                  </div>
-                  <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-                    <button onClick={() => handleAcceptRequestFromSearch(request.id)} disabled={processingId === request.id} style={{ padding: '6px 14px', borderRadius: 8, border: 'none', background: 'rgba(3,172,234,0.12)', fontSize: 11, fontWeight: 600, color: '#03ACEA', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", opacity: processingId === request.id ? 0.5 : 1 }}>Confirm</button>
-                    <button onClick={() => handleCancelRequest(request.id)} disabled={processingId === request.id} style={{ padding: '6px 14px', borderRadius: 8, border: 'none', background: 'rgba(232,114,110,0.08)', fontSize: 11, fontWeight: 600, color: '#E8726E', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", opacity: processingId === request.id ? 0.5 : 1 }}>Delete</button>
-                  </div>
+              )
+            )}
+            {/* Friend Requests (Received) */}
+            {receivedRequests.length > 0 && (
+              <div style={{ marginTop: searchQuery.trim() ? 20 : 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, paddingTop: searchQuery.trim() ? 10 : 0, borderTop: searchQuery.trim() ? '1px solid rgba(0,0,0,0.06)' : 'none' }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Friend Requests</span>
+                  <span style={{ fontSize: 11, color: '#9B9A98' }}>{receivedRequests.length} pending</span>
                 </div>
-              );
-            })}
+                {receivedRequests.map((request) => {
+                  const profile = getProfileById(request.user_id);
+                  if (!profile) return null;
+                  return (
+                    <div key={request.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+                      <UserAvatar name={profile.full_name || profile.username} src={profile.profile_picture_url || profile.avatar_url} size={32} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0 }}>{profile.full_name || profile.username}</p>
+                        <p style={{ fontSize: 11, color: '#9B9A98', margin: '1px 0 0' }}>@{profile.username}</p>
+                      </div>
+                      <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                        <button onClick={() => handleAcceptRequestFromSearch(request.id)} disabled={processingId === request.id} style={{ padding: '6px 14px', borderRadius: 8, border: 'none', background: 'rgba(3,172,234,0.12)', fontSize: 11, fontWeight: 600, color: '#03ACEA', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", opacity: processingId === request.id ? 0.5 : 1 }}>Confirm</button>
+                        <button onClick={() => handleCancelRequest(request.id)} disabled={processingId === request.id} style={{ padding: '6px 14px', borderRadius: 8, border: 'none', background: 'rgba(232,114,110,0.08)', fontSize: 11, fontWeight: 600, color: '#E8726E', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", opacity: processingId === request.id ? 0.5 : 1 }}>Delete</button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        )}
+
+        </div>
       </div>
 
 
