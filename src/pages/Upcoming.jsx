@@ -339,7 +339,7 @@ export default function Upcoming() {
                   {next7Days.length > 0 && <span style={{ fontSize: 11, color: '#9B9A98' }}>{next7Days.length} · {formatMoney(next7Days.reduce((s, e) => s + e.amount, 0))}</span>}
                 </div>
                 {next7Days.length === 0 ? (
-                  <div style={{ padding: '8px 0', fontSize: 13, color: '#9B9A98' }}>No payments in the next 7 days.</div>
+                  <div style={{ padding: '8px 0', fontSize: 13, color: '#9B9A98' }}>You're all caught up this week! 🎉</div>
                 ) : next7Days.map(event => <PaymentRow key={event.loanId + '-7'} event={event} />)}
               </div>
 
@@ -350,7 +350,7 @@ export default function Upcoming() {
                   {comingLater.length > 0 && <span style={{ fontSize: 11, color: '#9B9A98' }}>{comingLater.length} · {formatMoney(comingLater.reduce((s, e) => s + e.amount, 0))}</span>}
                 </div>
                 {comingLater.length === 0 ? (
-                  <div style={{ padding: '8px 0', fontSize: 13, color: '#9B9A98' }}>Nothing coming up after 7 days.</div>
+                  <div style={{ padding: '8px 0', fontSize: 13, color: '#9B9A98' }}>Clear skies ahead ✨</div>
                 ) : comingLater.map(event => <PaymentRow key={event.loanId + '-later'} event={event} />)}
               </div>
             </div>

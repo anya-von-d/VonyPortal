@@ -350,7 +350,7 @@ export default function Friends() {
                 <div style={{ width: 24, height: 24, border: '2px solid #03ACEA', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
               </div>
             ) : sortedFriends.length === 0 ? (
-              <div style={{ fontSize: 12, color: '#9B9A98', padding: '12px 0' }}>No friends yet</div>
+              <div style={{ fontSize: 12, color: '#9B9A98', padding: '12px 0' }}>No friends yet 👋 Invite some to get started!</div>
             ) : sortedFriends.map((friendship) => {
               const friendProfile = getFriendProfile(friendship);
               if (!friendProfile) return null;

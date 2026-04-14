@@ -85,7 +85,7 @@ export function UserSelector({ users = [], value, onSelect, placeholder = "Choos
           }}>
             {filteredUsers.length === 0 && !showAddFriends ? (
               <div style={{ padding: '14px 16px', textAlign: 'center', fontSize: 13, color: '#9B9A98' }}>
-                {searchTerm ? 'No friends found' : 'No friends yet. Add friends to send loan offers.'}
+                {searchTerm ? 'No friends found ✨' : 'No friends yet 👋 Add friends to send loan offers.'}
               </div>
             ) : (
               <div style={{ padding: '4px 0' }}>
@@ -134,7 +134,7 @@ export function UserSelector({ users = [], value, onSelect, placeholder = "Choos
             {filteredUsers.length === 0 && showAddFriends && (
               <div style={{ padding: '4px 0' }}>
                 <div style={{ padding: '10px 16px', textAlign: 'center', fontSize: 13, color: '#9B9A98' }}>
-                  {searchTerm ? 'No friends found' : 'No friends yet'}
+                  {searchTerm ? 'No friends found ✨' : 'No friends yet 👋'}
                 </div>
                 <div
                   onClick={handleAddFriends}

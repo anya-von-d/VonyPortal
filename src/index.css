@@ -356,6 +356,8 @@ input[type="date"] {
     scrollbar-width: none;
   }
   .rp-loan-list::-webkit-scrollbar { display: none; }
+  /* Create Loan: hide button icons on mobile to keep buttons side-by-side */
+  .btn-icon-hide-mobile { display: none !important; }
   /* Learn / Loan Help: hide desktop pill nav + grid, show mobile sections */
   .learn-desktop-view { display: none !important; }
   .learn-mobile-sections { display: block !important; }

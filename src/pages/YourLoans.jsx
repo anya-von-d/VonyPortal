@@ -607,7 +607,7 @@ export default function YourLoans() {
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: 15, fontWeight: 700, color: '#C5C3C0' }}>—</span>
-                  <span style={{ fontSize: 11, color: '#9B9A98' }}>{isLending ? 'None incoming' : 'Nothing due'}</span>
+                  <span style={{ fontSize: 11, color: '#9B9A98' }}>{isLending ? 'None incoming ✨' : 'Nothing due 🎉'}</span>
                 </div>
               )}
             </div>
@@ -657,7 +657,7 @@ export default function YourLoans() {
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: 15, fontWeight: 700, color: '#C5C3C0' }}>—</span>
-                  <span style={{ fontSize: 11, color: '#9B9A98' }}>No payments</span>
+                  <span style={{ fontSize: 11, color: '#9B9A98' }}>No payments yet ✨</span>
                 </div>
               )}
             </div>
@@ -705,7 +705,7 @@ export default function YourLoans() {
             <div className="loans-bottom-row" style={{ display: 'grid', gridTemplateColumns: activeLoans.length > 0 ? '1fr 1fr' : '1fr', gap: 20, marginBottom: 20, alignItems: 'start' }}>
               <PageCard title="Upcoming" headerRight={<Link to={createPageUrl("Upcoming")} style={{ fontSize: 11, fontWeight: 500, color: '#9B9A98', textDecoration: 'none' }}>Full schedule →</Link>} style={{ marginBottom: 0 }}>
                 {combinedLoans.length === 0 ? (
-                  <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98' }}>Nothing coming up.</div>
+                  <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98' }}>You're all clear! Nothing coming up yet 🎉</div>
                 ) : combinedLoans.map((loan) => {
                   const isOverdue = loan.days < 0;
                   const daysLbl = isOverdue ? `${Math.abs(loan.days)}d late` : loan.days === 0 ? 'today' : `${loan.days}d`;
@@ -824,7 +824,7 @@ export default function YourLoans() {
     if (allManageableLoans.length === 0) {
       return (
         <PageCard title="Loan Details" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 200 }}>
-          <div style={{ textAlign: 'center', padding: 26 }}><ClipboardList style={{ width: 40, height: 40, margin: '0 auto 8px', color: '#C7C6C4' }} /><p style={{ fontSize: 13, color: '#787776' }}>No loans to display</p></div>
+          <div style={{ textAlign: 'center', padding: 26 }}><ClipboardList style={{ width: 40, height: 40, margin: '0 auto 8px', color: '#C7C6C4' }} /><p style={{ fontSize: 13, color: '#787776' }}>No loans to display yet 🌱</p></div>
         </PageCard>
       );
     }
@@ -1259,7 +1259,7 @@ export default function YourLoans() {
                 const cfg = activityIconConfig[type] || activityIconConfig.created;
                 return { width: 24, height: 24, borderRadius: 6, background: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, position: 'relative', zIndex: 10, marginTop: 2, boxShadow: '0 0 0 3px white' };
               };
-              if (activities.length === 0) return <p style={{ fontSize: 11, color: '#C7C6C4' }}>No activity recorded yet.</p>;
+              if (activities.length === 0) return <p style={{ fontSize: 11, color: '#C7C6C4' }}>No activity recorded yet ✨</p>;
               return (
                 <div className="space-y-0 max-h-[200px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
                   {activities.map((activity, idx) => (

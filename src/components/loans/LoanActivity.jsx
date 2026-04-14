@@ -133,7 +133,7 @@ export default function LoanActivity({ agreement, loan, user }) {
     <div className="mt-8 pt-6 border-t border-slate-200/40">
       <h4 className="font-semibold text-slate-800 mb-4">Loan Activity</h4>
       {activities.length === 0 ? (
-        <p className="text-slate-500 text-sm">No activity recorded</p>
+        <p className="text-slate-500 text-sm">No activity recorded yet ✨</p>
       ) : (
         <div className="space-y-3">
           {activities.map((activity, index) => (

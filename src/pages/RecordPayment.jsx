@@ -522,7 +522,7 @@ export default function RecordPayment() {
                 {filteredLoans.length === 0 ? (
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '24px 0', color: '#C7C6C4' }}>
                     <FileText size={22} style={{ opacity: 0.3, marginBottom: 6 }} />
-                    <p style={{ fontSize: 12, color: '#787776', margin: 0 }}>No active loans found</p>
+                    <p style={{ fontSize: 12, color: '#787776', margin: 0 }}>No active loans yet 🌱</p>
                   </div>
                 ) : (
                   <div className="rp-loan-list" style={{ display: 'flex', flexDirection: 'column' }}>
