@@ -239,7 +239,7 @@ export default function ComingSoon() {
         <div className="learn-desktop-view">
           {/* Page title */}
           <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 16 }}>Learn</div>
-          <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 20 }} />
+          <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginLeft: -48, marginRight: -48, marginBottom: 20 }} />
 
           {/* Glassmorphic pill nav — centered */}
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 28 }}>
@@ -294,7 +294,7 @@ export default function ComingSoon() {
         {/* Mobile: all categories as titled sections with horizontal scroll */}
         <div className="learn-mobile-sections">
           <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 16 }}>Learn</div>
-          <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 20 }} />
+          <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginLeft: -48, marginRight: -48, marginBottom: 20 }} />
 
           {LEARN_CATEGORIES.map(cat => (
             <section key={cat.id} style={{ marginBottom: 28 }}>

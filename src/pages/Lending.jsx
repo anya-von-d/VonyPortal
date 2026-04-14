@@ -1589,7 +1589,7 @@ export default function Lending({ initialTab }) {
           {/* COL 2 - main content */}
           <div className="mesh-center" style={{ background: 'white', padding: '24px 48px 80px' }}>
             <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Create Loan</div>
-            <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 20 }} />
+            <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginLeft: -48, marginRight: -48, marginBottom: 20 }} />
 
           {/* ── No Friends Banner at the very top ── */}
           {activeSection === 'create' && !isLoadingUsers && friends.length === 0 && (

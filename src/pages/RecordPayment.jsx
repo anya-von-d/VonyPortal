@@ -499,7 +499,7 @@ export default function RecordPayment() {
 
           {/* Page title */}
           <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Record Payment</div>
-          <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 20 }} />
+          <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginLeft: -48, marginRight: -48, marginBottom: 20 }} />
 
           {/* ── No loans onboarding banner ── */}
           {!isLoading && loans.length === 0 && (

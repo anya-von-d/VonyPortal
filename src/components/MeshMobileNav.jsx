@@ -69,7 +69,7 @@ export default function MeshMobileNav({ user, activePage }) {
         <div style={{
           position: 'fixed', top: 0, right: 0, zIndex: 100,
           display: 'flex', alignItems: 'center', gap: 2,
-          padding: '13px 20px',
+          padding: '13px 48px 13px 0',
         }}>
           <Link to={createPageUrl("Requests")} style={{
             position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center',

@@ -198,7 +198,7 @@ export default function LoanHelp() {
         <div className="learn-desktop-view">
           {/* Page title */}
           <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Loan Help</div>
-          <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 20 }} />
+          <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginLeft: -48, marginRight: -48, marginBottom: 20 }} />
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
             <div style={{
               display: 'inline-flex',

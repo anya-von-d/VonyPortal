@@ -884,7 +884,7 @@ export default function Home() {
             <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.2, color: '#1A1918' }}>
               {greeting}, {firstName}
             </div>
-            <div className="home-greeting-icons" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div className="home-greeting-icons" style={{ display: bigScreen ? 'none' : 'flex', alignItems: 'center', gap: 10 }}>
               <Link to={createPageUrl("Requests")} style={{ position: 'relative', textDecoration: 'none' }}>
                 <div style={{ width: 32, height: 32, borderRadius: 9, background: 'rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#787776" strokeWidth="2" strokeLinecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -896,7 +896,7 @@ export default function Home() {
               </Link>
             </div>
           </div>
-          <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 20 }} />
+          <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginLeft: -48, marginRight: -48, marginBottom: 20 }} />
 
           {/* New user onboarding — below greeting */}
           {!hasLoans && (
