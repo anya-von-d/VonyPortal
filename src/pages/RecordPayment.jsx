@@ -504,28 +504,26 @@ export default function RecordPayment() {
           {/* ── No loans onboarding banner ── */}
           {!isLoading && loans.length === 0 && (
             <div style={{
-              marginBottom: 28, padding: '20px 22px', borderRadius: 14,
+              marginBottom: 28, padding: '16px 22px', borderRadius: 14,
               background: 'white', border: '1px solid rgba(0,0,0,0.07)',
-              boxShadow: '0 1px 4px rgba(0,0,0,0.04)', textAlign: 'center',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap',
             }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 4, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-                💸 Nothing to record just yet!
+              <div style={{ fontSize: 13, color: '#787776', fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                Create a loan first, then come back here to record payments.
               </div>
-              <div style={{ fontSize: 13, color: '#787776', lineHeight: 1.55, marginBottom: 16 }}>
-                Add some friends and create a loan first, then you can come back here to record payments.
-              </div>
-              <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
-                <Link
-                  to={createPageUrl('Friends')}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10, background: '#03ACEA', color: 'white', textDecoration: 'none', fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif" }}
-                >
-                  Find Friends
-                </Link>
+              <div style={{ display: 'flex', gap: 10, flexShrink: 0, flexWrap: 'wrap' }}>
                 <Link
                   to={createPageUrl('CreateOffer')}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10, background: 'white', color: '#1A1918', textDecoration: 'none', fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif", border: '1px solid rgba(0,0,0,0.10)' }}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10, background: '#03ACEA', color: 'white', textDecoration: 'none', fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif" }}
                 >
                   Create a Loan
+                </Link>
+                <Link
+                  to={createPageUrl('Friends')}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10, background: 'white', color: '#1A1918', textDecoration: 'none', fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif", border: '1px solid rgba(0,0,0,0.10)' }}
+                >
+                  Add Friends
                 </Link>
               </div>
             </div>

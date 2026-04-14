@@ -823,8 +823,8 @@ export default function YourLoans() {
   const renderDetailsTab = () => {
     if (allManageableLoans.length === 0) {
       return (
-        <PageCard title="Loan Details" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 200 }}>
-          <div style={{ textAlign: 'center', padding: 26 }}><ClipboardList style={{ width: 40, height: 40, margin: '0 auto 8px', color: '#C7C6C4' }} /><p style={{ fontSize: 13, color: '#787776' }}>No loans to display yet 🌱</p></div>
+        <PageCard title="Loan Details">
+          <div style={{ textAlign: 'center', padding: '24px 0', fontSize: 13, color: '#787776' }}>No loans to display yet 🌱</div>
         </PageCard>
       );
     }
