@@ -989,7 +989,7 @@ export default function Home() {
               <div style={{ fontSize: 13, color: '#787776', lineHeight: 1.55, marginBottom: 16 }}>
                 Lending money to friends has never been this easy. Start by adding a friend, then create your first loan together.
               </div>
-              <div style={{ display: 'flex', gap: 10 }}>
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
                 <Link
                   to={createPageUrl('Friends')}
                   style={{
@@ -1013,6 +1013,20 @@ export default function Home() {
                 >
                   Create a Loan
                 </Link>
+                <a
+                  href="https://www.vony-lending.com/help"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    padding: '8px 14px', borderRadius: 10,
+                    background: 'white', color: '#787776', textDecoration: 'none',
+                    fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif",
+                    border: '1px solid rgba(0,0,0,0.10)',
+                  }}
+                >
+                  How it Works
+                </a>
               </div>
             </div>
           )}
