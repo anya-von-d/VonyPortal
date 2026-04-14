@@ -324,7 +324,7 @@ input[type="date"] {
   /* Show mobile-only panels inside Col 2 */
   .rp-mobile-loan-selector { display: block !important; }
   .rp-empty-desktop { display: none !important; }
-  .lending-mobile-sidebar { display: block !important; }
+  .lending-summary-cards { grid-template-columns: 1fr !important; }
   .ra-mobile-filters { display: block !important; }
 }
 
