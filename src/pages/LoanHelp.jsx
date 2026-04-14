@@ -207,7 +207,7 @@ export default function LoanHelp() {
       <div className="mesh-center" style={{ background: 'white', borderRight: '1px solid rgba(0,0,0,0.06)', padding: '28px 48px 80px' }}>
 
         {/* Tab header */}
-        <div style={{ display: 'flex', gap: 24, alignItems: 'flex-end', marginLeft: -48, marginRight: -48, paddingLeft: 48, paddingRight: 48 }}>
+        <div className="tab-nav-scroll" style={{ display: 'flex', gap: 24, alignItems: 'flex-end', marginLeft: -48, marginRight: -48, paddingLeft: 48, paddingRight: 48 }}>
           {CATEGORIES.map(cat => (
             <button key={cat.id} onClick={() => setCategory(cat.id)} style={{
               position: 'relative', paddingBottom: 12,
@@ -227,7 +227,7 @@ export default function LoanHelp() {
         <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginLeft: -48, marginRight: -48, marginBottom: 20 }} />
 
         {/* Loan cards grid — 2 columns */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div className="page-cards-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           {loans.map((loan, index) => {
             const isRecommended = index === 0;
             const compareKey = `${category}-${loan.name}`;

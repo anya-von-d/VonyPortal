@@ -334,6 +334,18 @@ input[type="date"] {
   /* Friends page: stack with search on top */
   .friends-two-col { grid-template-columns: 1fr !important; }
   .friends-search-col { order: -1; }
+  /* Learn / Loan Help: single-column cards, scrollable tab nav */
+  .page-cards-grid { grid-template-columns: 1fr !important; }
+  .tab-nav-scroll {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .tab-nav-scroll::-webkit-scrollbar { display: none; }
 }
 
 /* Home + Dashboard pages responsive */

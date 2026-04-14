@@ -204,7 +204,7 @@ export default function ComingSoon() {
       <div className="mesh-center" style={{ background: 'white', borderRight: '1px solid rgba(0,0,0,0.06)', padding: '28px 48px 80px' }}>
 
         {/* Tab header */}
-        <div style={{ display: 'flex', gap: 24, alignItems: 'flex-end', marginLeft: -48, marginRight: -48, paddingLeft: 48, paddingRight: 48 }}>
+        <div className="tab-nav-scroll" style={{ display: 'flex', gap: 24, alignItems: 'flex-end', marginLeft: -48, marginRight: -48, paddingLeft: 48, paddingRight: 48 }}>
           {LEARN_CATEGORIES.map(cat => (
             <button key={cat.id} onClick={() => setLearnCategory(cat.id)} style={{
               position: 'relative', paddingBottom: 12,
@@ -224,7 +224,7 @@ export default function ComingSoon() {
         <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginLeft: -48, marginRight: -48, marginBottom: 20 }} />
 
         {/* Articles grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+        <div className="page-cards-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
           {(LEARN_ARTICLES[learnCategory] || []).map((article, index) => (
             <motion.div key={article.title} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} style={{ background: 'white', borderRadius: 18, padding: '24px 22px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', cursor: 'default', border: '1px solid rgba(0,0,0,0.05)' }}>
               <div style={{ display: 'inline-block', fontSize: 10, fontWeight: 600, color: '#9B9A98', textTransform: 'uppercase', letterSpacing: '0.1em', background: 'rgba(0,0,0,0.05)', borderRadius: 6, padding: '3px 8px', marginBottom: 14 }}>Coming Soon</div>
