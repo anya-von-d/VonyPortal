@@ -267,10 +267,9 @@ input[type="date"] {
   position: fixed;
   /* solid strip is 3px wide at right edge (x=197..200), gradient extends 6px left (x=191..197) */
   left: 191px;
-  bottom: 0;
+  top: 0;
   width: 9px;
-  /* stops just below the Log Out button: leave ~480px at top */
-  height: calc(100vh - 480px);
+  height: 100vh;
   /* left 67% = gradient fade, right 33% = solid #03ACEA */
   background: linear-gradient(to right, rgba(250,250,250,0) 0%, #03ACEA 67%, #03ACEA 100%);
   pointer-events: none;

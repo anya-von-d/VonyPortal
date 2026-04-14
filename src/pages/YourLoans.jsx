@@ -1495,7 +1495,6 @@ export default function YourLoans() {
               </button>
             ))}
           </div>
-          <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginLeft: -48, marginRight: -48, marginBottom: 20 }} />
 
           {/* Overdue reminder carousel */}
           {activeTab !== 'details' && (() => {

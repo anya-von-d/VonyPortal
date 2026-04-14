@@ -348,7 +348,6 @@ export default function Friends() {
 
         {/* Page title */}
         <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, color: '#1A1918', marginBottom: 12, letterSpacing: '-0.02em' }}>Friends</div>
-        <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginLeft: -48, marginRight: -48, marginBottom: 20 }} />
 
         {/* Invite box — always visible at the top */}
         {!isLoading && (

@@ -1171,7 +1171,6 @@ export default function LoanAgreements() {
 
           {/* Page title */}
           <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em', color: '#1A1918', marginBottom: 12 }}>Documents</div>
-          <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginLeft: -48, marginRight: -48, marginBottom: 20 }} />
 
           {/* Filters */}
           <div style={{ marginBottom: 16 }}>

@@ -314,7 +314,6 @@ export default function Upcoming() {
           <div style={{ marginLeft: -48, marginRight: -48, paddingLeft: 48, paddingRight: 48, paddingBottom: 12 }}>
             <span style={{ fontSize: 14, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif", letterSpacing: '-0.02em', color: '#1A1918' }}>Upcoming</span>
           </div>
-          <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginLeft: -48, marginRight: -48, marginBottom: 24 }} />
 
           {/* Two-column: section boxes left, calendar right */}
           <div className="upcoming-two-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'start' }}>
