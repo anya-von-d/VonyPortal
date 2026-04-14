@@ -408,7 +408,6 @@ export default function Profile() {
 
         {/* COL 2 - main content */}
         <div className="mesh-center" style={{ background: '#FBFAF9', borderRight: '1px solid rgba(0,0,0,0.06)', padding: '24px 48px 80px' }}>
-          <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, color: '#1A1918', marginBottom: 32, letterSpacing: '-0.02em' }}>Profile</div>
 
           {/* Error Alert */}
           {error && (
@@ -422,19 +421,18 @@ export default function Profile() {
             </motion.div>
           )}
 
-          {/* Profile Hero — photo, name, member-since, edit button */}
+          {/* Profile Hero — photo, name, member-since */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, marginBottom: 32 }}>
-            {/* Photo + hover overlay */}
+            {/* Photo + camera badge */}
             <div style={{ position: 'relative', display: 'inline-block' }}>
-              <UserAvatar name={user.full_name || user.username} src={formData.profile_picture_url} size={88} style={{ border: '3px solid rgba(0,0,0,0.06)', boxShadow: '0 4px 16px rgba(0,0,0,0.12)', display: 'block' }} />
+              <UserAvatar name={user.full_name || user.username} src={formData.profile_picture_url} size={100} style={{ border: '3px solid white', boxShadow: '0 4px 20px rgba(0,0,0,0.14)', display: 'block' }} />
+              {/* Always-visible camera badge */}
               <button
                 onClick={() => setShowPhotoMenu(!showPhotoMenu)}
                 disabled={isSaving}
-                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.45)', borderRadius: '50%', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', cursor: 'pointer', opacity: 0, transition: 'opacity 0.2s' }}
-                onMouseEnter={e => e.currentTarget.style.opacity = '1'}
-                onMouseLeave={e => e.currentTarget.style.opacity = '0'}
+                style={{ position: 'absolute', bottom: 2, right: 2, width: 28, height: 28, borderRadius: '50%', background: 'white', border: '1.5px solid rgba(0,0,0,0.10)', boxShadow: '0 2px 8px rgba(0,0,0,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
               >
-                <Camera size={22} />
+                <Camera size={13} style={{ color: '#1A1918' }} />
               </button>
               <input type="file" ref={fileInputRef} onChange={handleProfilePictureChange} style={{ display: 'none' }} accept="image/*" />
               <input type="file" ref={cameraInputRef} onChange={handleProfilePictureChange} style={{ display: 'none' }} accept="image/*" capture="environment" />
@@ -470,21 +468,13 @@ export default function Profile() {
               )}
             </div>
 
-            <h2 style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 24, fontWeight: 600, color: '#1A1918', margin: 0, lineHeight: 1, letterSpacing: '-0.02em' }}>
+            <h2 style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 22, fontWeight: 700, color: '#1A1918', margin: 0, lineHeight: 1, letterSpacing: '-0.02em' }}>
               {formData.full_name || user.full_name}
             </h2>
 
-            <p style={{ fontSize: 13, color: '#787776', margin: 0, fontFamily: "'DM Sans', sans-serif" }}>
+            <p style={{ fontSize: 13, color: '#9B9A98', margin: 0, fontFamily: "'DM Sans', sans-serif" }}>
               Member since {user.created_at ? new Date(user.created_at).getFullYear() : new Date().getFullYear()}
             </p>
-
-            <button
-              onClick={() => setShowPhotoMenu(!showPhotoMenu)}
-              disabled={isSaving}
-              style={{ background: 'rgba(0,0,0,0.05)', color: '#1A1918', border: '1px solid rgba(0,0,0,0.1)', borderRadius: 10, padding: '8px 20px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}
-            >
-              Edit Profile Photo
-            </button>
           </div>
 
           {/* Page Content */}

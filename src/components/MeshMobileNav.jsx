@@ -65,7 +65,7 @@ export default function MeshMobileNav({ user, activePage }) {
   return (
     <>
       {/* ── Desktop: top-right notification + profile icons ── */}
-      {!isMobile && (
+      {!isMobile && activePage !== 'Profile' && (
         <div style={{
           position: 'fixed', top: 0, right: 0, zIndex: 100,
           display: 'flex', alignItems: 'center', gap: 2,
