@@ -379,7 +379,7 @@ export default function Home() {
           </motion.div>
 
           {/* Notes app — bottom-left */}
-          <motion.div {...floatAnim(0.5, -2)} style={{ position: 'absolute', bottom: '2%', left: bigScreen ? '9%' : '-1%', filter: floatShadow }}>
+          <motion.div {...floatAnim(0.5, -2)} style={{ position: 'absolute', bottom: '2%', left: bigScreen ? '17%' : '-1%', filter: floatShadow }}>
             <svg width="190" height="150" viewBox="0 0 190 150" fill="none"><rect width="190" height="150" rx="12" fill="#fff"/><rect width="190" height="30" fill="#F5F5F5" rx="12"/><rect y="14" width="190" height="16" fill="#F5F5F5"/><circle cx="14" cy="14" r="5" fill="#FFCC02"/><text x="95" y="20" textAnchor="middle" fontFamily="'DM Sans', sans-serif" fontSize="10" fontWeight="600" fill="#1C1C1E">Notes</text><text x="16" y="50" fontFamily="'DM Sans', sans-serif" fontSize="14" fontWeight="700" fill="#1C1C1E">Need to repay:</text><circle cx="26" cy="72" r="4" fill="none" stroke="#FFCC02" strokeWidth="1.5"/><text x="38" y="76" fontFamily="'DM Sans', sans-serif" fontSize="12" fill="#444">Em (tickets)</text><circle cx="26" cy="96" r="4" fill="none" stroke="#FFCC02" strokeWidth="1.5"/><text x="38" y="100" fontFamily="'DM Sans', sans-serif" fontSize="12" fill="#444">Priyanka (rent)</text><circle cx="26" cy="120" r="4" fill="none" stroke="#FFCC02" strokeWidth="1.5"/><text x="38" y="124" fontFamily="'DM Sans', sans-serif" fontSize="12" fill="#444">Alex (dinner)</text></svg>
           </motion.div>
 
@@ -404,12 +404,12 @@ export default function Home() {
           </motion.div>
 
           {/* Post-it blue — bottom-right */}
-          <motion.div {...floatAnim(0.58, -3)} style={{ position: 'absolute', bottom: '4%', right: bigScreen ? '10%' : '1%', filter: floatShadow }}>
+          <motion.div {...floatAnim(0.58, -3)} style={{ position: 'absolute', bottom: '4%', right: bigScreen ? '19%' : '1%', filter: floatShadow }}>
             <svg width="180" height="88" viewBox="0 0 180 88" fill="none"><rect width="180" height="88" fill="#AECFF5" rx="3"/><path d="M140 88L180 48V88Z" fill="#7DB3EE"/><text x="16" y="34" fontFamily="Georgia, serif" fontSize="13" fontStyle="italic" fill="#1A3A5C">Remind Rohan about</text><text x="16" y="55" fontFamily="Georgia, serif" fontSize="13" fontStyle="italic" fill="#1A3A5C">the $40 he still owes</text></svg>
           </motion.div>
 
-          {/* WhatsApp (Henry) — bottom-right corner */}
-          <motion.div {...floatAnim(0.3, 2)} style={{ position: 'absolute', bottom: '-1%', right: bigScreen ? '2%' : '-1%', filter: floatShadow }}>
+          {/* WhatsApp (Henry) — behind card top-right on large screens */}
+          <motion.div {...floatAnim(0.3, bigScreen ? -20 : 2)} style={{ position: 'absolute', ...(bigScreen ? { top: '33%', right: '30%' } : { bottom: '-1%', right: '-1%' }), filter: floatShadow }}>
             <svg width="250" height="190" viewBox="0 0 250 190" fill="none"><rect width="250" height="190" rx="16" fill="#ECE5DD"/><rect width="250" height="34" fill="#075E54" rx="16"/><rect y="16" width="250" height="18" fill="#075E54"/><text x="14" y="22" fontFamily="'DM Sans', sans-serif" fontSize="12" fontWeight="600" fill="#fff">Henry</text><rect x="12" y="44" width="180" height="24" rx="8" fill="#fff"/><text x="20" y="60" fontFamily="'DM Sans', sans-serif" fontSize="10" fill="#333">How much do I owe you again?</text><rect x="80" y="74" width="158" height="24" rx="8" fill="#DCF8C6"/><text x="90" y="90" fontFamily="'DM Sans', sans-serif" fontSize="10" fill="#333">I think $200</text><rect x="12" y="104" width="178" height="24" rx="8" fill="#fff"/><text x="20" y="120" fontFamily="'DM Sans', sans-serif" fontSize="10" fill="#333">Wait, I thought it was $180</text><rect x="50" y="134" width="188" height="40" rx="8" fill="#DCF8C6"/><text x="60" y="150" fontFamily="'DM Sans', sans-serif" fontSize="10" fill="#333">You're right, my bad forgot you</text><text x="60" y="164" fontFamily="'DM Sans', sans-serif" fontSize="10" fill="#333">gave me that $20</text></svg>
           </motion.div>
 
@@ -426,7 +426,7 @@ export default function Home() {
             </h1>
             <p style={{ fontSize: 14, color: '#787776', marginBottom: 28, fontFamily: "'DM Sans', sans-serif" }}>
               Lending with friends{' '}
-              <span style={{ background: 'linear-gradient(transparent 55%, rgba(3,172,234,0.28) 55%)', paddingBottom: 1 }}>made simple</span>.
+              <span style={{ background: 'linear-gradient(transparent 70%, rgba(3,172,234,0.28) 70%)' }}>made simple</span>.
             </p>
             <button onClick={handleLogin} disabled={isAuthenticating} style={{
               width: '100%', padding: '11px 20px', fontSize: 15, fontWeight: 500,
