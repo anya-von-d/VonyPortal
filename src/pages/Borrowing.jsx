@@ -1007,7 +1007,7 @@ export default function Borrowing() {
                           <span style={{ fontSize: 19, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{format(nextPaymentLoan.date, 'MMM d')}</span>
                           {daysLabel && <span style={{ fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '2px 6px', flexShrink: 0 }}>{daysLabel}</span>}
                         </div>
-                        <div style={{ fontSize: 11, color: '#9B9A98', textAlign: 'right' }}>{formatMoney(nextPaymentLoan.payment_amount || 0)} to {firstName}</div>
+                        <div style={{ fontSize: 11, color: '#9B9A98', textAlign: 'right' }}>{format(nextPaymentLoan.date, 'do MMMM')}</div>
                       </>
                     ) : (
                       <>
@@ -1076,7 +1076,7 @@ export default function Borrowing() {
                 <PageCard title="Active Loans">
                   <div style={{ padding: '14px 0 4px' }}>
                     {activeLoans.length === 0 ? (
-                      <p style={{ fontSize: 13, color: '#787776', margin: 0 }}>No active loans yet 🌱</p>
+                      <p style={{ fontSize: 13, color: '#787776', margin: 0 }}>No active loans yet</p>
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                         {activeLoans.slice(0, 5).map(loan => {
@@ -1109,7 +1109,7 @@ export default function Borrowing() {
                       })
                       .sort((a, b) => a.days - b.days)
                       .slice(0, 5);
-                    if (rows.length === 0) return <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98', textAlign: 'center' }}>You're all clear! Nothing coming up yet 🎉</div>;
+                    if (rows.length === 0) return <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98', textAlign: 'center' }}>You're all clear! Nothing coming up yet</div>;
                     return rows.map((loan, idx) => {
                       const isOverdue = loan.days < 0;
                       const daysLabel = isOverdue ? `${Math.abs(loan.days)}d late` : loan.days === 0 ? 'today' : `${loan.days}d`;
@@ -1162,7 +1162,7 @@ export default function Borrowing() {
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 0', color: '#787776' }}>
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ opacity: 0.4, marginBottom: 6 }}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                        <p style={{ fontSize: 12, textAlign: 'center' }}>No upcoming payments ✨</p>
+                        <p style={{ fontSize: 12, textAlign: 'center' }}>No upcoming payments</p>
                       </div>
                     )}
                   </div>
@@ -1805,7 +1805,7 @@ export default function Borrowing() {
 
                                       if (activities.length === 0) {
                                         return (
-                                          <p style={{ fontSize: 11, color: '#C7C6C4', fontFamily: "'DM Sans', system-ui, sans-serif", textAlign: 'center' }}>No activity recorded yet ✨</p>
+                                          <p style={{ fontSize: 11, color: '#C7C6C4', fontFamily: "'DM Sans', system-ui, sans-serif", textAlign: 'center' }}>No activity recorded yet</p>
                                         );
                                       }
 

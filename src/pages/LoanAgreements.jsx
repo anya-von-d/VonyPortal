@@ -811,50 +811,52 @@ export default function LoanAgreements() {
     const paidPayments = loan?.amount_paid ? Math.floor(loan.amount_paid / agreement.payment_amount) : 0;
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
-          <div style={{ background: '#fafafa', borderRadius: 16, padding: 12, textAlign: 'center' }}>
-            <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>Principal</p>
-            <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1918', margin: '4px 0 0' }}>{formatMoney(agreement.amount)}</p>
+          <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 12, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', padding: '10px 14px', textAlign: 'center' }}>
+            <p style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Principal</p>
+            <p style={{ fontSize: 18, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', margin: '4px 0 0' }}>{formatMoney(agreement.amount)}</p>
           </div>
-          <div style={{ background: '#fafafa', borderRadius: 16, padding: 12, textAlign: 'center' }}>
-            <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>Interest</p>
-            <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1918', margin: '4px 0 0' }}>{formatMoney((agreement.total_amount || 0) - (agreement.amount || 0))}</p>
+          <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 12, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', padding: '10px 14px', textAlign: 'center' }}>
+            <p style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Interest</p>
+            <p style={{ fontSize: 18, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', margin: '4px 0 0' }}>{formatMoney((agreement.total_amount || 0) - (agreement.amount || 0))}</p>
           </div>
-          <div style={{ background: '#fafafa', borderRadius: 16, padding: 12, textAlign: 'center' }}>
-            <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>Total</p>
-            <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1918', margin: '4px 0 0' }}>{formatMoney(agreement.total_amount)}</p>
+          <div style={{ background: 'rgba(3,172,234,0.07)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 12, border: '1px solid rgba(3,172,234,0.18)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', padding: '10px 14px', textAlign: 'center' }}>
+            <p style={{ fontSize: 10, fontWeight: 700, color: '#03ACEA', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Total</p>
+            <p style={{ fontSize: 18, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', margin: '4px 0 0' }}>{formatMoney(agreement.total_amount)}</p>
           </div>
         </div>
 
-        <div style={{ maxHeight: 300, overflowX: 'auto', overflowY: 'auto', borderRadius: 12, border: '1px solid rgba(0,0,0,0.06)' }}>
+        <div style={{ maxHeight: 320, overflowX: 'auto', overflowY: 'auto', borderRadius: 12, background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
           <table style={{ width: '100%', fontSize: 11, minWidth: 700, borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ background: '#fafafa' }}>
-                <th style={{ padding: '8px', textAlign: 'left', fontWeight: 500, color: '#787776' }}>Payment</th>
-                <th style={{ padding: '8px', textAlign: 'left', fontWeight: 500, color: '#787776' }}>Payment Date</th>
-                <th style={{ padding: '8px', textAlign: 'right', fontWeight: 500, color: '#787776' }}>Starting Balance</th>
-                <th style={{ padding: '8px', textAlign: 'right', fontWeight: 500, color: '#787776' }}>Principal Payment</th>
-                <th style={{ padding: '8px', textAlign: 'right', fontWeight: 500, color: '#787776' }}>Interest Payment</th>
-                <th style={{ padding: '8px', textAlign: 'right', fontWeight: 500, color: '#787776' }}>Principal to Date</th>
-                <th style={{ padding: '8px', textAlign: 'right', fontWeight: 500, color: '#787776' }}>Interest to Date</th>
-                <th style={{ padding: '8px', textAlign: 'right', fontWeight: 500, color: '#787776' }}>Ending Balance</th>
+              <tr>
+                <th style={{ padding: '9px 10px', textAlign: 'left', fontWeight: 700, fontSize: 10, color: '#9B9A98', letterSpacing: '0.06em', textTransform: 'uppercase', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>Payment</th>
+                <th style={{ padding: '9px 10px', textAlign: 'left', fontWeight: 700, fontSize: 10, color: '#9B9A98', letterSpacing: '0.06em', textTransform: 'uppercase', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>Date</th>
+                <th style={{ padding: '9px 10px', textAlign: 'right', fontWeight: 700, fontSize: 10, color: '#9B9A98', letterSpacing: '0.06em', textTransform: 'uppercase', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>Start Bal.</th>
+                <th style={{ padding: '9px 10px', textAlign: 'right', fontWeight: 700, fontSize: 10, color: '#9B9A98', letterSpacing: '0.06em', textTransform: 'uppercase', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>Principal</th>
+                <th style={{ padding: '9px 10px', textAlign: 'right', fontWeight: 700, fontSize: 10, color: '#9B9A98', letterSpacing: '0.06em', textTransform: 'uppercase', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>Interest</th>
+                <th style={{ padding: '9px 10px', textAlign: 'right', fontWeight: 700, fontSize: 10, color: '#9B9A98', letterSpacing: '0.06em', textTransform: 'uppercase', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>Prin. TD</th>
+                <th style={{ padding: '9px 10px', textAlign: 'right', fontWeight: 700, fontSize: 10, color: '#9B9A98', letterSpacing: '0.06em', textTransform: 'uppercase', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>Int. TD</th>
+                <th style={{ padding: '9px 10px', textAlign: 'right', fontWeight: 700, fontSize: 10, color: '#9B9A98', letterSpacing: '0.06em', textTransform: 'uppercase', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>End Bal.</th>
               </tr>
             </thead>
             <tbody>
               {schedule.map((row, index) => (
-                <tr key={row.number} style={{ background: index < paidPayments ? 'rgba(3,172,234,0.06)' : 'transparent', borderTop: '1px solid rgba(0,0,0,0.04)' }}>
-                  <td style={{ padding: '6px 8px', color: '#787776' }}>
-                    {index < paidPayments && <CheckCircle size={12} style={{ color: '#03ACEA', marginRight: 4, verticalAlign: 'middle' }} />}
-                    {row.number}
+                <tr key={row.number} style={{ background: index < paidPayments ? 'rgba(3,172,234,0.05)' : index % 2 === 0 ? 'transparent' : 'rgba(0,0,0,0.01)' }}>
+                  <td style={{ padding: '7px 10px', color: '#787776', borderBottom: '1px solid rgba(0,0,0,0.035)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      {index < paidPayments && <CheckCircle size={11} style={{ color: '#03ACEA', flexShrink: 0 }} />}
+                      <span style={{ fontWeight: index < paidPayments ? 600 : 400 }}>{row.number}</span>
+                    </div>
                   </td>
-                  <td style={{ padding: '6px 8px', color: '#1A1918' }}>{format(row.date, 'MMM d, yyyy')}</td>
-                  <td style={{ padding: '6px 8px', textAlign: 'right', color: '#787776' }}>{formatMoney(row.startingBalance)}</td>
-                  <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 500, color: '#1A1918' }}>{formatMoney(row.principal)}</td>
-                  <td style={{ padding: '6px 8px', textAlign: 'right', color: '#787776' }}>{formatMoney(row.interest)}</td>
-                  <td style={{ padding: '6px 8px', textAlign: 'right', color: '#787776' }}>{formatMoney(row.principalToDate)}</td>
-                  <td style={{ padding: '6px 8px', textAlign: 'right', color: '#787776' }}>{formatMoney(row.interestToDate)}</td>
-                  <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 500, color: '#1A1918' }}>{formatMoney(row.endingBalance)}</td>
+                  <td style={{ padding: '7px 10px', color: '#1A1918', borderBottom: '1px solid rgba(0,0,0,0.035)' }}>{format(row.date, 'MMM d, yyyy')}</td>
+                  <td style={{ padding: '7px 10px', textAlign: 'right', color: '#9B9A98', borderBottom: '1px solid rgba(0,0,0,0.035)' }}>{formatMoney(row.startingBalance)}</td>
+                  <td style={{ padding: '7px 10px', textAlign: 'right', fontWeight: 600, color: '#1A1918', borderBottom: '1px solid rgba(0,0,0,0.035)' }}>{formatMoney(row.principal)}</td>
+                  <td style={{ padding: '7px 10px', textAlign: 'right', color: '#787776', borderBottom: '1px solid rgba(0,0,0,0.035)' }}>{formatMoney(row.interest)}</td>
+                  <td style={{ padding: '7px 10px', textAlign: 'right', color: '#9B9A98', borderBottom: '1px solid rgba(0,0,0,0.035)' }}>{formatMoney(row.principalToDate)}</td>
+                  <td style={{ padding: '7px 10px', textAlign: 'right', color: '#9B9A98', borderBottom: '1px solid rgba(0,0,0,0.035)' }}>{formatMoney(row.interestToDate)}</td>
+                  <td style={{ padding: '7px 10px', textAlign: 'right', fontWeight: 600, color: index < paidPayments ? '#03ACEA' : '#1A1918', borderBottom: '1px solid rgba(0,0,0,0.035)' }}>{formatMoney(row.endingBalance)}</td>
                 </tr>
               ))}
             </tbody>

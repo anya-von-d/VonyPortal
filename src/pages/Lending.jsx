@@ -1583,34 +1583,35 @@ export default function Lending({ initialTab }) {
           {/* ── No Friends Banner at the very top ── */}
           {activeSection === 'create' && !isLoadingUsers && friends.length === 0 && (
             <div style={{
-              background: 'rgba(3,172,234,0.06)', border: '1px solid rgba(3,172,234,0.15)',
-              borderRadius: 12, padding: '14px 16px', marginBottom: 20,
+              background: 'white', border: '1px solid rgba(0,0,0,0.07)',
+              borderRadius: 14, padding: '16px 20px', marginBottom: 20,
+              boxShadow: '0 1px 4px rgba(0,0,0,0.04)', textAlign: 'center',
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                <div style={{ width: 24, height: 24, borderRadius: 7, background: 'rgba(3,172,234,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Info size={13} color="#03ACEA" strokeWidth={2.2} />
-                </div>
-                <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', margin: 0 }}>You can only send offers to people in your friends list</p>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#1A1918', marginBottom: 4, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                You can only send offers to people in your friends list
               </div>
-              <div className="no-friends-btn-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div style={{ fontSize: 12, color: '#787776', lineHeight: 1.55, marginBottom: 14 }}>
+                Add a friend first, then create your loan offer together.
+              </div>
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
                 <button
                   type="button"
                   onClick={() => navigate(createPageUrl('Friends'))}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 14px', background: '#03ACEA', color: 'white', fontSize: 13, fontWeight: 500, borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: "'DM Sans', system-ui, sans-serif" }}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '7px 12px', background: '#03ACEA', color: 'white', fontSize: 12, fontWeight: 600, borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: "'DM Sans', system-ui, sans-serif" }}
                 >
-                  <UserIcon className="btn-icon-hide-mobile" size={14} />
+                  <UserIcon size={13} />
                   Find Your Friends
                 </button>
                 <button
                   type="button"
                   onClick={() => {
                     navigator.clipboard.writeText('https://lend-with-vony.com').then(() => {
-                      alert('Link copied! Share it with your friends to invite them to Vony 🎉');
+                      alert('Link copied! Share it with your friends to invite them to Vony.');
                     });
                   }}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 14px', background: 'white', color: '#1A1918', fontSize: 13, fontWeight: 500, borderRadius: 10, border: '1px solid rgba(0,0,0,0.10)', cursor: 'pointer', fontFamily: "'DM Sans', system-ui, sans-serif" }}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '7px 12px', background: 'white', color: '#1A1918', fontSize: 12, fontWeight: 600, borderRadius: 9, border: '1px solid rgba(0,0,0,0.10)', cursor: 'pointer', fontFamily: "'DM Sans', system-ui, sans-serif" }}
                 >
-                  <UserPlus className="btn-icon-hide-mobile" size={14} />
+                  <UserPlus size={13} />
                   Invite Your Friends
                 </button>
               </div>
@@ -1788,7 +1789,7 @@ export default function Lending({ initialTab }) {
                                 <span style={{ fontSize: 19, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{format(nextPaymentLoan.date, 'MMM d')}</span>
                                 {daysLabel && <span style={{ fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '2px 6px', flexShrink: 0 }}>{daysLabel}</span>}
                               </div>
-                              <div style={{ fontSize: 11, color: '#9B9A98', textAlign: 'right' }}>{formatMoney(nextPaymentLoan.payment_amount || 0)} from {firstName}</div>
+                              <div style={{ fontSize: 11, color: '#9B9A98', textAlign: 'right' }}>{format(nextPaymentLoan.date, 'do MMMM')}</div>
                             </>
                           ) : (
                             <>
@@ -2673,7 +2674,7 @@ export default function Lending({ initialTab }) {
                         <CheckCircle className="w-8 h-8 text-[#03ACEA]" />
                       </div>
                       <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-2">All Clear</p>
-                      <p className="text-lg font-semibold text-slate-800 mb-1">No loans to manage yet 🌱</p>
+                      <p className="text-lg font-semibold text-slate-800 mb-1">No loans to manage yet</p>
                       <p className="text-sm text-slate-500 mb-5">You're all caught up! Create a new loan offer to get started.</p>
                       <Button
                         onClick={() => setActiveSection('create')}
