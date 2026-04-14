@@ -408,8 +408,8 @@ export default function Home() {
             <svg width="180" height="88" viewBox="0 0 180 88" fill="none"><rect width="180" height="88" fill="#AECFF5" rx="3"/><path d="M140 88L180 48V88Z" fill="#7DB3EE"/><text x="16" y="34" fontFamily="Georgia, serif" fontSize="13" fontStyle="italic" fill="#1A3A5C">Remind Rohan about</text><text x="16" y="55" fontFamily="Georgia, serif" fontSize="13" fontStyle="italic" fill="#1A3A5C">the $40 he still owes</text></svg>
           </motion.div>
 
-          {/* WhatsApp (Henry) — behind card top-right on large screens */}
-          <motion.div {...floatAnim(0.3, bigScreen ? -20 : 2)} style={{ position: 'absolute', ...(bigScreen ? { top: '33%', right: '30%' } : { bottom: '-1%', right: '-1%' }), filter: floatShadow }}>
+          {/* WhatsApp (Henry) — mid-center */}
+          <motion.div {...floatAnim(0.3, 0)} style={{ position: 'absolute', top: '22%', right: '33%', filter: floatShadow }}>
             <svg width="250" height="190" viewBox="0 0 250 190" fill="none"><rect width="250" height="190" rx="16" fill="#ECE5DD"/><rect width="250" height="34" fill="#075E54" rx="16"/><rect y="16" width="250" height="18" fill="#075E54"/><text x="14" y="22" fontFamily="'DM Sans', sans-serif" fontSize="12" fontWeight="600" fill="#fff">Henry</text><rect x="12" y="44" width="180" height="24" rx="8" fill="#fff"/><text x="20" y="60" fontFamily="'DM Sans', sans-serif" fontSize="10" fill="#333">How much do I owe you again?</text><rect x="80" y="74" width="158" height="24" rx="8" fill="#DCF8C6"/><text x="90" y="90" fontFamily="'DM Sans', sans-serif" fontSize="10" fill="#333">I think $200</text><rect x="12" y="104" width="178" height="24" rx="8" fill="#fff"/><text x="20" y="120" fontFamily="'DM Sans', sans-serif" fontSize="10" fill="#333">Wait, I thought it was $180</text><rect x="50" y="134" width="188" height="40" rx="8" fill="#DCF8C6"/><text x="60" y="150" fontFamily="'DM Sans', sans-serif" fontSize="10" fill="#333">You're right, my bad forgot you</text><text x="60" y="164" fontFamily="'DM Sans', sans-serif" fontSize="10" fill="#333">gave me that $20</text></svg>
           </motion.div>
 

@@ -97,7 +97,7 @@ export default function MeshMobileNav({ user, activePage }) {
       )}
 
       {/* ── Mobile: fixed top bar + slide-out menu ── */}
-      {isMobile && <>
+      {isMobile && user && <>
       {/* Fixed top bar */}
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200,
