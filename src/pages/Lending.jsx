@@ -1843,7 +1843,7 @@ export default function Lending({ initialTab }) {
                       })
                       .sort((a, b) => a.days - b.days)
                       .slice(0, 5);
-                    if (rows.length === 0) return <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98' }}>You're all clear! Nothing coming up yet 🎉</div>;
+                    if (rows.length === 0) return <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98', textAlign: 'center' }}>You're all clear! Nothing coming up yet 🎉</div>;
                     return rows.map((loan, idx) => {
                       const isOverdue = loan.days < 0;
                       const daysLabel = isOverdue ? `${Math.abs(loan.days)}d late` : loan.days === 0 ? 'today' : `${loan.days}d`;
