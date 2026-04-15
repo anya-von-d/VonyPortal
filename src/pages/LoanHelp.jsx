@@ -106,7 +106,7 @@ export default function LoanHelp() {
 
   const RightSection = ({ title, children }) => (
     <div style={{ marginBottom: 40 }}>
-      <div style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 9 }}>{title}</div>
+      <div style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 9 }}>{title}</div>
       <div style={{ height: 1, background: 'rgba(0,0,0,0.07)', marginBottom: 14 }} />
       {children}
     </div>
@@ -247,7 +247,7 @@ export default function LoanHelp() {
                         <span style={{ fontSize: 9, fontWeight: 700, color: 'white', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Recommended for you</span>
                       </div>
                     )}
-                    <div style={{ fontSize: 10, fontWeight: 700, color: '#B0AFA D', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6, fontFamily: "'DM Sans', sans-serif" }}>{catLabel}</div>
+                    <div style={{ fontSize: 9, fontWeight: 700, color: '#B0AFA D', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6, fontFamily: "'DM Sans', sans-serif" }}>{catLabel}</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: '#1A1918', marginBottom: 3, fontFamily: "'DM Sans', sans-serif" }}>{loan.name}</div>
                     <div style={{ fontSize: 12, color: '#5C5B5A', marginBottom: 12, fontFamily: "'DM Sans', sans-serif" }}>{loan.tagline}</div>
                   </div>
@@ -303,7 +303,7 @@ export default function LoanHelp() {
                             <span style={{ fontSize: 9, fontWeight: 700, color: 'white', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Recommended for you</span>
                           </div>
                         )}
-                        <div style={{ fontSize: 10, fontWeight: 700, color: '#B0AFAD', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6, fontFamily: "'DM Sans', sans-serif" }}>{cat.label.toUpperCase()}</div>
+                        <div style={{ fontSize: 9, fontWeight: 700, color: '#B0AFAD', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6, fontFamily: "'DM Sans', sans-serif" }}>{cat.label.toUpperCase()}</div>
                         <div style={{ fontSize: 15, fontWeight: 700, color: '#1A1918', marginBottom: 3, fontFamily: "'DM Sans', sans-serif" }}>{loan.name}</div>
                         <div style={{ fontSize: 13, color: '#5C5B5A', marginBottom: 12, fontFamily: "'DM Sans', sans-serif" }}>{loan.tagline}</div>
                       </div>

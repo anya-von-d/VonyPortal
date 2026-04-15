@@ -469,7 +469,7 @@ export default function Requests() {
   const PageCard = ({ title, headerRight, children, style }) => (
     <div style={{ marginBottom: 24, ...style }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 9 }}>
-        <div style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{title}</div>
+        <div style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{title}</div>
         {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
       </div>
       <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 14 }} />

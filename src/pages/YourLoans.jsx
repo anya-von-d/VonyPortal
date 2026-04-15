@@ -874,7 +874,7 @@ export default function YourLoans() {
         {/* Select a Loan */}
         <div style={{ marginBottom: manageLoanSelected ? 8 : 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 9 }}>
-            <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Select a Loan</span>
+            <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Select a Loan</span>
           </div>
           <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 14 }} />
           <div style={{ position: 'relative' }}>
@@ -1330,7 +1330,7 @@ export default function YourLoans() {
       ...style
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 4, borderBottom: highlight ? '1px solid rgba(3,172,234,0.2)' : '1px solid rgba(0,0,0,0.07)' }}>
-        <span style={{ fontSize: 10, fontWeight: 700, color: highlight ? '#03ACEA' : '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{title}</span>
+        <span style={{ fontSize: 9, fontWeight: 700, color: highlight ? '#03ACEA' : '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{title}</span>
         {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
       </div>
       <div style={{ overflow: 'visible', ...(highlight ? { display: 'flex', flexDirection: 'column' } : {}) }}>
@@ -1382,7 +1382,7 @@ export default function YourLoans() {
               <div style={{ position: 'sticky', top: 0, background: 'transparent', padding: '6px 14px 5px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: '18px 18px 0 0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <FileText size={14} style={{ color: '#9B9A98' }} />
-                  <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>
+                  <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>
                     {activeDocPopup === 'promissory' && 'Promissory Note'}
                     {activeDocPopup === 'amortization' && 'Amortization Schedule'}
                     {activeDocPopup === 'summary' && 'Loan Summary'}

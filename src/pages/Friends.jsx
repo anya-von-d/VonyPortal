@@ -260,7 +260,7 @@ export default function Friends() {
 
   const RightSection = ({ title, children }) => (
     <div style={{ marginBottom: 40 }}>
-      <div style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 9 }}>{title}</div>
+      <div style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 9 }}>{title}</div>
       <div style={{ height: 1, background: 'rgba(0,0,0,0.07)', marginBottom: 14 }} />
       {children}
     </div>
@@ -415,7 +415,7 @@ export default function Friends() {
           {/* Left: Your Friends */}
           <div className="friends-friends-col" style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 4, borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
-              <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Your Friends</span>
+              <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Your Friends</span>
               {friends.length > 0 && <span style={{ fontSize: 11, color: '#9B9A98' }}>{friends.length}</span>}
             </div>
             {isLoading ? (
@@ -445,7 +445,7 @@ export default function Friends() {
           {/* Right: Find Your Friends */}
           <div className="friends-search-col" style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 10, marginBottom: 12, borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
-              <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Find Your Friends</span>
+              <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Find Your Friends</span>
               <button
                 onClick={() => setSettingsOpen(true)}
                 style={{ fontSize: 11, fontWeight: 500, color: '#03ACEA', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: "'DM Sans', sans-serif" }}
@@ -500,7 +500,7 @@ export default function Friends() {
             {receivedRequests.length > 0 && (
               <div style={{ marginTop: searchQuery.trim() ? 20 : 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, paddingTop: searchQuery.trim() ? 10 : 0, borderTop: searchQuery.trim() ? '1px solid rgba(0,0,0,0.06)' : 'none' }}>
-                  <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Friend Requests</span>
+                  <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Friend Requests</span>
                   <span style={{ fontSize: 11, color: '#9B9A98' }}>{receivedRequests.length} pending</span>
                 </div>
                 {receivedRequests.map((request) => {

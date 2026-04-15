@@ -814,15 +814,15 @@ export default function LoanAgreements() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
           <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 12, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', padding: '10px 14px', textAlign: 'center' }}>
-            <p style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Principal</p>
+            <p style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Principal</p>
             <p style={{ fontSize: 18, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', margin: '4px 0 0' }}>{formatMoney(agreement.amount)}</p>
           </div>
           <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 12, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', padding: '10px 14px', textAlign: 'center' }}>
-            <p style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Interest</p>
+            <p style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Interest</p>
             <p style={{ fontSize: 18, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', margin: '4px 0 0' }}>{formatMoney((agreement.total_amount || 0) - (agreement.amount || 0))}</p>
           </div>
           <div style={{ background: 'rgba(3,172,234,0.07)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 12, border: '1px solid rgba(3,172,234,0.18)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', padding: '10px 14px', textAlign: 'center' }}>
-            <p style={{ fontSize: 10, fontWeight: 700, color: '#03ACEA', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Total</p>
+            <p style={{ fontSize: 9, fontWeight: 700, color: '#03ACEA', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Total</p>
             <p style={{ fontSize: 18, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', margin: '4px 0 0' }}>{formatMoney(agreement.total_amount)}</p>
           </div>
         </div>
@@ -1023,7 +1023,7 @@ export default function LoanAgreements() {
   /* ── RightSection component ──────────────────────────────── */
   const RightSection = ({ title, children }) => (
     <div style={{ marginBottom: 40 }}>
-      <div style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 9 }}>{title}</div>
+      <div style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 9 }}>{title}</div>
       <div style={{ height: 1, background: 'rgba(0,0,0,0.07)', marginBottom: 14 }} />
       {children}
     </div>
@@ -1041,7 +1041,7 @@ export default function LoanAgreements() {
   const PageCard = ({ title, headerRight, children, style }) => (
     <div style={{ marginBottom: 24, ...style }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 9 }}>
-        <div style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{title}</div>
+        <div style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{title}</div>
         {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
       </div>
       <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 14 }} />
@@ -1072,7 +1072,7 @@ export default function LoanAgreements() {
               <div style={{ position: 'sticky', top: 0, background: 'transparent', padding: '6px 14px 5px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: '18px 18px 0 0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <FileText size={14} style={{ color: '#9B9A98' }} />
-                  <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>
+                  <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>
                     {activePopup === 'promissory' && 'Promissory Note'}
                     {activePopup === 'amortization' && 'Amortization Schedule'}
                     {activePopup === 'summary' && 'Loan Summary'}

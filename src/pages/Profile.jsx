@@ -246,7 +246,7 @@ export default function Profile() {
   const PageCard = ({ title, headerRight, children, style }) => (
     <div style={{ marginBottom: 24, ...style }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 9 }}>
-        <div style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{title}</div>
+        <div style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{title}</div>
         {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
       </div>
       <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 14 }} />
@@ -307,7 +307,7 @@ export default function Profile() {
           >
             <div style={{ padding: '6px 14px 5px', display: 'flex', alignItems: 'center', gap: 6 }}>
               <Clock size={12} style={{ color: '#9B9A98' }} />
-              <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Bank Account</span>
+              <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Bank Account</span>
             </div>
             <div style={{ background: '#ffffff', margin: '0 5px 5px', borderRadius: 10, padding: '28px 28px 24px' }}>
               <div style={{ width: 48, height: 48, borderRadius: 10, margin: '0 auto 20px', background: 'rgba(3,172,234,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -483,7 +483,7 @@ export default function Profile() {
             <div style={{ background: 'white', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', marginBottom: 20, overflow: 'hidden' }}>
               {/* Header */}
               <div style={{ padding: '14px 18px 12px', borderBottom: '1px solid rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>PERSONAL INFORMATION</span>
+                <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>PERSONAL INFORMATION</span>
                 {isEditing ? (
                   <div style={{ display: 'flex', gap: 8 }}>
                     <Button
@@ -617,7 +617,7 @@ export default function Profile() {
               <div style={{ background: 'white', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', marginBottom: 20, overflow: 'hidden' }}>
                 {/* Header */}
                 <div style={{ padding: '14px 18px 12px', borderBottom: '1px solid rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>BANK ACCOUNT</span>
+                  <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>BANK ACCOUNT</span>
                 </div>
                 {/* Body */}
                 <div style={{ padding: '16px 18px' }}>
@@ -644,7 +644,7 @@ export default function Profile() {
               <div style={{ background: 'white', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', marginBottom: 20, overflow: 'hidden' }}>
                 {/* Header */}
                 <div style={{ padding: '14px 18px 12px', borderBottom: '1px solid rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>VERIFICATION</span>
+                  <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>VERIFICATION</span>
                 </div>
                 {/* Body */}
                 <div style={{ padding: '16px 18px' }}>
