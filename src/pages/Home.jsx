@@ -1056,13 +1056,18 @@ export default function Home() {
                     zIndex: 0,
                     pointerEvents: 'none',
                   }} />
-                  {/* Card */}
+                  {/* Gradient border wrapper — matches sidebar line: transparent → #03ACEA */}
                   <div style={{
                     position: 'relative', zIndex: 1, flex: 1,
+                    background: 'linear-gradient(to right, rgba(3,172,234,0) 0%, #03ACEA 67%, #03ACEA 100%)',
+                    padding: 1, borderRadius: 11,
+                    display: 'flex', flexDirection: 'column',
+                  }}>
+                  {/* Card */}
+                  <div style={{
+                    flex: 1,
                     padding: '12px 14px', borderRadius: 10,
                     background: '#ffffff',
-                    border: '1px solid #03ACEA',
-                    boxShadow: '0 0 0 3px rgba(3,172,234,0.13), 0 0 0 2px rgba(3,172,234,0.22), inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(180,230,245,0.3)',
                     display: 'flex', flexDirection: 'column', justifyContent: 'center',
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
@@ -1083,6 +1088,7 @@ export default function Home() {
                         <span style={{ fontSize: 11, color: '#9B9A98' }}>None incoming ✨</span>
                       </div>
                     )}
+                  </div>
                   </div>
                 </div>
               );
