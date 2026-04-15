@@ -91,7 +91,7 @@ export default function MeshMobileNav({ user, activePage }) {
           padding: '0 24px 0 28px',
           fontFamily: "'DM Sans', sans-serif",
         }}>
-          {activePage === 'YourLoans' ? (
+          {activePage === 'My Loans' ? (
             <div style={{ display: 'flex', gap: 22, alignItems: 'center' }}>
               {[{key:'lending',label:'Lending'},{key:'borrowing',label:'Borrowing'},{key:'details',label:'Loan Details'}].map(tab => {
                 const currentTab = new URLSearchParams(location.search).get('tab') || 'lending';
