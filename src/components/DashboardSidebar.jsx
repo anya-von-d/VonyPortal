@@ -292,11 +292,11 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
       {/* ── Desktop sidebar ── */}
       <aside className="home-sidebar" style={{
         position: 'fixed', left: 0, top: 0, bottom: 0, width: 240,
-        background: '#EDECE8',
+        background: '#1A1918',
         zIndex: 52, display: 'flex', flexDirection: 'column',
-        fontFamily: "'DM Sans', sans-serif", overflowY: 'auto',
+        fontFamily: "'DM Sans', sans-serif",
       }}>
-        <div style={{ padding: '22px 24px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#1A1918', marginBottom: 0 }}>
+        <div style={{ padding: '22px 24px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <Link to="/" style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 400, fontStyle: 'italic', fontSize: '1.5rem', letterSpacing: '-0.02em', color: 'white', textDecoration: 'none' }}>Vony</Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <Link to={createPageUrl("Requests")} style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 8, background: 'transparent', transition: 'background 0.15s', textDecoration: 'none' }}>
@@ -330,10 +330,10 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
             </div>
           </div>
         </div>
-        <nav style={{ flex: 1, padding: '0 12px', display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <nav style={{ flex: 1, padding: '0 12px', display: 'flex', flexDirection: 'column', gap: 3, background: '#EDECE8', overflowY: 'auto' }}>
           {navLinks}
         </nav>
-        <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+        <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(0,0,0,0.06)', background: '#EDECE8' }}>
           <Link to={createPageUrl("Profile")} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
             <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#678AFB', color: 'white', fontWeight: 600, fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               {avatarInitial}
