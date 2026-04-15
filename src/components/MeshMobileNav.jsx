@@ -86,7 +86,7 @@ export default function MeshMobileNav({ user, activePage }) {
       {!isMobile && (
         <div style={{
           position: 'fixed', top: 0, left: 200, right: 0, zIndex: 100, height: 54,
-          background: 'linear-gradient(to bottom, #1A1918 0%, #1A1918 62%, transparent 100%)',
+          background: 'linear-gradient(to bottom, #1A1918 0%, #1A1918 60%, rgba(26,25,24,0.78) 70%, rgba(26,25,24,0.52) 80%, rgba(26,25,24,0.24) 90%, transparent 100%)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 24px 0 28px',
           fontFamily: "'DM Sans', sans-serif",
