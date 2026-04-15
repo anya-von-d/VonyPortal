@@ -556,7 +556,6 @@ export default function Requests() {
         {/* COL 2 - main content */}
         <div className="mesh-center" style={{ background: 'transparent', borderRight: '1px solid rgba(0,0,0,0.06)', padding: '24px 32px 80px' }}>
           <div style={{          }}>Notifications</div>
-          <div style={{ height: 1, background: '#03ACEA', marginLeft: -32, marginRight: -32, marginBottom: 20 }} />
 
           {/* All items: reminders first, then notification requests */}
           {(() => {
