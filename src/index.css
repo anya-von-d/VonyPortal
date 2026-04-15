@@ -265,50 +265,8 @@ input[type="date"] {
   position: relative;
 }
 
-/* ===== DARK SIDEBAR (desktop ≥901px) ===== */
+/* Content area: offset for fixed desktop top bar */
 @media (min-width: 901px) {
-  /* Dark background */
-  .mesh-left {
-    background: #1A1918 !important;
-    border-right: none !important;
-  }
-  /* Vony logo */
-  .mesh-left > div > a:first-child {
-    color: white !important;
-  }
-  /* All nav links */
-  .mesh-left nav a {
-    color: rgba(255,255,255,0.65) !important;
-  }
-  /* Active nav link — has non-transparent background in inline style */
-  .mesh-left nav a[style*="rgba(0"] {
-    color: white !important;
-    background: rgba(255,255,255,0.09) !important;
-  }
-  /* Icon boxes */
-  .mesh-left nav a > span:first-child {
-    background: rgba(255,255,255,0.07) !important;
-  }
-  /* SVG icons inherit currentColor */
-  .mesh-left nav svg {
-    stroke: currentColor !important;
-    color: inherit !important;
-  }
-  /* Coming Soon section label */
-  .mesh-left nav > div span {
-    color: rgba(255,255,255,0.3) !important;
-  }
-  /* Settings button text + icon */
-  .mesh-left button > span:last-child {
-    color: rgba(255,255,255,0.55) !important;
-  }
-  .mesh-left button > span:first-child {
-    background: rgba(255,255,255,0.07) !important;
-  }
-  .mesh-left button svg {
-    stroke: rgba(255,255,255,0.45) !important;
-  }
-  /* Content area: offset for fixed top bar */
   .mesh-center {
     padding-top: 66px !important;
   }
