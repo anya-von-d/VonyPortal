@@ -407,7 +407,7 @@ export default function Profile() {
         </div>
 
         {/* COL 2 - main content */}
-        <div className="mesh-center" style={{ background: 'transparent', borderRight: '1px solid rgba(0,0,0,0.06)', padding: '24px 48px 80px' }}>
+        <div className="mesh-center" style={{ background: 'transparent', borderRight: '1px solid rgba(0,0,0,0.06)', padding: '24px 32px 80px' }}>
 
           {/* Error Alert */}
           {error && (
