@@ -33,7 +33,7 @@ input[type="date"] {
 @layer base {
   html {
     scroll-behavior: smooth;
-    background-color: #FAFAF8;
+    background-color: #FDFCFA;
     background-image: url('/tile.png.jpeg');
     background-repeat: repeat;
     background-size: 50px 50px;
@@ -273,6 +273,10 @@ input[type="date"] {
   /* Page title shown in top bar on desktop — hide in-content version */
   .mobile-page-title {
     display: none !important;
+  }
+  /* Sidebar: slightly darker than main background */
+  .mesh-left {
+    background: rgba(0,0,0,0.028) !important;
   }
 }
 
