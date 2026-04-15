@@ -320,24 +320,60 @@ export default function Upcoming() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {/* Overdue */}
               {overdue.length > 0 && (
-                <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 4, borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
-                    <span style={{ fontSize: 9, fontWeight: 700, color: '#E8726E', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Overdue</span>
-                    <span style={{ fontSize: 11, color: '#9B9A98' }}>{overdue.length} · {formatMoney(overdue.reduce((s, e) => s + e.amount, 0))}</span>
+                <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
+                  {/* Aurora glow — red/orange palette */}
+                  <div style={{
+                    position: 'absolute', top: '50%', left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: 'calc(100% + 10px)', height: 'calc(100% + 10px)',
+                    background: 'linear-gradient(135deg, rgb(232,114,110) 0%, rgb(239,68,68) 30%, rgb(251,146,60) 60%, rgb(232,114,110) 100%)',
+                    filter: 'blur(5px) saturate(1.2)', opacity: 0.35,
+                    borderRadius: 18, zIndex: 0, pointerEvents: 'none',
+                  }} />
+                  {/* Gradient border wrapper */}
+                  <div style={{
+                    position: 'relative', zIndex: 1, flex: 1,
+                    background: 'linear-gradient(to right, rgba(232,114,110,0) 0%, #E8726E 67%, #E8726E 100%)',
+                    padding: 1, borderRadius: 11, display: 'flex', flexDirection: 'column',
+                  }}>
+                  <div style={{ flex: 1, padding: '14px 18px', borderRadius: 10, background: '#ffffff', display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 4, borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: '#E8726E', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Overdue</span>
+                      <span style={{ fontSize: 11, color: '#9B9A98' }}>{overdue.length} · {formatMoney(overdue.reduce((s, e) => s + e.amount, 0))}</span>
+                    </div>
+                    {overdue.map(event => <PaymentRow key={event.loanId + '-ov'} event={event} />)}
                   </div>
-                  {overdue.map(event => <PaymentRow key={event.loanId + '-ov'} event={event} />)}
+                  </div>
                 </div>
               )}
 
               {/* Next 7 Days */}
-              <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 4, borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
-                  <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Next 7 Days</span>
-                  {next7Days.length > 0 && <span style={{ fontSize: 11, color: '#9B9A98' }}>{next7Days.length} · {formatMoney(next7Days.reduce((s, e) => s + e.amount, 0))}</span>}
+              <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
+                {/* Aurora glow — cyan/teal palette */}
+                <div style={{
+                  position: 'absolute', top: '50%', left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: 'calc(100% + 10px)', height: 'calc(100% + 10px)',
+                  background: 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(6,182,212) 30%, rgb(20,184,166) 60%, rgb(3,172,234) 100%)',
+                  filter: 'blur(5px) saturate(1.2)', opacity: 0.35,
+                  borderRadius: 18, zIndex: 0, pointerEvents: 'none',
+                }} />
+                {/* Gradient border wrapper */}
+                <div style={{
+                  position: 'relative', zIndex: 1, flex: 1,
+                  background: 'linear-gradient(to right, rgba(3,172,234,0) 0%, #03ACEA 67%, #03ACEA 100%)',
+                  padding: 1, borderRadius: 11, display: 'flex', flexDirection: 'column',
+                }}>
+                <div style={{ flex: 1, padding: '14px 18px', borderRadius: 10, background: '#ffffff', display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 4, borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                    <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Next 7 Days</span>
+                    {next7Days.length > 0 && <span style={{ fontSize: 11, color: '#9B9A98' }}>{next7Days.length} · {formatMoney(next7Days.reduce((s, e) => s + e.amount, 0))}</span>}
+                  </div>
+                  {next7Days.length === 0 ? (
+                    <div style={{ padding: '8px 0', fontSize: 13, color: '#9B9A98', textAlign: 'center' }}>You're all caught up this week! 🎉</div>
+                  ) : next7Days.map(event => <PaymentRow key={event.loanId + '-7'} event={event} />)}
                 </div>
-                {next7Days.length === 0 ? (
-                  <div style={{ padding: '8px 0', fontSize: 13, color: '#9B9A98', textAlign: 'center' }}>You're all caught up this week! 🎉</div>
-                ) : next7Days.map(event => <PaymentRow key={event.loanId + '-7'} event={event} />)}
+                </div>
               </div>
 
               {/* Coming Later */}
