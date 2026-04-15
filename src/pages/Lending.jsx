@@ -1588,7 +1588,13 @@ export default function Lending({ initialTab }) {
 
           {/* COL 2 - main content */}
           <div className="mesh-center" style={{ background: 'transparent', padding: '24px 32px 80px' }}>
-  
+
+          {/* Mobile-only page title (desktop shows it in top bar) */}
+          <div className="mobile-page-title">
+            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Create Loan</div>
+            <div style={{ height: 1, background: 'rgba(0,0,0,0.08)', marginLeft: -32, marginRight: -32, marginBottom: 20 }} />
+          </div>
+
           {/* ── No Friends Banner at the very top ── */}
           {activeSection === 'create' && !isLoadingUsers && friends.length === 0 && (
             <div style={{

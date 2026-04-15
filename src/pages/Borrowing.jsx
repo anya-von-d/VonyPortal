@@ -931,7 +931,13 @@ export default function Borrowing() {
 
           {/* COL 2 - main content */}
           <div className="mesh-center" style={{ background: 'transparent', borderRight: '1px solid rgba(0,0,0,0.06)', padding: '24px 32px 80px' }}>
-  
+
+          {/* Mobile-only page title (desktop shows it in top bar) */}
+          <div className="mobile-page-title">
+            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>My Loans</div>
+            <div style={{ height: 1, background: 'rgba(0,0,0,0.08)', marginLeft: -32, marginRight: -32, marginBottom: 20 }} />
+          </div>
+
           {/* Tab bar — centered */}
           <div className="mobile-tab-bar" style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
             <div style={{ display: 'inline-flex', gap: 2, background: 'transparent', borderRadius: 10, padding: 3 }}>
