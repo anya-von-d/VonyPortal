@@ -6,6 +6,23 @@ import { useAuth } from "@/lib/AuthContext";
 import UserAvatar from "@/components/ui/UserAvatar";
 import SettingsModal from "@/components/SettingsModal";
 
+const PAGE_LABELS = {
+  'Home': 'Home',
+  'Upcoming': 'Upcoming',
+  'CreateOffer': 'Create Loan',
+  'RecordPayment': 'Record Payment',
+  'YourLoans': 'My Loans',
+  'Friends': 'Friends',
+  'RecentActivity': 'Recent Activity',
+  'LoanAgreements': 'Documents',
+  'Requests': 'Notifications',
+  'ComingSoon': 'Learn',
+  'LoanHelp': 'Loan Help',
+  'Borrowing': 'Borrowing',
+  'Lending': 'Lending',
+  'Profile': 'Profile',
+};
+
 const NAV_ITEMS = [
   { label: 'Home',            to: '/' },
   { label: 'Upcoming',        to: createPageUrl("Upcoming") },
@@ -64,35 +81,42 @@ export default function MeshMobileNav({ user, activePage }) {
 
   return (
     <>
-      {/* ── Desktop: top-right notification + profile icons ── */}
-      {!isMobile && activePage !== 'Profile' && (
+      {/* ── Desktop: full-width black top bar ── */}
+      {!isMobile && (
         <div style={{
-          position: 'fixed', top: 0, right: 0, zIndex: 100,
-          display: 'flex', alignItems: 'center', gap: 2,
-          padding: '13px 48px 13px 0',
+          position: 'fixed', top: 0, left: 200, right: 0, zIndex: 100, height: 54,
+          background: '#1A1918',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '0 24px 0 28px',
+          fontFamily: "'DM Sans', sans-serif",
         }}>
-          <Link to={createPageUrl("Requests")} style={{
-            position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            width: 32, height: 32, borderRadius: 9, textDecoration: 'none',
-          }}>
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#787776" strokeWidth="1.8" strokeLinecap="round">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-            </svg>
-            {notifCount > 0 && (
-              <span style={{
-                position: 'absolute', top: 5, right: 5,
-                width: 7, height: 7, borderRadius: '50%',
-                background: '#03ACEA',
-              }} />
-            )}
-          </Link>
-          <Link to={createPageUrl("Profile")} style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            width: 32, height: 32, borderRadius: 9, textDecoration: 'none',
-          }}>
-            <UserAvatar name={user?.full_name || user?.username} src={user?.avatar_url || user?.profile_picture_url} size={26} />
-          </Link>
+          <div style={{ fontSize: 14, fontWeight: 600, color: 'white', letterSpacing: '-0.01em' }}>
+            {PAGE_LABELS[activePage] || activePage}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Link to={createPageUrl("Requests")} style={{
+              position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: 32, height: 32, borderRadius: 9, textDecoration: 'none',
+            }}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" strokeWidth="1.8" strokeLinecap="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              </svg>
+              {notifCount > 0 && (
+                <span style={{
+                  position: 'absolute', top: 5, right: 5,
+                  width: 7, height: 7, borderRadius: '50%',
+                  background: '#03ACEA',
+                }} />
+              )}
+            </Link>
+            <Link to={createPageUrl("Profile")} style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: 32, height: 32, borderRadius: 9, textDecoration: 'none',
+            }}>
+              <UserAvatar name={user?.full_name || user?.username} src={user?.avatar_url || user?.profile_picture_url} size={26} />
+            </Link>
+          </div>
         </div>
       )}
 
