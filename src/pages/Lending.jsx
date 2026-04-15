@@ -1588,7 +1588,8 @@ export default function Lending({ initialTab }) {
 
           {/* COL 2 - main content */}
           <div className="mesh-center" style={{ background: 'transparent', padding: '24px 32px 80px' }}>
-            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 32 }}>Create Loan</div>
+            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Create Loan</div>
+            <div style={{ height: 1, background: '#03ACEA', marginLeft: -32, marginRight: -32, marginBottom: 20 }} />
   
           {/* ── No Friends Banner at the very top ── */}
           {activeSection === 'create' && !isLoadingUsers && friends.length === 0 && (
@@ -2687,21 +2688,34 @@ export default function Lending({ initialTab }) {
                         {(() => {
                           const isDisabled = isSubmitting || !formData.lender_username || !formData.borrower_username || !formData.amount || !formData.purpose || (loanType === 'scheduled' && (!formData.interest_rate || !formData.repayment_period || !formData.lender_send_funds_date || !formData.first_payment_date)) || (loanType === 'flexible' && formData.is_repeating && (!formData.repeating_start_date || !formData.repeating_num_payments));
                           return (
-                            <button
-                              type="submit"
-                              disabled={isDisabled}
-                              style={{
-                                width: '100%', padding: '12px 20px',
-                                background: isDisabled ? 'rgba(3,172,234,0.35)' : '#03ACEA',
-                                color: 'white', border: 'none', borderRadius: 12, cursor: isDisabled ? 'not-allowed' : 'pointer',
-                                fontSize: 14, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif",
-                                letterSpacing: '-0.01em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                                transition: 'background 0.2s',
-                              }}
-                            >
-                              <Send size={14} />
-                              {isSubmitting ? "Sending…" : (loanType === 'flexible' ? "Send Quick Payment Request" : (isUserBorrower ? "Send Loan Request" : "Send Loan Offer"))}
-                            </button>
+                            <div style={{ position: 'relative', paddingBottom: 8 }}>
+                              {/* Rainbow aura — matches VonyHomePage GET STARTED */}
+                              <div style={{
+                                position: 'absolute', bottom: 0, left: '50%',
+                                transform: 'translateX(-50%)',
+                                width: 'calc(100% + 36px)', height: '100%',
+                                background: 'linear-gradient(225deg, rgb(50,197,255), rgb(182,32,224) 51%, rgb(247,181,0))',
+                                filter: 'blur(12px) saturate(1.18)',
+                                opacity: isDisabled ? 0.15 : 0.4,
+                                borderRadius: 16, zIndex: 0, pointerEvents: 'none',
+                              }} />
+                              <button
+                                type="submit"
+                                disabled={isDisabled}
+                                style={{
+                                  position: 'relative', zIndex: 1,
+                                  width: '100%', padding: '14px 24px',
+                                  background: isDisabled ? 'rgba(26,25,24,0.45)' : '#1A1918',
+                                  color: 'white', border: 'none', borderRadius: 10,
+                                  cursor: isDisabled ? 'not-allowed' : 'pointer',
+                                  fontSize: 14, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif",
+                                  letterSpacing: '-0.01em', textAlign: 'center',
+                                  transition: 'background 0.2s',
+                                }}
+                              >
+                                {isSubmitting ? "Sending…" : (loanType === 'flexible' ? "Send Quick Payment Request" : (isUserBorrower ? "Send Loan Request" : "Send Loan Offer"))}
+                              </button>
+                            </div>
                           );
                         })()}
                       </form>
