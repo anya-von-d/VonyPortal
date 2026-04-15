@@ -876,7 +876,6 @@ export default function YourLoans() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 9 }}>
             <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Select a Loan</span>
           </div>
-          <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', marginBottom: 14 }} />
           <div style={{ position: 'relative' }}>
             <div
               onClick={() => setLoanDropdownOpen(o => !o)}
@@ -1329,7 +1328,7 @@ export default function YourLoans() {
       padding: '14px 18px',
       ...style
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 4, borderBottom: highlight ? '1px solid rgba(3,172,234,0.2)' : '1px solid rgba(0,0,0,0.07)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
         <span style={{ fontSize: 9, fontWeight: 700, color: highlight ? '#03ACEA' : '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{title}</span>
         {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
       </div>

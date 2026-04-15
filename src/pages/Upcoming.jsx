@@ -224,7 +224,7 @@ export default function Upcoming() {
 
   // ── Section heading ──
   const SectionHead = ({ label, count, total }) => (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 4, borderBottom: '1px solid rgba(0,0,0,0.07)', marginTop: 28 }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, marginTop: 28 }}>
       <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{label}</span>
       {count > 0 && <span style={{ fontSize: 11, color: '#9B9A98' }}>{count} · {formatMoney(total)}</span>}
     </div>
@@ -321,7 +321,7 @@ export default function Upcoming() {
               {/* Overdue */}
               {overdue.length > 0 && (
                 <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 4, borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
                     <span style={{ fontSize: 9, fontWeight: 700, color: '#E8726E', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Overdue</span>
                     <span style={{ fontSize: 11, color: '#9B9A98' }}>{overdue.length} · {formatMoney(overdue.reduce((s, e) => s + e.amount, 0))}</span>
                   </div>
@@ -331,7 +331,7 @@ export default function Upcoming() {
 
               {/* Next 7 Days */}
               <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 4, borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
                   <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Next 7 Days</span>
                   {next7Days.length > 0 && <span style={{ fontSize: 11, color: '#9B9A98' }}>{next7Days.length} · {formatMoney(next7Days.reduce((s, e) => s + e.amount, 0))}</span>}
                 </div>
@@ -342,7 +342,7 @@ export default function Upcoming() {
 
               {/* Coming Later */}
               <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 4, borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
                   <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Coming Later</span>
                   {comingLater.length > 0 && <span style={{ fontSize: 11, color: '#9B9A98' }}>{comingLater.length} · {formatMoney(comingLater.reduce((s, e) => s + e.amount, 0))}</span>}
                 </div>
