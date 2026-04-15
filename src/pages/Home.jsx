@@ -880,7 +880,7 @@ export default function Home() {
         <div className="mesh-center" style={{ background: 'transparent', padding: '24px 32px 80px' }}>
 
           {/* Greeting + icons */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
             <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.2, color: '#1A1918' }}>
               {greeting}, {firstName}
             </div>
@@ -896,6 +896,7 @@ export default function Home() {
               </Link>
             </div>
           </div>
+          <div style={{ height: 1, background: 'rgba(0,0,0,0.08)', marginLeft: -32, marginRight: -32, marginBottom: 20 }} />
 
           {/* New user onboarding — below greeting */}
           {!hasLoans && (
@@ -987,27 +988,31 @@ export default function Home() {
               const badgeBg = isLate ? 'rgba(232,114,110,0.08)' : days !== null && days <= 3 ? 'rgba(245,158,11,0.08)' : 'rgba(0,0,0,0.04)';
               return (
                 <div className="home-blue-card" style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
-                  {/* Aurora glow */}
+                  {/* Aurora glow — cyan/teal palette */}
                   <div style={{
                     position: 'absolute',
                     top: '50%', left: '50%',
                     transform: 'translate(-50%, -50%)',
                     width: 'calc(100% + 10px)',
                     height: 'calc(100% + 10px)',
-                    background: 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(99,102,241) 25%, rgb(139,92,246) 50%, rgb(124,58,237) 75%, rgb(29,91,148) 100%)',
+                    background: 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(6,182,212) 30%, rgb(20,184,166) 60%, rgb(3,172,234) 100%)',
                     filter: 'blur(5px) saturate(1.2)',
                     opacity: 0.35,
                     borderRadius: 18,
                     zIndex: 0,
                     pointerEvents: 'none',
                   }} />
-                  {/* Card */}
+                  {/* Gradient border wrapper */}
                   <div style={{
                     position: 'relative', zIndex: 1, flex: 1,
+                    background: 'linear-gradient(to right, rgba(3,172,234,0) 0%, #03ACEA 67%, #03ACEA 100%)',
+                    padding: 1, borderRadius: 11, display: 'flex', flexDirection: 'column',
+                  }}>
+                  {/* Card */}
+                  <div style={{
+                    flex: 1,
                     padding: '12px 14px', borderRadius: 10,
                     background: '#ffffff',
-                    border: '1.5px solid rgba(255,255,255,0.9)',
-                    boxShadow: '0 2px 16px rgba(29,91,148,0.10), inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(200,220,240,0.3)',
                     display: 'flex', flexDirection: 'column', justifyContent: 'center',
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
@@ -1028,6 +1033,7 @@ export default function Home() {
                         <span style={{ fontSize: 11, color: '#9B9A98' }}>Nothing due</span>
                       </div>
                     )}
+                  </div>
                   </div>
                 </div>
               );

@@ -557,30 +557,26 @@ export default function YourLoans() {
         <div className="loans-top-cards" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, marginBottom: 20, alignItems: 'center' }}>
           {/* Next Incoming / Next Payment Due — aurora card identical to Home page */}
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
-            {/* Aurora glow */}
+            {/* Aurora glow — cyan/teal palette */}
             <div style={{
               position: 'absolute', top: '50%', left: '50%',
               transform: 'translate(-50%, -50%)',
               width: 'calc(100% + 10px)', height: 'calc(100% + 10px)',
-              background: isLending
-                ? 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(6,182,212) 30%, rgb(20,184,166) 60%, rgb(3,172,234) 100%)'
-                : 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(99,102,241) 25%, rgb(139,92,246) 50%, rgb(124,58,237) 75%, rgb(29,91,148) 100%)',
+              background: 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(6,182,212) 30%, rgb(20,184,166) 60%, rgb(3,172,234) 100%)',
               filter: 'blur(5px) saturate(1.2)', opacity: 0.35,
               borderRadius: 18, zIndex: 0, pointerEvents: 'none',
             }} />
+            {/* Gradient border wrapper */}
+            <div style={{
+              position: 'relative', zIndex: 1, flex: 1,
+              background: 'linear-gradient(to right, rgba(3,172,234,0) 0%, #03ACEA 67%, #03ACEA 100%)',
+              padding: 1, borderRadius: 11, display: 'flex', flexDirection: 'column',
+            }}>
             {/* Card */}
             <div style={{
-              position: 'relative', zIndex: 1,
+              flex: 1,
               padding: '10px 14px', borderRadius: 10,
-              background: isLending
-                ? 'linear-gradient(160deg, rgba(255,255,255,0.97) 0%, rgba(240,252,255,0.93) 100%)'
-                : 'linear-gradient(160deg, rgba(255,255,255,0.97) 0%, rgba(245,251,255,0.93) 100%)',
-              backdropFilter: 'blur(16px) saturate(1.8) brightness(1.08)',
-              WebkitBackdropFilter: 'blur(16px) saturate(1.8) brightness(1.08)',
-              border: '1.5px solid rgba(255,255,255,0.9)',
-              boxShadow: isLending
-                ? '0 2px 16px rgba(3,172,234,0.10), inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(180,230,245,0.3)'
-                : '0 2px 16px rgba(29,91,148,0.10), inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(200,220,240,0.3)',
+              background: '#ffffff',
               display: 'flex', flexDirection: 'column', justifyContent: 'center',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 6 }}>
@@ -611,6 +607,7 @@ export default function YourLoans() {
                 </div>
               )}
             </div>
+            </div>
           </div>
 
           {/* Next Payment Amount — aurora style (lending only) */}
@@ -619,24 +616,21 @@ export default function YourLoans() {
               position: 'absolute', top: '50%', left: '50%',
               transform: 'translate(-50%, -50%)',
               width: 'calc(100% + 10px)', height: 'calc(100% + 10px)',
-              background: isLending
-                ? 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(6,182,212) 30%, rgb(20,184,166) 60%, rgb(3,172,234) 100%)'
-                : 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(99,102,241) 25%, rgb(139,92,246) 50%, rgb(124,58,237) 75%, rgb(29,91,148) 100%)',
+              background: 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(6,182,212) 30%, rgb(20,184,166) 60%, rgb(3,172,234) 100%)',
               filter: 'blur(5px) saturate(1.2)', opacity: 0.35,
               borderRadius: 18, zIndex: 0, pointerEvents: 'none',
             }} />
+            {/* Gradient border wrapper */}
             <div style={{
-              position: 'relative', zIndex: 1,
+              position: 'relative', zIndex: 1, flex: 1,
+              background: 'linear-gradient(to right, rgba(3,172,234,0) 0%, #03ACEA 67%, #03ACEA 100%)',
+              padding: 1, borderRadius: 11, display: 'flex', flexDirection: 'column',
+            }}>
+            {/* Card */}
+            <div style={{
+              flex: 1,
               padding: '10px 14px', borderRadius: 10,
-              background: isLending
-                ? 'linear-gradient(160deg, rgba(255,255,255,0.97) 0%, rgba(240,252,255,0.93) 100%)'
-                : 'linear-gradient(160deg, rgba(255,255,255,0.97) 0%, rgba(245,251,255,0.93) 100%)',
-              backdropFilter: 'blur(16px) saturate(1.8) brightness(1.08)',
-              WebkitBackdropFilter: 'blur(16px) saturate(1.8) brightness(1.08)',
-              border: '1.5px solid rgba(255,255,255,0.9)',
-              boxShadow: isLending
-                ? '0 2px 16px rgba(3,172,234,0.10), inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(180,230,245,0.3)'
-                : '0 2px 16px rgba(29,91,148,0.10), inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(200,220,240,0.3)',
+              background: '#ffffff',
               display: 'flex', flexDirection: 'column', justifyContent: 'center',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 6 }}>
@@ -660,6 +654,7 @@ export default function YourLoans() {
                   <span style={{ fontSize: 11, color: '#9B9A98' }}>No payments yet ✨</span>
                 </div>
               )}
+            </div>
             </div>
           </div>
 
@@ -937,22 +932,18 @@ export default function YourLoans() {
             const ringR = 54; const ringStroke = 9;
             const ringCirc = 2 * Math.PI * ringR; const ringDash = (paidPct / 100) * ringCirc;
             // Aurora style helpers
-            const auroraGrad = isLending
-              ? 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(6,182,212) 30%, rgb(20,184,166) 60%, rgb(3,172,234) 100%)'
-              : 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(99,102,241) 25%, rgb(139,92,246) 50%, rgb(124,58,237) 75%, rgb(29,91,148) 100%)';
-            const cardBg = isLending
-              ? 'linear-gradient(160deg, rgba(255,255,255,0.97) 0%, rgba(240,252,255,0.93) 100%)'
-              : 'linear-gradient(160deg, rgba(255,255,255,0.97) 0%, rgba(245,251,255,0.93) 100%)';
-            const cardShadow = isLending
-              ? '0 2px 16px rgba(3,172,234,0.10), inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(180,230,245,0.3)'
-              : '0 2px 16px rgba(29,91,148,0.10), inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(200,220,240,0.3)';
             const iconBg = isLending ? 'rgba(3,172,234,0.12)' : 'rgba(29,91,148,0.12)';
             const iconColor = isLending ? '#03ACEA' : '#1D5B94';
             const AuroraCard = ({ children }) => (
               <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'calc(100% + 10px)', height: 'calc(100% + 10px)', background: auroraGrad, filter: 'blur(5px) saturate(1.2)', opacity: 0.35, borderRadius: 18, zIndex: 0, pointerEvents: 'none' }} />
-                <div style={{ position: 'relative', zIndex: 1, flex: 1, padding: '12px 14px', borderRadius: 10, background: cardBg, backdropFilter: 'blur(16px) saturate(1.8) brightness(1.08)', WebkitBackdropFilter: 'blur(16px) saturate(1.8) brightness(1.08)', border: '1.5px solid rgba(255,255,255,0.9)', boxShadow: cardShadow }}>
+                {/* Aurora glow — cyan/teal palette */}
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'calc(100% + 10px)', height: 'calc(100% + 10px)', background: 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(6,182,212) 30%, rgb(20,184,166) 60%, rgb(3,172,234) 100%)', filter: 'blur(5px) saturate(1.2)', opacity: 0.35, borderRadius: 18, zIndex: 0, pointerEvents: 'none' }} />
+                {/* Gradient border wrapper */}
+                <div style={{ position: 'relative', zIndex: 1, flex: 1, background: 'linear-gradient(to right, rgba(3,172,234,0) 0%, #03ACEA 67%, #03ACEA 100%)', padding: 1, borderRadius: 11, display: 'flex', flexDirection: 'column' }}>
+                {/* Card */}
+                <div style={{ flex: 1, padding: '12px 14px', borderRadius: 10, background: '#ffffff' }}>
                   {children}
+                </div>
                 </div>
               </div>
             );
@@ -1478,7 +1469,7 @@ export default function YourLoans() {
         <div className="mesh-center" style={{ background: 'transparent', padding: '24px 32px 80px' }}>
 
           {/* Tab header */}
-          <div style={{ display: 'flex', gap: 24, alignItems: 'flex-end', marginLeft: -32, marginRight: -32, paddingLeft: 32, paddingRight: 32, marginBottom: 20 }}>
+          <div style={{ display: 'flex', gap: 24, alignItems: 'flex-end', marginLeft: -32, marginRight: -32, paddingLeft: 32, paddingRight: 32, marginBottom: 0 }}>
             {[{key:'lending',label:'Lending'},{key:'borrowing',label:'Borrowing'},{key:'details',label:'Loan Details'}].map(tab => (
               <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{
                 position: 'relative', paddingBottom: 12,
@@ -1492,6 +1483,7 @@ export default function YourLoans() {
               </button>
             ))}
           </div>
+          <div style={{ height: 1, background: 'rgba(0,0,0,0.08)', marginLeft: -32, marginRight: -32, marginBottom: 20 }} />
 
           {/* Overdue reminder carousel */}
           {activeTab !== 'details' && (() => {
