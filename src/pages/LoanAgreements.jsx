@@ -1069,7 +1069,7 @@ export default function LoanAgreements() {
               onClick={(e) => e.stopPropagation()}
               style={{ background: '#F5F4F0', borderRadius: 18, maxWidth: activePopup === 'amortization' ? 'min(960px, calc(100vw - 32px))' : 520, width: '100%', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 8px 40px rgba(0,0,0,0.16)' }}
             >
-              <div style={{ position: 'sticky', top: 0, background: '#F5F4F0', padding: '6px 14px 5px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: '18px 18px 0 0' }}>
+              <div style={{ position: 'sticky', top: 0, background: 'transparent', padding: '6px 14px 5px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: '18px 18px 0 0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <FileText size={14} style={{ color: '#9B9A98' }} />
                   <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>
@@ -1096,7 +1096,7 @@ export default function LoanAgreements() {
       <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: 0, minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased' }}>
 
         {/* Col 1: left nav */}
-        <div className="mesh-left" style={{ background: '#F5F4F0', borderRight: '1px solid rgba(0,0,0,0.06)' }}>
+        <div className="mesh-left" style={{ background: 'rgba(0,0,0,0.05)', borderRight: '1px solid rgba(0,0,0,0.06)' }}>
           <div style={{ position: 'sticky', top: 0, padding: '24px 8px 0' }}>
             <Link to="/" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 600, fontStyle: 'italic', fontSize: '1.3rem', color: '#1A1918', textDecoration: 'none', display: 'block', marginBottom: 16, paddingLeft: 6, lineHeight: 1, letterSpacing: '-0.02em' }}>Vony</Link>
             <nav style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -1167,7 +1167,7 @@ export default function LoanAgreements() {
         </div>
 
         {/* Col 2: center content */}
-        <div className="mesh-center" style={{ background: '#F5F4F0', padding: '24px 48px 80px' }}>
+        <div className="mesh-center" style={{ background: 'transparent', padding: '24px 48px 80px' }}>
 
           {/* Page title */}
           <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em', color: '#1A1918', marginBottom: 32 }}>Documents</div>

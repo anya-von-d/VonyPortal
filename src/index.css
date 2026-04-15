@@ -275,7 +275,7 @@ input[type="date"] {
   /* stops just below the Log Out button: leave ~480px at top */
   height: calc(100vh - 480px);
   /* left 67% = gradient fade, right 33% = solid #03ACEA */
-  background: linear-gradient(to right, rgba(250,250,250,0) 0%, #03ACEA 67%, #03ACEA 100%);
+  background: linear-gradient(to right, rgba(0,0,0,0) 0%, #03ACEA 67%, #03ACEA 100%);
   pointer-events: none;
   z-index: 5;
 }
