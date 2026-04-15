@@ -202,7 +202,7 @@ export default function LoanHelp() {
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 2,
-              borderRadius: 16, padding: '5px 8px',
+              borderRadius: 12, padding: '5px 8px',
               backdropFilter: 'blur(16px) saturate(1.5)',
               WebkitBackdropFilter: 'blur(16px) saturate(1.5)',
               background: 'rgba(255,255,255,0.75)',
@@ -235,7 +235,7 @@ export default function LoanHelp() {
               return (
                 <motion.div key={loan.name} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} style={{
                   background: 'white',
-                  borderRadius: 16,
+                  borderRadius: 12,
                   border: isRecommended ? '2px solid #03ACEA' : '1.5px solid rgba(0,0,0,0.08)',
                   boxShadow: isRecommended ? '0 4px 20px rgba(3,172,234,0.13)' : '0 2px 12px rgba(0,0,0,0.07)',
                   display: 'flex', flexDirection: 'column',
@@ -291,7 +291,7 @@ export default function LoanHelp() {
                   const isCompared = compared[compareKey] || false;
                   return (
                     <div key={loan.name} className="h-scroll-card" style={{
-                      background: 'white', borderRadius: 16,
+                      background: 'white', borderRadius: 12,
                       border: isRecommended ? '2px solid #03ACEA' : '1.5px solid rgba(0,0,0,0.08)',
                       boxShadow: isRecommended ? '0 4px 20px rgba(3,172,234,0.13)' : '0 2px 12px rgba(0,0,0,0.07)',
                       display: 'flex', flexDirection: 'column',

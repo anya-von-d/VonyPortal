@@ -270,7 +270,7 @@ export default function Profile() {
   if (error && !user) {
     return (
       <div style={{ minHeight: '100vh', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ background: 'white', borderRadius: 14, border: '1px solid rgba(0,0,0,0.06)', padding: 32, maxWidth: 400 }}>
+        <div style={{ background: 'white', borderRadius: 10, border: '1px solid rgba(0,0,0,0.06)', padding: 32, maxWidth: 400 }}>
           <div style={{ textAlign: 'center' }}>
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <XCircle className="w-8 h-8 text-red-600" />
@@ -309,8 +309,8 @@ export default function Profile() {
               <Clock size={12} style={{ color: '#9B9A98' }} />
               <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>Bank Account</span>
             </div>
-            <div style={{ background: '#ffffff', margin: '0 5px 5px', borderRadius: 14, padding: '28px 28px 24px' }}>
-              <div style={{ width: 48, height: 48, borderRadius: 14, margin: '0 auto 20px', background: 'rgba(3,172,234,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ background: '#ffffff', margin: '0 5px 5px', borderRadius: 10, padding: '28px 28px 24px' }}>
+              <div style={{ width: 48, height: 48, borderRadius: 10, margin: '0 auto 20px', background: 'rgba(3,172,234,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Landmark size={24} style={{ color: '#03ACEA' }} />
               </div>
               <h3 style={{ fontSize: 20, fontWeight: 700, color: '#1A1918', margin: '0 0 10px', textAlign: 'center', fontFamily: "'DM Sans', system-ui, sans-serif", letterSpacing: '-0.02em' }}>
@@ -480,7 +480,7 @@ export default function Profile() {
           {/* Page Content */}
           <div style={{ paddingBottom: 40 }}>
             {/* Personal Information — full width */}
-            <div style={{ background: 'white', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', marginBottom: 20, overflow: 'hidden' }}>
+            <div style={{ background: 'white', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', marginBottom: 20, overflow: 'hidden' }}>
               {/* Header */}
               <div style={{ padding: '14px 18px 12px', borderBottom: '1px solid rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>PERSONAL INFORMATION</span>
@@ -614,7 +614,7 @@ export default function Profile() {
             {/* Bank + Verification — 2 columns */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
               {/* Bank Account */}
-              <div style={{ background: 'white', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', marginBottom: 20, overflow: 'hidden' }}>
+              <div style={{ background: 'white', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', marginBottom: 20, overflow: 'hidden' }}>
                 {/* Header */}
                 <div style={{ padding: '14px 18px 12px', borderBottom: '1px solid rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>BANK ACCOUNT</span>
@@ -641,7 +641,7 @@ export default function Profile() {
               </div>
 
               {/* Verification Status */}
-              <div style={{ background: 'white', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', marginBottom: 20, overflow: 'hidden' }}>
+              <div style={{ background: 'white', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', marginBottom: 20, overflow: 'hidden' }}>
                 {/* Header */}
                 <div style={{ padding: '14px 18px 12px', borderBottom: '1px solid rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>VERIFICATION</span>

@@ -900,7 +900,7 @@ export default function Home() {
           {/* New user onboarding — below greeting */}
           {!hasLoans && (
             <div style={{
-              marginBottom: 28, padding: '20px 22px', borderRadius: 14,
+              marginBottom: 28, padding: '20px 22px', borderRadius: 10,
               background: 'white',
               border: '1px solid rgba(0,0,0,0.07)',
               boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
@@ -1004,7 +1004,7 @@ export default function Home() {
                   {/* Card */}
                   <div style={{
                     position: 'relative', zIndex: 1, flex: 1,
-                    padding: '12px 14px', borderRadius: 14,
+                    padding: '12px 14px', borderRadius: 10,
                     background: '#ffffff',
                     border: '1.5px solid rgba(255,255,255,0.9)',
                     boxShadow: '0 2px 16px rgba(29,91,148,0.10), inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(200,220,240,0.3)',
@@ -1059,7 +1059,7 @@ export default function Home() {
                   {/* Card */}
                   <div style={{
                     position: 'relative', zIndex: 1, flex: 1,
-                    padding: '12px 14px', borderRadius: 14,
+                    padding: '12px 14px', borderRadius: 10,
                     background: '#ffffff',
                     border: '1.5px solid rgba(255,255,255,0.9)',
                     boxShadow: '0 2px 16px rgba(3,172,234,0.10), inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(180,230,245,0.3)',
@@ -1089,7 +1089,7 @@ export default function Home() {
             })()}
 
             {/* Overview */}
-            <div className="home-overview-card" style={{ padding: '12px 14px', borderRadius: 14, background: 'white', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.06)' }}>
+            <div className="home-overview-card" style={{ padding: '12px 14px', borderRadius: 10, background: 'white', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.06)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
                 <div style={{ width: 20, height: 20, borderRadius: 6, background: 'rgba(3,172,234,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
@@ -1115,7 +1115,7 @@ export default function Home() {
             {/* Left column: Upcoming → Recent Activity → Active Lending */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
               {/* Upcoming */}
-              <div style={{ background: '#ffffff', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', padding: '14px 18px' }}>
+              <div style={{ background: '#ffffff', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', padding: '14px 18px' }}>
                 <SectionHeader title="Upcoming" linkTo={createPageUrl("Upcoming")} linkLabel="Full schedule →" />
                 {combinedPaymentEvents.length === 0 ? (
                   <div style={{ padding: '8px 0', fontSize: 13, color: '#9B9A98', textAlign: 'center' }}>You're all caught up ✨</div>
@@ -1149,7 +1149,7 @@ export default function Home() {
               </div>
 
               {/* Recent Activity */}
-              <div style={{ background: '#ffffff', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', padding: '14px 18px' }}>
+              <div style={{ background: '#ffffff', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', padding: '14px 18px' }}>
                 <SectionHeader title="Recent Activity" linkTo={createPageUrl("RecentActivity")} linkLabel="View all →" />
                 {recentActivity.length === 0 ? (
                   <div style={{ padding: '8px 0', fontSize: 13, color: '#9B9A98', textAlign: 'center' }}>No activity just yet 🕊️</div>
@@ -1173,7 +1173,7 @@ export default function Home() {
               </div>
 
               {/* Active Lending */}
-              <div style={{ background: '#ffffff', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', padding: '14px 18px' }}>
+              <div style={{ background: '#ffffff', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', padding: '14px 18px' }}>
                 <SectionHeader title="Active Lending" linkTo={createPageUrl("YourLoans")} linkLabel="View all →" />
                 {lentLoans.length === 0 ? (
                   <div style={{ padding: '8px 0', fontSize: 13, color: '#9B9A98', textAlign: 'center' }}>Start a loan to see it here 🌱</div>
@@ -1211,7 +1211,7 @@ export default function Home() {
             {/* Right column: How April → Your Loans Over Time → Active Borrowing */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
               {/* How month is going */}
-              <div style={{ background: '#ffffff', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', padding: '14px 18px' }}>
+              <div style={{ background: '#ffffff', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', padding: '14px 18px' }}>
                 <SectionHeader title={`How ${format(today, 'MMMM')} is going`} />
                 {/* Received */}
                 <div style={{ padding: '9px 0' }}>
@@ -1238,7 +1238,7 @@ export default function Home() {
               </div>
 
               {/* Your Loans Over Time */}
-              <div style={{ background: '#ffffff', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', padding: '14px 18px' }} ref={loansChartRef}>
+              <div style={{ background: '#ffffff', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', padding: '14px 18px' }} ref={loansChartRef}>
                 <SectionHeader title="Your Loans Over Time" />
                 {!chartData ? (
                   <div style={{ padding: '8px 0', fontSize: 13, color: '#9B9A98', textAlign: 'center' }}>Your loan history will appear here 📊</div>
@@ -1291,7 +1291,7 @@ export default function Home() {
               </div>
 
               {/* Active Borrowing */}
-              <div style={{ background: '#ffffff', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', padding: '14px 18px' }}>
+              <div style={{ background: '#ffffff', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.08), 0 6px 24px rgba(0,0,0,0.06)', padding: '14px 18px' }}>
                 <SectionHeader title="Active Borrowing" linkTo={createPageUrl("YourLoans")} linkLabel="View all →" />
                 {borrowedLoans.length === 0 ? (
                   <div style={{ padding: '8px 0', fontSize: 13, color: '#9B9A98', textAlign: 'center' }}>Nothing borrowed just yet 🤝</div>

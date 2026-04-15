@@ -989,7 +989,7 @@ export default function Borrowing() {
                 const firstName = lender?.full_name?.split(' ')[0] || 'User';
                 return (
                   <div style={{
-                    padding: '12px 14px', borderRadius: 14,
+                    padding: '12px 14px', borderRadius: 10,
                     background: 'linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(3,172,234,0.06) 60%, rgba(3,172,234,0.10) 100%)',
                     backdropFilter: 'blur(10px) saturate(1.6)', WebkitBackdropFilter: 'blur(10px) saturate(1.6)',
                     border: '2px solid #03ACEA',
@@ -1025,7 +1025,7 @@ export default function Borrowing() {
                 const totalPaid = activeLoans.reduce((s, l) => s + (l.amount_paid || 0), 0);
                 const pct = totalOwed > 0 ? Math.round((totalPaid / totalOwed) * 100) : 0;
                 return (
-                  <div style={{ padding: '12px 14px', borderRadius: 14, background: 'white', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <div style={{ padding: '12px 14px', borderRadius: 10, background: 'white', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
                       <div style={{ width: 20, height: 20, borderRadius: 6, background: 'rgba(3,172,234,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="7 13 12 18 17 13"/><line x1="12" y1="18" x2="12" y2="6"/></svg>

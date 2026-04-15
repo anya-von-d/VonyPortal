@@ -757,7 +757,7 @@ export default function LoanAgreements() {
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-        <div style={{ background: '#F5F4F0', borderRadius: 16, padding: 16 }}>
+        <div style={{ background: '#F5F4F0', borderRadius: 12, padding: 16 }}>
           <p style={{ fontSize: 12, color: '#787776', marginBottom: 4 }}>Principal Amount</p>
           <p style={{ fontSize: 28, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(agreement.amount)}</p>
         </div>
@@ -766,7 +766,7 @@ export default function LoanAgreements() {
           The lender agrees to lend <strong>{borrowerInfo.full_name}</strong> <strong>{formatMoney(agreement.amount)}</strong> before <strong>{format(sendFundsDate, 'MMM d, yyyy')}</strong> at an interest rate of <strong>{agreement.interest_rate}%</strong>. The loan will be repaid over <strong>{repaymentPeriod} {repaymentUnit}</strong> in <strong>{paymentFrequency}</strong> payments of <strong>{formatMoney(agreement.payment_amount)}</strong>. Payments will be due {paymentFrequency === 'weekly' ? <>on <strong>{dayOfWeekLabel}</strong></> : <>on the <strong>{dayOfMonth}{daySuffix}</strong></>} at <strong>{formattedTime} {timezone}</strong>, with the first of the <strong>{numPayments}</strong> payments due on <strong>{format(firstPaymentDate, 'MMM d, yyyy')}</strong> and the last payment due on <strong>{lastPaymentDate ? format(lastPaymentDate, 'MMM d, yyyy') : '—'}</strong>.{agreement.purpose ? <> This loan is for <strong>{agreement.purpose}</strong>.</> : ''}
         </p>
 
-        <div style={{ background: '#F5F4F0', borderRadius: 16, padding: 16 }}>
+        <div style={{ background: '#F5F4F0', borderRadius: 12, padding: 16 }}>
           <h3 style={{ fontSize: 14, fontWeight: 600, color: '#1A1918', marginBottom: 12 }}>Terms of Repayment</h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, fontSize: 13 }}>
             <div><span style={{ color: '#787776' }}>Total Amount Due:</span> <span style={{ fontWeight: 500 }}>{formatMoney(agreement.total_amount)}</span></div>
@@ -889,18 +889,18 @@ export default function LoanAgreements() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          <div style={{ background: '#F5F4F0', borderRadius: 16, padding: 16 }}>
+          <div style={{ background: '#F5F4F0', borderRadius: 12, padding: 16 }}>
             <p style={{ fontSize: 11, color: '#787776', marginBottom: 4 }}>Loan Amount</p>
             <p style={{ fontSize: 24, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(agreement.amount)}</p>
           </div>
-          <div style={{ background: '#F5F4F0', borderRadius: 16, padding: 16 }}>
+          <div style={{ background: '#F5F4F0', borderRadius: 12, padding: 16 }}>
             <p style={{ fontSize: 11, color: '#787776', marginBottom: 4 }}>Total Due</p>
             <p style={{ fontSize: 24, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(agreement.total_amount)}</p>
           </div>
         </div>
 
         {loan && (
-          <div style={{ background: '#F5F4F0', borderRadius: 16, padding: 16 }}>
+          <div style={{ background: '#F5F4F0', borderRadius: 12, padding: 16 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
               <span style={{ fontSize: 13, color: '#787776' }}>Payment Progress</span>
               <span style={{ fontSize: 13, fontWeight: 500, color: '#1A1918' }}>
@@ -974,7 +974,7 @@ export default function LoanAgreements() {
         </div>
 
         {agreement.purpose && (
-          <div style={{ background: '#F5F4F0', borderRadius: 16, padding: 16 }}>
+          <div style={{ background: '#F5F4F0', borderRadius: 12, padding: 16 }}>
             <p style={{ fontSize: 11, color: '#787776', marginBottom: 4 }}>Purpose</p>
             <p style={{ color: '#1A1918', margin: 0 }}>{agreement.purpose}</p>
           </div>
@@ -1083,7 +1083,7 @@ export default function LoanAgreements() {
                 </button>
               </div>
 
-              <div style={{ background: '#ffffff', margin: '0 5px 5px', borderRadius: 14, padding: 20 }}>
+              <div style={{ background: '#ffffff', margin: '0 5px 5px', borderRadius: 10, padding: 20 }}>
                 {activePopup === 'promissory' && <PromissoryNotePopup agreement={popupAgreement} />}
                 {activePopup === 'amortization' && <AmortizationSchedulePopup agreement={popupAgreement} />}
                 {activePopup === 'summary' && <LoanSummaryPopup agreement={popupAgreement} />}
@@ -1195,7 +1195,7 @@ export default function LoanAgreements() {
           </div>
 
           {/* ── Agreements List ──────────────────────────────────── */}
-          <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)' }}>
+          <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, padding: '10px 16px' }}>
               <span style={{ fontSize: 11, fontWeight: 500, color: '#787776', marginRight: 4 }}>Page {laSafePage + 1} of {laTotalPages}</span>
               <button onClick={() => setLaPage(Math.max(0, laSafePage - 1))} disabled={laSafePage === 0} style={{ width: 26, height: 26, borderRadius: 7, border: '1px solid rgba(0,0,0,0.09)', background: 'white', cursor: laSafePage === 0 ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: laSafePage === 0 ? 0.3 : 1, flexShrink: 0 }}>

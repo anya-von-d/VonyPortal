@@ -245,7 +245,7 @@ export default function ComingSoon() {
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 28 }}>
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 2,
-              borderRadius: 16, padding: '5px 8px',
+              borderRadius: 12, padding: '5px 8px',
               backdropFilter: 'blur(16px) saturate(1.5)',
               WebkitBackdropFilter: 'blur(16px) saturate(1.5)',
               background: 'rgba(255,255,255,0.75)',
@@ -273,7 +273,7 @@ export default function ComingSoon() {
             {(LEARN_ARTICLES[learnCategory] || []).map((article, index) => {
               const clr = CAT_COLORS[learnCategory];
               return (
-                <motion.div key={article.title} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} style={{ background: clr.bg, borderRadius: 14, padding: '14px 16px', boxShadow: '0 1px 6px rgba(0,0,0,0.04)', cursor: 'default', border: `1px solid ${clr.border}`, position: 'relative' }}>
+                <motion.div key={article.title} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} style={{ background: clr.bg, borderRadius: 10, padding: '14px 16px', boxShadow: '0 1px 6px rgba(0,0,0,0.04)', cursor: 'default', border: '1px solid rgba(0,0,0,0.06)', position: 'relative' }}>
                   {/* Star */}
                   <div style={{ position: 'absolute', top: 10, right: 10 }}>
                     <StarButton saved={saved.has(article.title)} onToggle={() => toggleSave(article.title)} />
@@ -301,7 +301,7 @@ export default function ComingSoon() {
                 {(LEARN_ARTICLES[cat.id] || []).map((article) => {
                   const clr = CAT_COLORS[cat.id];
                   return (
-                    <div key={article.title} className="h-scroll-card" style={{ background: clr.bg, borderRadius: 14, padding: '14px 15px', boxShadow: '0 1px 6px rgba(0,0,0,0.04)', border: `1px solid ${clr.border}`, position: 'relative' }}>
+                    <div key={article.title} className="h-scroll-card" style={{ background: clr.bg, borderRadius: 10, padding: '14px 15px', boxShadow: '0 1px 6px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.06)', position: 'relative' }}>
                       {/* Star */}
                       <div style={{ position: 'absolute', top: 10, right: 10 }}>
                         <StarButton saved={saved.has(article.title)} onToggle={() => toggleSave(article.title)} />

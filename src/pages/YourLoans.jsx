@@ -538,7 +538,7 @@ export default function YourLoans() {
     const barBg = isLending ? 'rgba(3,172,234,0.1)' : 'rgba(29,91,148,0.1)';
 
     const glowBox = {
-      padding: 16, borderRadius: 14, background: 'white',
+      padding: 16, borderRadius: 10, background: 'white',
       boxShadow: '0 0 0 2px rgba(3,172,234,0.25), 0 0 16px rgba(3,172,234,0.12), 0 2px 12px rgba(0,0,0,0.04)',
       border: '1.5px solid rgba(3,172,234,0.35)',
     };
@@ -571,7 +571,7 @@ export default function YourLoans() {
             {/* Card */}
             <div style={{
               position: 'relative', zIndex: 1,
-              padding: '10px 14px', borderRadius: 14,
+              padding: '10px 14px', borderRadius: 10,
               background: isLending
                 ? 'linear-gradient(160deg, rgba(255,255,255,0.97) 0%, rgba(240,252,255,0.93) 100%)'
                 : 'linear-gradient(160deg, rgba(255,255,255,0.97) 0%, rgba(245,251,255,0.93) 100%)',
@@ -627,7 +627,7 @@ export default function YourLoans() {
             }} />
             <div style={{
               position: 'relative', zIndex: 1,
-              padding: '10px 14px', borderRadius: 14,
+              padding: '10px 14px', borderRadius: 10,
               background: isLending
                 ? 'linear-gradient(160deg, rgba(255,255,255,0.97) 0%, rgba(240,252,255,0.93) 100%)'
                 : 'linear-gradient(160deg, rgba(255,255,255,0.97) 0%, rgba(245,251,255,0.93) 100%)',
@@ -664,7 +664,7 @@ export default function YourLoans() {
           </div>
 
           {/* Total Active Lending / Active Borrowing — standalone glassmorphism */}
-          <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '12px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '12px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
               <div style={{ width: 20, height: 20, borderRadius: 6, background: 'rgba(3,172,234,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
@@ -951,7 +951,7 @@ export default function YourLoans() {
             const AuroraCard = ({ children }) => (
               <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'calc(100% + 10px)', height: 'calc(100% + 10px)', background: auroraGrad, filter: 'blur(5px) saturate(1.2)', opacity: 0.35, borderRadius: 18, zIndex: 0, pointerEvents: 'none' }} />
-                <div style={{ position: 'relative', zIndex: 1, flex: 1, padding: '12px 14px', borderRadius: 14, background: cardBg, backdropFilter: 'blur(16px) saturate(1.8) brightness(1.08)', WebkitBackdropFilter: 'blur(16px) saturate(1.8) brightness(1.08)', border: '1.5px solid rgba(255,255,255,0.9)', boxShadow: cardShadow }}>
+                <div style={{ position: 'relative', zIndex: 1, flex: 1, padding: '12px 14px', borderRadius: 10, background: cardBg, backdropFilter: 'blur(16px) saturate(1.8) brightness(1.08)', WebkitBackdropFilter: 'blur(16px) saturate(1.8) brightness(1.08)', border: '1.5px solid rgba(255,255,255,0.9)', boxShadow: cardShadow }}>
                   {children}
                 </div>
               </div>
@@ -1323,7 +1323,7 @@ export default function YourLoans() {
       background: 'rgba(255,255,255,0.85)',
       backdropFilter: 'blur(12px) saturate(1.4)',
       WebkitBackdropFilter: 'blur(12px) saturate(1.4)',
-      borderRadius: 14,
+      borderRadius: 10,
       border: '1px solid rgba(0,0,0,0.07)',
       boxShadow: '0 2px 16px rgba(0,0,0,0.05)',
       padding: '14px 18px',
@@ -1390,7 +1390,7 @@ export default function YourLoans() {
                 </div>
                 <button onClick={closeDocPopup} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#787776' }}><X size={20} /></button>
               </div>
-              <div style={{ background: '#ffffff', margin: '0 5px 5px', borderRadius: 14, padding: 20 }}>
+              <div style={{ background: '#ffffff', margin: '0 5px 5px', borderRadius: 10, padding: 20 }}>
                 {activeDocPopup === 'promissory' && <PromissoryNotePopup agreement={docPopupAgreement} />}
                 {activeDocPopup === 'amortization' && <AmortizationSchedulePopup agreement={docPopupAgreement} />}
                 {activeDocPopup === 'summary' && <LoanSummaryPopup agreement={docPopupAgreement} />}

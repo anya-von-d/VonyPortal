@@ -504,7 +504,7 @@ export default function RecordPayment() {
           {/* ── No loans onboarding banner ── */}
           {!isLoading && loans.length === 0 && (
             <div style={{
-              marginBottom: 28, padding: '16px 22px', borderRadius: 14,
+              marginBottom: 28, padding: '16px 22px', borderRadius: 10,
               background: 'white', border: '1px solid rgba(0,0,0,0.07)',
               boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap',
@@ -533,7 +533,7 @@ export default function RecordPayment() {
           <div className="rp-two-col" style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 20, alignItems: 'start' }}>
 
             {/* Left: Select Your Loan */}
-            <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
+            <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 12, borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
                 <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Select Your Loan</span>
                 <button onClick={clearFilters} style={{
@@ -587,7 +587,7 @@ export default function RecordPayment() {
             </div>
 
             {/* Right: Payment Form */}
-            <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 14, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
+            <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
               <div style={{ paddingBottom: 10, marginBottom: 12, borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
                 <span style={{ fontSize: 10, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                   {currentStep === 0 ? 'Payment Details' : currentStep === 1 ? 'Payment Details' : currentStep === 2 ? 'Confirm Payment' : 'Payment Recorded'}
@@ -604,7 +604,7 @@ export default function RecordPayment() {
                   {currentStep === 1 && selectedLoan && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                       {/* Loan sentence */}
-                      <div style={{ background: 'rgba(3,172,234,0.08)', borderRadius: 14, padding: 16 }}>
+                      <div style={{ background: 'rgba(3,172,234,0.08)', borderRadius: 10, padding: 16 }}>
                         <p style={{ fontSize: 15, fontWeight: 500, color: '#1A1918', margin: 0, lineHeight: 1.6 }}>
                           {nameOrYouCapitalized(isUserLender(selectedLoan) ? selectedLoan.borrower_id : user?.id)} paid {nameOrYou(isUserLender(selectedLoan) ? user?.id : selectedLoan.lender_id)}{' '}
                           {amount && parseFloat(amount) > 0
