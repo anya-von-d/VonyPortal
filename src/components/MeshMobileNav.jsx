@@ -10,7 +10,7 @@ const PAGE_LABELS = {
   'Home': 'Home',
   'Upcoming': 'Upcoming',
   'CreateOffer': 'Create Loan',
-  'RecordPayment': 'Record Payment',
+  'RecordPayment': 'Log Payment',
   'Lending': 'Lending',
   'Borrowing': 'Borrowing',
   'Friends': 'Friends',
@@ -26,7 +26,7 @@ const NAV_ITEMS = [
   { label: 'Home',            to: '/' },
   { label: 'Upcoming',        to: createPageUrl("Upcoming") },
   { label: 'Create Loan',     to: createPageUrl("CreateOffer") },
-  { label: 'Record Payment',  to: createPageUrl("RecordPayment") },
+  { label: 'Log Payment',     to: createPageUrl("RecordPayment") },
   { label: 'Lending',         to: createPageUrl("Lending") },
   { label: 'Borrowing',       to: createPageUrl("Borrowing") },
   { label: 'Friends',         to: createPageUrl("Friends") },
@@ -35,9 +35,7 @@ const NAV_ITEMS = [
   { label: 'Learn',           to: createPageUrl("ComingSoon") },
 ];
 
-const SOON_ITEMS = [
-  { label: 'Loan Help', to: createPageUrl("LoanHelp") },
-];
+const SOON_ITEMS = [];
 
 export default function MeshMobileNav({ user, activePage }) {
   const { logout } = useAuth();
