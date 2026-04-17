@@ -1426,24 +1426,26 @@ export default function YourLoans({ defaultTab }) {
   const LENDER_GREEN = '#03ACEA';
 
   const PageCard = ({ title, headerRight, children, style, highlight }) => (
+    <div style={{ position: 'relative', marginBottom: 24 }}>
+      <div className="home-aura-glow" style={{ position: 'absolute', inset: -7, background: '#CFDCE7', borderRadius: 16, filter: 'blur(8px)', opacity: 0.55, zIndex: 0, pointerEvents: 'none' }} />
     <div style={{
-      marginBottom: 24,
-      background: 'rgba(255,255,255,0.85)',
+      position: 'relative', zIndex: 1,
+      background: '#ffffff',
       backdropFilter: 'blur(12px) saturate(1.4)',
       WebkitBackdropFilter: 'blur(12px) saturate(1.4)',
       borderRadius: 10,
-      border: '1px solid rgba(0,0,0,0.07)',
-      boxShadow: '0 2px 16px rgba(0,0,0,0.05)',
+      border: highlight ? '1px solid rgba(3,172,234,0.25)' : '1px solid rgba(207,220,231,0.6)',
       padding: '14px 18px',
       ...style
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 4, borderBottom: highlight ? '1px solid rgba(3,172,234,0.2)' : '1px solid rgba(0,0,0,0.07)' }}>
-        <span style={{ fontSize: 9, fontWeight: 700, color: highlight ? '#03ACEA' : '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{title}</span>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
+        <span style={{ fontSize: 13, fontWeight: 600, color: highlight ? '#03ACEA' : '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
         {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
       </div>
       <div style={{ overflow: 'visible', ...(highlight ? { display: 'flex', flexDirection: 'column' } : {}) }}>
         {children}
       </div>
+    </div>
     </div>
   );
 

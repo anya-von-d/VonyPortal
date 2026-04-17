@@ -511,9 +511,11 @@ export default function RecordPayment() {
           <div className="rp-two-col" style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 20, alignItems: 'start' }}>
 
             {/* Left: Select Your Loan */}
-            <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, marginBottom: 12, borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
-                <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Select Your Loan</span>
+            <div style={{ position: 'relative' }}>
+              <div className="home-aura-glow" style={{ position: 'absolute', inset: -7, background: '#CFDCE7', borderRadius: 16, filter: 'blur(8px)', opacity: 0.55, zIndex: 0, pointerEvents: 'none' }} />
+            <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(207,220,231,0.6)', padding: '14px 18px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Select Your Loan</span>
                 <button onClick={clearFilters} style={{
                   padding: '2px 8px', borderRadius: 6, border: 'none', background: 'transparent',
                   fontSize: 11, fontWeight: 500, color: hasAnyFilter ? '#E8726E' : '#C7C6C4',
@@ -563,11 +565,14 @@ export default function RecordPayment() {
                 )}
               </div>
             </div>
+            </div>
 
             {/* Right: Payment Form */}
-            <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
-              <div style={{ paddingBottom: 10, marginBottom: 12, borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
-                <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            <div style={{ position: 'relative' }}>
+              <div className="home-aura-glow" style={{ position: 'absolute', inset: -7, background: '#CFDCE7', borderRadius: 16, filter: 'blur(8px)', opacity: 0.55, zIndex: 0, pointerEvents: 'none' }} />
+            <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(207,220,231,0.6)', padding: '14px 18px' }}>
+              <div style={{ paddingBottom: 5, marginBottom: 2 }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>
                   {currentStep === 0 ? 'Payment Details' : currentStep === 1 ? 'Payment Details' : currentStep === 2 ? 'Confirm Payment' : 'Payment Recorded'}
                 </span>
               </div>
@@ -787,6 +792,7 @@ export default function RecordPayment() {
                     </motion.div>
                   )}
               </div>
+            </div>
             </div>
 
           </div>{/* end rp-two-col */}
