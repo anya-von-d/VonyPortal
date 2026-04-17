@@ -795,67 +795,58 @@ export default function YourLoans() {
                     key={loan.id}
                     onClick={() => { setManageLoanSelected(loan); setActiveTab('details'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                     style={{
-                      flexShrink: 0, width: 148,
+                      flexShrink: 0, width: 220,
                       background: 'white', borderRadius: 12,
                       border: '1px solid rgba(0,0,0,0.07)',
                       boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                      padding: '10px 12px 14px',
-                      display: 'flex', flexDirection: 'column', alignItems: 'center',
+                      padding: '12px 14px',
+                      display: 'flex', flexDirection: 'column',
                       cursor: 'pointer',
                       transition: 'box-shadow 0.15s, transform 0.15s',
                     }}
                     onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.10)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
                     onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)'; e.currentTarget.style.transform = 'none'; }}
                   >
-                    {/* Status badge - top left */}
-                    <div style={{
-                      alignSelf: 'flex-start',
-                      fontSize: 10, fontWeight: 700,
-                      color: statusColor,
-                      background: statusBg,
-                      borderRadius: 6,
-                      padding: '2px 7px',
-                      marginBottom: 10,
-                      letterSpacing: '0.01em',
-                      fontFamily: "'DM Sans', sans-serif",
-                    }}>
-                      {statusLabel}
-                    </div>
-                    {/* Avatar */}
-                    <UserAvatar
-                      name={name}
-                      src={otherProfile?.profile_picture_url}
-                      size={48}
-                    />
-                    {/* Name */}
-                    <div style={{
-                      fontSize: 13, fontWeight: 600, color: '#1A1918',
-                      textAlign: 'center', marginTop: 8, marginBottom: 2,
-                      width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                      fontFamily: "'DM Sans', sans-serif",
-                    }}>
-                      {firstName}
-                    </div>
-                    {lastName && (
+                    {/* Top row: avatar + name (left) · status badge (right) */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 10 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                        <UserAvatar
+                          name={name}
+                          src={otherProfile?.profile_picture_url}
+                          size={34}
+                        />
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{
+                            fontSize: 13, fontWeight: 600, color: '#1A1918',
+                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                            fontFamily: "'DM Sans', sans-serif",
+                          }}>
+                            {name}
+                          </div>
+                        </div>
+                      </div>
+                      {/* Status badge - top right */}
                       <div style={{
-                        fontSize: 11, color: '#787776',
-                        textAlign: 'center', marginBottom: 6,
-                        width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        flexShrink: 0,
+                        fontSize: 10, fontWeight: 700,
+                        color: statusColor,
+                        background: statusBg,
+                        borderRadius: 6,
+                        padding: '2px 7px',
+                        letterSpacing: '0.01em',
                         fontFamily: "'DM Sans', sans-serif",
                       }}>
-                        {lastName}
+                        {statusLabel}
                       </div>
-                    )}
+                    </div>
                     {/* Loan info */}
                     <div style={{
-                      fontSize: 11, color: '#787776', textAlign: 'center', lineHeight: 1.4,
-                      width: '100%', fontFamily: "'DM Sans', sans-serif",
+                      fontSize: 11, color: '#787776', lineHeight: 1.4,
+                      fontFamily: "'DM Sans', sans-serif",
                     }}>
                       {isLending ? 'Lent' : 'Borrowed'} <span style={{ fontWeight: 600, color: '#1A1918' }}>{formatMoney(totalAmt)}</span>
                       {purpose && (
-                        <div style={{ color: '#9B9A98', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          for {purpose}
-                        </div>
+                        <span style={{ color: '#9B9A98' }}> for {purpose}</span>
                       )}
                     </div>
                   </div>
