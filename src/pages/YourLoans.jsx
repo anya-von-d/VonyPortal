@@ -545,67 +545,55 @@ export default function YourLoans({ defaultTab }) {
             { label: 'Frequency', value: paymentFrequency.charAt(0).toUpperCase() + paymentFrequency.slice(1) },
           ];
           return (
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, marginBottom: 16, alignItems: 'start' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                  <AuroraCard>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
-                      <div style={{ width: 20, height: 20, borderRadius: 6, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        {isLending
-                          ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2.5" strokeLinecap="round"><polyline points="17 11 12 6 7 11"/><line x1="12" y1="6" x2="12" y2="18"/></svg>
-                          : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2.5" strokeLinecap="round"><polyline points="7 13 12 18 17 13"/><line x1="12" y1="18" x2="12" y2="6"/></svg>
-                        }
-                      </div>
-                      <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{isLending ? 'Next Payment Incoming' : 'Next Payment Due'}</span>
-                    </div>
-                    {nextPmtDate ? (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap', overflow: 'hidden' }}>
-                        <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{format(nextPmtDate, 'MMM d')}</span>
-                        {dLabel && <span style={{ fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '2px 6px', flexShrink: 0 }}>{dLabel}</span>}
-                      </div>
-                    ) : (
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#C5C3C0' }}>—</span>
-                    )}
-                  </AuroraCard>
-                  <AuroraCard>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
-                      <div style={{ width: 20, height: 20, borderRadius: 6, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                      </div>
-                      <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Next Payment Amount</span>
-                    </div>
-                    {nextPmtDate ? (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap', overflow: 'hidden' }}>
-                        <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{formatMoney(nextPmtAmt)}</span>
-                        <span style={{ fontSize: 11, color: '#9B9A98', marginLeft: 'auto', flexShrink: 0, whiteSpace: 'nowrap' }}>{isLending ? `from ${otherPartyUsername}` : `to ${otherPartyUsername}`}</span>
-                      </div>
-                    ) : (
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#C5C3C0' }}>—</span>
-                    )}
-                  </AuroraCard>
-                </div>
-                <PageCard title="Loan Terms" style={{ marginBottom: 0 }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-                    {loanTermItems.map((item, idx) => (<div key={idx} style={{ textAlign: 'center' }}><p style={{ fontSize: 10, color: '#787776', fontWeight: 500, marginBottom: 2 }}>{item.label}</p><p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>{item.value}</p></div>))}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 16 }}>
+              {/* Consolidated Next Payment Due card */}
+              <AuroraCard>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
+                  <div style={{ width: 20, height: 20, borderRadius: 6, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    {isLending
+                      ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2.5" strokeLinecap="round"><polyline points="17 11 12 6 7 11"/><line x1="12" y1="6" x2="12" y2="18"/></svg>
+                      : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2.5" strokeLinecap="round"><polyline points="7 13 12 18 17 13"/><line x1="12" y1="18" x2="12" y2="6"/></svg>
+                    }
                   </div>
-                </PageCard>
-              </div>
-              <PageCard title="Payment Progress" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 0 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-                  <circle cx={dCx} cy={dCy} r={ringR} fill="none" stroke="#E5E4E2" strokeWidth={ringStroke} strokeLinecap="round" />
-                  {paidPct > 0 && (
-                    <circle cx={dCx} cy={dCy} r={ringR} fill="none" stroke="#03ACEA" strokeWidth={ringStroke}
-                      strokeDasharray={`${ringDash} ${ringCirc - ringDash}`} strokeLinecap="round"
-                      transform={`rotate(-90 ${dCx} ${dCy})`} />
-                  )}
-                  <text x={dCx} y={dCy - 7} textAnchor="middle" dominantBaseline="middle" style={{ fontSize: 20, fontWeight: 700, fill: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>{Math.round(paidPct)}%</text>
-                  <text x={dCx} y={dCy + 12} textAnchor="middle" dominantBaseline="middle" style={{ fontSize: 11, fontWeight: 500, fill: '#787776', fontFamily: "'DM Sans', sans-serif" }}>repaid</text>
-                </svg>
-                <p style={{ fontSize: 11, fontWeight: 500, color: '#1A1918', marginTop: 6, textAlign: 'center' }}>
-                  <span style={{ fontWeight: 700 }}>${totalPaidAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                  <span style={{ color: '#787776' }}> of ${totalWithInterest.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {isLending ? 'repaid' : 'paid back'}</span>
-                </p>
+                  <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{isLending ? 'Next Payment Incoming' : 'Next Payment Due'}</span>
+                </div>
+                {nextPmtDate ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap', overflow: 'hidden' }}>
+                    <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{format(nextPmtDate, 'MMM d')}</span>
+                    {dLabel && <span style={{ fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '2px 6px', flexShrink: 0 }}>{dLabel}</span>}
+                    <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0, marginLeft: 6 }}>{formatMoney(nextPmtAmt)}</span>
+                    <span style={{ fontSize: 11, color: '#9B9A98', marginLeft: 'auto', flexShrink: 0, whiteSpace: 'nowrap' }}>{isLending ? `from ${otherPartyUsername}` : `to ${otherPartyUsername}`}</span>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: '#C5C3C0' }}>—</span>
+                    <span style={{ fontSize: 11, color: '#9B9A98' }}>{isLending ? 'None incoming ✨' : 'Nothing due 🎉'}</span>
+                  </div>
+                )}
+              </AuroraCard>
+
+              {/* Payment Progress aurora card */}
+              <AuroraCard>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
+                  <div style={{ width: 20, height: 20, borderRadius: 6, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                  </div>
+                  <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Payment Progress</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap', overflow: 'hidden' }}>
+                  <span style={{ fontSize: 15, letterSpacing: '-0.02em', flexShrink: 0, color: '#1A1918' }}>
+                    <span style={{ fontWeight: 800 }}>{Math.round(paidPct)}%</span>
+                    <span style={{ fontWeight: 400 }}> {isLending ? 'repaid' : 'paid back'}</span>
+                  </span>
+                  <span style={{ fontSize: 11, color: '#9B9A98', marginLeft: 'auto', flexShrink: 0, whiteSpace: 'nowrap' }}>
+                    ${totalPaidAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} of ${totalWithInterest.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} repaid
+                  </span>
+                </div>
+              </AuroraCard>
+
+              <PageCard title="Loan Terms" style={{ marginBottom: 0 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                  {loanTermItems.map((item, idx) => (<div key={idx} style={{ textAlign: 'center' }}><p style={{ fontSize: 10, color: '#787776', fontWeight: 500, marginBottom: 2 }}>{item.label}</p><p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>{item.value}</p></div>))}
                 </div>
               </PageCard>
             </div>
@@ -903,61 +891,12 @@ export default function YourLoans({ defaultTab }) {
     const totalPaidAll = activeLoans.reduce((s, l) => s + (l.amount_paid || 0), 0);
     const pctAll = totalOwedAll > 0 ? Math.round((totalPaidAll / totalOwedAll) * 100) : 0;
 
-    // Aurora card helper for mobile section
-    const MobileAuroraCard = ({ label, icon, children }) => (
-      <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'calc(100% + 10px)', height: 'calc(100% + 10px)', background: 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(6,182,212) 30%, rgb(20,184,166) 60%, rgb(3,172,234) 100%)', filter: 'blur(5px) saturate(1.2)', opacity: 0.35, borderRadius: 18, zIndex: 0, pointerEvents: 'none' }} />
-        <div style={{ position: 'relative', zIndex: 1, flex: 1, background: 'linear-gradient(to right, rgba(3,172,234,0) 0%, #03ACEA 67%, #03ACEA 100%)', padding: 1, borderRadius: 11, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ flex: 1, padding: '10px 14px', borderRadius: 10, background: '#ffffff', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 6 }}>
-              <div style={{ width: 20, height: 20, borderRadius: 6, background: isLending ? 'rgba(3,172,234,0.12)' : 'rgba(29,91,148,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{icon}</div>
-              <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{label}</span>
-            </div>
-            {children}
-          </div>
-        </div>
-      </div>
-    );
-
     return (
       <>
-        {/* Mobile-only: consolidated Next Payment Due + Payment Progress */}
-        <div className="loans-mobile-pay-top">
-          <MobileAuroraCard
-            label="Next Payment Due"
-            icon={isLending
-              ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round"><polyline points="17 11 12 6 7 11"/><line x1="12" y1="6" x2="12" y2="18"/></svg>
-              : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1D5B94" strokeWidth="2.5" strokeLinecap="round"><polyline points="7 13 12 18 17 13"/><line x1="12" y1="18" x2="12" y2="6"/></svg>
-            }
-          >
-            {nextPaymentLoan ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap', overflow: 'hidden' }}>
-                <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{format(new Date(nextPaymentLoan.next_payment_date), 'MMM d')}</span>
-                {daysLabel && <span style={{ fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '2px 6px', flexShrink: 0 }}>{daysLabel}</span>}
-                <span style={{ fontSize: 11, color: '#9B9A98', marginLeft: 'auto', flexShrink: 0, whiteSpace: 'nowrap' }}>{formatMoney(nextPaymentAmount)} {isLending ? 'from' : 'to'} {otherPartyUsername}</span>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 15, fontWeight: 700, color: '#C5C3C0' }}>—</span>
-                <span style={{ fontSize: 11, color: '#9B9A98' }}>{isLending ? 'None incoming ✨' : 'Nothing due 🎉'}</span>
-              </div>
-            )}
-          </MobileAuroraCard>
-          <MobileAuroraCard
-            label="Payment Progress"
-            icon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={isLending ? '#03ACEA' : '#1D5B94'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap', overflow: 'hidden' }}>
-              <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{pctAll}% {isLending ? 'paid back' : 'repaid'}</span>
-              <span style={{ fontSize: 11, color: '#9B9A98', marginLeft: 'auto', flexShrink: 0, whiteSpace: 'nowrap' }}>{formatMoney(totalPaidAll)} of {formatMoney(totalOwedAll)} {isLending ? 'paid back' : 'repaid'}</span>
-            </div>
-          </MobileAuroraCard>
-        </div>
-
         {/* 1. Three standalone top cards */}
         <div className="loans-top-cards" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, marginBottom: 20, alignItems: 'center' }}>
-          {/* Next Incoming / Next Payment Due — aurora card identical to Home page */}
-          <div className="loans-pay-card-desktop" style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
+          {/* Next Incoming / Next Payment Due — aurora card */}
+          <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
             {/* Aurora glow — cyan/teal palette */}
             <div style={{
               position: 'absolute', top: '50%', left: '50%',
@@ -1012,7 +951,7 @@ export default function YourLoans({ defaultTab }) {
           </div>
 
           {/* Next Payment Amount — aurora style */}
-          <div className="loans-pay-card-desktop" style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
             <div style={{
               position: 'absolute', top: '50%', left: '50%',
               transform: 'translate(-50%, -50%)',
