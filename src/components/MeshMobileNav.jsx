@@ -15,7 +15,7 @@ const PAGE_LABELS = {
   'Borrowing': 'Borrowing',
   'Friends': 'Friends',
   'RecentActivity': 'Recent Activity',
-  'LoanAgreements': 'Documents',
+  'LoanAgreements': 'Records',
   'Requests': 'Notifications',
   'ComingSoon': 'Learn',
   'LoanHelp': 'Loan Help',
@@ -30,8 +30,8 @@ const NAV_ITEMS = [
   { label: 'Lending',         to: createPageUrl("Lending") },
   { label: 'Borrowing',       to: createPageUrl("Borrowing") },
   { label: 'Friends',         to: createPageUrl("Friends") },
+  { label: 'Records',         to: createPageUrl("LoanAgreements") },
   { label: 'Recent Activity', to: createPageUrl("RecentActivity") },
-  { label: 'Documents',       to: createPageUrl("LoanAgreements") },
   { label: 'Learn',           to: createPageUrl("ComingSoon") },
 ];
 

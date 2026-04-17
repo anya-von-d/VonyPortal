@@ -135,7 +135,7 @@ export default function SidebarBottomSection() {
   return (
     <>
       {/* ── Key Alerts section ── */}
-      <div style={{ marginTop: 20, paddingTop: 14, borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+      <div>
         <div style={{ paddingLeft: 12, marginBottom: 8 }}>
           <span style={{
             fontSize: 9, fontWeight: 700, color: '#03ACEA',
