@@ -980,6 +980,7 @@ export default function Home() {
                     position: 'relative', zIndex: 1, flex: 1,
                     padding: '12px 14px', borderRadius: 10,
                     background: '#ffffff',
+                    border: '1px solid #2563EB',
                     display: 'flex', flexDirection: 'column', justifyContent: 'center',
                   }}>
                     <SectionHeader title="Next Payment Due" />
