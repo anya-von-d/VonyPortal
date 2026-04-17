@@ -383,6 +383,14 @@ input[type="date"] {
 .loan-card-scroll::-webkit-scrollbar { display: none; }
 
 
+/* Loan detail: desktop/mobile layout toggle */
+.loans-detail-desktop-only { display: grid; }
+.loans-detail-mobile-only { display: none; }
+@media (max-width: 768px) {
+  .loans-detail-desktop-only { display: none !important; }
+  .loans-detail-mobile-only { display: flex; flex-direction: column; gap: 16px; margin-bottom: 16px; }
+}
+
 /* Home + Dashboard pages responsive */
 @media (max-width: 900px) {
   .home-sidebar {
