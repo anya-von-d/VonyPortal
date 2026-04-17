@@ -1314,19 +1314,14 @@ export default function YourLoans({ defaultTab }) {
                       {purpose && <span style={{ color: '#9B9A98' }}> for {purpose}</span>}
                     </div>
 
-                    {/* "$X of $Y repaid/paid back" */}
-                    <div style={{ fontSize: 11, color: '#9B9A98' }}>
-                      {formatMoney(paidAmt)} of {formatMoney(totalAmt)} {isLending ? 'paid back' : 'repaid'}
-                    </div>
-
                     {/* next payment line */}
                     {daysLabel !== null && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', fontSize: 11, color: '#787776' }}>
                         <span>{isLending ? 'Next payment incoming' : 'Next payment due'}</span>
                         <span style={{
                           fontSize: 10, fontWeight: 700,
-                          color: '#6B3FA0',
-                          background: 'rgba(107,63,160,0.10)',
+                          color: isOverdue ? '#D97706' : '#6B3FA0',
+                          background: isOverdue ? 'rgba(217,119,6,0.10)' : 'rgba(107,63,160,0.10)',
                           borderRadius: 6, padding: '2px 7px',
                           letterSpacing: '0.01em', whiteSpace: 'nowrap',
                         }}>
@@ -1490,25 +1485,25 @@ export default function YourLoans({ defaultTab }) {
                 const currentPath = window.location.pathname;
                 const isActive = to === '/' ? currentPath === '/' : currentPath.includes(to.split('?')[0].replace('/app/', ''));
                 const navIcons = {
-                  'Home': <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-                  'Upcoming': <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
-                  'Create Loan': <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>,
-                  'Record Payment': <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
-                  'Lending': <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
-                  'Borrowing': <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="7 13 12 18 17 13"/><line x1="12" y1="18" x2="12" y2="6"/><circle cx="12" cy="6" r="3"/></svg>,
-                  'Friends': <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
-                  'Recent Activity': <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-                  'Documents': <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>,
-                  };
+                  'Home': <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+                  'Upcoming': <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+                  'Create Loan': <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>,
+                  'Record Payment': <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
+                  'Lending': <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
+                  'Borrowing': <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="7 13 12 18 17 13"/><line x1="12" y1="18" x2="12" y2="6"/><circle cx="12" cy="6" r="3"/></svg>,
+                  'Friends': <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+                  'Recent Activity': <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+                  'Documents': <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>,
+                };
                 return (
                   <Link key={label} to={to} style={{
-                    display: 'flex', alignItems: 'center', gap: 8, padding: '7px 12px', borderRadius: 9, textDecoration: 'none',
+                    display: 'flex', alignItems: 'center', gap: 9, padding: '7px 12px', borderRadius: 9, textDecoration: 'none',
                     fontSize: 13, fontWeight: isActive ? 600 : 500,
                     color: isActive ? '#1A1918' : '#787776',
                     background: isActive ? 'rgba(0,0,0,0.05)' : 'transparent',
                     fontFamily: "'DM Sans', sans-serif", width: '100%', boxSizing: 'border-box',
                   }}>
-                    <span style={{ flexShrink: 0, width: 26, height: 26, borderRadius: 7, background: isActive ? 'rgba(0,0,0,0.07)' : 'rgba(0,0,0,0.04)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{navIcons[label]}</span>
+                    <span style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: isActive ? '#03ACEA' : '#9B9A98' }}>{navIcons[label]}</span>
                     {label}
                   </Link>
                 );
@@ -1541,69 +1536,6 @@ export default function YourLoans({ defaultTab }) {
           </div>
           )}
 
-
-          {/* Overdue reminder carousel */}
-          {(() => {
-            const isLendingTab = activeTab === 'lending';
-            const allOverdue = isLendingTab
-              ? activeLendingLoans.filter(l => l.next_payment_date && daysUntilDate(l.next_payment_date) < 0).map(l => ({ ...l, role: 'lending' }))
-              : activeBorrowingLoans.filter(l => l.next_payment_date && daysUntilDate(l.next_payment_date) < 0).map(l => ({ ...l, role: 'borrowing' }));
-            if (allOverdue.length === 0) return null;
-            const clampedSlide = reminderSlide % allOverdue.length;
-            const carouselInner = (
-              <>
-                <div style={{ overflow: 'hidden' }}>
-                  <div style={{ display: 'flex', transition: 'transform 0.5s cubic-bezier(0.4,0,0.2,1)', transform: `translateX(-${clampedSlide * 100}%)` }}>
-                    {allOverdue.map((loan, idx) => {
-                      const isLen = loan.role === 'lending';
-                      const otherParty = getUserById(isLen ? loan.borrower_id : loan.lender_id);
-                      const firstName = otherParty?.full_name?.split(' ')[0] || otherParty?.username || 'User';
-                      const amt = formatMoney(loan.payment_amount || 0);
-                      const accentCol = isLen ? '#54A6CF' : '#E8726E';
-                      return (
-                        <div key={`reminder-${loan.id}`} style={{ minWidth: '100%', padding: '16px', display: 'flex', alignItems: 'center', gap: 14 }}>
-                          <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(232,114,110,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <Clock style={{ width: 16, height: 16, color: '#E8726E' }} />
-                          </div>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', lineHeight: 1.5, margin: '0 0 2px' }}>
-                              {isLen ? (
-                                <><strong style={{ fontWeight: 600 }}>{firstName}</strong>{`'s payment to you is overdue.`}</>
-                              ) : (
-                                <>Your <strong style={{ fontWeight: 600 }}>{amt}</strong>{` payment to `}<strong style={{ fontWeight: 600 }}>{firstName}</strong>{` is overdue.`}</>
-                              )}
-                            </p>
-                            <p style={{ fontSize: 12, color: '#787776', lineHeight: 1.5, margin: 0 }}>
-                              {isLen ? `If they've already paid, make sure to record it.` : `If you've already paid, make sure to record the payment.`}
-                            </p>
-                          </div>
-                          <Link to={createPageUrl("RecordPayment")} style={{
-                            display: 'inline-flex', padding: '7px 14px', borderRadius: 20,
-                            background: accentCol, color: 'white',
-                            fontSize: 11, fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap',
-                            fontFamily: "'DM Sans', sans-serif", flexShrink: 0,
-                          }}>Record Payment</Link>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-                {allOverdue.length > 1 && (
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: 6, padding: '4px 0 14px' }}>
-                    {allOverdue.map((_, i) => (
-                      <button key={i} onClick={() => setReminderSlide(i)} style={{
-                        width: i === clampedSlide ? 16 : 6, height: 6,
-                        borderRadius: 3, border: 'none', cursor: 'pointer', padding: 0,
-                        background: i === clampedSlide ? '#1A1918' : 'rgba(0,0,0,0.15)',
-                        transition: 'all 0.25s',
-                      }} />
-                    ))}
-                  </div>
-                )}
-              </>
-            );
-            return <PageCard title="Overdue Payments" style={{ marginBottom: 20 }}>{carouselInner}</PageCard>;
-          })()}
 
           {activeTab === 'lending' && renderSummaryTab('lending')}
           {activeTab === 'borrowing' && renderSummaryTab('borrowing')}
