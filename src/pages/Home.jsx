@@ -1050,7 +1050,7 @@ export default function Home() {
 
             {/* Overview */}
             <div style={{ position: 'relative' }}>
-              <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+              <div className="home-aura-glow" style={{ position: 'absolute', inset: -5, background: '#CFDCE7', borderRadius: 14, filter: 'blur(6px)', opacity: 0.52, zIndex: 0, pointerEvents: 'none' }} />
             <div className="home-overview-card" style={{ position: 'relative', zIndex: 1, padding: '12px 14px', borderRadius: 10, background: 'white', border: 'none' }}>
               <SectionHeader title="Overview" />
               {/* One-line centered: Owed to you $x   You owe $y */}
@@ -1074,7 +1074,7 @@ export default function Home() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
               {/* Upcoming */}
               <div style={{ position: 'relative' }}>
-              <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+              <div className="home-aura-glow" style={{ position: 'absolute', inset: -5, background: '#CFDCE7', borderRadius: 14, filter: 'blur(6px)', opacity: 0.52, zIndex: 0, pointerEvents: 'none' }} />
               <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
                 <SectionHeader title="Upcoming" linkTo={createPageUrl("Upcoming")} linkLabel="Full schedule →" />
                 {combinedPaymentEvents.length === 0 ? (
@@ -1113,11 +1113,11 @@ export default function Home() {
               <div style={{ position: 'relative' }}>
                 {/* Thin aurora glow — #CFDCE7 → background */}
                 <div className="home-aura-glow" style={{
-                  position: 'absolute', inset: -3,
+                  position: 'absolute', inset: -5,
                   background: '#CFDCE7',
-                  borderRadius: 12,
-                  filter: 'blur(4px)',
-                  opacity: 0.5,
+                  borderRadius: 14,
+                  filter: 'blur(6px)',
+                  opacity: 0.52,
                   zIndex: 0,
                   pointerEvents: 'none',
                 }} />
@@ -1147,7 +1147,7 @@ export default function Home() {
 
               {/* Active Lending */}
               <div style={{ position: 'relative' }}>
-              <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+              <div className="home-aura-glow" style={{ position: 'absolute', inset: -5, background: '#CFDCE7', borderRadius: 14, filter: 'blur(6px)', opacity: 0.52, zIndex: 0, pointerEvents: 'none' }} />
               <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
                 <SectionHeader title="Active Lending" linkTo={createPageUrl("YourLoans")} linkLabel="View all →" />
                 {lentLoans.length === 0 ? (
@@ -1188,7 +1188,7 @@ export default function Home() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
               {/* How month is going */}
               <div style={{ position: 'relative' }}>
-              <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+              <div className="home-aura-glow" style={{ position: 'absolute', inset: -5, background: '#CFDCE7', borderRadius: 14, filter: 'blur(6px)', opacity: 0.52, zIndex: 0, pointerEvents: 'none' }} />
               <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
                 <SectionHeader title={`How ${format(today, 'MMMM')} is going`} />
                 {/* Received */}
@@ -1218,7 +1218,7 @@ export default function Home() {
 
               {/* Your Loans Over Time */}
               <div style={{ position: 'relative' }}>
-              <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+              <div className="home-aura-glow" style={{ position: 'absolute', inset: -5, background: '#CFDCE7', borderRadius: 14, filter: 'blur(6px)', opacity: 0.52, zIndex: 0, pointerEvents: 'none' }} />
               <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }} ref={loansChartRef}>
                 <SectionHeader title="Your Loans Over Time" />
                 {!chartData ? (
@@ -1274,7 +1274,7 @@ export default function Home() {
 
               {/* Active Borrowing */}
               <div style={{ position: 'relative' }}>
-              <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+              <div className="home-aura-glow" style={{ position: 'absolute', inset: -5, background: '#CFDCE7', borderRadius: 14, filter: 'blur(6px)', opacity: 0.52, zIndex: 0, pointerEvents: 'none' }} />
               <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
                 <SectionHeader title="Active Borrowing" linkTo={createPageUrl("YourLoans")} linkLabel="View all →" />
                 {borrowedLoans.length === 0 ? (
