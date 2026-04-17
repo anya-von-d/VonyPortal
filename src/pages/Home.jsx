@@ -842,7 +842,7 @@ export default function Home() {
                 return (
                   <Link key={label} to={to} style={{
                     display: 'flex', alignItems: 'center', gap: 10, padding: '7px 12px', borderRadius: 9, textDecoration: 'none',
-                    fontSize: 13, fontWeight: isActive ? 600 : 500,
+                    fontSize: 13, fontWeight: isActive ? 700 : 500,
                     color: isActive ? '#03ACEA' : '#787776',
                     background: isActive ? '#D9EAF4' : 'transparent',
                     fontFamily: "'DM Sans', sans-serif", width: '100%', boxSizing: 'border-box',
