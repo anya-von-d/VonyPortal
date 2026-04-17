@@ -729,7 +729,9 @@ export default function RecentActivityPage() {
           </div>
 
           {/* ── Activity List ──────────────────────────────────── */}
-          <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)' }}>
+          <div style={{ position: 'relative' }}>
+            <div className="home-aura-glow" style={{ position: 'absolute', inset: -7, background: '#CFDCE7', borderRadius: 16, filter: 'blur(8px)', opacity: 0.55, zIndex: 0, pointerEvents: 'none' }} />
+          <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(207,220,231,0.6)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, padding: '10px 16px' }}>
               <span style={{ fontSize: 11, fontWeight: 500, color: '#787776', marginRight: 4 }}>Page {raSafePage + 1} of {raTotalPages}</span>
               <button onClick={() => setRaPage(Math.max(0, raSafePage - 1))} disabled={raSafePage === 0} style={{ width: 22, height: 22, borderRadius: 6, border: '1px solid rgba(0,0,0,0.09)', background: 'white', cursor: raSafePage === 0 ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: raSafePage === 0 ? 0.3 : 1, flexShrink: 0 }}>
@@ -806,6 +808,7 @@ export default function RecentActivityPage() {
             )}
             </div>
           </div>
+          </div>{/* end activity-list aurora wrapper */}
 
         </div>
 
