@@ -351,27 +351,6 @@ function ComingSoonTab() {
         These features are coming soon to Vony.
       </p>
       <Link
-        to={createPageUrl('ComingSoon')}
-        style={{
-          display: 'flex', alignItems: 'center', gap: 14, padding: '12px 14px',
-          borderRadius: 11, border: '1px solid rgba(0,0,0,0.08)',
-          background: 'white', textDecoration: 'none', marginBottom: 8,
-          fontFamily: "'DM Sans', sans-serif", transition: 'background 0.15s',
-        }}
-        onMouseEnter={e => e.currentTarget.style.background = '#fafafa'}
-        onMouseLeave={e => e.currentTarget.style.background = 'white'}
-      >
-        <span style={{ width: 18, height: 18, flexShrink: 0, color: '#787776', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ width: '100%', height: '100%' }}>
-            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-          </svg>
-        </span>
-        <div>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', marginBottom: 1 }}>Learn</div>
-          <div style={{ fontSize: 11, color: '#9B9A98' }}>Educational content about lending and borrowing.</div>
-        </div>
-      </Link>
-      <Link
         to={createPageUrl('LoanHelp')}
         style={{
           display: 'flex', alignItems: 'center', gap: 14, padding: '12px 14px',

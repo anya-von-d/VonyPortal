@@ -165,7 +165,7 @@ export default function SidebarBottomSection() {
               }}>
                 <NotifIcon type={notif.type} />
                 <span style={{
-                  fontSize: 12, fontWeight: 400, color: '#1A1918',
+                  fontSize: 11, fontWeight: 500, color: '#787776',
                   fontFamily: "'DM Sans', sans-serif",
                   lineHeight: 1.4,
                 }}>

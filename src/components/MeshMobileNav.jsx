@@ -32,10 +32,10 @@ const NAV_ITEMS = [
   { label: 'Friends',         to: createPageUrl("Friends") },
   { label: 'Recent Activity', to: createPageUrl("RecentActivity") },
   { label: 'Documents',       to: createPageUrl("LoanAgreements") },
+  { label: 'Learn',           to: createPageUrl("ComingSoon") },
 ];
 
 const SOON_ITEMS = [
-  { label: 'Learn',     to: createPageUrl("ComingSoon") },
   { label: 'Loan Help', to: createPageUrl("LoanHelp") },
 ];
 
