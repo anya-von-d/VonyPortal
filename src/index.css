@@ -380,6 +380,7 @@ input[type="date"] {
   -webkit-overflow-scrolling: touch;
 }
 .pill-nav-scroll::-webkit-scrollbar { display: none; }
+.loan-card-scroll::-webkit-scrollbar { display: none; }
 
 /* Home + Dashboard pages responsive */
 @media (max-width: 900px) {

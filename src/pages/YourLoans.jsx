@@ -768,6 +768,95 @@ export default function YourLoans() {
           );
         })()}
 
+        {/* Scrollable loan card row */}
+        {activeLoans.length > 0 && (
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif", marginBottom: 12 }}>
+              Your Loans
+            </div>
+            <div className="loan-card-scroll" style={{
+              display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8,
+              scrollbarWidth: 'none', msOverflowStyle: 'none',
+              WebkitOverflowScrolling: 'touch',
+            }}>
+              {activeLoans.map(loan => {
+                const otherProfile = publicProfiles.find(p => p.user_id === (isLending ? loan.borrower_id : loan.lender_id));
+                const name = otherProfile?.full_name || otherProfile?.username || 'User';
+                const firstName = name.split(' ')[0];
+                const lastName = name.split(' ').slice(1).join(' ');
+                const totalAmt = loan.total_amount || loan.amount || 0;
+                const purpose = loan.purpose || '';
+                const isOverdue = loan.next_payment_date && daysUntilDate(loan.next_payment_date) < 0;
+                const statusLabel = isOverdue ? 'Overdue' : 'On Track';
+                const statusBg = isOverdue ? 'rgba(232,114,110,0.12)' : 'rgba(3,172,234,0.12)';
+                const statusColor = isOverdue ? '#B94040' : '#0A7AB0';
+                return (
+                  <div key={loan.id} style={{
+                    flexShrink: 0, width: 148,
+                    background: 'white', borderRadius: 12,
+                    border: '1px solid rgba(0,0,0,0.07)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                    padding: '10px 12px 14px',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center',
+                  }}>
+                    {/* Status badge - top left */}
+                    <div style={{
+                      alignSelf: 'flex-start',
+                      fontSize: 10, fontWeight: 700,
+                      color: statusColor,
+                      background: statusBg,
+                      borderRadius: 6,
+                      padding: '2px 7px',
+                      marginBottom: 10,
+                      letterSpacing: '0.01em',
+                      fontFamily: "'DM Sans', sans-serif",
+                    }}>
+                      {statusLabel}
+                    </div>
+                    {/* Avatar */}
+                    <UserAvatar
+                      name={name}
+                      src={otherProfile?.profile_picture_url}
+                      size={48}
+                    />
+                    {/* Name */}
+                    <div style={{
+                      fontSize: 13, fontWeight: 600, color: '#1A1918',
+                      textAlign: 'center', marginTop: 8, marginBottom: 2,
+                      width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      fontFamily: "'DM Sans', sans-serif",
+                    }}>
+                      {firstName}
+                    </div>
+                    {lastName && (
+                      <div style={{
+                        fontSize: 11, color: '#787776',
+                        textAlign: 'center', marginBottom: 6,
+                        width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        fontFamily: "'DM Sans', sans-serif",
+                      }}>
+                        {lastName}
+                      </div>
+                    )}
+                    {/* Loan info */}
+                    <div style={{
+                      fontSize: 11, color: '#787776', textAlign: 'center', lineHeight: 1.4,
+                      width: '100%', fontFamily: "'DM Sans', sans-serif",
+                    }}>
+                      {isLending ? 'Lent' : 'Borrowed'} <span style={{ fontWeight: 600, color: '#1A1918' }}>{formatMoney(totalAmt)}</span>
+                      {purpose && (
+                        <div style={{ color: '#9B9A98', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          for {purpose}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* 6. Loans Ranked By — borrowing only, reformatted */}
         {!isLending && activeLoans.length > 0 && (
           <PageCard title="Loans Ranked By" headerRight={
