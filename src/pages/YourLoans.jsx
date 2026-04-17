@@ -1199,14 +1199,14 @@ export default function YourLoans() {
               {activeLoans.map(loan => {
                 const otherProfile = publicProfiles.find(p => p.user_id === (isLending ? loan.borrower_id : loan.lender_id));
                 const name = otherProfile?.full_name || otherProfile?.username || 'User';
-                const firstName = name.split(' ')[0];
-                const lastName = name.split(' ').slice(1).join(' ');
                 const totalAmt = loan.total_amount || loan.amount || 0;
                 const purpose = loan.purpose || '';
-                const isOverdue = loan.next_payment_date && daysUntilDate(loan.next_payment_date) < 0;
+                const daysLeft = loan.next_payment_date ? daysUntilDate(loan.next_payment_date) : null;
+                const isOverdue = daysLeft !== null && daysLeft < 0;
                 const statusLabel = isOverdue ? 'Overdue' : 'On Track';
                 const statusBg = isOverdue ? 'rgba(232,114,110,0.12)' : 'rgba(3,172,234,0.12)';
                 const statusColor = isOverdue ? '#B94040' : '#0A7AB0';
+                const daysLabel = daysLeft === null ? null : isOverdue ? `${Math.abs(daysLeft)}d late` : daysLeft === 0 ? 'today' : `${daysLeft}d`;
                 return (
                   <div
                     key={loan.id}
@@ -1217,55 +1217,63 @@ export default function YourLoans() {
                       border: selectedScrollLoan?.id === loan.id ? '1.5px solid rgba(3,172,234,0.5)' : '1px solid rgba(0,0,0,0.07)',
                       boxShadow: selectedScrollLoan?.id === loan.id ? '0 2px 12px rgba(3,172,234,0.12)' : '0 2px 8px rgba(0,0,0,0.04)',
                       padding: '12px 14px',
-                      display: 'flex', flexDirection: 'column',
+                      display: 'flex', flexDirection: 'column', gap: 8,
                       cursor: 'pointer',
                       transition: 'box-shadow 0.15s, transform 0.15s',
+                      fontFamily: "'DM Sans', sans-serif",
                     }}
                     onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.10)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
                     onMouseLeave={e => { e.currentTarget.style.boxShadow = selectedScrollLoan?.id === loan.id ? '0 2px 12px rgba(3,172,234,0.12)' : '0 2px 8px rgba(0,0,0,0.04)'; e.currentTarget.style.transform = 'none'; }}
                   >
-                    {/* Top row: avatar + name (left) · status badge (right) */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 10 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-                        <UserAvatar
-                          name={name}
-                          src={otherProfile?.profile_picture_url}
-                          size={34}
-                        />
-                        <div style={{ minWidth: 0 }}>
-                          <div style={{
-                            fontSize: 13, fontWeight: 600, color: '#1A1918',
-                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                            fontFamily: "'DM Sans', sans-serif",
-                          }}>
-                            {name}
-                          </div>
-                        </div>
-                      </div>
-                      {/* Status badge - top right */}
+                    {/* Row 1: status badge (right-aligned) */}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                       <div style={{
-                        flexShrink: 0,
                         fontSize: 10, fontWeight: 700,
-                        color: statusColor,
-                        background: statusBg,
-                        borderRadius: 6,
-                        padding: '2px 7px',
-                        letterSpacing: '0.01em',
-                        fontFamily: "'DM Sans', sans-serif",
+                        color: statusColor, background: statusBg,
+                        borderRadius: 6, padding: '2px 7px', letterSpacing: '0.01em',
                       }}>
                         {statusLabel}
                       </div>
                     </div>
-                    {/* Loan info */}
-                    <div style={{
-                      fontSize: 11, color: '#787776', lineHeight: 1.4,
-                      fontFamily: "'DM Sans', sans-serif",
-                    }}>
-                      {isLending ? 'Lent' : 'Borrowed'} <span style={{ fontWeight: 600, color: '#1A1918' }}>{formatMoney(totalAmt)}</span>
-                      {purpose && (
-                        <span style={{ color: '#9B9A98' }}> for {purpose}</span>
-                      )}
+
+                    {/* Row 2: rectangular avatar + name */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <UserAvatar
+                        name={name}
+                        src={otherProfile?.profile_picture_url}
+                        size={26}
+                        radius={5}
+                      />
+                      <div style={{
+                        fontSize: 13, fontWeight: 600, color: '#1A1918',
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      }}>
+                        {name}
+                      </div>
                     </div>
+
+                    {/* Row 3: "You lent/borrowed $X for reason" */}
+                    <div style={{ fontSize: 11, color: '#787776', lineHeight: 1.4 }}>
+                      {isLending ? 'You lent' : 'You borrowed'}{' '}
+                      <span style={{ fontWeight: 600, color: '#1A1918' }}>{formatMoney(totalAmt)}</span>
+                      {purpose && <span style={{ color: '#9B9A98' }}> for {purpose}</span>}
+                    </div>
+
+                    {/* Row 4: next payment line */}
+                    {daysLabel !== null && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', fontSize: 11, color: '#787776' }}>
+                        <span>{isLending ? 'Next payment incoming' : 'Next payment due'}</span>
+                        <span style={{
+                          fontSize: 10, fontWeight: 700,
+                          color: '#6B3FA0',
+                          background: 'rgba(107,63,160,0.10)',
+                          borderRadius: 6, padding: '2px 7px',
+                          letterSpacing: '0.01em', whiteSpace: 'nowrap',
+                        }}>
+                          {daysLabel}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 );
               })}
