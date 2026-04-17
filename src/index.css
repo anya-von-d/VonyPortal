@@ -291,8 +291,7 @@ input[type="date"] {
     grid-template-columns: 1fr !important;
   }
   .loan-details-doc-boxes {
-    flex-wrap: nowrap !important;
-    overflow-x: auto;
+    align-items: center;
   }
 }
 

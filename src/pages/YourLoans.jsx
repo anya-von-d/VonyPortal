@@ -586,6 +586,11 @@ export default function YourLoans({ defaultTab }) {
                       )}
                     </AuroraCard>
                   </div>
+                  <PageCard title="Loan Terms" style={{ marginBottom: 0 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                      {loanTermItems.map((item, idx) => (<div key={idx} style={{ textAlign: 'center' }}><p style={{ fontSize: 10, color: '#787776', fontWeight: 500, marginBottom: 2 }}>{item.label}</p><p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>{item.value}</p></div>))}
+                    </div>
+                  </PageCard>
                 </div>
                 <PageCard title="Payment Progress" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 0 }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -649,19 +654,18 @@ export default function YourLoans({ defaultTab }) {
                     </span>
                   </div>
                 </AuroraCard>
+                <PageCard title="Loan Terms" style={{ marginBottom: 0 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                    {loanTermItems.map((item, idx) => (<div key={idx} style={{ textAlign: 'center' }}><p style={{ fontSize: 10, color: '#787776', fontWeight: 500, marginBottom: 2 }}>{item.label}</p><p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>{item.value}</p></div>))}
+                  </div>
+                </PageCard>
               </div>
-
-              {/* Loan Terms — always full-width */}
-              <PageCard title="Loan Terms" style={{ marginBottom: 16 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-                  {loanTermItems.map((item, idx) => (<div key={idx} style={{ textAlign: 'center' }}><p style={{ fontSize: 10, color: '#787776', fontWeight: 500, marginBottom: 2 }}>{item.label}</p><p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>{item.value}</p></div>))}
-                </div>
-              </PageCard>
             </>
           );
         })()}
 
-        {/* Full-width: Payment History + Docs + Payments */}
+        {/* 2-col masonry: left = Payment History + Docs, right = Payments */}
+        <div className="loan-details-masonry" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'start' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
         <PageCard title="Payment History">
           <div>
@@ -758,7 +762,9 @@ export default function YourLoans({ defaultTab }) {
             </div>
           </div>
         </div>
+        </div>{/* end left column */}
 
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
         <PageCard title="Payments">
           <div>
           {(() => {
@@ -821,7 +827,8 @@ export default function YourLoans({ defaultTab }) {
           })()}
           </div>
         </PageCard>
-        </div>{/* end flat column */}
+        </div>{/* end right column */}
+        </div>{/* end 2-col masonry */}
 
         {/* Activity | Loan Progress row */}
         <div className="loan-details-activity-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'start', marginTop: 24 }}>
