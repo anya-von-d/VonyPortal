@@ -808,7 +808,7 @@ export default function Home() {
         <div className="mesh-left" style={{ background: 'transparent', borderRight: '1px solid rgba(0,0,0,0.06)' }}>
           <div style={{ position: 'sticky', top: 0, height: '100vh', padding: '24px 8px 16px', display: 'flex', flexDirection: 'column' }}>
             {/* Vony logo */}
-            <Link to="/" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 600, fontStyle: 'italic', fontSize: '1.3rem', color: '#1A1918', textDecoration: 'none', display: 'block', marginBottom: 16, lineHeight: 1, letterSpacing: '-0.02em', paddingLeft: 6 }}>Vony</Link>
+            <Link to="/" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 600, fontStyle: 'italic', fontSize: '1.6rem', color: '#1A1918', textDecoration: 'none', display: 'block', marginBottom: 16, lineHeight: 1, letterSpacing: '-0.02em', paddingLeft: 6 }}>Vony</Link>
             {(() => {
               const navIcons = {
                 'Home': <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
