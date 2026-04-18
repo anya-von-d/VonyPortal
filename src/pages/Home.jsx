@@ -556,6 +556,9 @@ export default function Home() {
   const overdueYouOwe = myLoans.filter(l =>
     l && l.borrower_id === user.id && l.status === 'active' && l.next_payment_date && new Date(l.next_payment_date) < today
   );
+  const overdueOwedToYou = myLoans.filter(l =>
+    l && l.lender_id === user.id && l.status === 'active' && l.next_payment_date && new Date(l.next_payment_date) < today
+  );
 
   // Upcoming/overdue payment events
   const activeLoansForPayments = myLoans.filter(l => l && l.status === 'active' && l.next_payment_date);
@@ -1477,6 +1480,17 @@ export default function Home() {
                 <SectionHeader title={`How ${format(today, 'MMMM')} is Going`} />
                 {/* Summary lines */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 2 }}>
+                  {/* Overdue callouts (show first when present) */}
+                  {overdueYouOwe.length > 0 && (
+                    <div style={{ fontSize: 12, color: '#1A1918' }}>
+                      You have <strong style={{ color: '#E8726E' }}>{overdueYouOwe.length}</strong> overdue payment{overdueYouOwe.length === 1 ? '' : 's'}
+                    </div>
+                  )}
+                  {overdueOwedToYou.length > 0 && (
+                    <div style={{ fontSize: 12, color: '#1A1918' }}>
+                      <strong style={{ color: '#E8726E' }}>{overdueOwedToYou.length}</strong> payment{overdueOwedToYou.length === 1 ? '' : 's'} to you {overdueOwedToYou.length === 1 ? 'is' : 'are'} overdue
+                    </div>
+                  )}
                   {/* Outgoing line: completed vs scheduled (skip if nothing scheduled) */}
                   {outScheduledTotal > 0 && (
                     <div style={{ fontSize: 12, color: '#1A1918' }}>
