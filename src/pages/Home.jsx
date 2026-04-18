@@ -1153,8 +1153,8 @@ export default function Home() {
                   let primaryLine;
                   if (isOverdue) {
                     primaryLine = event.isLender
-                      ? <>{amountStr} payment from {event.firstName} overdue</>
-                      : <>{amountStr} payment to {event.firstName} overdue</>;
+                      ? <>{amountStr} from {event.firstName} is overdue</>
+                      : <>{amountStr} to {event.firstName} is overdue</>;
                   } else {
                     primaryLine = event.isLender
                       ? <>Due to receive {amountStr} from {event.firstName}</>
@@ -1172,7 +1172,7 @@ export default function Home() {
                         {daysLabel}
                       </div>
                       <div style={{ flex: 1, minWidth: 0, fontSize: 12, color: '#1A1918', overflow: 'hidden' }}>
-                        <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 500 }}>
+                        <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {primaryLine}
                         </div>
                         {event.purpose && (
