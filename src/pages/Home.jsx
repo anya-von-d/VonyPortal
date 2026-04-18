@@ -875,7 +875,7 @@ export default function Home() {
         <DesktopSidebar />
 
         {/* ── CENTER ── */}
-        <div className="mesh-center" style={{ background: 'transparent', padding: '24px 32px 80px' }}>
+        <div className="mesh-center" style={{ background: 'transparent', padding: '24px 48px 80px' }}>
 
           {/* Mobile-only page title (desktop shows it in top bar) */}
           <div className="mobile-page-title">
@@ -1001,7 +1001,7 @@ export default function Home() {
                   <div style={{
                     position: 'relative', zIndex: 1, flex: 1,
                     padding: '12px 14px', borderRadius: 10,
-                    background: 'radial-gradient(ellipse at center, rgba(255,255,255,1) 30%, rgba(255,255,255,0.6) 100%)',
+                    background: 'radial-gradient(ellipse at center, rgba(255,255,255,1) 75%, rgba(255,255,255,0.55) 100%)',
                     backdropFilter: 'blur(8px)',
                     WebkitBackdropFilter: 'blur(8px)',
                     border: '1px solid rgba(50,138,182,0.65)',
@@ -1125,8 +1125,8 @@ export default function Home() {
                       </div>
                       <div style={{ flex: 1, minWidth: 0, fontSize: 13, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {event.isLender
-                          ? <>{event.firstName} pays you</>
-                          : <>Pay {event.firstName}</>}
+                          ? <>Payment due from {event.firstName}</>
+                          : <>Payment due to {event.firstName}</>}
                         {event.purpose && <span style={{ color: '#9B9A98' }}> · {event.purpose}</span>}
                       </div>
                       <span style={{ fontSize: 13, fontWeight: 700, flexShrink: 0, color: event.isLender ? '#03ACEA' : '#1A1918', letterSpacing: '-0.01em' }}>
