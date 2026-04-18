@@ -370,7 +370,7 @@ export default function Home() {
 
           {/* Post-it yellow — upper-left */}
           <motion.div {...floatAnim(0.35, 5)} style={{ position: 'absolute', top: '32%', left: bigScreen ? '13%' : '2%', filter: floatShadow }}>
-            <svg width="180" height="88" viewBox="0 0 180 88" fill="none"><rect width="180" height="88" fill="#FFE082" rx="3"/><path d="M140 88L180 48V88Z" fill="#FFC107"/><text x="16" y="38" fontFamily="Georgia, serif" fontSize="15" fontStyle="italic" fill="#5D4037">Remember to pay</text><text x="16" y="60" fontFamily="Georgia, serif" fontSize="15" fontStyle="italic" fill="#5D4037">Oliver back for gas</text></svg>
+            <svg width="180" height="88" viewBox="0 0 180 88" fill="none"><rect width="180" height="88" fill="#FFE082" rx="3"/><path d="M140 88L180 48V88Z" fill="#FFC107"/><text x="16" y="38" fontFamily="'DM Sans', sans-serif" fontSize="15" fontStyle="italic" fill="#5D4037">Remember to pay</text><text x="16" y="60" fontFamily="'DM Sans', sans-serif" fontSize="15" fontStyle="italic" fill="#5D4037">Oliver back for gas</text></svg>
           </motion.div>
 
           {/* Excel spreadsheet — mid-left */}
@@ -405,7 +405,7 @@ export default function Home() {
 
           {/* Post-it blue — bottom-right */}
           <motion.div {...floatAnim(0.58, -3)} style={{ position: 'absolute', bottom: '4%', right: bigScreen ? '19%' : '1%', filter: floatShadow }}>
-            <svg width="180" height="88" viewBox="0 0 180 88" fill="none"><rect width="180" height="88" fill="#AECFF5" rx="3"/><path d="M140 88L180 48V88Z" fill="#7DB3EE"/><text x="16" y="34" fontFamily="Georgia, serif" fontSize="13" fontStyle="italic" fill="#1A3A5C">Remind Rohan about</text><text x="16" y="55" fontFamily="Georgia, serif" fontSize="13" fontStyle="italic" fill="#1A3A5C">the $40 he still owes</text></svg>
+            <svg width="180" height="88" viewBox="0 0 180 88" fill="none"><rect width="180" height="88" fill="#AECFF5" rx="3"/><path d="M140 88L180 48V88Z" fill="#7DB3EE"/><text x="16" y="34" fontFamily="'DM Sans', sans-serif" fontSize="13" fontStyle="italic" fill="#1A3A5C">Remind Rohan about</text><text x="16" y="55" fontFamily="'DM Sans', sans-serif" fontSize="13" fontStyle="italic" fill="#1A3A5C">the $40 he still owes</text></svg>
           </motion.div>
 
           {/* WhatsApp (Henry) — mid-center */}
@@ -418,7 +418,7 @@ export default function Home() {
         {/* ── Sign-in card ── */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} style={{ maxWidth: 400, width: '100%', position: 'relative', zIndex: 2 }}>
           <div className="glass-card" style={{ padding: 36, textAlign: 'center' }}>
-            <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontWeight: 600, fontSize: '2.2rem', color: '#1A1918', letterSpacing: '-0.01em', lineHeight: 1, marginBottom: 20 }}>
+            <div style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: '2.2rem', color: '#1A1918', letterSpacing: '-0.02em', lineHeight: 1, marginBottom: 20 }}>
               Vony
             </div>
             <h1 style={{ fontSize: '1.4rem', fontWeight: 700, color: '#1A1918', marginBottom: 6, letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif" }}>
