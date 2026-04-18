@@ -1638,24 +1638,24 @@ export default function Lending({ initialTab }) {
                 {/* Lending Overview Section */}
                 <PageCard title="Lending Overview">
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                    {/* Next Payment Incoming — Home aurora style */}
+                    {/* Next Payment Incoming — exact Home style */}
                     {(() => {
                       const days = nextPaymentLoan ? Math.ceil((nextPaymentLoan.date.getTime() - Date.now()) / 86400000) : null;
                       const isLate = days !== null && days < 0;
                       const daysLabel = days === null ? null : isLate ? `${Math.abs(days)}d late` : days === 0 ? 'today' : `${days}d`;
-                      const badgeColor = isLate ? '#E8726E' : days !== null && days <= 3 ? '#F59E0B' : '#9B9A98';
-                      const badgeBg = isLate ? 'rgba(232,114,110,0.08)' : days !== null && days <= 3 ? 'rgba(245,158,11,0.08)' : 'rgba(0,0,0,0.04)';
+                      const badgeColor = isLate ? '#E8726E' : '#03ACEA';
+                      const badgeBg = isLate ? 'rgba(232,114,110,0.08)' : 'rgba(3,172,234,0.10)';
                       const borrower = nextPaymentLoan ? publicProfiles.find(p => p.user_id === nextPaymentLoan.borrower_id) : null;
                       const firstName = borrower?.full_name?.split(' ')[0] || 'User';
                       return (
                         <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
                           <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 'calc(100% + 10px)', height: 'calc(100% + 10px)', background: 'linear-gradient(135deg,rgb(3,172,234) 0%,rgb(6,182,212) 30%,rgb(20,184,166) 60%,rgb(3,172,234) 100%)', filter: 'blur(5px) saturate(1.2)', opacity: 0.35, borderRadius: 18, zIndex: 0, pointerEvents: 'none' }} />
-                          <div style={{ position: 'relative', zIndex: 1, flex: 1, padding: '12px 14px', borderRadius: 10, background: '#ffffff', border: '1px solid rgba(3,172,234,0.65)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                          <div style={{ position: 'relative', zIndex: 1, flex: 1, padding: '12px 14px', borderRadius: 10, background: '#ffffff', border: '1px solid rgba(50,138,182,0.65)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                             {daysLabel && nextPaymentLoan && (
                               <span style={{ position: 'absolute', top: 10, right: 12, fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 4, padding: '2px 5px', lineHeight: 1.2 }}>{daysLabel}</span>
                             )}
                             <div style={{ display: 'flex', alignItems: 'center', gap: 5, paddingBottom: 5, marginBottom: 2 }}>
-                              <span style={{ width: 20, height: 20, borderRadius: 6, background: 'rgba(3,172,234,0.12)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                              <span style={{ width: 20, height: 20, borderRadius: 6, background: '#EBF4FA', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><polyline points="19 12 12 19 5 12"/></svg>
                               </span>
                               <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Next Payment Incoming</span>
@@ -1663,7 +1663,7 @@ export default function Lending({ initialTab }) {
                             {nextPaymentLoan ? (
                               <>
                                 <div style={{ textAlign: 'center', fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                  <span style={{ fontSize: 12, fontWeight: 800, color: '#03ACEA', letterSpacing: '-0.02em', marginRight: 6, background: 'rgba(3,172,234,0.10)', padding: '2px 7px', borderRadius: 5, display: 'inline-block' }}>
+                                  <span style={{ fontSize: 12, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', marginRight: 4 }}>
                                     {formatMoney(nextPaymentLoan.payment_amount || 0)}
                                   </span>
                                   <span style={{ fontSize: 12, fontWeight: 400, color: '#1A1918' }}>from {firstName}</span>
@@ -1675,7 +1675,7 @@ export default function Lending({ initialTab }) {
                             ) : (
                               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <span style={{ fontSize: 12, fontWeight: 700, color: '#C5C3C0' }}>—</span>
-                                <span style={{ fontSize: 11, color: '#9B9A98' }}>Nothing incoming</span>
+                                <span style={{ fontSize: 11, color: '#9B9A98' }}>None incoming ✨</span>
                               </div>
                             )}
                           </div>
