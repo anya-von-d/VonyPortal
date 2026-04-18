@@ -708,7 +708,9 @@ export default function Home() {
       return { month: monthDate, owedToYou, youOwe, label: format(monthDate, 'MMM'), isCurrent, isFuture };
     });
 
-    const maxVal = Math.max(...data.map(d => d.owedToYou), ...data.map(d => d.youOwe), 1);
+    const rawMax = Math.max(...data.map(d => d.owedToYou), ...data.map(d => d.youOwe), 1);
+    // Round the y-axis max up to the nearest 100 so the ticks (max + half) are clean numbers
+    const maxVal = Math.max(100, Math.ceil(rawMax / 100) * 100);
     return { data, maxVal };
   })();
 
@@ -731,10 +733,10 @@ export default function Home() {
       if (loan.status === 'pending' || !loan.status) {
         description = isLender ? `Sent ${amount} loan offer to ${name}` : `Received ${amount} loan offer from ${name}`;
         icon = isLender ? 'send' : 'receive';
-        color = isLender ? '#6366F1' : '#03ACEA';
+        color = isLender ? '#4F46E5' : '#03ACEA';
       } else if (loan.status === 'active') {
         description = isLender ? `${name} accepted your ${amount} loan` : `You accepted ${amount} loan from ${name}`;
-        icon = 'check'; color = '#14B8A6';
+        icon = 'check'; color = '#06B6D4';
       } else if (loan.status === 'declined') {
         description = isLender ? `${name} declined your ${amount} loan` : `You declined ${amount} loan from ${name}`;
         icon = 'x'; color = '#DC2626';
@@ -743,7 +745,7 @@ export default function Home() {
         icon = 'x'; color = '#DC2626';
       } else if (loan.status === 'completed') {
         description = isLender ? `${name} fully repaid your ${amount} loan` : `You fully repaid ${amount} loan to ${name}`;
-        icon = 'check'; color = '#14B8A6';
+        icon = 'check'; color = '#06B6D4';
       } else {
         description = isLender ? `${amount} loan to ${name}` : `${amount} loan from ${name}`;
       }
@@ -769,7 +771,7 @@ export default function Home() {
         description: isBorrower ? `You made a ${amount} payment to ${name}` : `Received ${amount} payment from ${name}`,
         detail: format(new Date(p.payment_date || p.created_at), 'MMM d'),
         icon: isBorrower ? 'send' : 'receive',
-        color: isBorrower ? '#6366F1' : '#03ACEA',
+        color: isBorrower ? '#4F46E5' : '#03ACEA',
         amount: isBorrower ? `-${amount}` : `+${amount}`
       });
     });
@@ -1017,7 +1019,7 @@ export default function Home() {
                     <SectionHeader title="Next Payment Due" titleColor="#2563EB" />
                     {nextBorrowerPayment ? (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap', overflow: 'hidden' }}>
-                        <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{format(nextBorrowerPayment.date, 'MMM d')}</span>
+                        <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{format(nextBorrowerPayment.date, 'MMM d')}</span>
                         {daysLabel && <span style={{ fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '2px 6px', flexShrink: 0 }}>{daysLabel}</span>}
                         <span style={{ fontSize: 11, color: '#9B9A98', marginLeft: 'auto', flexShrink: 0, whiteSpace: 'nowrap' }}>{formatMoney(nextBorrowerPayment.payment_amount || 0)} to {nextBorrowerPayment.firstName}</span>
                       </div>
@@ -1076,7 +1078,7 @@ export default function Home() {
                     <SectionHeader title="Next Payment Incoming" />
                     {nextLenderPayment ? (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap', overflow: 'hidden' }}>
-                        <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{format(nextLenderPayment.date, 'MMM d')}</span>
+                        <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{format(nextLenderPayment.date, 'MMM d')}</span>
                         {daysLabel && <span style={{ fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '2px 6px', flexShrink: 0 }}>{daysLabel}</span>}
                         <span style={{ fontSize: 11, color: '#9B9A98', marginLeft: 'auto', flexShrink: 0, whiteSpace: 'nowrap' }}>{formatMoney(nextLenderPayment.payment_amount || 0)} from {nextLenderPayment.firstName}</span>
                       </div>
@@ -1240,8 +1242,8 @@ export default function Home() {
                     <span style={{ fontSize: 13, color: '#1A1918' }}>Received</span>
                     <span style={{ fontSize: 14, fontWeight: 700, color: '#03ACEA', letterSpacing: '-0.01em' }}>{formatMoney(monthlyReceived)}</span>
                   </div>
-                  <div style={{ height: 6, borderRadius: 3, background: 'rgba(3,172,234,0.1)', overflow: 'visible' }}>
-                    <div style={{ height: '100%', borderRadius: 3, background: '#03ACEA', width: `${monthlyExpectedReceive > 0 ? Math.min((monthlyReceived / monthlyExpectedReceive) * 100, 100) : 0}%`, transition: 'width 0.8s ease-out', boxShadow: '0 0 6px rgba(3,172,234,0.65), 0 0 12px rgba(3,172,234,0.35)' }} />
+                  <div style={{ height: 6, borderRadius: 3, background: 'rgba(3,172,234,0.1)', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', borderRadius: 3, background: '#03ACEA', width: `${monthlyExpectedReceive > 0 ? Math.min((monthlyReceived / monthlyExpectedReceive) * 100, 100) : 0}%`, transition: 'width 0.8s ease-out' }} />
                   </div>
                   <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 4 }}>of {formatMoney(monthlyExpectedReceive)} expected</div>
                 </div>
@@ -1251,15 +1253,15 @@ export default function Home() {
                     <span style={{ fontSize: 13, color: '#1A1918' }}>Paid out</span>
                     <span style={{ fontSize: 14, fontWeight: 700, color: '#1D5B94', letterSpacing: '-0.01em' }}>{formatMoney(monthlyPaidOut)}</span>
                   </div>
-                  <div style={{ height: 6, borderRadius: 3, background: 'rgba(29,91,148,0.1)', overflow: 'visible' }}>
-                    <div style={{ height: '100%', borderRadius: 3, background: '#1D5B94', width: `${monthlyExpectedPay > 0 ? Math.min((monthlyPaidOut / monthlyExpectedPay) * 100, 100) : 0}%`, transition: 'width 0.8s ease-out', boxShadow: '0 0 6px rgba(29,91,148,0.6), 0 0 12px rgba(29,91,148,0.3)' }} />
+                  <div style={{ height: 6, borderRadius: 3, background: 'rgba(29,91,148,0.1)', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', borderRadius: 3, background: '#1D5B94', width: `${monthlyExpectedPay > 0 ? Math.min((monthlyPaidOut / monthlyExpectedPay) * 100, 100) : 0}%`, transition: 'width 0.8s ease-out' }} />
                   </div>
                   <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 4 }}>of {formatMoney(monthlyExpectedPay)} expected</div>
                 </div>
                 {/* Status message */}
                 <div style={{
                   marginTop: 10,
-                  background: '#ECF4FA',
+                  background: '#D9EAF4',
                   color: '#328AB6',
                   borderRadius: 8,
                   padding: '8px 12px',
@@ -1288,14 +1290,15 @@ export default function Home() {
                     if (v >= 1_000) return `$${(v/1_000).toFixed(v >= 10_000 ? 0 : 1)}k`;
                     return `$${Math.round(v)}`;
                   };
-                  const yTicks = [chartData.maxVal, chartData.maxVal * 0.75, chartData.maxVal * 0.5, chartData.maxVal * 0.25, 0];
+                  const yTicks = [chartData.maxVal, chartData.maxVal / 2];
                   const Y_AXIS_WIDTH = 34;
                   return (
                   <>
                     {/* Chart — y-axis ticks + bars */}
                     <div style={{ display: 'flex', alignItems: 'stretch', gap: 6, height: 120 }}>
-                      <div style={{ width: Y_AXIS_WIDTH, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', fontSize: 9, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", textAlign: 'right', lineHeight: 1, paddingRight: 2 }}>
-                        {yTicks.map((v, i) => <span key={i}>{compactMoney(v)}</span>)}
+                      <div style={{ width: Y_AXIS_WIDTH, position: 'relative', fontSize: 9, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", textAlign: 'right', lineHeight: 1, paddingRight: 4 }}>
+                        <span style={{ position: 'absolute', top: 0, right: 4 }}>{compactMoney(chartData.maxVal)}</span>
+                        <span style={{ position: 'absolute', top: '50%', right: 4, transform: 'translateY(-50%)' }}>{compactMoney(chartData.maxVal / 2)}</span>
                       </div>
                       <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', gap: 14, height: '100%' }}>
                         {chartData.data.map((d, i) => {
