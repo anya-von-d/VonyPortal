@@ -269,15 +269,14 @@ export default function Upcoming() {
             <div style={{ height: 1, background: 'rgba(0,0,0,0.08)', marginLeft: -32, marginRight: -32, marginBottom: 20 }} />
           </div>
 
-          {/* Three-column: overdue+7days | coming later | calendar */}
+          {/* Three-column: overdue+7days+coming later | cashflow+so far | calendar */}
           <div className="upcoming-three-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, alignItems: 'start' }}>
 
-            {/* Col 1: Overdue + Next 7 Days */}
+            {/* Col 1: Overdue + Next 7 Days + Coming Later */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {/* Overdue */}
               {overdue.length > 0 && (
                 <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
-                  {/* Aurora glow — red/orange palette */}
                   <div style={{
                     position: 'absolute', top: '50%', left: '50%',
                     transform: 'translate(-50%, -50%)',
@@ -286,7 +285,6 @@ export default function Upcoming() {
                     filter: 'blur(5px) saturate(1.2)', opacity: 0.35,
                     borderRadius: 18, zIndex: 0, pointerEvents: 'none',
                   }} />
-                  {/* Gradient border wrapper */}
                   <div style={{
                     position: 'relative', zIndex: 1, flex: 1,
                     background: 'linear-gradient(to right, rgba(232,114,110,0) 0%, #E8726E 67%, #E8726E 100%)',
@@ -305,7 +303,6 @@ export default function Upcoming() {
 
               {/* Next 7 Days */}
               <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
-                {/* Aurora glow — cyan/teal palette */}
                 <div style={{
                   position: 'absolute', top: '50%', left: '50%',
                   transform: 'translate(-50%, -50%)',
@@ -314,7 +311,6 @@ export default function Upcoming() {
                   filter: 'blur(5px) saturate(1.2)', opacity: 0.35,
                   borderRadius: 18, zIndex: 0, pointerEvents: 'none',
                 }} />
-                {/* Gradient border wrapper */}
                 <div style={{
                   position: 'relative', zIndex: 1, flex: 1,
                   background: 'linear-gradient(to right, rgba(3,172,234,0) 0%, #03ACEA 67%, #03ACEA 100%)',
@@ -326,27 +322,90 @@ export default function Upcoming() {
                     {next7Days.length > 0 && <span style={{ fontSize: 11, color: '#9B9A98' }}>{next7Days.length} · {formatMoney(next7Days.reduce((s, e) => s + e.amount, 0))}</span>}
                   </div>
                   {next7Days.length === 0 ? (
-                    <div style={{ padding: '8px 0', fontSize: 13, color: '#9B9A98', textAlign: 'center' }}>You're all caught up this week! 🎉</div>
+                    <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>You're all caught up this week! 🎉</div>
                   ) : next7Days.map(event => <PaymentRow key={event.loanId + '-7'} event={event} />)}
                 </div>
                 </div>
               </div>
 
-            </div>{/* end col 1 */}
-
-            {/* Col 2: Coming Later */}
-            <div>
+              {/* Coming Later */}
               <div style={{ position: 'relative' }}>
                 <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
-              <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Coming Later</span>
-                  {comingLater.length > 0 && <span style={{ fontSize: 11, color: '#9B9A98' }}>{comingLater.length} · {formatMoney(comingLater.reduce((s, e) => s + e.amount, 0))}</span>}
+                <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Coming Later</span>
+                    {comingLater.length > 0 && <span style={{ fontSize: 11, color: '#9B9A98' }}>{comingLater.length} · {formatMoney(comingLater.reduce((s, e) => s + e.amount, 0))}</span>}
+                  </div>
+                  {comingLater.length === 0 ? (
+                    <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>Clear skies ahead ✨</div>
+                  ) : comingLater.map(event => <PaymentRow key={event.loanId + '-later'} event={event} />)}
                 </div>
-                {comingLater.length === 0 ? (
-                  <div style={{ padding: '8px 0', fontSize: 13, color: '#9B9A98', textAlign: 'center' }}>Clear skies ahead ✨</div>
-                ) : comingLater.map(event => <PaymentRow key={event.loanId + '-later'} event={event} />)}
               </div>
+            </div>{/* end col 1 */}
+
+            {/* Col 2: Cashflow + So Far This Month */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {/* Cashflow */}
+              <div style={{ position: 'relative' }}>
+                <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+                <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 8 }}>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Cashflow</span>
+                    <span style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>{format(today, 'MMMM')}</span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div style={{ fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>
+                      Expected to receive <span style={{ fontWeight: 700, color: '#03ACEA' }}>{formatMoney(monthlyExpectedReceive)}</span> this month
+                    </div>
+                    <div style={{ fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>
+                      Due to pay out <span style={{ fontWeight: 700, color: '#1D5B94' }}>{formatMoney(monthlyExpectedPay)}</span> this month
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* So Far This Month */}
+              <div style={{ position: 'relative' }}>
+                <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+                <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 10 }}>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>So far this month</span>
+                  </div>
+                  {/* Received */}
+                  {(() => {
+                    const pct = monthlyExpectedReceive > 0 ? Math.min(100, Math.round((monthlyReceived / monthlyExpectedReceive) * 100)) : 0;
+                    return (
+                      <div style={{ marginBottom: 14 }}>
+                        <div style={{ fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", marginBottom: 5 }}>
+                          Received <span style={{ fontWeight: 800, color: '#03ACEA', letterSpacing: '-0.02em' }}>{formatMoney(monthlyReceived)}</span>
+                        </div>
+                        <div style={{ width: '100%', height: 5, borderRadius: 3, background: 'rgba(3,172,234,0.15)', overflow: 'hidden' }}>
+                          <div style={{ height: '100%', borderRadius: 3, background: '#03ACEA', width: `${pct}%`, transition: 'width 1s cubic-bezier(0.4,0,0.2,1)' }} />
+                        </div>
+                        <div style={{ fontSize: 12, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", marginTop: 4 }}>
+                          monthly payment has been {pct}% received
+                        </div>
+                      </div>
+                    );
+                  })()}
+                  {/* Paid out */}
+                  {(() => {
+                    const pct = monthlyExpectedPay > 0 ? Math.min(100, Math.round((monthlyPaidOut / monthlyExpectedPay) * 100)) : 0;
+                    return (
+                      <div>
+                        <div style={{ fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", marginBottom: 5 }}>
+                          Paid out <span style={{ fontWeight: 800, color: '#1D5B94', letterSpacing: '-0.02em' }}>{formatMoney(monthlyPaidOut)}</span>
+                        </div>
+                        <div style={{ width: '100%', height: 5, borderRadius: 3, background: 'rgba(29,91,148,0.15)', overflow: 'hidden' }}>
+                          <div style={{ height: '100%', borderRadius: 3, background: '#1D5B94', width: `${pct}%`, transition: 'width 1s cubic-bezier(0.4,0,0.2,1)' }} />
+                        </div>
+                        <div style={{ fontSize: 12, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", marginTop: 4 }}>
+                          monthly payment has been {pct}% paid back
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
               </div>
             </div>{/* end col 2 */}
 
@@ -420,7 +479,22 @@ export default function Upcoming() {
 
               {/* Selected day details */}
               <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid rgba(0,0,0,0.06)' }}>
-                {/* Date label — Document Center style */}
+                {/* Color key */}
+                <div style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#03ACEA', flexShrink: 0, display: 'inline-block' }} />
+                    <span style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>Incoming</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#1D5B94', flexShrink: 0, display: 'inline-block' }} />
+                    <span style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>Outgoing</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ width: 6, height: 6, borderRadius: 2, background: '#E8726E', flexShrink: 0, display: 'inline-block' }} />
+                    <span style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>Overdue</span>
+                  </div>
+                </div>
+                {/* Date label */}
                 <div style={{
                   fontSize: 9, fontWeight: 700, color: '#787776',
                   letterSpacing: '0.1em', textTransform: 'uppercase',
