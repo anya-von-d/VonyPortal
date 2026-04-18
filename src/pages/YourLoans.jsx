@@ -961,7 +961,7 @@ export default function YourLoans({ defaultTab }) {
     return (
       <>
         {/* 1. Three standalone top cards */}
-        <div className="loans-top-cards" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, marginBottom: 20, alignItems: 'center' }}>
+        <div className="loans-top-cards" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 20, alignItems: 'center' }}>
           {/* Next Payment Incoming / Due — exact Home aurora card */}
           {(() => {
             const auroraBg = isLending
@@ -1041,46 +1041,6 @@ export default function YourLoans({ defaultTab }) {
             );
           })()}
 
-          {/* Next Payment Amount — aurora style */}
-          <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
-            {/* Gradient border wrapper */}
-            <div style={{
-              position: 'relative', zIndex: 1, flex: 1,
-              borderRadius: 11, display: 'flex', flexDirection: 'column',
-              boxShadow: '0 -1px 3px rgba(78,108,135,0.6), 0 -5px 11px rgba(125,155,180,0.42), 0 -12px 22px rgba(48,68,88,0.22), 0 2px 4px rgba(215,228,238,0.65), 0 6px 13px rgba(168,195,215,0.48), 0 13px 24px rgba(125,155,180,0.26), 0 0 18px rgba(125,155,180,0.3), 0 0 30px rgba(78,108,135,0.14)',
-            }}>
-            {/* Card */}
-            <div style={{
-              flex: 1,
-              padding: '10px 14px', borderRadius: 10,
-              background: '#ffffff',
-              display: 'flex', flexDirection: 'column', justifyContent: 'center',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 6 }}>
-                <div style={{ width: 20, height: 20, borderRadius: 6, background: isLending ? 'rgba(3,172,234,0.12)' : 'rgba(29,91,148,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={isLending ? '#03ACEA' : '#1D5B94'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                </div>
-                <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Next Payment Amount</span>
-              </div>
-              {nextPaymentLoan ? (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'nowrap', overflow: 'hidden' }}>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>
-                    {formatMoney(nextPaymentAmount)}
-                  </span>
-                  <span style={{ fontSize: 11, color: '#9B9A98', flexShrink: 0, whiteSpace: 'nowrap', textAlign: 'right' }}>
-                    {isLending ? 'from' : 'to'} {otherPartyUsername}
-                  </span>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: '#C5C3C0' }}>—</span>
-                  <span style={{ fontSize: 11, color: '#9B9A98' }}>No payments yet ✨</span>
-                </div>
-              )}
-            </div>
-            </div>
-          </div>
-
           {/* Overview — exact Home two-ring card */}
           {(() => {
             const Ring = ({ percent, color, label }) => {
@@ -1099,15 +1059,10 @@ export default function YourLoans({ defaultTab }) {
                 </div>
               );
             };
-            const borrowLoans = activeBorrowingLoans;
             const lendLoans = activeLendingLoans;
-            const totalBorrowedAmount = borrowLoans.reduce((s, l) => s + (l.total_amount || l.amount || 0), 0);
-            const totalPaidBack = borrowLoans.reduce((s, l) => s + (l.amount_paid || 0), 0);
             const totalLentAmount = lendLoans.reduce((s, l) => s + (l.total_amount || l.amount || 0), 0);
             const totalRepaid = lendLoans.reduce((s, l) => s + (l.amount_paid || 0), 0);
-            const percentPaid = totalBorrowedAmount > 0 ? Math.round((totalPaidBack / totalBorrowedAmount) * 100) : 0;
             const percentRepaid = totalLentAmount > 0 ? Math.round((totalRepaid / totalLentAmount) * 100) : 0;
-            const borrowOwed = Math.max(0, totalBorrowedAmount - totalPaidBack);
             const lentOwed = Math.max(0, totalLentAmount - totalRepaid);
             const textBlockStyle = { flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 };
             const bigLineStyle  = { fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" };
@@ -1120,13 +1075,6 @@ export default function YourLoans({ defaultTab }) {
                     <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Overview</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 4 }}>
-                    <Ring percent={percentPaid} color="#1D5B94" label="Paid back" />
-                    <div style={textBlockStyle}>
-                      <div style={bigLineStyle}>You owe <span style={{ color: '#1D5B94' }}>{formatMoney(borrowOwed)}</span></div>
-                      <div style={subLineStyle}>{formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)} paid back</div>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 6 }}>
                     <div style={textBlockStyle}>
                       <div style={bigLineStyle}>You're owed <span style={{ color: '#03ACEA' }}>{formatMoney(lentOwed)}</span></div>
                       <div style={subLineStyle}>{formatMoney(totalRepaid)} of {formatMoney(totalLentAmount)} repaid to you</div>
@@ -1166,25 +1114,34 @@ export default function YourLoans({ defaultTab }) {
                   const daysLbl = isOverdue ? `${Math.abs(loan.days)}d late` : loan.days === 0 ? 'today' : `${loan.days}d`;
                   const amtSign = isLending ? '+' : '-';
                   return (
-                    <div key={loan.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0' }}>
+                    <div key={loan.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '9px 0' }}>
                       <div style={{
-                        minWidth: 42, textAlign: 'center', flexShrink: 0,
+                        flexShrink: 0, alignSelf: 'center',
                         fontSize: 10, fontWeight: 700, lineHeight: 1.2,
                         color: isOverdue ? '#E8726E' : loan.days <= 3 ? '#F59E0B' : '#9B9A98',
                         background: isOverdue ? 'rgba(232,114,110,0.08)' : loan.days <= 3 ? 'rgba(245,158,11,0.08)' : 'rgba(0,0,0,0.04)',
-                        borderRadius: 6, padding: '3px 6px',
+                        borderRadius: 6, padding: '2px 5px',
                       }}>
                         {daysLbl}
                       </div>
-                      <div style={{ flex: 1, minWidth: 0, fontSize: 13, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {isLending
-                          ? <><strong>{loan.firstName}</strong> pays you</>
-                          : <>Pay <strong>{loan.firstName}</strong></>}
-                        {loan.purpose && <span style={{ color: '#9B9A98', fontWeight: 400 }}> · {loan.purpose}</span>}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', marginRight: 4 }}>
+                            {formatMoney(loan.payment_amount || 0)}
+                          </span>
+                          <span style={{ fontSize: 12, fontWeight: 400, color: '#1A1918' }}>
+                            {isOverdue
+                              ? (isLending ? `from ${loan.firstName} is overdue` : `to ${loan.firstName} is overdue`)
+                              : (isLending ? `due from ${loan.firstName}` : `due to ${loan.firstName}`)
+                            }
+                          </span>
+                        </div>
+                        {loan.purpose && (
+                          <div style={{ fontSize: 12, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {loan.purpose}
+                          </div>
+                        )}
                       </div>
-                      <span style={{ fontSize: 13, fontWeight: 700, flexShrink: 0, color: isLending ? '#03ACEA' : '#1A1918', letterSpacing: '-0.01em' }}>
-                        {amtSign}{formatMoney(loan.payment_amount || 0)}
-                      </span>
                     </div>
                   );
                 })}
@@ -1495,7 +1452,7 @@ export default function YourLoans({ defaultTab }) {
       ...style
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-        <span style={{ fontSize: 13, fontWeight: 600, color: highlight ? '#03ACEA' : '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
+        <span style={{ fontSize: 12, fontWeight: 600, color: highlight ? '#03ACEA' : '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>{title}</span>
         {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
       </div>
       <div style={{ overflow: 'visible', ...(highlight ? { display: 'flex', flexDirection: 'column' } : {}) }}>
