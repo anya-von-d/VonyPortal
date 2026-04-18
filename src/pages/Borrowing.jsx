@@ -795,7 +795,12 @@ export default function Borrowing() {
         <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>{title}</div>
         {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
       </div>
-      <div style={{ overflow: 'visible' }}>{children}</div>
+      <div style={{ position: 'relative' }}>
+        <div style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px', overflow: 'visible' }}>
+          {children}
+        </div>
+      </div>
     </div>
   );
 
@@ -861,7 +866,7 @@ export default function Borrowing() {
           <DesktopSidebar />
 
           {/* COL 2 - main content */}
-          <div className="mesh-center" style={{ background: 'transparent', borderRight: '1px solid rgba(0,0,0,0.06)', padding: '24px 32px 80px' }}>
+          <div className="mesh-center" style={{ background: 'transparent', padding: '24px 32px 80px' }}>
 
           {/* Mobile-only page title (desktop shows it in top bar) */}
           <div className="mobile-page-title">
@@ -923,12 +928,13 @@ export default function Borrowing() {
                 const lender = nextPaymentLoan ? publicProfiles.find(p => p.user_id === nextPaymentLoan.lender_id) : null;
                 const firstName = lender?.full_name?.split(' ')[0] || 'User';
                 return (
+                  <div style={{ position: 'relative' }}>
+                  <div style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
                   <div style={{
+                    position: 'relative', zIndex: 1,
                     padding: '12px 14px', borderRadius: 10,
-                    background: 'linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(3,172,234,0.06) 60%, rgba(3,172,234,0.10) 100%)',
-                    backdropFilter: 'blur(10px) saturate(1.6)', WebkitBackdropFilter: 'blur(10px) saturate(1.6)',
-                    border: '2px solid #03ACEA',
-                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), inset 0 0 16px rgba(3,172,234,0.07), 0 0 0 4px rgba(3,172,234,0.15), 0 0 24px rgba(3,172,234,0.18), 0 0 48px rgba(3,172,234,0.08), 0 2px 12px rgba(0,0,0,0.04)',
+                    background: '#ffffff',
+                    border: '1px solid rgba(3,172,234,0.25)',
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
                       <div style={{ width: 20, height: 20, borderRadius: 6, background: 'rgba(29,91,148,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -951,6 +957,7 @@ export default function Borrowing() {
                       </>
                     )}
                   </div>
+                  </div>
                 );
               })()}
 
@@ -960,7 +967,9 @@ export default function Borrowing() {
                 const totalPaid = activeLoans.reduce((s, l) => s + (l.amount_paid || 0), 0);
                 const pct = totalOwed > 0 ? Math.round((totalPaid / totalOwed) * 100) : 0;
                 return (
-                  <div style={{ padding: '12px 14px', borderRadius: 10, background: 'white', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <div style={{ position: 'relative' }}>
+                  <div style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+                  <div style={{ position: 'relative', zIndex: 1, padding: '12px 14px', borderRadius: 10, background: '#ffffff', border: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
                       <div style={{ width: 20, height: 20, borderRadius: 6, background: 'rgba(3,172,234,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="7 13 12 18 17 13"/><line x1="12" y1="18" x2="12" y2="6"/></svg>
@@ -976,6 +985,7 @@ export default function Borrowing() {
                     </div>
                     <div style={{ fontSize: 10, color: '#9B9A98' }}>{formatMoney(totalPaid)} of {formatMoney(totalOwed)} repaid</div>
                   </div>
+                  </div>
                 );
               })()}
             </div>
@@ -984,7 +994,7 @@ export default function Borrowing() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {/* Loan Progress */}
                 <PageCard title="Loan Progress">
-                  <div style={{ padding: '14px 0 4px' }}>
+                  <div style={{ padding: 0 }}>
                     {activeLoans.length === 0 ? (
                       <p style={{ fontSize: 13, color: '#787776', margin: 0 }}>No active loans yet 🌱</p>
                     ) : (() => {
@@ -1009,7 +1019,7 @@ export default function Borrowing() {
 
                 {/* Active Loans */}
                 <PageCard title="Active Loans">
-                  <div style={{ padding: '14px 0 4px' }}>
+                  <div style={{ padding: 0 }}>
                     {activeLoans.length === 0 ? (
                       <p style={{ fontSize: 13, color: '#787776', margin: 0 }}>No active loans yet</p>
                     ) : (
@@ -1797,7 +1807,7 @@ export default function Borrowing() {
           </div>
 
           {/* COL 3 - right panel */}
-          <div className="mesh-right" style={{ background: '#F5F4F0' }}>
+          <div className="mesh-right" style={{ background: 'transparent' }}>
             <div style={{ position: 'sticky', top: 0, padding: '28px 28px 0' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10, marginBottom: 28 }}>
                 <Link to={createPageUrl("Requests")} style={{ color: '#6B6A68', textDecoration: 'none' }}>

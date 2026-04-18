@@ -1416,7 +1416,12 @@ export default function Lending({ initialTab }) {
         <div style={{ fontSize: 13, fontWeight: 600, color: highlight ? '#03ACEA' : '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>{title}</div>
         {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
       </div>
-      <div style={{ overflow: 'visible' }}>{children}</div>
+      <div style={{ position: 'relative' }}>
+        <div style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px', overflow: 'visible' }}>
+          {children}
+        </div>
+      </div>
     </div>
   );
 
@@ -1530,8 +1535,7 @@ export default function Lending({ initialTab }) {
           {activeSection === 'create' && !isLoadingUsers && friends.length === 0 && (
             <div style={{
               marginBottom: 28, padding: '16px 22px', borderRadius: 10,
-              background: 'white', border: '1px solid rgba(0,0,0,0.07)',
-              boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+              background: '#ffffff', border: 'none',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap',
             }}>
               <div style={{ fontSize: 13, color: '#787776', fontFamily: "'DM Sans', system-ui, sans-serif" }}>
@@ -1686,10 +1690,8 @@ export default function Lending({ initialTab }) {
                       return (
                         <div style={{
                           padding: '12px 14px', borderRadius: 10,
-                          background: 'linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(3,172,234,0.06) 60%, rgba(3,172,234,0.10) 100%)',
-                          backdropFilter: 'blur(10px) saturate(1.6)', WebkitBackdropFilter: 'blur(10px) saturate(1.6)',
-                          border: '2px solid #03ACEA',
-                          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), inset 0 0 16px rgba(3,172,234,0.07), 0 0 0 4px rgba(3,172,234,0.15), 0 0 24px rgba(3,172,234,0.18), 0 0 48px rgba(3,172,234,0.08), 0 2px 12px rgba(0,0,0,0.04)',
+                          background: '#ffffff',
+                          border: '1px solid rgba(3,172,234,0.25)',
                         }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
                             <div style={{ width: 20, height: 20, borderRadius: 6, background: 'rgba(3,172,234,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -1721,7 +1723,7 @@ export default function Lending({ initialTab }) {
                       const totalPaid = activeLoans.reduce((s, l) => s + (l.amount_paid || 0), 0);
                       const pct = totalOwed > 0 ? Math.round((totalPaid / totalOwed) * 100) : 0;
                       return (
-                        <div style={{ padding: '12px 14px', borderRadius: 10, background: 'white', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                        <div style={{ padding: '12px 14px', borderRadius: 10, background: '#ffffff', border: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
                             <div style={{ width: 20, height: 20, borderRadius: 6, background: 'rgba(3,172,234,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
@@ -1785,7 +1787,7 @@ export default function Lending({ initialTab }) {
 
                   {/* Loan Progress */}
                   <PageCard title="Loan Progress">
-                    <div style={{ padding: '14px 0 4px' }}>
+                    <div style={{ padding: 0 }}>
                       {activeLoans.length === 0 ? (
                         <p style={{ fontSize: 13, color: '#787776', margin: 0 }}>No active loans yet 🌱</p>
                       ) : (() => {
@@ -2592,7 +2594,7 @@ export default function Lending({ initialTab }) {
                         {/* Mobile-only: Borrower Will Pay + Loan Summary (shown below blue box on mobile) */}
                         <div className="lending-mobile-pay-summary" style={{ display: 'none', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                           {/* Borrower Will Pay */}
-                          <div style={{ background: 'rgba(255,255,255,0.85)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
+                          <div style={{ background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
                               <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Borrower Will Pay</span>
                             </div>
@@ -2608,7 +2610,7 @@ export default function Lending({ initialTab }) {
                             )}
                           </div>
                           {/* Loan Summary */}
-                          <div style={{ background: 'rgba(255,255,255,0.85)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
+                          <div style={{ background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
                               <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Loan Summary</span>
                             </div>
