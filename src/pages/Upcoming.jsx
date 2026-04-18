@@ -77,7 +77,7 @@ export default function Upcoming() {
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: 32, height: 32, border: '2px solid #54A6CF', borderTopColor: 'transparent', borderRadius: '50%', margin: '0 auto 16px' }} className="animate-spin" />
-          <p style={{ fontSize: 14, color: '#787776', fontFamily: "'DM Sans', sans-serif" }}>Loading...</p>
+          <p style={{ fontSize: 12, color: '#787776', fontFamily: "'DM Sans', sans-serif" }}>Loading...</p>
         </div>
       </div>
     );
@@ -265,7 +265,7 @@ export default function Upcoming() {
 
           {/* Mobile-only page title (desktop shows it in top bar) */}
           <div className="mobile-page-title">
-            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Upcoming</div>
+            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Upcoming</div>
             <div style={{ height: 1, background: 'rgba(0,0,0,0.08)', marginLeft: -32, marginRight: -32, marginBottom: 20 }} />
           </div>
 
@@ -334,8 +334,8 @@ export default function Upcoming() {
 
               {/* Coming Later */}
               <div style={{ position: 'relative' }}>
-                <div className="home-aura-glow" style={{ position: 'absolute', inset: -7, background: '#CFDCE7', borderRadius: 16, filter: 'blur(8px)', opacity: 0.55, zIndex: 0, pointerEvents: 'none' }} />
-              <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(207,220,231,0.6)', padding: '14px 18px' }}>
+                <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+              <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
                   <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Coming Later</span>
                   {comingLater.length > 0 && <span style={{ fontSize: 11, color: '#9B9A98' }}>{comingLater.length} · {formatMoney(comingLater.reduce((s, e) => s + e.amount, 0))}</span>}

@@ -279,7 +279,7 @@ export default function Friends() {
 
           {/* Mobile-only page title (desktop shows it in top bar) */}
           <div className="mobile-page-title">
-            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Friends</div>
+            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Friends</div>
             <div style={{ height: 1, background: 'rgba(0,0,0,0.08)', marginLeft: -32, marginRight: -32, marginBottom: 20 }} />
           </div>
 
@@ -348,8 +348,8 @@ export default function Friends() {
 
           {/* Left: Your Friends */}
           <div style={{ position: 'relative' }}>
-            <div className="home-aura-glow" style={{ position: 'absolute', inset: -7, background: '#CFDCE7', borderRadius: 16, filter: 'blur(8px)', opacity: 0.55, zIndex: 0, pointerEvents: 'none' }} />
-          <div className="friends-friends-col" style={{ position: 'relative', zIndex: 1, background: '#ffffff', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(207,220,231,0.6)', padding: '14px 18px' }}>
+            <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+          <div className="friends-friends-col" style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
               <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Your Friends</span>
               {friends.length > 0 && <span style={{ fontSize: 11, color: '#9B9A98' }}>{friends.length}</span>}
@@ -381,8 +381,8 @@ export default function Friends() {
 
           {/* Right: Find Your Friends */}
           <div style={{ position: 'relative' }}>
-            <div className="home-aura-glow" style={{ position: 'absolute', inset: -7, background: '#CFDCE7', borderRadius: 16, filter: 'blur(8px)', opacity: 0.55, zIndex: 0, pointerEvents: 'none' }} />
-          <div className="friends-search-col" style={{ position: 'relative', zIndex: 1, background: '#ffffff', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(207,220,231,0.6)', padding: '14px 18px' }}>
+            <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+          <div className="friends-search-col" style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 5, marginBottom: 2 }}>
               <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Find Your Friends</span>
               <button

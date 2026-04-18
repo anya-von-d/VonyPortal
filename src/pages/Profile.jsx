@@ -259,7 +259,7 @@ export default function Profile() {
       <div style={{ minHeight: '100vh', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: 32, height: 32, border: '2px solid #03ACEA', borderTopColor: 'transparent', borderRadius: '50%', margin: '0 auto 16px' }} className="animate-spin" />
-          <p style={{ fontSize: 14, color: '#787776', fontFamily: "'DM Sans', sans-serif" }}>Loading profile...</p>
+          <p style={{ fontSize: 12, color: '#787776', fontFamily: "'DM Sans', sans-serif" }}>Loading profile...</p>
         </div>
       </div>
     );
@@ -274,7 +274,7 @@ export default function Profile() {
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <XCircle className="w-8 h-8 text-red-600" />
             </div>
-            <h3 style={{ fontSize: 18, fontWeight: 600, color: '#0D0D0C', marginBottom: 8 }}>Connection Error</h3>
+            <h3 style={{ fontSize: 13, fontWeight: 600, color: '#0D0D0C', marginBottom: 8 }}>Connection Error</h3>
             <p style={{ color: '#787776', marginBottom: 16 }}>{error}</p>
             <Button onClick={loadUserData} className="text-white hover:opacity-90" style={{ background: '#03ACEA' }}>
               Try Again
@@ -312,7 +312,7 @@ export default function Profile() {
               <div style={{ width: 48, height: 48, borderRadius: 10, margin: '0 auto 20px', background: 'rgba(3,172,234,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Landmark size={24} style={{ color: '#03ACEA' }} />
               </div>
-              <h3 style={{ fontSize: 20, fontWeight: 700, color: '#1A1918', margin: '0 0 10px', textAlign: 'center', fontFamily: "'DM Sans', system-ui, sans-serif", letterSpacing: '-0.02em' }}>
+              <h3 style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: '0 0 10px', textAlign: 'center', fontFamily: "'DM Sans', system-ui, sans-serif", letterSpacing: '-0.02em' }}>
                 Coming Soon
               </h3>
               <p style={{ fontSize: 13, color: '#787776', margin: '0 0 8px', textAlign: 'center', lineHeight: 1.6 }}>
@@ -323,7 +323,7 @@ export default function Profile() {
               </p>
               <button
                 onClick={() => setShowComingSoonModal(false)}
-                style={{ width: '100%', padding: '12px 0', borderRadius: 12, border: 'none', background: 'linear-gradient(135deg, #03ACEA 0%, #7C3AED 100%)', color: 'white', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}
+                style={{ width: '100%', padding: '12px 0', borderRadius: 12, border: 'none', background: 'linear-gradient(135deg, #03ACEA 0%, #7C3AED 100%)', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}
               >
                 Got it!
               </button>
@@ -342,7 +342,7 @@ export default function Profile() {
 
           {/* Mobile-only page title (desktop shows it in top bar) */}
           <div className="mobile-page-title">
-            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Profile</div>
+            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Profile</div>
             <div style={{ height: 1, background: 'rgba(0,0,0,0.08)', marginLeft: -32, marginRight: -32, marginBottom: 20 }} />
           </div>
 
@@ -405,7 +405,7 @@ export default function Profile() {
               )}
             </div>
 
-            <h2 style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 22, fontWeight: 700, color: '#1A1918', margin: 0, lineHeight: 1, letterSpacing: '-0.02em' }}>
+            <h2 style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0, lineHeight: 1, letterSpacing: '-0.02em' }}>
               {formData.full_name || user.full_name}
             </h2>
 
@@ -418,8 +418,8 @@ export default function Profile() {
           <div style={{ paddingBottom: 40 }}>
             {/* Personal Information — full width */}
             <div style={{ position: 'relative', marginBottom: 20 }}>
-              <div className="home-aura-glow" style={{ position: 'absolute', inset: -7, background: '#CFDCE7', borderRadius: 16, filter: 'blur(8px)', opacity: 0.55, zIndex: 0, pointerEvents: 'none' }} />
-            <div style={{ position: 'relative', zIndex: 1, background: 'white', borderRadius: 10, border: '1px solid rgba(207,220,231,0.6)', overflow: 'hidden' }}>
+              <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+            <div style={{ position: 'relative', zIndex: 1, background: 'white', borderRadius: 10, border: 'none', overflow: 'hidden' }}>
               {/* Header */}
               <div style={{ padding: '14px 18px 7px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Personal Information</span>
@@ -555,8 +555,8 @@ export default function Profile() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
               {/* Bank Account */}
               <div style={{ position: 'relative', marginBottom: 20 }}>
-                <div className="home-aura-glow" style={{ position: 'absolute', inset: -7, background: '#CFDCE7', borderRadius: 16, filter: 'blur(8px)', opacity: 0.55, zIndex: 0, pointerEvents: 'none' }} />
-              <div style={{ position: 'relative', zIndex: 1, background: 'white', borderRadius: 10, border: '1px solid rgba(207,220,231,0.6)', overflow: 'hidden' }}>
+                <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+              <div style={{ position: 'relative', zIndex: 1, background: 'white', borderRadius: 10, border: 'none', overflow: 'hidden' }}>
                 {/* Header */}
                 <div style={{ padding: '14px 18px 7px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Bank Account</span>
@@ -585,8 +585,8 @@ export default function Profile() {
 
               {/* Verification Status */}
               <div style={{ position: 'relative', marginBottom: 20 }}>
-                <div className="home-aura-glow" style={{ position: 'absolute', inset: -7, background: '#CFDCE7', borderRadius: 16, filter: 'blur(8px)', opacity: 0.55, zIndex: 0, pointerEvents: 'none' }} />
-              <div style={{ position: 'relative', zIndex: 1, background: 'white', borderRadius: 10, border: '1px solid rgba(207,220,231,0.6)', overflow: 'hidden' }}>
+                <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+              <div style={{ position: 'relative', zIndex: 1, background: 'white', borderRadius: 10, border: 'none', overflow: 'hidden' }}>
                 {/* Header */}
                 <div style={{ padding: '14px 18px 7px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Verification</span>

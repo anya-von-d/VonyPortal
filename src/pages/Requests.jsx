@@ -460,7 +460,7 @@ export default function Requests() {
       <div style={{ minHeight: '100vh', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: 32, height: 32, border: '2px solid #03ACEA', borderTopColor: 'transparent', borderRadius: '50%', margin: '0 auto 16px' }} className="animate-spin" />
-          <p style={{ fontSize: 14, color: '#787776', fontFamily: "'DM Sans', sans-serif" }}>Loading notifications...</p>
+          <p style={{ fontSize: 12, color: '#787776', fontFamily: "'DM Sans', sans-serif" }}>Loading notifications...</p>
         </div>
       </div>
     );
@@ -468,8 +468,8 @@ export default function Requests() {
 
   const PageCard = ({ title, headerRight, children, style }) => (
     <div style={{ position: 'relative', marginBottom: 24 }}>
-      <div className="home-aura-glow" style={{ position: 'absolute', inset: -7, background: '#CFDCE7', borderRadius: 16, filter: 'blur(8px)', opacity: 0.55, zIndex: 0, pointerEvents: 'none' }} />
-      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: '1px solid rgba(207,220,231,0.6)', padding: '14px 18px', ...style }}>
+      <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px', ...style }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 5, marginBottom: 2 }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>{title}</div>
           {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
@@ -492,7 +492,7 @@ export default function Requests() {
 
           {/* Mobile-only page title (desktop shows it in top bar) */}
           <div className="mobile-page-title">
-            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Notifications</div>
+            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Notifications</div>
             <div style={{ height: 1, background: 'rgba(0,0,0,0.08)', marginLeft: -32, marginRight: -32, marginBottom: 20 }} />
           </div>
 
@@ -654,16 +654,16 @@ export default function Requests() {
                 <div className="p-2 bg-red-100 rounded-full">
                   <AlertTriangle className="w-5 h-5 text-red-600" />
                 </div>
-                <h3 style={{ fontWeight: 600, fontSize: 18, color: '#1A1918' }}>Deny Payment?</h3>
+                <h3 style={{ fontWeight: 600, fontSize: 13, color: '#1A1918' }}>Deny Payment?</h3>
               </div>
-              <p style={{ fontSize: 14, color: '#787776', marginBottom: 24 }}>
+              <p style={{ fontSize: 12, color: '#787776', marginBottom: 24 }}>
                 Are you sure you want to deny this payment of ${confirmingDeny.amount?.toFixed(2)}? This action cannot be undone.
               </p>
               <div className="flex gap-3">
-                <button onClick={() => setConfirmingDeny(null)} style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: 'transparent', color: '#1A1918', fontSize: 14, fontWeight: 600, border: 'none', cursor: 'pointer' }}>
+                <button onClick={() => setConfirmingDeny(null)} style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: 'transparent', color: '#1A1918', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer' }}>
                   Cancel
                 </button>
-                <button onClick={handleDenyPayment} style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: '#dc2626', color: 'white', fontSize: 14, fontWeight: 600, border: 'none', cursor: 'pointer' }}>
+                <button onClick={handleDenyPayment} style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: '#dc2626', color: 'white', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer' }}>
                   Deny Payment
                 </button>
               </div>
@@ -692,16 +692,16 @@ export default function Requests() {
                 <div className="p-2 bg-amber-100 rounded-full">
                   <AlertTriangle className="w-5 h-5 text-amber-600" />
                 </div>
-                <h3 style={{ fontWeight: 600, fontSize: 18, color: '#1A1918' }}>Cancel Payment?</h3>
+                <h3 style={{ fontWeight: 600, fontSize: 13, color: '#1A1918' }}>Cancel Payment?</h3>
               </div>
-              <p style={{ fontSize: 14, color: '#787776', marginBottom: 24 }}>
+              <p style={{ fontSize: 12, color: '#787776', marginBottom: 24 }}>
                 Are you sure you want to cancel this payment of ${confirmingCancel.amount?.toFixed(2)}? This will remove the payment record.
               </p>
               <div className="flex gap-3">
-                <button onClick={() => setConfirmingCancel(null)} style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: 'transparent', color: '#1A1918', fontSize: 14, fontWeight: 600, border: 'none', cursor: 'pointer' }}>
+                <button onClick={() => setConfirmingCancel(null)} style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: 'transparent', color: '#1A1918', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer' }}>
                   Keep
                 </button>
-                <button onClick={handleCancelPayment} style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: '#d97706', color: 'white', fontSize: 14, fontWeight: 600, border: 'none', cursor: 'pointer' }}>
+                <button onClick={handleCancelPayment} style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: '#d97706', color: 'white', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer' }}>
                   Cancel Payment
                 </button>
               </div>
@@ -758,8 +758,8 @@ export default function Requests() {
                 const otherName = getOtherPartyName(payment);
                 return (
                   <>
-                    <h3 style={{ fontWeight: 600, fontSize: 18, color: '#1A1918', marginBottom: 4 }}>Confirm Payment</h3>
-                    <p style={{ fontSize: 14, color: '#787776', marginBottom: 16 }}>
+                    <h3 style={{ fontWeight: 600, fontSize: 13, color: '#1A1918', marginBottom: 4 }}>Confirm Payment</h3>
+                    <p style={{ fontSize: 12, color: '#787776', marginBottom: 16 }}>
                       @{otherName} recorded a payment of <span style={{ fontWeight: 700, color: '#1A1918' }}>${payment.amount?.toFixed(2)}</span> via {methodInfo.label} on {format(new Date(payment.payment_date), 'MMM d, yyyy')}.
                     </p>
                     <div className="flex gap-3">
@@ -768,7 +768,7 @@ export default function Requests() {
                           setConfirmingDeny(payment);
                           setViewingPayment(null);
                         }}
-                        style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: 'transparent', color: '#E8726E', fontSize: 14, fontWeight: 600, border: 'none', cursor: 'pointer' }}
+                        style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: 'transparent', color: '#E8726E', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer' }}
                       >
                         Deny
                       </button>
@@ -778,7 +778,7 @@ export default function Requests() {
                           setViewingPayment(null);
                         }}
                         disabled={processingId === payment.id}
-                        style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: '#03ACEA', color: 'white', fontSize: 14, fontWeight: 600, border: 'none', cursor: 'pointer', opacity: processingId === payment.id ? 0.5 : 1 }}
+                        style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: '#03ACEA', color: 'white', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer', opacity: processingId === payment.id ? 0.5 : 1 }}
                       >
                         Confirm
                       </button>
@@ -794,8 +794,8 @@ export default function Requests() {
                 const otherName = getOtherPartyName(payment, true);
                 return (
                   <>
-                    <h3 style={{ fontWeight: 600, fontSize: 18, color: '#1A1918', marginBottom: 4 }}>Payment Details</h3>
-                    <p style={{ fontSize: 14, color: '#787776', marginBottom: 8 }}>
+                    <h3 style={{ fontWeight: 600, fontSize: 13, color: '#1A1918', marginBottom: 4 }}>Payment Details</h3>
+                    <p style={{ fontSize: 12, color: '#787776', marginBottom: 8 }}>
                       You recorded a payment of <span style={{ fontWeight: 700, color: '#1A1918' }}>${payment.amount?.toFixed(2)}</span> to @{otherName} via {methodInfo.label}.
                     </p>
                     <p style={{ fontSize: 12, color: '#787776', marginBottom: 16 }}>Waiting for @{otherName} to confirm.</p>
@@ -805,13 +805,13 @@ export default function Requests() {
                           setConfirmingCancel(payment);
                           setViewingPayment(null);
                         }}
-                        style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: 'transparent', color: '#E8726E', fontSize: 14, fontWeight: 600, border: 'none', cursor: 'pointer' }}
+                        style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: 'transparent', color: '#E8726E', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer' }}
                       >
                         Cancel Payment
                       </button>
                       <button
                         onClick={() => setViewingPayment(null)}
-                        style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: '#03ACEA', color: 'white', fontSize: 14, fontWeight: 600, border: 'none', cursor: 'pointer' }}
+                        style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: '#03ACEA', color: 'white', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer' }}
                       >
                         Close
                       </button>
@@ -826,8 +826,8 @@ export default function Requests() {
                 const otherName = getLoanOtherParty(loan);
                 return (
                   <>
-                    <h3 style={{ fontWeight: 600, fontSize: 18, color: '#1A1918', marginBottom: 4 }}>Loan Change Request</h3>
-                    <p style={{ fontSize: 14, color: '#787776', marginBottom: 8 }}>
+                    <h3 style={{ fontWeight: 600, fontSize: 13, color: '#1A1918', marginBottom: 4 }}>Loan Change Request</h3>
+                    <p style={{ fontSize: 12, color: '#787776', marginBottom: 8 }}>
                       @{otherName} wants to modify the terms of your ${loan.amount?.toLocaleString()} loan{loan.purpose ? ` for ${loan.purpose}` : ''}.
                     </p>
                     {loan.contract_modification_notes && (
@@ -843,7 +843,7 @@ export default function Requests() {
                           setViewingPayment(null);
                         }}
                         disabled={processingId === loan.id}
-                        style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: 'transparent', color: '#E8726E', fontSize: 14, fontWeight: 600, border: 'none', cursor: 'pointer', opacity: processingId === loan.id ? 0.5 : 1 }}
+                        style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: 'transparent', color: '#E8726E', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer', opacity: processingId === loan.id ? 0.5 : 1 }}
                       >
                         Reject
                       </button>
@@ -853,7 +853,7 @@ export default function Requests() {
                           setViewingPayment(null);
                         }}
                         disabled={processingId === loan.id}
-                        style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: '#03ACEA', color: 'white', fontSize: 14, fontWeight: 600, border: 'none', cursor: 'pointer', opacity: processingId === loan.id ? 0.5 : 1 }}
+                        style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: '#03ACEA', color: 'white', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer', opacity: processingId === loan.id ? 0.5 : 1 }}
                       >
                         Approve
                       </button>

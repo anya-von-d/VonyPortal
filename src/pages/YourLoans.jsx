@@ -318,7 +318,7 @@ export default function YourLoans({ defaultTab }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
         <div style={{ background: 'transparent', borderRadius: 12, border: '1px solid rgba(0,0,0,0.05)', padding: 14, marginBottom: 0 }}>
           <p style={{ fontSize: 11, color: '#787776', margin: '0 0 4px' }}>Principal Amount</p>
-          <p style={{ fontSize: 26, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(agreement.amount)}</p>
+          <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(agreement.amount)}</p>
         </div>
         <p style={{ fontSize: 13, lineHeight: 1.7, color: '#1A1918', margin: 0 }}>
           <strong>{lenderInfo.full_name}</strong> agrees to lend <strong>{borrowerInfo.full_name}</strong> <strong>{formatMoney(agreement.amount)}</strong>{agreement.purpose ? <> for <strong>{agreement.purpose}</strong></> : ''}, with <strong>{agreement.interest_rate}%</strong> interest. <strong>{borrowerInfo.full_name}</strong> agrees to pay back <strong>{formatMoney(agreement.total_amount)}</strong> in <strong>{agreement.payment_frequency}</strong> payments of <strong>{formatMoney(agreement.payment_amount)}</strong> over <strong>{agreement.repayment_period} {agreement.repayment_unit || 'months'}</strong>.
@@ -335,12 +335,12 @@ export default function YourLoans({ defaultTab }) {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div style={{ background: 'transparent', borderRadius: 10, border: '1px solid rgba(0,0,0,0.05)', padding: 14 }}>
             <p style={{ fontSize: 11, color: '#787776', margin: '0 0 4px' }}>Borrower</p>
-            <p style={{ fontSize: 18, fontStyle: 'italic', fontFamily: 'Georgia, serif', color: '#1A1918', margin: 0 }}>{agreement.borrower_name || borrowerInfo.full_name}</p>
+            <p style={{ fontSize: 13, fontStyle: 'italic', fontFamily: "'DM Sans', sans-serif", color: '#1A1918', margin: 0 }}>{agreement.borrower_name || borrowerInfo.full_name}</p>
             {agreement.borrower_signed_date && <p style={{ fontSize: 11, color: '#787776', margin: '4px 0 0' }}>Signed {format(new Date(agreement.borrower_signed_date), 'MMM d, yyyy')}</p>}
           </div>
           <div style={{ background: 'transparent', borderRadius: 10, border: '1px solid rgba(0,0,0,0.05)', padding: 14 }}>
             <p style={{ fontSize: 11, color: '#787776', margin: '0 0 4px' }}>Lender</p>
-            <p style={{ fontSize: 18, fontStyle: 'italic', fontFamily: 'Georgia, serif', color: '#1A1918', margin: 0 }}>{agreement.lender_name || lenderInfo.full_name}</p>
+            <p style={{ fontSize: 13, fontStyle: 'italic', fontFamily: "'DM Sans', sans-serif", color: '#1A1918', margin: 0 }}>{agreement.lender_name || lenderInfo.full_name}</p>
             {agreement.lender_signed_date && <p style={{ fontSize: 11, color: '#787776', margin: '4px 0 0' }}>Signed {format(new Date(agreement.lender_signed_date), 'MMM d, yyyy')}</p>}
           </div>
         </div>
@@ -409,11 +409,11 @@ export default function YourLoans({ defaultTab }) {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div style={{ background: 'transparent', borderRadius: 12, border: '1px solid rgba(0,0,0,0.05)', padding: 16 }}>
             <p style={{ fontSize: 11, color: '#787776', margin: '0 0 4px' }}>Loan Amount</p>
-            <p style={{ fontSize: 24, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(agreement.amount)}</p>
+            <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(agreement.amount)}</p>
           </div>
           <div style={{ background: 'transparent', borderRadius: 12, border: '1px solid rgba(0,0,0,0.05)', padding: 16 }}>
             <p style={{ fontSize: 11, color: '#787776', margin: '0 0 4px' }}>Total Due</p>
-            <p style={{ fontSize: 24, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(agreement.total_amount)}</p>
+            <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(agreement.total_amount)}</p>
           </div>
         </div>
         {loan && (
@@ -450,7 +450,7 @@ export default function YourLoans({ defaultTab }) {
           </div>
         </div>
         <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', paddingTop: 16 }}>
-          <h4 style={{ fontSize: 14, fontWeight: 600, color: '#1A1918', margin: '0 0 12px' }}>Parties</h4>
+          <h4 style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', margin: '0 0 12px' }}>Parties</h4>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             {[{ label: 'Lender', info: lenderInfo }, { label: 'Borrower', info: borrowerInfo }].map(({ label, info }) => (
               <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -561,7 +561,7 @@ export default function YourLoans({ defaultTab }) {
                       </div>
                       {nextPmtDate ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap', overflow: 'hidden' }}>
-                          <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{format(nextPmtDate, 'MMM d')}</span>
+                          <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{format(nextPmtDate, 'MMM d')}</span>
                           {dLabel && <span style={{ fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '2px 6px', flexShrink: 0 }}>{dLabel}</span>}
                         </div>
                       ) : (
@@ -577,7 +577,7 @@ export default function YourLoans({ defaultTab }) {
                       </div>
                       {nextPmtDate ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap', overflow: 'hidden' }}>
-                          <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{formatMoney(nextPmtAmt)}</span>
+                          <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{formatMoney(nextPmtAmt)}</span>
                           <span style={{ fontSize: 11, color: '#9B9A98', marginLeft: 'auto', flexShrink: 0, whiteSpace: 'nowrap' }}>{isLending ? `from ${otherPartyUsername}` : `to ${otherPartyUsername}`}</span>
                         </div>
                       ) : (
@@ -600,7 +600,7 @@ export default function YourLoans({ defaultTab }) {
                         strokeDasharray={`${ringDash} ${ringCirc - ringDash}`} strokeLinecap="round"
                         transform={`rotate(-90 ${dCx} ${dCy})`} />
                     )}
-                    <text x={dCx} y={dCy - 7} textAnchor="middle" dominantBaseline="middle" style={{ fontSize: 20, fontWeight: 700, fill: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>{Math.round(paidPct)}%</text>
+                    <text x={dCx} y={dCy - 7} textAnchor="middle" dominantBaseline="middle" style={{ fontSize: 13, fontWeight: 700, fill: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>{Math.round(paidPct)}%</text>
                     <text x={dCx} y={dCy + 12} textAnchor="middle" dominantBaseline="middle" style={{ fontSize: 11, fontWeight: 500, fill: '#787776', fontFamily: "'DM Sans', sans-serif" }}>repaid</text>
                   </svg>
                   <p style={{ fontSize: 11, fontWeight: 500, color: '#1A1918', marginTop: 6, textAlign: 'center' }}>
@@ -625,13 +625,13 @@ export default function YourLoans({ defaultTab }) {
                   </div>
                   {nextPmtDate ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap', overflow: 'hidden' }}>
-                      <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{format(nextPmtDate, 'MMM d')}</span>
+                      <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{format(nextPmtDate, 'MMM d')}</span>
                       {dLabel && <span style={{ fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '2px 6px', flexShrink: 0 }}>{dLabel}</span>}
                       <span style={{ fontSize: 11, color: '#9B9A98', marginLeft: 'auto', flexShrink: 0, whiteSpace: 'nowrap' }}>{formatMoney(nextPmtAmt)} {isLending ? `from ${otherPartyUsername}` : `to ${otherPartyUsername}`}</span>
                     </div>
                   ) : (
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 15, fontWeight: 700, color: '#C5C3C0' }}>—</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#C5C3C0' }}>—</span>
                       <span style={{ fontSize: 11, color: '#9B9A98' }}>{isLending ? 'None incoming ✨' : 'Nothing due 🎉'}</span>
                     </div>
                   )}
@@ -991,7 +991,7 @@ export default function YourLoans({ defaultTab }) {
               </div>
               {nextPaymentLoan ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap', overflow: 'hidden' }}>
-                  <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>
                     {format(new Date(nextPaymentLoan.next_payment_date), 'MMM d')}
                   </span>
                   {daysLabel && <span style={{ fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '2px 6px', flexShrink: 0 }}>{daysLabel}</span>}
@@ -1001,7 +1001,7 @@ export default function YourLoans({ defaultTab }) {
                 </div>
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: '#C5C3C0' }}>—</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#C5C3C0' }}>—</span>
                   <span style={{ fontSize: 11, color: '#9B9A98' }}>{isLending ? 'None incoming ✨' : 'Nothing due 🎉'}</span>
                 </div>
               )}
@@ -1032,7 +1032,7 @@ export default function YourLoans({ defaultTab }) {
               </div>
               {nextPaymentLoan ? (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'nowrap', overflow: 'hidden' }}>
-                  <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>
                     {formatMoney(nextPaymentAmount)}
                   </span>
                   <span style={{ fontSize: 11, color: '#9B9A98', flexShrink: 0, whiteSpace: 'nowrap', textAlign: 'right' }}>
@@ -1041,7 +1041,7 @@ export default function YourLoans({ defaultTab }) {
                 </div>
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: '#C5C3C0' }}>—</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#C5C3C0' }}>—</span>
                   <span style={{ fontSize: 11, color: '#9B9A98' }}>No payments yet ✨</span>
                 </div>
               )}
@@ -1071,7 +1071,7 @@ export default function YourLoans({ defaultTab }) {
                 </span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'nowrap', overflow: 'hidden' }}>
-                <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>
+                <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>
                   {formatMoney(Math.max(0, totalOwedAll - totalPaidAll))}
                 </span>
                 <span style={{ fontSize: 11, color: '#9B9A98', flexShrink: 0, whiteSpace: 'nowrap' }}>
@@ -1399,7 +1399,7 @@ export default function YourLoans({ defaultTab }) {
                     border: '1px solid rgba(3,172,234,0.15)',
                     width: '100%', boxSizing: 'border-box',
                   }}>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>
                       {isLending ? 'You lent' : 'You borrowed'}{' '}
                       {formatMoney(detailAmt)}{' '}
                       {isLending ? 'to' : 'from'}{' '}
@@ -1427,7 +1427,7 @@ export default function YourLoans({ defaultTab }) {
 
   const PageCard = ({ title, headerRight, children, style, highlight }) => (
     <div style={{ position: 'relative', marginBottom: 24 }}>
-      <div className="home-aura-glow" style={{ position: 'absolute', inset: -7, background: '#CFDCE7', borderRadius: 16, filter: 'blur(8px)', opacity: 0.55, zIndex: 0, pointerEvents: 'none' }} />
+      <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
     <div style={{
       position: 'relative', zIndex: 1,
       background: '#ffffff',
@@ -1454,7 +1454,7 @@ export default function YourLoans({ defaultTab }) {
       <div style={{ minHeight: '100vh', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: 32, height: 32, border: '2px solid #82F0B9', borderTopColor: 'transparent', borderRadius: '50%', margin: '0 auto 16px' }} className="animate-spin" />
-          <p style={{ fontSize: 14, color: '#787776', fontFamily: "'DM Sans', sans-serif" }}>Loading your loans...</p>
+          <p style={{ fontSize: 12, color: '#787776', fontFamily: "'DM Sans', sans-serif" }}>Loading your loans...</p>
         </div>
       </div>
     );
@@ -1526,7 +1526,7 @@ export default function YourLoans({ defaultTab }) {
               {[{key:'lending',label:'Lending'},{key:'borrowing',label:'Borrowing'}].map(tab => (
                 <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{
                   paddingBottom: 10, border: 'none', background: 'transparent', cursor: 'pointer',
-                  fontSize: 17, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif",
+                  fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
                   letterSpacing: '-0.02em',
                   color: activeTab === tab.key ? '#1A1918' : 'rgba(0,0,0,0.28)',
                   transition: 'color 0.2s',
@@ -1540,7 +1540,7 @@ export default function YourLoans({ defaultTab }) {
           ) : (
           <div className="mobile-page-title">
             <div style={{ paddingBottom: 10, marginBottom: 0 }}>
-              <span style={{ fontSize: 17, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif", letterSpacing: '-0.02em', color: '#1A1918' }}>
+              <span style={{ fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", letterSpacing: '-0.02em', color: '#1A1918' }}>
                 {defaultTab === 'lending' ? 'Lending' : 'Borrowing'}
               </span>
             </div>

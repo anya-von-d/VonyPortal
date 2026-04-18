@@ -804,7 +804,7 @@ export default function Borrowing() {
       <div style={{ minHeight: '100vh', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: 32, height: 32, border: '2px solid #03ACEA', borderTopColor: 'transparent', borderRadius: '50%', margin: '0 auto 16px' }} className="animate-spin" />
-          <p style={{ fontSize: 14, color: '#787776', fontFamily: "'DM Sans', sans-serif" }}>Loading borrowing...</p>
+          <p style={{ fontSize: 12, color: '#787776', fontFamily: "'DM Sans', sans-serif" }}>Loading borrowing...</p>
         </div>
       </div>
     );
@@ -865,7 +865,7 @@ export default function Borrowing() {
 
           {/* Mobile-only page title (desktop shows it in top bar) */}
           <div className="mobile-page-title">
-            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>My Loans</div>
+            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>My Loans</div>
             <div style={{ height: 1, background: 'rgba(0,0,0,0.08)', marginLeft: -32, marginRight: -32, marginBottom: 20 }} />
           </div>
 
@@ -902,7 +902,7 @@ export default function Borrowing() {
                   }
                 </p>
               </div>
-              <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1918', margin: 0 }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>
                 ${nextPaymentAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
@@ -939,14 +939,14 @@ export default function Borrowing() {
                     {nextPaymentLoan ? (
                       <>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                          <span style={{ fontSize: 19, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{format(nextPaymentLoan.date, 'MMM d')}</span>
+                          <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{format(nextPaymentLoan.date, 'MMM d')}</span>
                           {daysLabel && <span style={{ fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '2px 6px', flexShrink: 0 }}>{daysLabel}</span>}
                         </div>
                         <div style={{ fontSize: 11, color: '#9B9A98', textAlign: 'right' }}>{format(nextPaymentLoan.date, 'do MMMM')}</div>
                       </>
                     ) : (
                       <>
-                        <div style={{ fontSize: 15, fontWeight: 700, color: '#C5C3C0', marginBottom: 4 }}>—</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: '#C5C3C0', marginBottom: 4 }}>—</div>
                         <div style={{ fontSize: 11, color: '#9B9A98' }}>Nothing due 🎉</div>
                       </>
                     )}
@@ -968,7 +968,7 @@ export default function Borrowing() {
                       <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Active Borrowing</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
-                      <span style={{ fontSize: 18, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{formatMoney(totalOwed)}</span>
+                      <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{formatMoney(totalOwed)}</span>
                       <span style={{ fontSize: 11, fontWeight: 700, color: '#03ACEA' }}>{pct}%</span>
                     </div>
                     <div style={{ width: '100%', height: 6, borderRadius: 3, background: '#D9EAF4', overflow: 'hidden', marginBottom: 6 }}>
@@ -1080,7 +1080,7 @@ export default function Borrowing() {
                         <div>
                           <p style={{ fontSize: 11, color: '#787776', marginBottom: 2 }}>Next Payment Date</p>
                           <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                            <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1918', margin: 0 }}>{format(new Date(nextPaymentLoan.next_payment_date), 'EEE, MMM d')}</p>
+                            <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>{format(new Date(nextPaymentLoan.next_payment_date), 'EEE, MMM d')}</p>
                             {nextPaymentDays !== null && (
                               <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>{nextPaymentDays > 0 ? `${nextPaymentDays}d away` : nextPaymentDays === 0 ? 'Due today' : `${Math.abs(nextPaymentDays)}d overdue`}</p>
                             )}
@@ -1089,7 +1089,7 @@ export default function Borrowing() {
                         <div>
                           <p style={{ fontSize: 11, color: '#787776', marginBottom: 2 }}>Next Payment Amount</p>
                           <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                            <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(nextPaymentAmount)}</p>
+                            <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(nextPaymentAmount)}</p>
                             <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>to {nextPaymentLenderUsername}</p>
                           </div>
                         </div>

@@ -186,17 +186,17 @@ function AmountFilterDropdown({ amountMode, setAmountMode, amountVal1, setAmount
                 <p style={{ fontSize: 13, color: '#787776', margin: 0 }}>{modeDescriptions[amountMode]}</p>
                 {amountMode === 'between' ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 14, color: '#787776', fontWeight: 500 }}>$</span>
+                    <span style={{ fontSize: 12, color: '#787776', fontWeight: 500 }}>$</span>
                     <input type="number" placeholder="0" value={amountVal1} onChange={e => setAmountVal1(e.target.value)} style={inputStyle}
                       onFocus={e => e.target.style.borderColor = '#82F0B9'} onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.1)'} />
                     <span style={{ fontSize: 13, color: '#787776' }}>›</span>
-                    <span style={{ fontSize: 14, color: '#787776', fontWeight: 500 }}>$</span>
+                    <span style={{ fontSize: 12, color: '#787776', fontWeight: 500 }}>$</span>
                     <input type="number" placeholder="0" value={amountVal2} onChange={e => setAmountVal2(e.target.value)} style={inputStyle}
                       onFocus={e => e.target.style.borderColor = '#82F0B9'} onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.1)'} />
                   </div>
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <span style={{ fontSize: 14, color: '#787776', fontWeight: 500 }}>$</span>
+                    <span style={{ fontSize: 12, color: '#787776', fontWeight: 500 }}>$</span>
                     <input type="number" placeholder="0" value={amountVal1} onChange={e => setAmountVal1(e.target.value)} style={{ ...inputStyle, width: 100 }}
                       onFocus={e => e.target.style.borderColor = '#82F0B9'} onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.1)'} />
                   </div>
@@ -773,7 +773,7 @@ export default function LoanAgreements() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
         <div style={{ background: '#F5F4F0', borderRadius: 12, padding: 16 }}>
           <p style={{ fontSize: 12, color: '#787776', marginBottom: 4 }}>Principal Amount</p>
-          <p style={{ fontSize: 28, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(agreement.amount)}</p>
+          <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(agreement.amount)}</p>
         </div>
 
         <p style={{ fontSize: 13, lineHeight: 1.7, color: '#1A1918' }}>
@@ -781,7 +781,7 @@ export default function LoanAgreements() {
         </p>
 
         <div style={{ background: '#F5F4F0', borderRadius: 12, padding: 16 }}>
-          <h3 style={{ fontSize: 14, fontWeight: 600, color: '#1A1918', marginBottom: 12 }}>Terms of Repayment</h3>
+          <h3 style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', marginBottom: 12 }}>Terms of Repayment</h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, fontSize: 13 }}>
             <div><span style={{ color: '#787776' }}>Total Amount Due:</span> <span style={{ fontWeight: 500 }}>{formatMoney(agreement.total_amount)}</span></div>
             <div><span style={{ color: '#787776' }}>Interest Rate:</span> <span style={{ fontWeight: 500 }}>{agreement.interest_rate}%</span></div>
@@ -793,12 +793,12 @@ export default function LoanAgreements() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div style={{ background: '#F5F4F0', borderRadius: 10, padding: 16 }}>
             <p style={{ fontSize: 11, color: '#787776', marginBottom: 4 }}>Borrower</p>
-            <p style={{ fontSize: 18, fontStyle: 'italic', fontFamily: 'Georgia, serif', color: '#1A1918', margin: 0 }}>{agreement.borrower_name || borrowerInfo.full_name}</p>
+            <p style={{ fontSize: 13, fontStyle: 'italic', fontFamily: "'DM Sans', sans-serif", color: '#1A1918', margin: 0 }}>{agreement.borrower_name || borrowerInfo.full_name}</p>
             <p style={{ fontSize: 11, color: '#787776', marginTop: 4 }}>Signed {format(new Date(agreement.borrower_signed_date), 'MMM d, yyyy')}</p>
           </div>
           <div style={{ background: '#F5F4F0', borderRadius: 10, padding: 16 }}>
             <p style={{ fontSize: 11, color: '#787776', marginBottom: 4 }}>Lender</p>
-            <p style={{ fontSize: 18, fontStyle: 'italic', fontFamily: 'Georgia, serif', color: '#1A1918', margin: 0 }}>{agreement.lender_name || lenderInfo.full_name}</p>
+            <p style={{ fontSize: 13, fontStyle: 'italic', fontFamily: "'DM Sans', sans-serif", color: '#1A1918', margin: 0 }}>{agreement.lender_name || lenderInfo.full_name}</p>
             <p style={{ fontSize: 11, color: '#787776', marginTop: 4 }}>Signed {format(new Date(agreement.lender_signed_date), 'MMM d, yyyy')}</p>
           </div>
         </div>
@@ -827,21 +827,21 @@ export default function LoanAgreements() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
-          <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 12, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', padding: '10px 14px', textAlign: 'center' }}>
+          <div style={{ background: '#ffffff', borderRadius: 10, border: 'none', padding: '10px 14px', textAlign: 'center' }}>
             <p style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Principal</p>
-            <p style={{ fontSize: 18, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', margin: '4px 0 0' }}>{formatMoney(agreement.amount)}</p>
+            <p style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', margin: '4px 0 0' }}>{formatMoney(agreement.amount)}</p>
           </div>
-          <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 12, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', padding: '10px 14px', textAlign: 'center' }}>
+          <div style={{ background: '#ffffff', borderRadius: 10, border: 'none', padding: '10px 14px', textAlign: 'center' }}>
             <p style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Interest</p>
-            <p style={{ fontSize: 18, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', margin: '4px 0 0' }}>{formatMoney((agreement.total_amount || 0) - (agreement.amount || 0))}</p>
+            <p style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', margin: '4px 0 0' }}>{formatMoney((agreement.total_amount || 0) - (agreement.amount || 0))}</p>
           </div>
-          <div style={{ background: 'rgba(3,172,234,0.07)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 12, border: '1px solid rgba(3,172,234,0.18)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', padding: '10px 14px', textAlign: 'center' }}>
+          <div style={{ background: 'rgba(3,172,234,0.07)', borderRadius: 12, border: '1px solid rgba(3,172,234,0.18)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', padding: '10px 14px', textAlign: 'center' }}>
             <p style={{ fontSize: 9, fontWeight: 700, color: '#03ACEA', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Total</p>
-            <p style={{ fontSize: 18, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', margin: '4px 0 0' }}>{formatMoney(agreement.total_amount)}</p>
+            <p style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', margin: '4px 0 0' }}>{formatMoney(agreement.total_amount)}</p>
           </div>
         </div>
 
-        <div style={{ maxHeight: 320, overflowX: 'auto', overflowY: 'auto', borderRadius: 12, background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+        <div style={{ maxHeight: 320, overflowX: 'auto', overflowY: 'auto', borderRadius: 12, background: 'rgba(255,255,255,0.85)', border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
           <table style={{ width: '100%', fontSize: 11, minWidth: 700, borderCollapse: 'collapse' }}>
             <thead>
               <tr>
@@ -905,11 +905,11 @@ export default function LoanAgreements() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div style={{ background: '#F5F4F0', borderRadius: 12, padding: 16 }}>
             <p style={{ fontSize: 11, color: '#787776', marginBottom: 4 }}>Loan Amount</p>
-            <p style={{ fontSize: 24, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(agreement.amount)}</p>
+            <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(agreement.amount)}</p>
           </div>
           <div style={{ background: '#F5F4F0', borderRadius: 12, padding: 16 }}>
             <p style={{ fontSize: 11, color: '#787776', marginBottom: 4 }}>Total Due</p>
-            <p style={{ fontSize: 24, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(agreement.total_amount)}</p>
+            <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(agreement.total_amount)}</p>
           </div>
         </div>
 
@@ -968,7 +968,7 @@ export default function LoanAgreements() {
         </div>
 
         <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', paddingTop: 16 }}>
-          <h4 style={{ fontSize: 14, fontWeight: 600, color: '#1A1918', marginBottom: 12 }}>Parties</h4>
+          <h4 style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', marginBottom: 12 }}>Parties</h4>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <UserAvatar name={lenderInfo.full_name} src={lenderInfo.profile_picture_url} size={40} />
@@ -1053,8 +1053,8 @@ export default function LoanAgreements() {
 
   const PageCard = ({ title, headerRight, children, style }) => (
     <div style={{ position: 'relative', marginBottom: 24 }}>
-      <div className="home-aura-glow" style={{ position: 'absolute', inset: -7, background: '#CFDCE7', borderRadius: 16, filter: 'blur(8px)', opacity: 0.55, zIndex: 0, pointerEvents: 'none' }} />
-      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: '1px solid rgba(207,220,231,0.6)', padding: '14px 18px', ...style }}>
+      <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px', ...style }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 5, marginBottom: 2 }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>{title}</div>
           {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
@@ -1118,7 +1118,7 @@ export default function LoanAgreements() {
 
           {/* Mobile-only page title (desktop shows it in top bar) */}
           <div className="mobile-page-title">
-            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Records</div>
+            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Records</div>
             <div style={{ height: 1, background: 'rgba(0,0,0,0.08)', marginLeft: -32, marginRight: -32, marginBottom: 20 }} />
           </div>
 
@@ -1146,7 +1146,7 @@ export default function LoanAgreements() {
           </div>
 
           {/* ── Agreements List ──────────────────────────────────── */}
-          <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)' }}>
+          <div style={{ background: '#ffffff', borderRadius: 10, border: 'none' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, padding: '10px 16px' }}>
               <span style={{ fontSize: 11, fontWeight: 500, color: '#787776', marginRight: 4 }}>Page {laSafePage + 1} of {laTotalPages}</span>
               <button onClick={() => setLaPage(Math.max(0, laSafePage - 1))} disabled={laSafePage === 0} style={{ width: 22, height: 22, borderRadius: 6, border: '1px solid rgba(0,0,0,0.09)', background: 'white', cursor: laSafePage === 0 ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: laSafePage === 0 ? 0.3 : 1, flexShrink: 0 }}>

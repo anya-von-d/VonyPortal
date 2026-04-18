@@ -264,7 +264,7 @@ function ExportDropdown({ filteredCount, totalCount, hasAnyFilter, onExport }) {
             onClick={() => { onExport(); setOpen(false); }}
             style={{
               width: '100%', padding: '12px 20px', borderRadius: 22, border: 'none', cursor: 'pointer',
-              background: '#1A1918', color: 'white', fontSize: 14, fontWeight: 600,
+              background: '#1A1918', color: 'white', fontSize: 13, fontWeight: 600,
               fontFamily: "'DM Sans', sans-serif",
             }}
           >
@@ -658,7 +658,7 @@ export default function RecentActivityPage() {
 
           {/* Mobile-only page title (desktop shows it in top bar) */}
           <div className="mobile-page-title">
-            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Recent Activity</div>
+            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Recent Activity</div>
             <div style={{ height: 1, background: 'rgba(0,0,0,0.08)', marginLeft: -32, marginRight: -32, marginBottom: 20 }} />
           </div>
 
@@ -685,8 +685,8 @@ export default function RecentActivityPage() {
 
           {/* ── Activity List ──────────────────────────────────── */}
           <div style={{ position: 'relative' }}>
-            <div className="home-aura-glow" style={{ position: 'absolute', inset: -7, background: '#CFDCE7', borderRadius: 16, filter: 'blur(8px)', opacity: 0.55, zIndex: 0, pointerEvents: 'none' }} />
-          <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(207,220,231,0.6)' }}>
+            <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+          <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, padding: '10px 16px' }}>
               <span style={{ fontSize: 11, fontWeight: 500, color: '#787776', marginRight: 4 }}>Page {raSafePage + 1} of {raTotalPages}</span>
               <button onClick={() => setRaPage(Math.max(0, raSafePage - 1))} disabled={raSafePage === 0} style={{ width: 22, height: 22, borderRadius: 6, border: '1px solid rgba(0,0,0,0.09)', background: 'white', cursor: raSafePage === 0 ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: raSafePage === 0 ? 0.3 : 1, flexShrink: 0 }}>
@@ -806,7 +806,7 @@ export default function RecentActivityPage() {
               </div>
               <div style={{ background: '#F5F4F0', borderRadius: 10, padding: '12px 14px' }}>
                 <p style={{ fontSize: 11, color: '#787776', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>Purpose</p>
-                <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{viewingLoanOffer.purpose || '—'}</p>
+                <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{viewingLoanOffer.purpose || '—'}</p>
               </div>
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
@@ -816,7 +816,7 @@ export default function RecentActivityPage() {
                 }}
                 style={{
                   flex: 1, padding: '12px 20px', borderRadius: 22, border: 'none', cursor: 'pointer',
-                  background: '#1A1918', color: 'white', fontSize: 14, fontWeight: 600,
+                  background: '#1A1918', color: 'white', fontSize: 13, fontWeight: 600,
                   fontFamily: "'DM Sans', sans-serif",
                 }}
               >
@@ -827,7 +827,7 @@ export default function RecentActivityPage() {
                 style={{
                   padding: '12px 20px', borderRadius: 22,
                   border: '1px solid rgba(0,0,0,0.12)', cursor: 'pointer',
-                  background: 'white', color: '#1A1918', fontSize: 14, fontWeight: 600,
+                  background: 'white', color: '#1A1918', fontSize: 13, fontWeight: 600,
                   fontFamily: "'DM Sans', sans-serif",
                 }}
               >
