@@ -942,7 +942,7 @@ export default function YourLoans({ defaultTab }) {
     const rankingFilter = isLending ? rankingFilterLending : rankingFilterBorrowing;
     const setRankingFilter = isLending ? setRankingFilterLending : setRankingFilterBorrowing;
     const barColor = isLending ? '#03ACEA' : '#1D5B94';
-    const barBg = isLending ? 'rgba(3,172,234,0.1)' : 'rgba(29,91,148,0.1)';
+    const barBg = '#D9EAF4';
 
     const glowBox = {
       padding: 16, borderRadius: 10, background: 'white',

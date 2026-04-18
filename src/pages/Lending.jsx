@@ -1795,7 +1795,7 @@ export default function Lending({ initialTab }) {
                             <span style={{ fontSize: 18, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{formatMoney(totalOwed)}</span>
                             <span style={{ fontSize: 11, fontWeight: 700, color: '#03ACEA' }}>{pct}%</span>
                           </div>
-                          <div style={{ width: '100%', height: 6, borderRadius: 3, background: 'rgba(3,172,234,0.12)', overflow: 'hidden', marginBottom: 6 }}>
+                          <div style={{ width: '100%', height: 6, borderRadius: 3, background: '#D9EAF4', overflow: 'hidden', marginBottom: 6 }}>
                             <div style={{ height: '100%', borderRadius: 3, background: '#03ACEA', width: `${pct}%`, transition: 'width 1s cubic-bezier(0.4,0,0.2,1)' }} />
                           </div>
                           <div style={{ fontSize: 10, color: '#9B9A98' }}>{formatMoney(totalPaid)} of {formatMoney(totalOwed)} repaid</div>
@@ -1861,7 +1861,7 @@ export default function Lending({ initialTab }) {
                               <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>Active Loans</div>
                               <div style={{ fontSize: 12, color: '#787776' }}>{pctAll}%</div>
                             </div>
-                            <div style={{ width: '100%', height: 6, borderRadius: 3, background: 'rgba(3,172,234,0.15)', overflow: 'hidden' }}>
+                            <div style={{ width: '100%', height: 6, borderRadius: 3, background: '#D9EAF4', overflow: 'hidden' }}>
                               <div style={{ height: '100%', borderRadius: 3, background: '#03ACEA', width: `${pctAll}%`, transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
                             </div>
                             <div style={{ fontSize: 11, color: '#787776', marginTop: 6 }}>{formatMoney(paidAll)} of {formatMoney(totalAll)} repaid</div>

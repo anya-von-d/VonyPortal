@@ -1001,14 +1001,14 @@ export default function Home() {
                   <div style={{
                     position: 'relative', zIndex: 1, flex: 1,
                     padding: '12px 14px', borderRadius: 10,
-                    background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.95) 20%, rgba(255,255,255,0.55) 100%)',
+                    background: 'radial-gradient(ellipse at center, rgba(255,255,255,1) 30%, rgba(255,255,255,0.6) 100%)',
                     backdropFilter: 'blur(8px)',
                     WebkitBackdropFilter: 'blur(8px)',
                     border: '1px solid rgba(50,138,182,0.65)',
                     display: 'flex', flexDirection: 'column', justifyContent: 'center',
                   }}>
                     {daysLabel && nextBorrowerPayment && (
-                      <span style={{ position: 'absolute', top: 10, right: 12, fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '2px 6px' }}>{daysLabel}</span>
+                      <span style={{ position: 'absolute', top: 10, right: 12, fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '3px 9px' }}>{daysLabel}</span>
                     )}
                     <SectionHeader title="Next Payment Due" titleColor="#1A1918" />
                     {nextBorrowerPayment ? (
@@ -1058,7 +1058,7 @@ export default function Home() {
                     display: 'flex', flexDirection: 'column', justifyContent: 'center',
                   }}>
                     {daysLabel && nextLenderPayment && (
-                      <span style={{ position: 'absolute', top: 10, right: 12, fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '2px 6px' }}>{daysLabel}</span>
+                      <span style={{ position: 'absolute', top: 10, right: 12, fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '3px 9px' }}>{daysLabel}</span>
                     )}
                     <SectionHeader title="Next Payment Incoming" />
                     {nextLenderPayment ? (
