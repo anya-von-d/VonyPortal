@@ -957,7 +957,7 @@ export default function Home() {
               <div style={{
                 position: 'relative', zIndex: 1,
                 display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', borderRadius: 9,
-                background: '#1A1918', border: 'none',
+                background: '#2D5777', border: 'none',
               }}>
                 <div style={{ width: 20, height: 20, borderRadius: 6, background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -1236,7 +1236,7 @@ export default function Home() {
                     <span style={{ fontSize: 14, fontWeight: 700, color: '#1D5B94', letterSpacing: '-0.01em' }}>{formatMoney(monthlyPaidOut)}</span>
                   </div>
                   <div style={{ height: 6, borderRadius: 3, background: '#D9EAF4', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', borderRadius: 3, background: '#328AB6', width: `${monthlyExpectedPay > 0 ? Math.min((monthlyPaidOut / monthlyExpectedPay) * 100, 100) : 0}%`, transition: 'width 0.8s ease-out' }} />
+                    <div style={{ height: '100%', borderRadius: 3, background: '#2D5777', width: `${monthlyExpectedPay > 0 ? Math.min((monthlyPaidOut / monthlyExpectedPay) * 100, 100) : 0}%`, transition: 'width 0.8s ease-out' }} />
                   </div>
                   <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 4 }}>of {formatMoney(monthlyExpectedPay)} expected</div>
                 </div>
