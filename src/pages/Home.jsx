@@ -613,6 +613,38 @@ export default function Home() {
   const monthlyExpectedReceive = lentLoans.reduce((sum, l) => sum + (l.payment_amount || 0), 0);
   const monthlyExpectedPay = borrowedLoans.reduce((sum, l) => sum + (l.payment_amount || 0), 0);
 
+  // Monthly scheduled-payment counts (outgoing = borrower side)
+  const outCompletedCount = safePayments.filter(p => {
+    if (!p || p.status !== 'completed') return false;
+    const loan = myLoans.find(l => l.id === p.loan_id);
+    if (!loan || loan.borrower_id !== user.id) return false;
+    const pDate = new Date(p.payment_date || p.created_at);
+    return pDate >= currentMonth && pDate <= currentMonthEnd;
+  }).length;
+  const outPendingCount = borrowedLoans.filter(l =>
+    l && l.next_payment_date &&
+    new Date(l.next_payment_date) >= currentMonth &&
+    new Date(l.next_payment_date) <= currentMonthEnd
+  ).length;
+  const outScheduledTotal = outCompletedCount + outPendingCount;
+  const leftToPay = Math.max(0, monthlyExpectedPay - monthlyPaidOut);
+
+  // Incoming = lender side
+  const inCompletedCount = safePayments.filter(p => {
+    if (!p || p.status !== 'completed') return false;
+    const loan = myLoans.find(l => l.id === p.loan_id);
+    if (!loan || loan.lender_id !== user.id) return false;
+    const pDate = new Date(p.payment_date || p.created_at);
+    return pDate >= currentMonth && pDate <= currentMonthEnd;
+  }).length;
+  const inPendingCount = lentLoans.filter(l =>
+    l && l.next_payment_date &&
+    new Date(l.next_payment_date) >= currentMonth &&
+    new Date(l.next_payment_date) <= currentMonthEnd
+  ).length;
+  const inScheduledTotal = inCompletedCount + inPendingCount;
+  const leftToReceive = Math.max(0, monthlyExpectedReceive - monthlyReceived);
+
   // Helper message for "How {month} is going" card — prioritized status line.
   // Overdue cases win; otherwise we pick one of several positive variants
   // based on whichever condition is true.
@@ -1443,29 +1475,38 @@ export default function Home() {
               <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
               <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
                 <SectionHeader title={`How ${format(today, 'MMMM')} is Going`} />
-                {/* Received */}
-                <div style={{ padding: '9px 0' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
-                    <span style={{ fontSize: 12, color: '#1A1918' }}>Received</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: '#03ACEA', letterSpacing: '-0.01em' }}>{formatMoney(monthlyReceived)}</span>
-                  </div>
-                  <div style={{ height: 6, borderRadius: 3, background: '#D9EAF4', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', borderRadius: 3, background: '#03ACEA', width: `${monthlyExpectedReceive > 0 ? Math.min((monthlyReceived / monthlyExpectedReceive) * 100, 100) : 0}%`, transition: 'width 0.8s ease-out' }} />
-                  </div>
-                  <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 4 }}>of {formatMoney(monthlyExpectedReceive)} expected</div>
+                {/* Summary lines */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 2 }}>
+                  {/* Outgoing line: completed vs scheduled (skip if nothing scheduled) */}
+                  {outScheduledTotal > 0 && (
+                    <div style={{ fontSize: 12, color: '#1A1918' }}>
+                      {outCompletedCount > 0
+                        ? <>You've completed <strong style={{ color: '#1D5B94' }}>{outCompletedCount}</strong> of <strong style={{ color: '#1D5B94' }}>{outScheduledTotal}</strong> scheduled payments</>
+                        : <>You have <strong style={{ color: '#1D5B94' }}>{outScheduledTotal}</strong> payment{outScheduledTotal === 1 ? '' : 's'} this month</>}
+                    </div>
+                  )}
+                  {/* $ left to pay */}
+                  {leftToPay > 0 && (
+                    <div style={{ fontSize: 12, color: '#1A1918' }}>
+                      <strong style={{ color: '#1D5B94' }}>{formatMoney(leftToPay)}</strong> left to pay this month
+                    </div>
+                  )}
+                  {/* Incoming line */}
+                  {inScheduledTotal > 0 && (
+                    <div style={{ fontSize: 12, color: '#1A1918' }}>
+                      {inCompletedCount > 0
+                        ? <>You've received <strong style={{ color: '#03ACEA' }}>{inCompletedCount}</strong> of <strong style={{ color: '#03ACEA' }}>{inScheduledTotal}</strong> payments</>
+                        : <>You're due to receive <strong style={{ color: '#03ACEA' }}>{inScheduledTotal}</strong> payment{inScheduledTotal === 1 ? '' : 's'} this month</>}
+                    </div>
+                  )}
+                  {/* $ expected to receive */}
+                  {leftToReceive > 0 && (
+                    <div style={{ fontSize: 12, color: '#1A1918' }}>
+                      You're expected to receive <strong style={{ color: '#03ACEA' }}>{formatMoney(leftToReceive)}</strong> before the end of the month
+                    </div>
+                  )}
                 </div>
-                {/* Paid out */}
-                <div style={{ padding: '9px 0' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
-                    <span style={{ fontSize: 12, color: '#1A1918' }}>Paid out</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: '#1D5B94', letterSpacing: '-0.01em' }}>{formatMoney(monthlyPaidOut)}</span>
-                  </div>
-                  <div style={{ height: 6, borderRadius: 3, background: '#D9EAF4', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', borderRadius: 3, background: '#1D5B94', width: `${monthlyExpectedPay > 0 ? Math.min((monthlyPaidOut / monthlyExpectedPay) * 100, 100) : 0}%`, transition: 'width 0.8s ease-out' }} />
-                  </div>
-                  <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 4 }}>of {formatMoney(monthlyExpectedPay)} expected</div>
-                </div>
-                {/* Status message */}
+                {/* Insight */}
                 <div style={{ marginTop: 10, textAlign: 'center' }}>
                   <span style={{
                     display: 'inline-block',
