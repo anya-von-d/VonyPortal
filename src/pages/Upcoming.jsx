@@ -246,7 +246,7 @@ export default function Upcoming() {
   // ── Section heading ──
   const SectionHead = ({ label, count, total }) => (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2, marginTop: 28 }}>
-      <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>{label}</span>
+      <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>{label}</span>
       {count > 0 && <span style={{ fontSize: 11, color: '#9B9A98' }}>{count} · {formatMoney(total)}</span>}
     </div>
   );
@@ -294,7 +294,7 @@ export default function Upcoming() {
                   }}>
                   <div style={{ flex: 1, padding: '14px 18px', borderRadius: 10, background: '#ffffff', display: 'flex', flexDirection: 'column' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                      <span style={{ fontSize: 13, fontWeight: 600, color: '#E8726E', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Overdue</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: '#E8726E', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Overdue</span>
                       <span style={{ fontSize: 11, color: '#9B9A98' }}>{overdue.length} · {formatMoney(overdue.reduce((s, e) => s + e.amount, 0))}</span>
                     </div>
                     {overdue.map(event => <PaymentRow key={event.loanId + '-ov'} event={event} />)}
@@ -322,7 +322,7 @@ export default function Upcoming() {
                 }}>
                 <div style={{ flex: 1, padding: '14px 18px', borderRadius: 10, background: '#ffffff', display: 'flex', flexDirection: 'column' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Next 7 Days</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Next 7 Days</span>
                     {next7Days.length > 0 && <span style={{ fontSize: 11, color: '#9B9A98' }}>{next7Days.length} · {formatMoney(next7Days.reduce((s, e) => s + e.amount, 0))}</span>}
                   </div>
                   {next7Days.length === 0 ? (
@@ -340,7 +340,7 @@ export default function Upcoming() {
                 <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
               <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Coming Later</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Coming Later</span>
                   {comingLater.length > 0 && <span style={{ fontSize: 11, color: '#9B9A98' }}>{comingLater.length} · {formatMoney(comingLater.reduce((s, e) => s + e.amount, 0))}</span>}
                 </div>
                 {comingLater.length === 0 ? (

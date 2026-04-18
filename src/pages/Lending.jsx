@@ -1791,59 +1791,6 @@ export default function Lending({ initialTab }) {
                 <div className="grid md:grid-cols-2 gap-4">
                   {/* Left column: Month Repayment Amount + Overview stacked */}
                   <div className="space-y-4">
-                    {/* Month Repayment Amount Box */}
-                    {(() => {
-                      const monthEnd = endOfMonth(selectedMonth);
-                      let totalReceive = 0;
-
-                      activeLoans.forEach(loan => {
-                        if (!loan.next_payment_date) return;
-                        const paymentDate = new Date(loan.next_payment_date);
-                        const paymentAmount = loan.payment_amount || 0;
-
-                        const addAmountIfInMonth = (date) => {
-                          if (isSameMonth(date, selectedMonth)) {
-                            totalReceive += paymentAmount;
-                          }
-                        };
-
-                        addAmountIfInMonth(paymentDate);
-
-                        const frequency = loan.payment_frequency;
-                        if (frequency && frequency !== 'none') {
-                          let currentDate = new Date(loan.next_payment_date);
-                          let iterations = 0;
-                          while (iterations < 10) {
-                            if (frequency === 'weekly') {
-                              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
-                            } else if (frequency === 'biweekly') {
-                              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 14));
-                            } else if (frequency === 'monthly') {
-                              currentDate = addMonths(currentDate, 1);
-                            } else if (frequency === 'daily') {
-                              currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
-                            } else {
-                              break;
-                            }
-                            if (currentDate > monthEnd) break;
-                            addAmountIfInMonth(currentDate);
-                            iterations++;
-                          }
-                        }
-                      });
-
-                      return (
-                        <div className="bg-[#03ACEA]/12 rounded-xl p-3 flex items-center justify-between">
-                          <p className="text-[11px] text-[#1A1918] uppercase tracking-[0.12em] font-medium" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-                            {format(selectedMonth, 'MMMM')} Repayment Amount
-                          </p>
-                          <p className="text-sm font-bold text-[#1A1918]">
-                            +${totalReceive.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </p>
-                        </div>
-                      );
-                    })()}
-
                     {/* Month Repayment Overview Box */}
                     <PageCard title={`${format(selectedMonth, 'MMMM')} Repayment Overview`} headerRight={
                       <div className="relative">

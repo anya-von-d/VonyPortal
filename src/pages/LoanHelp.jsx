@@ -106,7 +106,7 @@ export default function LoanHelp() {
 
   const RightSection = ({ title, children }) => (
     <div style={{ marginBottom: 40 }}>
-      <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif", paddingBottom: 5, marginBottom: 2 }}>{title}</div>
+      <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif", paddingBottom: 5, marginBottom: 2 }}>{title}</div>
       {children}
     </div>
   );
@@ -211,7 +211,7 @@ export default function LoanHelp() {
         <div className="learn-mobile-sections">
           {CATEGORIES.map(cat => (
             <section key={cat.id} style={{ marginBottom: 28 }}>
-              <h3 style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', margin: '0 0 12px 0' }}>
+              <h3 style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', margin: '0 0 12px 0' }}>
                 {cat.label}
               </h3>
               <div className="h-scroll-cards">
