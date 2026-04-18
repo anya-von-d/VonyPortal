@@ -200,24 +200,43 @@ export default function Upcoming() {
   });
 
   // ── PaymentRow component ──
+  // Matches the Home "Upcoming" card styling: countdown badge on the left,
+  // primary line (e.g. "$1.02 due to Natalie"), purpose as secondary line.
   const PaymentRow = ({ event }) => {
     const isOverdueItem = event.days < 0;
     const daysLabel = isOverdueItem ? `${Math.abs(event.days)}d late` : event.days === 0 ? 'today' : `${event.days}d`;
-    const badgeColor = isOverdueItem ? '#E8726E' : event.days <= 3 ? '#F59E0B' : '#9B9A98';
-    const badgeBg = isOverdueItem ? 'rgba(232,114,110,0.08)' : event.days <= 3 ? 'rgba(245,158,11,0.08)' : 'rgba(0,0,0,0.04)';
-    const amtColor = event.isLender ? '#03ACEA' : '#1A1918';
-    const amtSign = event.isLender ? '+' : '-';
+    const amountStr = formatMoney(event.amount);
+    let primaryLine;
+    if (isOverdueItem) {
+      primaryLine = event.isLender
+        ? <>{amountStr} from {event.firstName} is overdue</>
+        : <>{amountStr} to {event.firstName} is overdue</>;
+    } else {
+      primaryLine = event.isLender
+        ? <>Due to receive {amountStr} from {event.firstName}</>
+        : <>{amountStr} due to {event.firstName}</>;
+    }
     return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderBottom: 'none' }}>
-        <div style={{ minWidth: 50, flexShrink: 0, fontSize: 10, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 6, padding: '3px 7px', textAlign: 'center' }}>{daysLabel}</div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {event.isLender ? <>Payment due from <strong>{event.firstName}</strong></> : <>Payment due to <strong>{event.firstName}</strong></>}
-            {event.purpose && <span style={{ color: '#9B9A98', fontWeight: 400 }}> · {event.purpose}</span>}
-          </div>
-          <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 1 }}>{format(event.date, 'MMM d')}</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0' }}>
+        <div style={{
+          flexShrink: 0,
+          fontSize: 10, fontWeight: 700, lineHeight: 1.2,
+          color: isOverdueItem ? '#E8726E' : event.days <= 3 ? '#F59E0B' : '#9B9A98',
+          background: isOverdueItem ? 'rgba(232,114,110,0.08)' : event.days <= 3 ? 'rgba(245,158,11,0.08)' : 'rgba(0,0,0,0.04)',
+          borderRadius: 5, padding: '2px 5px',
+        }}>
+          {daysLabel}
         </div>
-        <span style={{ fontSize: 13, fontWeight: 700, flexShrink: 0, color: amtColor, letterSpacing: '-0.01em' }}>{amtSign}{formatMoney(event.amount)}</span>
+        <div style={{ flex: 1, minWidth: 0, fontSize: 12, color: '#1A1918', overflow: 'hidden' }}>
+          <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {primaryLine}
+          </div>
+          {event.purpose && (
+            <div style={{ fontSize: 11, color: '#9B9A98', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 1 }}>
+              {event.purpose}
+            </div>
+          )}
+        </div>
       </div>
     );
   };

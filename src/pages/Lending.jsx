@@ -1595,73 +1595,10 @@ export default function Lending({ initialTab }) {
             </div>
           )}
 
-          {/* ── Loan Type + Borrower Will Pay + Loan Summary ── */}
-          {activeSection === 'create' && (
-            <div className="lending-summary-cards" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 24 }}>
-              {/* Loan Type */}
-              <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Loan Type</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
-                  <span style={{ fontSize: 13, fontWeight: 500, color: loanType === 'scheduled' ? '#1A1918' : '#9B9A98' }}>Loan</span>
-                  <button
-                    type="button"
-                    onClick={() => setLoanType(loanType === 'flexible' ? 'scheduled' : 'flexible')}
-                    style={{ position: 'relative', width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', flexShrink: 0, background: loanType === 'flexible' ? '#03ACEA' : 'rgba(0,0,0,0.12)', transition: 'background 0.2s' }}
-                  >
-                    <div style={{ position: 'absolute', top: 3, left: loanType === 'flexible' ? 23 : 3, width: 18, height: 18, borderRadius: '50%', background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.2)', transition: 'left 0.2s' }} />
-                  </button>
-                  <span style={{ fontSize: 13, fontWeight: 500, color: loanType === 'flexible' ? '#1A1918' : '#9B9A98' }}>Quick Pay</span>
-                </div>
-                <p style={{ fontSize: 11, color: '#9B9A98', lineHeight: 1.5, margin: 0 }}>
-                  {loanType === 'flexible' ? 'One-time payment, perfect for splitting expenses' : 'Structured repayment plan with interest'}
-                </p>
-              </div>
-
-              {/* Loan Summary */}
-              <div className="lending-loan-summary-card" style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Loan Summary</span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {formData.purpose && (
-                    <div>
-                      <div style={{ fontSize: 11, color: '#9B9A98', marginBottom: 1 }}>For</div>
-                      <div style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{formData.purpose}</div>
-                    </div>
-                  )}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                    <span style={{ fontSize: 12, color: '#9B9A98' }}>Amount</span>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>{formData.amount ? `$${parseFloat(formData.amount).toLocaleString()}` : '$0.00'}</span>
-                  </div>
-                  {loanType === 'scheduled' && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                      <span style={{ fontSize: 12, color: '#9B9A98' }}>Interest</span>
-                      <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>{formData.amount && formData.interest_rate ? `$${details.totalInterest.toFixed(2)}` : '$0.00'}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Borrower Will Pay */}
-              <div className="lending-pay-card" style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Borrower Will Pay</span>
-                </div>
-                {loanType === 'scheduled' ? (
-                  <>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: '#03ACEA', letterSpacing: '-0.03em', lineHeight: 1, marginBottom: 4 }}>
-                      {formData.amount && details.monthlyPayment > 0 ? `$${details.monthlyPayment.toFixed(2)}` : '$0.00'}
-                    </div>
-                    <div style={{ fontSize: 12, color: '#9B9A98' }}>{formData.payment_frequency || 'monthly'} after interest</div>
-                  </>
-                ) : (
-                  <div style={{ fontSize: 13, color: '#9B9A98' }}>N/A for Quick Pay</div>
-                )}
-              </div>
-            </div>
-          )}
+          {/* ── Loan Type + Borrower Will Pay + Loan Summary ──
+               These three cards are rendered inside the Create form below
+               (inside the .lending-create-layout left column) so they can sit
+               stacked beside the form on desktop. Nothing is rendered here. */}
 
           {/* Tab Navigation — hidden when accessed as standalone Create Loan page */}
           {!initialTab && (
@@ -2128,9 +2065,76 @@ export default function Lending({ initialTab }) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
               >
-                {/* Form */}
-                <div>
-                  <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {/* Form + stacked summary cards (desktop 2-col; mobile stacks) */}
+                <div className="lending-create-layout" style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 24, alignItems: 'start' }}>
+                  {/* Left column: Loan Type + Loan Summary + Borrower Will Pay */}
+                  <div className="lending-summary-cards" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>
+                    {/* Loan Type */}
+                    <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Loan Type</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
+                        <span style={{ fontSize: 13, fontWeight: 500, color: loanType === 'scheduled' ? '#1A1918' : '#9B9A98' }}>Loan</span>
+                        <button
+                          type="button"
+                          onClick={() => setLoanType(loanType === 'flexible' ? 'scheduled' : 'flexible')}
+                          style={{ position: 'relative', width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', flexShrink: 0, background: loanType === 'flexible' ? '#03ACEA' : 'rgba(0,0,0,0.12)', transition: 'background 0.2s' }}
+                        >
+                          <div style={{ position: 'absolute', top: 3, left: loanType === 'flexible' ? 23 : 3, width: 18, height: 18, borderRadius: '50%', background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.2)', transition: 'left 0.2s' }} />
+                        </button>
+                        <span style={{ fontSize: 13, fontWeight: 500, color: loanType === 'flexible' ? '#1A1918' : '#9B9A98' }}>Quick Pay</span>
+                      </div>
+                      <p style={{ fontSize: 11, color: '#9B9A98', lineHeight: 1.5, margin: 0 }}>
+                        {loanType === 'flexible' ? 'One-time payment, perfect for splitting expenses' : 'Structured repayment plan with interest'}
+                      </p>
+                    </div>
+
+                    {/* Loan Summary */}
+                    <div className="lending-loan-summary-card" style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Loan Summary</span>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        {formData.purpose && (
+                          <div>
+                            <div style={{ fontSize: 11, color: '#9B9A98', marginBottom: 1 }}>For</div>
+                            <div style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{formData.purpose}</div>
+                          </div>
+                        )}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                          <span style={{ fontSize: 12, color: '#9B9A98' }}>Amount</span>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>{formData.amount ? `$${parseFloat(formData.amount).toLocaleString()}` : '$0.00'}</span>
+                        </div>
+                        {loanType === 'scheduled' && (
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                            <span style={{ fontSize: 12, color: '#9B9A98' }}>Interest</span>
+                            <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>{formData.amount && formData.interest_rate ? `$${details.totalInterest.toFixed(2)}` : '$0.00'}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Borrower Will Pay */}
+                    <div className="lending-pay-card" style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px) saturate(1.4)', WebkitBackdropFilter: 'blur(12px) saturate(1.4)', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', padding: '14px 18px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Borrower Will Pay</span>
+                      </div>
+                      {loanType === 'scheduled' ? (
+                        <>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: '#03ACEA', letterSpacing: '-0.03em', lineHeight: 1, marginBottom: 4 }}>
+                            {formData.amount && details.monthlyPayment > 0 ? `$${details.monthlyPayment.toFixed(2)}` : '$0.00'}
+                          </div>
+                          <div style={{ fontSize: 12, color: '#9B9A98' }}>{formData.payment_frequency || 'monthly'} after interest</div>
+                        </>
+                      ) : (
+                        <div style={{ fontSize: 13, color: '#9B9A98' }}>N/A for Quick Pay</div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Right column: actual form */}
+                  <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 0 }}>
                         {/* Lender + Borrower — side by side with persistent labels */}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                           {/* Lender */}

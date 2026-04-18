@@ -301,10 +301,9 @@ input[type="date"] {
   .home-two-col-row .home-card-upcoming,
   .home-two-col-row .home-card-howmonth,
   .home-two-col-row .home-card-recent,
-  .home-two-col-row .home-card-lending,
-  .home-two-col-row .home-card-chart,
   .home-two-col-row .home-card-bor-overview,
-  .home-two-col-row .home-card-lending-loans {
+  .home-two-col-row .home-card-lending-loans,
+  .home-two-col-row .home-card-your-borrowing {
     break-inside: avoid;
     -webkit-column-break-inside: avoid;
     page-break-inside: avoid;
@@ -369,22 +368,21 @@ input[type="date"] {
   .home-card-npd       { order: 1 !important; }
   .home-card-npi       { order: 2 !important; }
   .home-card-overview  { order: 3 !important; }
-  .home-card-tasks     { order: 4 !important; }
-  .home-card-upcoming  { order: 5 !important; }
-  .home-card-howmonth  { order: 6 !important; }
-  .home-card-lending   { order: 7 !important; }
-  .home-card-recent    { order: 8 !important; }
-  .home-card-chart     { order: 9 !important; }
-  .home-card-bor-overview   { order: 10 !important; }
-  .home-card-lending-loans  { order: 11 !important; }
-  /* Hide the View all link on mobile inside the Lending/Borrowing Progress card */
-  .home-progress-viewall { display: none !important; }
+  .home-card-tasks          { order: 4 !important; }
+  .home-card-upcoming       { order: 5 !important; }
+  .home-card-howmonth       { order: 6 !important; }
+  .home-card-recent         { order: 7 !important; }
+  .home-card-bor-overview   { order: 8 !important; }
+  .home-card-lending-loans  { order: 9 !important; }
+  .home-card-your-borrowing { order: 10 !important; }
   /* Record Payment: stack loan selector above form on mobile */
   .rp-two-col { grid-template-columns: 1fr !important; }
   /* Create Loan: hide Borrower Will Pay + Loan Summary from top row; show below blue box */
   .lending-pay-card, .lending-loan-summary-card { display: none !important; }
   .lending-mobile-pay-summary { display: grid !important; }
   .lending-summary-cards { grid-template-columns: 1fr !important; }
+  /* Create Loan desktop 2-col layout collapses to a single column on mobile */
+  .lending-create-layout { grid-template-columns: 1fr !important; }
   .ra-mobile-filters { display: block !important; }
   /* YourLoans lending/borrowing tab: stack all cards */
   .loans-top-cards { grid-template-columns: 1fr !important; }

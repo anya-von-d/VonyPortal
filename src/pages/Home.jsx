@@ -1403,72 +1403,6 @@ export default function Home() {
               </div>
               </div>{/* end Recent Activity aurora wrapper */}
 
-              {/* Lending / Borrowing Progress — combined card */}
-              {(() => {
-                const isLending = progressTab === 'lending';
-                const activeLoans = isLending ? lentLoans : borrowedLoans;
-                const tabBtnStyle = (active) => ({
-                  fontSize: 12, fontWeight: active ? 700 : 500,
-                  color: active ? '#03ACEA' : '#9B9A98',
-                  letterSpacing: '-0.01em',
-                  background: 'transparent', border: 'none', padding: 0,
-                  cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-                });
-                return (
-              <div className="home-card-lending" style={{ position: 'relative' }}>
-              <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
-              <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2, gap: 12 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                    <button type="button" onClick={() => { setProgressTab('lending'); setActiveAnimKey(k => k + 1); }} style={tabBtnStyle(isLending)}>Lending Progress</button>
-                    <button type="button" onClick={() => { setProgressTab('borrowing'); setActiveAnimKey(k => k + 1); }} style={tabBtnStyle(!isLending)}>Borrowing Progress</button>
-                  </div>
-                  <Link className="home-progress-viewall" to={createPageUrl("YourLoans")} style={{ fontSize: 11, fontWeight: 500, color: '#03ACEA', textDecoration: 'none' }}>View all →</Link>
-                </div>
-                {activeLoans.length === 0 ? (
-                  <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>
-                    {isLending ? 'Start a loan to see it here 🌱' : 'Nothing borrowed just yet 🤝'}
-                  </div>
-                ) : (
-                  <div ref={isLending ? activeLoansRef : undefined} style={{ display: 'flex', flexDirection: 'column' }}>
-                    {activeLoans.slice(0, 5).map((loan, idx) => {
-                      const otherId = isLending ? loan.borrower_id : loan.lender_id;
-                      const otherProfile = safeAllProfiles.find(p => p.user_id === otherId);
-                      const totalAmt = loan.total_amount || loan.amount || 0;
-                      const paidAmt = loan.amount_paid || 0;
-                      const pct = totalAmt > 0 ? Math.round((paidAmt / totalAmt) * 100) : 0;
-                      const name = otherProfile?.full_name?.split(' ')[0] || otherProfile?.username || 'User';
-                      const purpose = loan.purpose ? ` for ${loan.purpose}` : '';
-                      const barColor = isLending ? '#03ACEA' : '#1D5B94';
-                      const trackColor = isLending ? 'rgba(3,172,234,0.1)' : 'rgba(29,91,148,0.1)';
-                      const label = isLending
-                        ? `You lent ${name} ${formatMoney(totalAmt)}${purpose}`
-                        : `${name} lent you ${formatMoney(totalAmt)}${purpose}`;
-                      const footer = isLending
-                        ? `${formatMoney(paidAmt)} of ${formatMoney(totalAmt)} paid back`
-                        : `${formatMoney(paidAmt)} of ${formatMoney(totalAmt)} repaid`;
-                      return (
-                        <div key={loan.id} style={{ padding: '9px 0' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                            <UserAvatar name={otherProfile?.full_name || otherProfile?.username} src={otherProfile?.profile_picture_url} size={20} radius={5} />
-                            <div style={{ fontSize: 12, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</div>
-                          </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <div style={{ flex: 1, height: 6, borderRadius: 3, background: trackColor, overflow: 'hidden' }}>
-                              <div key={`progress-${idx}-${activeAnimKey}`} style={{ height: '100%', borderRadius: 3, background: barColor, width: `${pct}%`, animation: `barGrowRight 0.8s ease-out ${idx * 0.08}s both` }} />
-                            </div>
-                            <span style={{ fontSize: 11, fontWeight: 700, color: '#9B9A98', flexShrink: 0 }}>{pct}%</span>
-                          </div>
-                          <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 3 }}>{footer}</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-              </div>
-                );
-              })()}
             </div>
 
             {/* Right column: How April → Your Loans Over Time → Active Borrowing */}
@@ -1539,78 +1473,6 @@ export default function Home() {
               </div>
               </div>{/* end how-month aurora wrapper */}
 
-              {/* Your Loans Over Time */}
-              <div className="home-card-chart" style={{ position: 'relative' }}>
-              <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
-              <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }} ref={loansChartRef}>
-                <SectionHeader title="Your Loans Over Time" />
-                {!chartData ? (
-                  <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>Your loan history will appear here 📊</div>
-                ) : (() => {
-                  // Compact money label for the y-axis ticks
-                  const compactMoney = v => {
-                    if (v >= 1_000_000) return `$${(v/1_000_000).toFixed(v >= 10_000_000 ? 0 : 1)}M`;
-                    if (v >= 1_000) return `$${(v/1_000).toFixed(v >= 10_000 ? 0 : 1)}k`;
-                    return `$${Math.round(v)}`;
-                  };
-                  const yTicks = [chartData.maxVal, chartData.maxVal / 2];
-                  const Y_AXIS_WIDTH = 34;
-                  return (
-                  <>
-                    {/* Chart — y-axis ticks + bars */}
-                    <div style={{ display: 'flex', alignItems: 'stretch', gap: 6, height: 120 }}>
-                      <div style={{ width: Y_AXIS_WIDTH, position: 'relative', fontSize: 9, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", textAlign: 'right', lineHeight: 1, paddingRight: 4 }}>
-                        <span style={{ position: 'absolute', top: 0, right: 4 }}>{compactMoney(chartData.maxVal)}</span>
-                        <span style={{ position: 'absolute', top: '50%', right: 4, transform: 'translateY(-50%)' }}>{compactMoney(chartData.maxVal / 2)}</span>
-                      </div>
-                      <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', gap: 14, height: '100%' }}>
-                        {chartData.data.map((d, i) => {
-                          const lendPct = (d.owedToYou / chartData.maxVal) * 100;
-                          const borPct = (d.youOwe / chartData.maxVal) * 100;
-                          return (
-                            <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'flex-end' }}>
-                              <div style={{ width: '100%', display: 'flex', gap: 3, alignItems: 'flex-end', height: '100%', justifyContent: 'center' }}>
-                                <div style={{ width: 8, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '100%', flexShrink: 0 }}>
-                                  <div style={{ width: '100%', height: `${Math.max(lendPct, 2)}%`, borderRadius: '3px 3px 0 0', background: d.isFuture ? 'rgba(3,172,234,0.25)' : '#03ACEA', transition: 'height 0.6s ease-out' }} />
-                                </div>
-                                <div style={{ width: 8, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '100%', flexShrink: 0 }}>
-                                  <div style={{ width: '100%', height: `${Math.max(borPct, 2)}%`, borderRadius: '3px 3px 0 0', background: d.isFuture ? 'rgba(29,91,148,0.2)' : '#1D5B94', transition: 'height 0.6s ease-out' }} />
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                    {/* X-axis labels — offset to align under bars */}
-                    <div style={{ display: 'flex', gap: 6, marginTop: 6, paddingLeft: Y_AXIS_WIDTH + 6 }}>
-                      {chartData.data.map((d, i) => (
-                        <div key={i} style={{ flex: 1, textAlign: 'center', fontSize: 10, color: d.isFuture ? '#C5C3C0' : d.isCurrent ? '#03ACEA' : '#9B9A98', fontWeight: d.isCurrent ? 700 : 500 }}>
-                          {d.label}
-                        </div>
-                      ))}
-                    </div>
-                    {/* Legend — centered below chart */}
-                    <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 12 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#787776' }}>
-                        <div style={{ width: 10, height: 10, borderRadius: 3, background: '#03ACEA' }} />
-                        Lending
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#787776' }}>
-                        <div style={{ width: 10, height: 10, borderRadius: 3, background: '#1D5B94' }} />
-                        Borrowing
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#9B9A98' }}>
-                        <div style={{ width: 10, height: 10, borderRadius: 3, background: 'rgba(3,172,234,0.25)' }} />
-                        Predicted
-                      </div>
-                    </div>
-                  </>
-                  );
-                })()}
-              </div>
-              </div>{/* end loans-chart aurora wrapper */}
-
               {/* Borrowing Overview */}
               {(() => {
                 // Outstanding per loan, for the pie slices.
@@ -1650,23 +1512,32 @@ export default function Home() {
                     <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
                       <SectionHeader title="Borrowing Overview" />
                       <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 2 }}>
-                        {/* Pie */}
-                        <div style={{ flexShrink: 0 }}>
+                        {/* Pie with % repaid in the center */}
+                        <div style={{ flexShrink: 0, position: 'relative', width: 96, height: 96 }}>
                           {sliceTotal > 0 ? (
-                            <svg width="96" height="96" viewBox="0 0 100 100">{pieSlices}</svg>
+                            <svg width="96" height="96" viewBox="0 0 100 100">
+                              {pieSlices}
+                              {/* Donut hole for the center label */}
+                              <circle cx={CX} cy={CY} r={22} fill="#ffffff" />
+                            </svg>
                           ) : (
                             <svg width="96" height="96" viewBox="0 0 100 100">
                               <circle cx={CX} cy={CY} r={R} fill="#EBF4FA" />
+                              <circle cx={CX} cy={CY} r={22} fill="#ffffff" />
                             </svg>
                           )}
+                          <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+                            <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif", lineHeight: 1 }}>{percentPaid}%</span>
+                            <span style={{ fontSize: 9, fontWeight: 500, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", marginTop: 2 }}>repaid</span>
+                          </div>
                         </div>
                         {/* Right text */}
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif", marginBottom: 4 }}>
-                            You Owe {formatMoney(borrowedRemaining)}
+                          <div style={{ fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", marginBottom: 2 }}>
+                            {formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)} paid back
                           </div>
                           <div style={{ fontSize: 12, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>
-                            {formatMoney(borrowedRemaining)} of {formatMoney(totalBorrowedAmount)} outstanding across {borrowedLoans.length} loan{borrowedLoans.length === 1 ? '' : 's'}
+                            Across {borrowedLoans.length} active loan{borrowedLoans.length === 1 ? '' : 's'}
                           </div>
                         </div>
                       </div>
@@ -1679,7 +1550,7 @@ export default function Home() {
               <div className="home-card-lending-loans" style={{ position: 'relative' }}>
                 <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
                 <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
-                  <SectionHeader title="Lending Loans" linkTo={createPageUrl("YourLoans")} linkLabel="View all →" />
+                  <SectionHeader title="Your Lending" linkTo={createPageUrl("YourLoans")} linkLabel="View all →" />
                   {lentLoans.length === 0 ? (
                     <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>You haven't lent anything yet 🌱</div>
                   ) : (
@@ -1701,7 +1572,34 @@ export default function Home() {
                               <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, color: statusColor, background: statusBg, borderRadius: 5, padding: '2px 6px', lineHeight: 1.2 }}>{statusLabel}</span>
                             </div>
                             <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              Borrowed {formatMoney(total)}{loan.purpose ? ` for ${loan.purpose}` : ''}
+                              Borrowed {formatMoney(total)} from you{loan.purpose ? ` for ${loan.purpose}` : ''}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Your Borrowing */}
+              <div className="home-card-your-borrowing" style={{ position: 'relative' }}>
+                <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+                <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
+                  <SectionHeader title="Your Borrowing" linkTo={createPageUrl("YourLoans")} linkLabel="View all →" />
+                  {borrowedLoans.length === 0 ? (
+                    <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>You haven't borrowed anything yet 🤝</div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      {borrowedLoans.slice(0, 5).map(loan => {
+                        const otherProfile = safeAllProfiles.find(p => p.user_id === loan.lender_id);
+                        const name = otherProfile?.full_name?.split(' ')[0] || otherProfile?.username || 'User';
+                        const total = loan.total_amount || loan.amount || 0;
+                        return (
+                          <div key={loan.id} style={{ padding: '9px 0' }}>
+                            <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</div>
+                            <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              lent you {formatMoney(total)}{loan.purpose ? ` for ${loan.purpose}` : ''}
                             </div>
                           </div>
                         );
