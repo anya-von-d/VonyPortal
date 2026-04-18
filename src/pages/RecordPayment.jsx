@@ -53,7 +53,7 @@ function SingleSelectDropdown({ options, selected, onChange }) {
       <button onClick={() => setOpen(!open)} style={{
         display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10,
         border: '1px solid rgba(0,0,0,0.06)', background: selected !== 'all' ? 'rgba(3,172,234,0.08)' : 'white',
-        fontSize: 13, fontWeight: 500, color: '#1A1918', cursor: 'pointer',
+        fontSize: 12, fontWeight: 500, color: '#1A1918', cursor: 'pointer',
         fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap', transition: 'background 0.15s',
       }}>
         {current.label}
@@ -68,7 +68,7 @@ function SingleSelectDropdown({ options, selected, onChange }) {
           {options.map(opt => (
             <button key={opt.id} onClick={() => { onChange(opt.id); setOpen(false); }} style={{
               display: 'block', width: '100%', textAlign: 'left', padding: '8px 10px', borderRadius: 8,
-              border: 'none', cursor: 'pointer', fontSize: 13, color: '#1A1918',
+              border: 'none', cursor: 'pointer', fontSize: 12, color: '#1A1918',
               background: selected === opt.id ? 'rgba(3,172,234,0.08)' : 'transparent',
               fontWeight: selected === opt.id ? 600 : 400, fontFamily: "'DM Sans', sans-serif",
             }}
@@ -370,7 +370,7 @@ export default function RecordPayment() {
   /* ── RightSection component ──────────────────────────────── */
   const RightSection = ({ title, children }) => (
     <div style={{ marginBottom: 40 }}>
-      <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif", paddingBottom: 5, marginBottom: 2 }}>{title}</div>
+      <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif", paddingBottom: 5, marginBottom: 2 }}>{title}</div>
       {children}
     </div>
   );
@@ -381,7 +381,7 @@ export default function RecordPayment() {
       <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
       <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: highlight ? '1px solid rgba(3,172,234,0.25)' : 'none', padding: '14px 18px', ...style }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 5, marginBottom: 2 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: highlight ? '#03ACEA' : '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>{title}</div>
+          <div style={{ fontSize: 12, fontWeight: 600, color: highlight ? '#03ACEA' : '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>{title}</div>
           {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
         </div>
         <div style={{ overflow: 'visible' }}>{children}</div>
@@ -419,18 +419,18 @@ export default function RecordPayment() {
               <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(232,114,110,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
                 <AlertCircle size={24} style={{ color: '#E8726E' }} />
               </div>
-              <h3 style={{ fontSize: 18, fontWeight: 600, color: '#1A1918', textAlign: 'center', margin: '0 0 8px' }}>Deny Payment?</h3>
-              <p style={{ fontSize: 13, color: '#787776', textAlign: 'center', margin: '0 0 24px', lineHeight: 1.6 }}>
+              <h3 style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', textAlign: 'center', margin: '0 0 8px', fontFamily: "'DM Sans', sans-serif" }}>Deny Payment?</h3>
+              <p style={{ fontSize: 12, color: '#787776', textAlign: 'center', margin: '0 0 24px', lineHeight: 1.6 }}>
                 Are you sure you didn't receive this payment? If so click deny to let {nameOrYou(confirmingDeny.recorded_by) === 'you' ? 'them' : `${getUserById(confirmingDeny.recorded_by).full_name || getUserById(confirmingDeny.recorded_by).username}`} know
               </p>
               <div style={{ display: 'flex', gap: 12 }}>
                 <button onClick={() => setConfirmingDeny(null)} style={{
                   flex: 1, padding: '10px 0', borderRadius: 12, border: '1px solid rgba(0,0,0,0.06)',
-                  background: 'white', fontSize: 13, fontWeight: 600, color: '#787776', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+                  background: 'white', fontSize: 12, fontWeight: 600, color: '#787776', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
                 }}>Cancel</button>
                 <button onClick={handleDenyPayment} style={{
                   flex: 1, padding: '10px 0', borderRadius: 12, border: 'none',
-                  background: '#E8726E', fontSize: 13, fontWeight: 600, color: 'white', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+                  background: '#E8726E', fontSize: 12, fontWeight: 600, color: 'white', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
                 }}>Deny Payment</button>
               </div>
             </motion.div>
@@ -439,7 +439,7 @@ export default function RecordPayment() {
       </AnimatePresence>
 
       <MeshMobileNav user={user} activePage="Log Payment" />
-      <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: 0, minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased' }}>
+      <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: 0, minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 12, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased' }}>
 
         {/* Col 1: left nav */}
         <DesktopSidebar />
@@ -449,7 +449,7 @@ export default function RecordPayment() {
 
           {/* Mobile-only page title (desktop shows it in top bar) */}
           <div className="mobile-page-title">
-            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Log Payment</div>
+            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Log Payment</div>
             <div style={{ height: 1, background: 'rgba(0,0,0,0.08)', marginLeft: -32, marginRight: -32, marginBottom: 20 }} />
           </div>
 
@@ -461,7 +461,7 @@ export default function RecordPayment() {
               boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap',
             }}>
-              <div style={{ fontSize: 13, color: '#787776', fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+              <div style={{ fontSize: 12, color: '#787776', fontFamily: "'DM Sans', sans-serif" }}>
                 💸 Nothing to record just yet! Create a loan first.
               </div>
               <div style={{ display: 'flex', gap: 8, flexShrink: 0, flexWrap: 'wrap' }}>
@@ -482,14 +482,14 @@ export default function RecordPayment() {
           )}
 
           {/* ── Two-col: Select Your Loan | Payment Form ── */}
-          <div className="rp-two-col" style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 20, alignItems: 'start' }}>
+          <div className="rp-two-col" style={{ display: 'grid', gridTemplateColumns: '360px 1fr', gap: 20, alignItems: 'start' }}>
 
             {/* Left: Select Your Loan */}
             <div style={{ position: 'relative' }}>
               <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
             <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Select Your Loan</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Select Your Loan</span>
                 <button onClick={clearFilters} style={{
                   padding: '2px 8px', borderRadius: 6, border: 'none', background: 'transparent',
                   fontSize: 11, fontWeight: 500, color: hasAnyFilter ? '#E8726E' : '#C7C6C4',
@@ -521,14 +521,32 @@ export default function RecordPayment() {
                           background: 'transparent', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
                           border: 'none',
                         }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <UserAvatar name={other.full_name || other.username} src={other.profile_picture_url} size={26} style={{ outline: isSelected ? '2px solid #03ACEA' : 'none', outlineOffset: 1, flexShrink: 0 }} />
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            {other.profile_picture_url ? (
+                              <img
+                                src={other.profile_picture_url}
+                                alt={other.full_name || other.username}
+                                style={{
+                                  width: 28, height: 22, borderRadius: 4, objectFit: 'cover', flexShrink: 0,
+                                  outline: isSelected ? '2px solid #03ACEA' : 'none', outlineOffset: 1,
+                                }}
+                              />
+                            ) : (
+                              <div style={{
+                                width: 28, height: 22, borderRadius: 4, flexShrink: 0,
+                                background: '#EBF4FA', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                fontSize: 10, fontWeight: 700, color: '#03ACEA', fontFamily: "'DM Sans', sans-serif",
+                                outline: isSelected ? '2px solid #03ACEA' : 'none', outlineOffset: 1,
+                              }}>
+                                {(other.full_name || other.username || '?').slice(0, 1).toUpperCase()}
+                              </div>
+                            )}
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <p style={{ fontSize: 12, fontWeight: isSelected ? 600 : 500, color: isSelected ? '#1A1918' : '#3A3938', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {isLender ? `You lent ${firstName} $${loanAmt}${loan.purpose ? ` for ${loan.purpose}` : ''}` : `${firstName} lent you $${loanAmt}${loan.purpose ? ` for ${loan.purpose}` : ''}`}
                               </p>
                               <p style={{ fontSize: 11, color: '#9B9A98', margin: '1px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                Loan created: {createdDate} · ${loanAmt} · ${remaining.toFixed(2)} left
+                                {loan.purpose || 'No reason specified'}
                               </p>
                             </div>
                           </div>
@@ -546,15 +564,15 @@ export default function RecordPayment() {
               <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
             <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
               <div style={{ paddingBottom: 5, marginBottom: 2 }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>
                   {currentStep === 0 ? 'Payment Details' : currentStep === 1 ? 'Payment Details' : currentStep === 2 ? 'Confirm Payment' : 'Payment Recorded'}
                 </span>
               </div>
               <div style={{ overflow: 'visible' }}>
                   {currentStep === 0 && !selectedLoan && (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 0', color: '#C7C6C4' }}>
-                      <p style={{ fontSize: 15, fontWeight: 500, color: '#787776', margin: 0 }}>Select a loan to get started</p>
-                      <p style={{ fontSize: 12, color: '#C7C6C4', margin: '4px 0 0' }}>Choose from your active loans on the left</p>
+                      <p style={{ fontSize: 12, fontWeight: 500, color: '#787776', margin: 0, fontFamily: "'DM Sans', sans-serif" }}>Select a loan to get started</p>
+                      <p style={{ fontSize: 12, color: '#C7C6C4', margin: '4px 0 0', fontFamily: "'DM Sans', sans-serif" }}>Choose from your active loans on the left</p>
                     </div>
                   )}
 
@@ -562,40 +580,54 @@ export default function RecordPayment() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                       {/* Loan sentence */}
                       <div style={{ background: 'rgba(3,172,234,0.08)', borderRadius: 10, padding: 16 }}>
-                        <p style={{ fontSize: 15, fontWeight: 500, color: '#1A1918', margin: 0, lineHeight: 1.6 }}>
+                        <p style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', margin: 0, lineHeight: 1.6, fontFamily: "'DM Sans', sans-serif" }}>
                           {nameOrYouCapitalized(isUserLender(selectedLoan) ? selectedLoan.borrower_id : user?.id)} paid {nameOrYou(isUserLender(selectedLoan) ? user?.id : selectedLoan.lender_id)}{' '}
                           {amount && parseFloat(amount) > 0
                             ? <strong>${parseFloat(amount).toFixed(2)}</strong>
-                            : <span style={{ color: '#03ACEA', borderBottom: '2px solid #03ACEA', paddingBottom: 1, fontWeight: 600, letterSpacing: '0.04em' }}>$__</span>
+                            : <span style={{ color: '#03ACEA', borderBottom: '2px solid #03ACEA', paddingBottom: 1, fontWeight: 600, letterSpacing: '0.04em' }}>{'$\u00A0\u00A0'}</span>
                           }{' '}for {selectedLoan.purpose || 'this loan'}
                         </p>
                       </div>
 
-                      {/* Amount */}
-                      <div>
-                        <label style={{ fontSize: 12, fontWeight: 600, color: '#787776', marginBottom: 6, display: 'block' }}>Payment Amount</label>
-                        <div style={{ position: 'relative' }}>
-                          <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 15, fontWeight: 600, color: '#1A1918' }}>$</span>
+                      {/* Amount + Date on the same row */}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                        <div>
+                          <label style={{ fontSize: 12, fontWeight: 600, color: '#787776', marginBottom: 6, display: 'block', fontFamily: "'DM Sans', sans-serif" }}>Payment Amount</label>
+                          <div style={{ position: 'relative' }}>
+                            <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 12, fontWeight: 600, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>$</span>
+                            <input
+                              type="number" step="0.01" min="0" value={amount}
+                              onChange={e => { setAmount(e.target.value); setError(''); }}
+                              style={{
+                                width: '100%', padding: '10px 14px 10px 26px', borderRadius: 12,
+                                border: '1px solid rgba(0,0,0,0.06)', background: 'white',
+                                fontSize: 12, fontWeight: 500, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", outline: 'none',
+                              }}
+                              onFocus={e => e.target.style.borderColor = 'rgba(3,172,234,0.4)'}
+                              onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.06)'}
+                            />
+                          </div>
+                          {selectedLoan && (
+                            <p style={{ fontSize: 11, color: '#787776', margin: '6px 0 0', fontFamily: "'DM Sans', sans-serif" }}>Remaining balance: ${getRemainingBalance(selectedLoan).toFixed(2)}</p>
+                          )}
+                        </div>
+                        <div>
+                          <label style={{ fontSize: 12, fontWeight: 600, color: '#787776', marginBottom: 6, display: 'block', fontFamily: "'DM Sans', sans-serif" }}>Payment Date</label>
                           <input
-                            type="number" step="0.01" min="0" value={amount}
-                            onChange={e => { setAmount(e.target.value); setError(''); }}
+                            type="date" value={paymentDate} max={format(new Date(), 'yyyy-MM-dd')}
+                            onChange={e => setPaymentDate(e.target.value)}
                             style={{
-                              width: '100%', padding: '12px 14px 12px 28px', borderRadius: 12,
+                              width: '100%', padding: '10px 14px', borderRadius: 12,
                               border: '1px solid rgba(0,0,0,0.06)', background: 'white',
-                              fontSize: 15, fontWeight: 500, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", outline: 'none',
+                              fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", outline: 'none',
                             }}
-                            onFocus={e => e.target.style.borderColor = 'rgba(3,172,234,0.4)'}
-                            onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.06)'}
                           />
                         </div>
-                        {selectedLoan && (
-                          <p style={{ fontSize: 11, color: '#787776', margin: '6px 0 0' }}>Remaining balance: ${getRemainingBalance(selectedLoan).toFixed(2)}</p>
-                        )}
                       </div>
 
                       {/* Payment Method */}
                       <div>
-                        <label style={{ fontSize: 12, fontWeight: 600, color: '#787776', marginBottom: 8, display: 'block' }}>Payment Method</label>
+                        <label style={{ fontSize: 12, fontWeight: 600, color: '#787776', marginBottom: 8, display: 'block', fontFamily: "'DM Sans', sans-serif" }}>Payment Method</label>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
                           {PAYMENT_METHODS.map(method => {
                             const Icon = method.icon;
@@ -624,20 +656,6 @@ export default function RecordPayment() {
                         </div>
                       </div>
 
-                      {/* Payment Date */}
-                      <div>
-                        <label style={{ fontSize: 12, fontWeight: 600, color: '#787776', marginBottom: 6, display: 'block' }}>Payment Date</label>
-                        <input
-                          type="date" value={paymentDate} max={format(new Date(), 'yyyy-MM-dd')}
-                          onChange={e => setPaymentDate(e.target.value)}
-                          style={{
-                            width: '100%', padding: '10px 14px', borderRadius: 12,
-                            border: '1px solid rgba(0,0,0,0.06)', background: 'white',
-                            fontSize: 13, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", outline: 'none',
-                          }}
-                        />
-                      </div>
-
                       {error && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 10, background: 'rgba(232,114,110,0.08)' }}>
                           <AlertCircle size={14} style={{ color: '#E8726E', flexShrink: 0 }} />
@@ -645,13 +663,27 @@ export default function RecordPayment() {
                         </div>
                       )}
 
-                      <button onClick={handleContinue} style={{
-                        width: '100%', padding: '12px 0', borderRadius: 12, border: 'none',
-                        background: '#03ACEA', color: 'white', fontSize: 14, fontWeight: 600,
-                        cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                      }}>
-                        Continue <ArrowRight size={16} />
-                      </button>
+                      {/* Continue — styled like Home notification bar (rainbow aura + dark blue pill) */}
+                      <div style={{ position: 'relative', paddingTop: 8 }}>
+                        <div style={{
+                          position: 'absolute', top: 0, left: '50%',
+                          transform: 'translateX(-50%)',
+                          width: 'calc(100% + 36px)', height: '100%',
+                          background: 'linear-gradient(225deg, rgb(129,140,248) 0%, rgb(99,102,241) 12%, rgb(79,70,229) 24%, rgb(67,56,202) 36%, rgb(37,99,235) 50%, rgb(59,130,246) 64%, rgb(96,165,250) 76%, rgb(56,189,248) 88%, rgb(14,165,233) 100%)',
+                          filter: 'blur(12px) saturate(1.18)',
+                          opacity: 0.55,
+                          borderRadius: 16, zIndex: 0, pointerEvents: 'none',
+                        }} />
+                        <button onClick={handleContinue} style={{
+                          position: 'relative', zIndex: 1,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                          width: '100%', padding: '10px 12px', borderRadius: 9,
+                          background: '#14324D', border: 'none', cursor: 'pointer',
+                          fontSize: 12, fontWeight: 600, color: 'white', fontFamily: "'DM Sans', sans-serif",
+                        }}>
+                          Continue <ArrowRight size={14} />
+                        </button>
+                      </div>
                     </div>
                   )}
 
@@ -659,20 +691,20 @@ export default function RecordPayment() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                         <div style={{ background: 'rgba(3,172,234,0.08)', borderRadius: 12, padding: 14 }}>
-                          <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>Amount</p>
-                          <p style={{ fontSize: 20, fontWeight: 700, color: '#1A1918', margin: '4px 0 0' }}>${parseFloat(amount).toFixed(2)}</p>
+                          <p style={{ fontSize: 11, color: '#787776', margin: 0, fontFamily: "'DM Sans', sans-serif" }}>Amount</p>
+                          <p style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', margin: '4px 0 0', fontFamily: "'DM Sans', sans-serif" }}>${parseFloat(amount).toFixed(2)}</p>
                         </div>
                         <div style={{ background: 'rgba(3,172,234,0.08)', borderRadius: 12, padding: 14 }}>
-                          <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>Method</p>
-                          <p style={{ fontSize: 15, fontWeight: 600, color: '#1A1918', margin: '4px 0 0' }}>{PAYMENT_METHODS.find(m => m.id === paymentMethod)?.label}</p>
+                          <p style={{ fontSize: 11, color: '#787776', margin: 0, fontFamily: "'DM Sans', sans-serif" }}>Method</p>
+                          <p style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', margin: '4px 0 0', fontFamily: "'DM Sans', sans-serif" }}>{PAYMENT_METHODS.find(m => m.id === paymentMethod)?.label}</p>
                         </div>
                         <div style={{ background: 'rgba(3,172,234,0.08)', borderRadius: 12, padding: 14 }}>
-                          <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>Date</p>
-                          <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: '4px 0 0' }}>{format(new Date(paymentDate + 'T12:00:00'), 'MMM d, yyyy')}</p>
+                          <p style={{ fontSize: 11, color: '#787776', margin: 0, fontFamily: "'DM Sans', sans-serif" }}>Date</p>
+                          <p style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', margin: '4px 0 0', fontFamily: "'DM Sans', sans-serif" }}>{format(new Date(paymentDate + 'T12:00:00'), 'MMM d, yyyy')}</p>
                         </div>
                         <div style={{ background: 'rgba(3,172,234,0.08)', borderRadius: 12, padding: 14 }}>
-                          <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>To</p>
-                          <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: '4px 0 0' }}>
+                          <p style={{ fontSize: 11, color: '#787776', margin: 0, fontFamily: "'DM Sans', sans-serif" }}>To</p>
+                          <p style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', margin: '4px 0 0', fontFamily: "'DM Sans', sans-serif" }}>
                             {nameOrYouCapitalized(isUserLender(selectedLoan) ? selectedLoan.borrower_id : selectedLoan.lender_id)}
                           </p>
                         </div>
@@ -694,24 +726,38 @@ export default function RecordPayment() {
 
                       <div style={{ display: 'flex', gap: 12 }}>
                         <button onClick={() => setCurrentStep(1)} style={{
-                          flex: 1, padding: '12px 0', borderRadius: 12, border: '1px solid rgba(0,0,0,0.06)',
-                          background: 'white', fontSize: 13, fontWeight: 600, color: '#787776', cursor: 'pointer',
+                          flex: 1, padding: '10px 0', borderRadius: 12, border: '1px solid rgba(0,0,0,0.06)',
+                          background: 'white', fontSize: 12, fontWeight: 600, color: '#787776', cursor: 'pointer',
                           fontFamily: "'DM Sans', sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                         }}>
                           <ArrowLeft size={14} /> Back
                         </button>
-                        <button onClick={handleConfirmPayment} disabled={isProcessing} style={{
-                          flex: 2, padding: '12px 0', borderRadius: 12, border: 'none',
-                          background: isProcessing ? 'rgba(3,172,234,0.5)' : '#03ACEA', color: 'white', fontSize: 14, fontWeight: 600,
-                          cursor: isProcessing ? 'default' : 'pointer', fontFamily: "'DM Sans', sans-serif",
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                        }}>
-                          {isProcessing ? (
-                            <div style={{ width: 18, height: 18, border: '2px solid white', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                          ) : (
-                            <><CheckCircle size={16} /> Confirm Payment</>
-                          )}
-                        </button>
+                        {/* Confirm — same notification-bar styling as Continue */}
+                        <div style={{ flex: 2, position: 'relative', paddingTop: 8 }}>
+                          <div style={{
+                            position: 'absolute', top: 0, left: '50%',
+                            transform: 'translateX(-50%)',
+                            width: 'calc(100% + 36px)', height: '100%',
+                            background: 'linear-gradient(225deg, rgb(129,140,248) 0%, rgb(99,102,241) 12%, rgb(79,70,229) 24%, rgb(67,56,202) 36%, rgb(37,99,235) 50%, rgb(59,130,246) 64%, rgb(96,165,250) 76%, rgb(56,189,248) 88%, rgb(14,165,233) 100%)',
+                            filter: 'blur(12px) saturate(1.18)',
+                            opacity: isProcessing ? 0.28 : 0.55,
+                            borderRadius: 16, zIndex: 0, pointerEvents: 'none',
+                          }} />
+                          <button onClick={handleConfirmPayment} disabled={isProcessing} style={{
+                            position: 'relative', zIndex: 1,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                            width: '100%', padding: '10px 12px', borderRadius: 9,
+                            background: isProcessing ? 'rgba(20,50,77,0.6)' : '#14324D', border: 'none',
+                            cursor: isProcessing ? 'default' : 'pointer',
+                            fontSize: 12, fontWeight: 600, color: 'white', fontFamily: "'DM Sans', sans-serif",
+                          }}>
+                            {isProcessing ? (
+                              <div style={{ width: 16, height: 16, border: '2px solid white', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                            ) : (
+                              <><CheckCircle size={14} /> Confirm Payment</>
+                            )}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -728,7 +774,7 @@ export default function RecordPayment() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.35 }}
-                        style={{ fontSize: 22, fontWeight: 700, color: '#1A1918', margin: 0 }}
+                        style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', margin: 0, fontFamily: "'DM Sans', sans-serif" }}
                       >
                         Payment Recorded! 🎉
                       </motion.h3>
@@ -736,7 +782,7 @@ export default function RecordPayment() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.45 }}
-                        style={{ fontSize: 13, color: '#787776', margin: 0, textAlign: 'center' }}
+                        style={{ fontSize: 12, color: '#787776', margin: 0, textAlign: 'center', fontFamily: "'DM Sans', sans-serif" }}
                       >
                         Your payment of ${parseFloat(amount).toFixed(2)} has been sent for confirmation
                       </motion.p>
@@ -759,7 +805,7 @@ export default function RecordPayment() {
                         whileTap={{ scale: 0.97 }}
                         onClick={() => { setSelectedLoan(null); setCurrentStep(0); setAmount(''); setPaymentMethod(''); setIsSuccess(false); setTransactionId(''); }} style={{
                         marginTop: 8, padding: '10px 24px', borderRadius: 12, border: 'none',
-                        background: 'linear-gradient(135deg, #03ACEA, #7C3AED)', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+                        background: 'linear-gradient(135deg, #03ACEA, #7C3AED)', color: 'white', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
                       }}>
                         Record Another Payment
                       </motion.button>

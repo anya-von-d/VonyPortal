@@ -1398,20 +1398,17 @@ export default function Home() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 2 }}>
                       {overdueYouOwe.length > 0 && (
                         <div style={rowStyle}>
-                          <OverdueIcon color="#E8726E" />
-                          <span>You have <strong style={{ color: '#E8726E' }}>{overdueYouOwe.length}</strong> overdue payment{overdueYouOwe.length === 1 ? '' : 's'}</span>
+<span>You have <strong style={{ color: '#E8726E' }}>{overdueYouOwe.length}</strong> overdue payment{overdueYouOwe.length === 1 ? '' : 's'}</span>
                         </div>
                       )}
                       {overdueOwedToYou.length > 0 && (
                         <div style={rowStyle}>
-                          <OverdueIcon color="#E8726E" />
-                          <span><strong style={{ color: '#E8726E' }}>{overdueOwedToYou.length}</strong> payment{overdueOwedToYou.length === 1 ? '' : 's'} to you {overdueOwedToYou.length === 1 ? 'is' : 'are'} overdue</span>
+<span><strong style={{ color: '#E8726E' }}>{overdueOwedToYou.length}</strong> payment{overdueOwedToYou.length === 1 ? '' : 's'} to you {overdueOwedToYou.length === 1 ? 'is' : 'are'} overdue</span>
                         </div>
                       )}
                       {outScheduledTotal > 0 && (
                         <div style={rowStyle}>
-                          <OutIcon color="#1D5B94" />
-                          <span>
+<span>
                             {outCompletedCount > 0
                               ? <>You've completed <strong style={{ color: '#1D5B94' }}>{outCompletedCount}</strong> of <strong style={{ color: '#1D5B94' }}>{outScheduledTotal}</strong> scheduled payments</>
                               : <>You have <strong style={{ color: '#1D5B94' }}>{outScheduledTotal}</strong> payment{outScheduledTotal === 1 ? '' : 's'} this month</>}
@@ -1420,14 +1417,12 @@ export default function Home() {
                       )}
                       {leftToPay > 0 && (
                         <div style={rowStyle}>
-                          <OutIcon color="#1D5B94" />
-                          <span><strong style={{ color: '#1D5B94' }}>{formatMoney(leftToPay)}</strong> left to pay this month</span>
+<span><strong style={{ color: '#1D5B94' }}>{formatMoney(leftToPay)}</strong> left to pay this month</span>
                         </div>
                       )}
                       {inScheduledTotal > 0 && (
                         <div style={rowStyle}>
-                          <InIcon color="#03ACEA" />
-                          <span>
+<span>
                             {inCompletedCount > 0
                               ? <>You've received <strong style={{ color: '#03ACEA' }}>{inCompletedCount}</strong> of <strong style={{ color: '#03ACEA' }}>{inScheduledTotal}</strong> payments</>
                               : <>You're due to receive <strong style={{ color: '#03ACEA' }}>{inScheduledTotal}</strong> payment{inScheduledTotal === 1 ? '' : 's'} this month</>}
@@ -1436,8 +1431,7 @@ export default function Home() {
                       )}
                       {leftToReceive > 0 && (
                         <div style={rowStyle}>
-                          <InIcon color="#03ACEA" />
-                          <span>You're expected to receive <strong style={{ color: '#03ACEA' }}>{formatMoney(leftToReceive)}</strong> before the end of the month</span>
+<span>You're expected to receive <strong style={{ color: '#03ACEA' }}>{formatMoney(leftToReceive)}</strong> before the end of the month</span>
                         </div>
                       )}
                     </div>
@@ -1474,16 +1468,16 @@ export default function Home() {
                   return (
                     <div style={{ position: 'relative', width: 80, height: 80, flexShrink: 0 }}>
                       <svg width="80" height="80" viewBox="0 0 128 128" style={{ transform: 'rotate(-90deg)' }}>
-                        <circle cx="64" cy="64" r="45" fill="none" stroke={`${color}26`} strokeWidth="6" />
+                        <circle cx="64" cy="64" r="45" fill="none" stroke={`${color}26`} strokeWidth="12" />
                         <circle
                           cx="64" cy="64" r="45" fill="none"
-                          stroke={color} strokeWidth="6" strokeLinecap="round"
+                          stroke={color} strokeWidth="12" strokeLinecap="round"
                           strokeDasharray={C} strokeDashoffset={offset}
                         />
                       </svg>
                       <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', gap: 1 }}>
                         <span style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif", lineHeight: 1 }}>{percent}%</span>
-                        <span style={{ fontSize: 8, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.06em', fontFamily: "'DM Sans', sans-serif", lineHeight: 1 }}>{label}</span>
+                        <span style={{ fontSize: 9, fontWeight: 500, color: '#787776', fontFamily: "'DM Sans', sans-serif", lineHeight: 1 }}>{label}</span>
                       </div>
                     </div>
                   );
@@ -1495,9 +1489,8 @@ export default function Home() {
                 const lentOwed = Math.max(0, totalLentAmount - totalRepaid);
 
                 const textBlockStyle = { flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 };
-                const bigLineStyle  = { fontSize: 13, fontWeight: 600, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", letterSpacing: '-0.01em' };
-                const subLineStyle  = { fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" };
-                const mutedLineStyle = { fontSize: 12, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" };
+                const bigLineStyle  = { fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" };
+                const subLineStyle  = { fontSize: 12, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" };
 
                 return (
                   <div className="home-card-bor-overview" style={{ position: 'relative' }}>
@@ -1511,7 +1504,6 @@ export default function Home() {
                         <div style={textBlockStyle}>
                           <div style={bigLineStyle}>You owe <span style={{ color: '#1D5B94' }}>{formatMoney(borrowOwed)}</span></div>
                           <div style={subLineStyle}>{formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)} paid back</div>
-                          <div style={mutedLineStyle}>Across {borrowedLoans.length} active loan{borrowedLoans.length === 1 ? '' : 's'}</div>
                         </div>
                       </div>
 
@@ -1520,7 +1512,6 @@ export default function Home() {
                         <div style={textBlockStyle}>
                           <div style={bigLineStyle}>You're owed <span style={{ color: '#03ACEA' }}>{formatMoney(lentOwed)}</span></div>
                           <div style={subLineStyle}>{formatMoney(totalRepaid)} of {formatMoney(totalLentAmount)} repaid to you</div>
-                          <div style={mutedLineStyle}>Across {lentLoans.length} active loan{lentLoans.length === 1 ? '' : 's'}</div>
                         </div>
                         <Ring percent={percentRepaid} color="#03ACEA" label="Repaid" />
                       </div>
