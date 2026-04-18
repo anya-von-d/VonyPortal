@@ -1683,14 +1683,38 @@ export default function Lending({ initialTab }) {
                       );
                     })()}
 
-                    {/* Overview — Home style */}
+                    {/* Overview — exact Home two-ring box */}
                     {(() => {
-                      const C = 2 * Math.PI * 45;
-                      const totalOwed = activeLoans.reduce((s, l) => s + (l.total_amount || l.amount || 0), 0);
-                      const totalPaidL = activeLoans.reduce((s, l) => s + (l.amount_paid || 0), 0);
-                      const pct = totalOwed > 0 ? Math.round((totalPaidL / totalOwed) * 100) : 0;
-                      const offset = C - (pct / 100) * C;
-                      const remaining = Math.max(0, totalOwed - totalPaidL);
+                      const Ring = ({ percent, color, label }) => {
+                        const C = 2 * Math.PI * 45;
+                        const offset = C - (percent / 100) * C;
+                        return (
+                          <div style={{ position: 'relative', width: 80, height: 80, flexShrink: 0 }}>
+                            <svg width="80" height="80" viewBox="0 0 128 128" style={{ transform: 'rotate(-90deg)' }}>
+                              <circle cx="64" cy="64" r="45" fill="none" stroke={`${color}26`} strokeWidth="12" />
+                              <circle cx="64" cy="64" r="45" fill="none" stroke={color} strokeWidth="12" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={offset} />
+                            </svg>
+                            <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', gap: 1 }}>
+                              <span style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif", lineHeight: 1 }}>{percent}%</span>
+                              <span style={{ fontSize: 9, fontWeight: 500, color: '#787776', fontFamily: "'DM Sans', sans-serif", lineHeight: 1 }}>{label}</span>
+                            </div>
+                          </div>
+                        );
+                      };
+                      const allActive = allUserLoans.filter(l => l.status === 'active');
+                      const borrowLoans = allActive.filter(l => l.borrower_id === currentUser?.id);
+                      const lendLoans = allActive.filter(l => l.lender_id === currentUser?.id);
+                      const totalBorrowedAmount = borrowLoans.reduce((s, l) => s + (l.total_amount || l.amount || 0), 0);
+                      const totalPaidBack = borrowLoans.reduce((s, l) => s + (l.amount_paid || 0), 0);
+                      const totalLentAmount = lendLoans.reduce((s, l) => s + (l.total_amount || l.amount || 0), 0);
+                      const totalRepaid = lendLoans.reduce((s, l) => s + (l.amount_paid || 0), 0);
+                      const percentPaid = totalBorrowedAmount > 0 ? Math.round((totalPaidBack / totalBorrowedAmount) * 100) : 0;
+                      const percentRepaid = totalLentAmount > 0 ? Math.round((totalRepaid / totalLentAmount) * 100) : 0;
+                      const borrowOwed = Math.max(0, totalBorrowedAmount - totalPaidBack);
+                      const lentOwed = Math.max(0, totalLentAmount - totalRepaid);
+                      const textBlockStyle = { flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 };
+                      const bigLineStyle  = { fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" };
+                      const subLineStyle  = { fontSize: 12, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" };
                       return (
                         <div style={{ position: 'relative' }}>
                           <div style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
@@ -1699,20 +1723,18 @@ export default function Lending({ initialTab }) {
                               <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Overview</span>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 4 }}>
-                              <div style={{ position: 'relative', width: 80, height: 80, flexShrink: 0 }}>
-                                <svg width="80" height="80" viewBox="0 0 128 128" style={{ transform: 'rotate(-90deg)' }}>
-                                  <circle cx="64" cy="64" r="45" fill="none" stroke="#03ACEA26" strokeWidth="12" />
-                                  <circle cx="64" cy="64" r="45" fill="none" stroke="#03ACEA" strokeWidth="12" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={offset} />
-                                </svg>
-                                <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', gap: 1 }}>
-                                  <span style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif", lineHeight: 1 }}>{pct}%</span>
-                                  <span style={{ fontSize: 9, fontWeight: 500, color: '#787776', fontFamily: "'DM Sans', sans-serif", lineHeight: 1 }}>Repaid</span>
-                                </div>
+                              <Ring percent={percentPaid} color="#1D5B94" label="Paid back" />
+                              <div style={textBlockStyle}>
+                                <div style={bigLineStyle}>You owe <span style={{ color: '#1D5B94' }}>{formatMoney(borrowOwed)}</span></div>
+                                <div style={subLineStyle}>{formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)} paid back</div>
                               </div>
-                              <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                <div style={{ fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>You're owed <span style={{ color: '#03ACEA' }}>{formatMoney(remaining)}</span></div>
-                                <div style={{ fontSize: 12, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>{formatMoney(totalPaidL)} of {formatMoney(totalOwed)} repaid to you</div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 6 }}>
+                              <div style={textBlockStyle}>
+                                <div style={bigLineStyle}>You're owed <span style={{ color: '#03ACEA' }}>{formatMoney(lentOwed)}</span></div>
+                                <div style={subLineStyle}>{formatMoney(totalRepaid)} of {formatMoney(totalLentAmount)} repaid to you</div>
                               </div>
+                              <Ring percent={percentRepaid} color="#03ACEA" label="Repaid" />
                             </div>
                           </div>
                         </div>
