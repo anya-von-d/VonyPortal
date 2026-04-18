@@ -286,14 +286,8 @@ input[type="date"] {
      no divider line, and a #7EC0EA wash at the top that fades out before the
      main-content cards begin. */
   .home-mesh .mesh-left {
-    background: linear-gradient(to bottom,
-      #7EC0EA 0px,
-      #7EC0EA 40px,
-      rgba(126, 192, 234, 0) 120px,
-      transparent 100%
-    ) !important;
+    background: transparent !important;
     border-right: none !important;
-    box-shadow: 0 0 32px 6px rgba(126, 192, 234, 0.55), 0 0 80px 14px rgba(3, 172, 234, 0.22) !important;
   }
   /* Home: summary row — gaps and edge padding match the other cards. */
   .home-summary-cards {
