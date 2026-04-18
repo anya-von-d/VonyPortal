@@ -944,24 +944,21 @@ export default function Home() {
                     )}
                     <SectionHeader title="Next Payment Due" titleColor="#2563EB" />
                     {nextBorrowerPayment ? (
-                      <>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, flexWrap: 'nowrap', overflow: 'hidden' }}>
-                          <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{format(nextBorrowerPayment.date, 'MMM d')}</span>
-                          <span style={{ fontSize: 11, color: '#9B9A98', flexShrink: 0 }}>,</span>
-                          <span style={{ fontSize: 11, color: '#9B9A98', marginLeft: 'auto', flexShrink: 0, whiteSpace: 'nowrap' }}>{formatMoney(nextBorrowerPayment.payment_amount || 0)} to {nextBorrowerPayment.firstName}</span>
-                        </div>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexWrap: 'nowrap', overflow: 'hidden' }}>
+                        <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{format(nextBorrowerPayment.date, 'MMM d')}</span>
+                        <span style={{ fontSize: 11, color: '#9B9A98', flexShrink: 0, whiteSpace: 'nowrap' }}>, {formatMoney(nextBorrowerPayment.payment_amount || 0)} to {nextBorrowerPayment.firstName}</span>
                         <Link
                           to={`${createPageUrl("RecordPayment")}?loanId=${nextBorrowerPayment.id}`}
                           style={{
-                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                            marginTop: 10, padding: '6px 10px', borderRadius: 7,
-                            background: '#2563EB', color: 'white',
+                            marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4,
+                            padding: '4px 8px', borderRadius: 6,
+                            background: '#D9EAF4', color: '#328AB6',
                             fontSize: 11, fontWeight: 600, textDecoration: 'none',
-                            alignSelf: 'flex-start',
+                            flexShrink: 0, whiteSpace: 'nowrap',
                             fontFamily: "'DM Sans', sans-serif",
                           }}
-                        >Log Payment</Link>
-                      </>
+                        >Log Payment →</Link>
+                      </div>
                     ) : (
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span style={{ fontSize: 15, fontWeight: 700, color: '#C5C3C0' }}>—</span>
@@ -1009,24 +1006,21 @@ export default function Home() {
                     )}
                     <SectionHeader title="Next Payment Incoming" />
                     {nextLenderPayment ? (
-                      <>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, flexWrap: 'nowrap', overflow: 'hidden' }}>
-                          <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{format(nextLenderPayment.date, 'MMM d')}</span>
-                          <span style={{ fontSize: 11, color: '#9B9A98', flexShrink: 0 }}>,</span>
-                          <span style={{ fontSize: 11, color: '#9B9A98', marginLeft: 'auto', flexShrink: 0, whiteSpace: 'nowrap' }}>{formatMoney(nextLenderPayment.payment_amount || 0)} from {nextLenderPayment.firstName}</span>
-                        </div>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexWrap: 'nowrap', overflow: 'hidden' }}>
+                        <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', flexShrink: 0 }}>{format(nextLenderPayment.date, 'MMM d')}</span>
+                        <span style={{ fontSize: 11, color: '#9B9A98', flexShrink: 0, whiteSpace: 'nowrap' }}>, {formatMoney(nextLenderPayment.payment_amount || 0)} from {nextLenderPayment.firstName}</span>
                         <Link
                           to={`${createPageUrl("RecordPayment")}?loanId=${nextLenderPayment.id}`}
                           style={{
-                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                            marginTop: 10, padding: '6px 10px', borderRadius: 7,
-                            background: '#03ACEA', color: 'white',
+                            marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4,
+                            padding: '4px 8px', borderRadius: 6,
+                            background: '#D9EAF4', color: '#328AB6',
                             fontSize: 11, fontWeight: 600, textDecoration: 'none',
-                            alignSelf: 'flex-start',
+                            flexShrink: 0, whiteSpace: 'nowrap',
                             fontFamily: "'DM Sans', sans-serif",
                           }}
-                        >Log Payment</Link>
-                      </>
+                        >Log Payment →</Link>
+                      </div>
                     ) : (
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span style={{ fontSize: 15, fontWeight: 700, color: '#C5C3C0' }}>—</span>
