@@ -1006,7 +1006,7 @@ export default function Home() {
                     display: 'flex', flexDirection: 'column', justifyContent: 'center',
                   }}>
                     {daysLabel && nextBorrowerPayment && (
-                      <span style={{ position: 'absolute', top: 10, right: 12, fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '3px 9px' }}>{daysLabel}</span>
+                      <span style={{ position: 'absolute', top: 10, right: 12, fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 4, padding: '2px 5px', lineHeight: 1.2 }}>{daysLabel}</span>
                     )}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 5, paddingBottom: 5, marginBottom: 2 }}>
                       <span style={{ width: 20, height: 20, borderRadius: 6, background: '#EBF4FA', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -1072,7 +1072,7 @@ export default function Home() {
                     display: 'flex', flexDirection: 'column', justifyContent: 'center',
                   }}>
                     {daysLabel && nextLenderPayment && (
-                      <span style={{ position: 'absolute', top: 10, right: 12, fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '3px 9px' }}>{daysLabel}</span>
+                      <span style={{ position: 'absolute', top: 10, right: 12, fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 4, padding: '2px 5px', lineHeight: 1.2 }}>{daysLabel}</span>
                     )}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 5, paddingBottom: 5, marginBottom: 2 }}>
                       <span style={{ width: 20, height: 20, borderRadius: 6, background: '#EBF4FA', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -1148,27 +1148,38 @@ export default function Home() {
                 ) : combinedPaymentEvents.map((event, idx) => {
                   const isOverdue = event.days < 0;
                   const daysLabel = isOverdue ? `${Math.abs(event.days)}d late` : event.days === 0 ? 'today' : `${event.days}d`;
-                  const amtSign = event.isLender ? '+' : '-';
+                  const amountStr = formatMoney(event.remainingAmount);
+                  let primaryLine;
+                  if (isOverdue) {
+                    primaryLine = event.isLender
+                      ? <>{amountStr} payment from {event.firstName} overdue</>
+                      : <>{amountStr} payment to {event.firstName} overdue</>;
+                  } else {
+                    primaryLine = event.isLender
+                      ? <>Due to receive {amountStr} from {event.firstName}</>
+                      : <>{amountStr} due to {event.firstName}</>;
+                  }
                   return (
                     <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0' }}>
                       <div style={{
-                        minWidth: 42, textAlign: 'center', flexShrink: 0,
+                        flexShrink: 0,
                         fontSize: 10, fontWeight: 700, lineHeight: 1.2,
                         color: isOverdue ? '#E8726E' : event.days <= 3 ? '#F59E0B' : '#9B9A98',
                         background: isOverdue ? 'rgba(232,114,110,0.08)' : event.days <= 3 ? 'rgba(245,158,11,0.08)' : 'rgba(0,0,0,0.04)',
-                        borderRadius: 6, padding: '3px 6px',
+                        borderRadius: 5, padding: '2px 5px',
                       }}>
                         {daysLabel}
                       </div>
-                      <div style={{ flex: 1, minWidth: 0, fontSize: 12, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {event.isLender
-                          ? <>Payment due from {event.firstName}</>
-                          : <>Payment due to {event.firstName}</>}
-                        {event.purpose && <span style={{ color: '#9B9A98' }}> · {event.purpose}</span>}
+                      <div style={{ flex: 1, minWidth: 0, fontSize: 12, color: '#1A1918', overflow: 'hidden' }}>
+                        <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 500 }}>
+                          {primaryLine}
+                        </div>
+                        {event.purpose && (
+                          <div style={{ fontSize: 11, color: '#9B9A98', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 1 }}>
+                            {event.purpose}
+                          </div>
+                        )}
                       </div>
-                      <span style={{ fontSize: 12, fontWeight: 700, flexShrink: 0, color: event.isLender ? '#03ACEA' : '#1A1918', letterSpacing: '-0.01em' }}>
-                        {amtSign}{formatMoney(event.remainingAmount)}
-                      </span>
                     </div>
                   );
                 })}
