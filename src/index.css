@@ -282,6 +282,17 @@ input[type="date"] {
   .mesh-left {
     background: rgba(0,0,0,0.028) !important;
   }
+  /* Home: wider gutters between cards on desktop (mobile unchanged) */
+  .home-summary-cards {
+    gap: 36px !important;
+    margin-bottom: 36px !important;
+  }
+  .home-two-col-row {
+    gap: 36px !important;
+  }
+  .home-two-col-row > div {
+    gap: 36px !important;
+  }
 }
 
 /* Loan details responsive */
