@@ -123,7 +123,7 @@ export default function LoanHelp() {
 
           {/* Mobile-only page title (desktop shows it in top bar) */}
           <div className="mobile-page-title">
-            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Loan Help</div>
+            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Loan Help</div>
             <div style={{ height: 1, background: 'rgba(0,0,0,0.08)', marginLeft: -32, marginRight: -32, marginBottom: 20 }} />
           </div>
 
@@ -135,7 +135,7 @@ export default function LoanHelp() {
               borderRadius: 12, padding: '5px 8px',
               backdropFilter: 'blur(16px) saturate(1.5)',
               WebkitBackdropFilter: 'blur(16px) saturate(1.5)',
-              background: 'rgba(255,255,255,0.75)',
+              background: '#ffffff',
               boxShadow: '0px 2px 4px -2px rgba(0,0,0,0.08), 0px 8px 16px -8px rgba(0,0,0,0.03), inset 0px -5px 6px rgba(255,255,255,0.5), inset 0px -8px 24px rgba(255,255,255,0.12)',
             }}>
               {CATEGORIES.map(cat => {
@@ -179,7 +179,7 @@ export default function LoanHelp() {
                       </div>
                     )}
                     <div style={{ fontSize: 9, fontWeight: 700, color: '#B0AFA D', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6, fontFamily: "'DM Sans', sans-serif" }}>{catLabel}</div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: '#1A1918', marginBottom: 3, fontFamily: "'DM Sans', sans-serif" }}>{loan.name}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', marginBottom: 3, fontFamily: "'DM Sans', sans-serif" }}>{loan.name}</div>
                     <div style={{ fontSize: 12, color: '#5C5B5A', marginBottom: 12, fontFamily: "'DM Sans', sans-serif" }}>{loan.tagline}</div>
                   </div>
                   {/* Bullets */}
@@ -211,7 +211,7 @@ export default function LoanHelp() {
         <div className="learn-mobile-sections">
           {CATEGORIES.map(cat => (
             <section key={cat.id} style={{ marginBottom: 28 }}>
-              <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', margin: '0 0 12px 0' }}>
+              <h3 style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', margin: '0 0 12px 0' }}>
                 {cat.label}
               </h3>
               <div className="h-scroll-cards">
@@ -235,7 +235,7 @@ export default function LoanHelp() {
                           </div>
                         )}
                         <div style={{ fontSize: 9, fontWeight: 700, color: '#B0AFAD', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6, fontFamily: "'DM Sans', sans-serif" }}>{cat.label.toUpperCase()}</div>
-                        <div style={{ fontSize: 15, fontWeight: 700, color: '#1A1918', marginBottom: 3, fontFamily: "'DM Sans', sans-serif" }}>{loan.name}</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', marginBottom: 3, fontFamily: "'DM Sans', sans-serif" }}>{loan.name}</div>
                         <div style={{ fontSize: 13, color: '#5C5B5A', marginBottom: 12, fontFamily: "'DM Sans', sans-serif" }}>{loan.tagline}</div>
                       </div>
                       {/* Bullets */}
