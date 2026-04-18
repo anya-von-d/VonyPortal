@@ -1319,54 +1319,6 @@ export default function Home() {
                   </div>
                 );
               })()}
-              {/* Upcoming */}
-              <div className="home-card-upcoming" style={{ position: 'relative' }}>
-              <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
-              <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
-                <SectionHeader title="Upcoming" linkTo={createPageUrl("Upcoming")} linkLabel="Full schedule →" />
-                {combinedPaymentEvents.length === 0 ? (
-                  <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>You're all caught up ✨</div>
-                ) : combinedPaymentEvents.map((event, idx) => {
-                  const isOverdue = event.days < 0;
-                  const daysLabel = isOverdue ? `${Math.abs(event.days)}d late` : event.days === 0 ? 'today' : `${event.days}d`;
-                  const amountStr = formatMoney(event.remainingAmount);
-                  let primaryLine;
-                  if (isOverdue) {
-                    primaryLine = event.isLender
-                      ? <>{amountStr} from {event.firstName} is overdue</>
-                      : <>{amountStr} to {event.firstName} is overdue</>;
-                  } else {
-                    primaryLine = event.isLender
-                      ? <>Due to receive {amountStr} from {event.firstName}</>
-                      : <>{amountStr} due to {event.firstName}</>;
-                  }
-                  return (
-                    <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0' }}>
-                      <div style={{
-                        flexShrink: 0,
-                        fontSize: 10, fontWeight: 700, lineHeight: 1.2,
-                        color: isOverdue ? '#E8726E' : event.days <= 3 ? '#F59E0B' : '#9B9A98',
-                        background: isOverdue ? 'rgba(232,114,110,0.08)' : event.days <= 3 ? 'rgba(245,158,11,0.08)' : 'rgba(0,0,0,0.04)',
-                        borderRadius: 5, padding: '2px 5px',
-                      }}>
-                        {daysLabel}
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0, fontSize: 12, color: '#1A1918', overflow: 'hidden' }}>
-                        <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {primaryLine}
-                        </div>
-                        {event.purpose && (
-                          <div style={{ fontSize: 11, color: '#9B9A98', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 1 }}>
-                            {event.purpose}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              </div>{/* end upcoming aurora wrapper */}
-
               {/* Recent Activity */}
               <div className="home-card-recent" style={{ position: 'relative' }}>
                 {/* Thin aurora glow — #CFDCE7 → background */}
@@ -1412,48 +1364,65 @@ export default function Home() {
               <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
               <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
                 <SectionHeader title={`How ${format(today, 'MMMM')} is Going`} />
-                {/* Summary lines */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 2 }}>
-                  {/* Overdue callouts (show first when present) */}
-                  {overdueYouOwe.length > 0 && (
-                    <div style={{ fontSize: 12, color: '#1A1918' }}>
-                      You have <strong style={{ color: '#E8726E' }}>{overdueYouOwe.length}</strong> overdue payment{overdueYouOwe.length === 1 ? '' : 's'}
+                {/* Summary lines — each gets a leading bullet colored to match the numeric accent */}
+                {(() => {
+                  // Bullet helper: colored dot + line text, flex-aligned.
+                  const Bullet = ({ color }) => (
+                    <span style={{
+                      width: 5, height: 5, borderRadius: '50%', background: color,
+                      flexShrink: 0, display: 'inline-block', marginTop: 7,
+                    }} />
+                  );
+                  const rowStyle = { display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: '#1A1918' };
+                  return (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 2 }}>
+                      {overdueYouOwe.length > 0 && (
+                        <div style={rowStyle}>
+                          <Bullet color="#E8726E" />
+                          <span>You have <strong style={{ color: '#E8726E' }}>{overdueYouOwe.length}</strong> overdue payment{overdueYouOwe.length === 1 ? '' : 's'}</span>
+                        </div>
+                      )}
+                      {overdueOwedToYou.length > 0 && (
+                        <div style={rowStyle}>
+                          <Bullet color="#E8726E" />
+                          <span><strong style={{ color: '#E8726E' }}>{overdueOwedToYou.length}</strong> payment{overdueOwedToYou.length === 1 ? '' : 's'} to you {overdueOwedToYou.length === 1 ? 'is' : 'are'} overdue</span>
+                        </div>
+                      )}
+                      {outScheduledTotal > 0 && (
+                        <div style={rowStyle}>
+                          <Bullet color="#1D5B94" />
+                          <span>
+                            {outCompletedCount > 0
+                              ? <>You've completed <strong style={{ color: '#1D5B94' }}>{outCompletedCount}</strong> of <strong style={{ color: '#1D5B94' }}>{outScheduledTotal}</strong> scheduled payments</>
+                              : <>You have <strong style={{ color: '#1D5B94' }}>{outScheduledTotal}</strong> payment{outScheduledTotal === 1 ? '' : 's'} this month</>}
+                          </span>
+                        </div>
+                      )}
+                      {leftToPay > 0 && (
+                        <div style={rowStyle}>
+                          <Bullet color="#1D5B94" />
+                          <span><strong style={{ color: '#1D5B94' }}>{formatMoney(leftToPay)}</strong> left to pay this month</span>
+                        </div>
+                      )}
+                      {inScheduledTotal > 0 && (
+                        <div style={rowStyle}>
+                          <Bullet color="#03ACEA" />
+                          <span>
+                            {inCompletedCount > 0
+                              ? <>You've received <strong style={{ color: '#03ACEA' }}>{inCompletedCount}</strong> of <strong style={{ color: '#03ACEA' }}>{inScheduledTotal}</strong> payments</>
+                              : <>You're due to receive <strong style={{ color: '#03ACEA' }}>{inScheduledTotal}</strong> payment{inScheduledTotal === 1 ? '' : 's'} this month</>}
+                          </span>
+                        </div>
+                      )}
+                      {leftToReceive > 0 && (
+                        <div style={rowStyle}>
+                          <Bullet color="#03ACEA" />
+                          <span>You're expected to receive <strong style={{ color: '#03ACEA' }}>{formatMoney(leftToReceive)}</strong> before the end of the month</span>
+                        </div>
+                      )}
                     </div>
-                  )}
-                  {overdueOwedToYou.length > 0 && (
-                    <div style={{ fontSize: 12, color: '#1A1918' }}>
-                      <strong style={{ color: '#E8726E' }}>{overdueOwedToYou.length}</strong> payment{overdueOwedToYou.length === 1 ? '' : 's'} to you {overdueOwedToYou.length === 1 ? 'is' : 'are'} overdue
-                    </div>
-                  )}
-                  {/* Outgoing line: completed vs scheduled (skip if nothing scheduled) */}
-                  {outScheduledTotal > 0 && (
-                    <div style={{ fontSize: 12, color: '#1A1918' }}>
-                      {outCompletedCount > 0
-                        ? <>You've completed <strong style={{ color: '#1D5B94' }}>{outCompletedCount}</strong> of <strong style={{ color: '#1D5B94' }}>{outScheduledTotal}</strong> scheduled payments</>
-                        : <>You have <strong style={{ color: '#1D5B94' }}>{outScheduledTotal}</strong> payment{outScheduledTotal === 1 ? '' : 's'} this month</>}
-                    </div>
-                  )}
-                  {/* $ left to pay */}
-                  {leftToPay > 0 && (
-                    <div style={{ fontSize: 12, color: '#1A1918' }}>
-                      <strong style={{ color: '#1D5B94' }}>{formatMoney(leftToPay)}</strong> left to pay this month
-                    </div>
-                  )}
-                  {/* Incoming line */}
-                  {inScheduledTotal > 0 && (
-                    <div style={{ fontSize: 12, color: '#1A1918' }}>
-                      {inCompletedCount > 0
-                        ? <>You've received <strong style={{ color: '#03ACEA' }}>{inCompletedCount}</strong> of <strong style={{ color: '#03ACEA' }}>{inScheduledTotal}</strong> payments</>
-                        : <>You're due to receive <strong style={{ color: '#03ACEA' }}>{inScheduledTotal}</strong> payment{inScheduledTotal === 1 ? '' : 's'} this month</>}
-                    </div>
-                  )}
-                  {/* $ expected to receive */}
-                  {leftToReceive > 0 && (
-                    <div style={{ fontSize: 12, color: '#1A1918' }}>
-                      You're expected to receive <strong style={{ color: '#03ACEA' }}>{formatMoney(leftToReceive)}</strong> before the end of the month
-                    </div>
-                  )}
-                </div>
+                  );
+                })()}
                 {/* Insight */}
                 <div style={{ marginTop: 10, textAlign: 'center' }}>
                   <span style={{
@@ -1473,73 +1442,69 @@ export default function Home() {
               </div>
               </div>{/* end how-month aurora wrapper */}
 
-              {/* Borrowing Overview */}
+              {/* Borrowing Overview — borrowing ring (pie left / text right),
+                  then lending ring below it (text left / pie right, mirrored) */}
               {(() => {
-                // Outstanding per loan, for the pie slices.
-                const slices = borrowedLoans
-                  .map(l => {
-                    const total = l.total_amount || l.amount || 0;
-                    const paid = l.amount_paid || 0;
-                    const remaining = Math.max(0, total - paid);
-                    const otherProfile = safeAllProfiles.find(p => p.user_id === l.lender_id);
-                    const name = otherProfile?.full_name?.split(' ')[0] || otherProfile?.username || 'Loan';
-                    return { value: remaining, name, id: l.id };
-                  })
-                  .filter(s => s.value > 0);
-                const sliceTotal = slices.reduce((s, x) => s + x.value, 0);
-                const PIE_COLORS = ['#03ACEA', '#1D5B94', '#2D5777', '#328AB6', '#60A5FA', '#0F3D6B'];
-                // Build cumulative SVG arc paths.
-                const R = 40, CX = 50, CY = 50;
-                let cumulative = 0;
-                const pieSlices = slices.map((s, i) => {
-                  const startAngle = (cumulative / sliceTotal) * Math.PI * 2 - Math.PI / 2;
-                  cumulative += s.value;
-                  const endAngle = (cumulative / sliceTotal) * Math.PI * 2 - Math.PI / 2;
-                  const x1 = CX + R * Math.cos(startAngle);
-                  const y1 = CY + R * Math.sin(startAngle);
-                  const x2 = CX + R * Math.cos(endAngle);
-                  const y2 = CY + R * Math.sin(endAngle);
-                  const largeArc = endAngle - startAngle > Math.PI ? 1 : 0;
-                  // Single-slice full circle needs two arcs.
-                  const d = slices.length === 1
-                    ? `M ${CX - R} ${CY} A ${R} ${R} 0 1 1 ${CX + R} ${CY} A ${R} ${R} 0 1 1 ${CX - R} ${CY} Z`
-                    : `M ${CX} ${CY} L ${x1} ${y1} A ${R} ${R} 0 ${largeArc} 1 ${x2} ${y2} Z`;
-                  return <path key={s.id} d={d} fill={PIE_COLORS[i % PIE_COLORS.length]} />;
-                });
+                // Ring pie helper matching the "loan details" style in Lending.jsx:
+                // thin circumference ring with a tinted track and a colored arc
+                // proportional to the percent paid/repaid.
+                const Ring = ({ percent, color }) => {
+                  const C = 2 * Math.PI * 45;
+                  const offset = C - (percent / 100) * C;
+                  return (
+                    <div style={{ position: 'relative', width: 110, height: 110, flexShrink: 0 }}>
+                      <svg width="110" height="110" viewBox="0 0 128 128" style={{ transform: 'rotate(-90deg)' }}>
+                        <circle cx="64" cy="64" r="45" fill="none" stroke={`${color}26`} strokeWidth="12" />
+                        <circle
+                          cx="64" cy="64" r="45" fill="none"
+                          stroke={color} strokeWidth="12" strokeLinecap="round"
+                          strokeDasharray={C} strokeDashoffset={offset}
+                        />
+                      </svg>
+                      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+                        <span style={{ fontSize: 18, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif", lineHeight: 1 }}>{percent}%</span>
+                      </div>
+                    </div>
+                  );
+                };
+
+                // Borrowing side (you owe)
+                const borrowOwed = Math.max(0, totalBorrowedAmount - totalPaidBack);
+                // Lending side (you're owed)
+                const lentOwed = Math.max(0, totalLentAmount - totalRepaid);
+
+                const textBlockStyle = { flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 };
+                const bigLineStyle  = { fontSize: 13, fontWeight: 600, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", letterSpacing: '-0.01em' };
+                const subLineStyle  = { fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" };
+                const mutedLineStyle = { fontSize: 12, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" };
+
                 return (
                   <div className="home-card-bor-overview" style={{ position: 'relative' }}>
                     <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
                     <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
                       <SectionHeader title="Borrowing Overview" />
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 2 }}>
-                        {/* Pie with % repaid in the center */}
-                        <div style={{ flexShrink: 0, position: 'relative', width: 96, height: 96 }}>
-                          {sliceTotal > 0 ? (
-                            <svg width="96" height="96" viewBox="0 0 100 100">
-                              {pieSlices}
-                              {/* Donut hole for the center label */}
-                              <circle cx={CX} cy={CY} r={22} fill="#ffffff" />
-                            </svg>
-                          ) : (
-                            <svg width="96" height="96" viewBox="0 0 100 100">
-                              <circle cx={CX} cy={CY} r={R} fill="#EBF4FA" />
-                              <circle cx={CX} cy={CY} r={22} fill="#ffffff" />
-                            </svg>
-                          )}
-                          <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
-                            <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif", lineHeight: 1 }}>{percentPaid}%</span>
-                            <span style={{ fontSize: 9, fontWeight: 500, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", marginTop: 2 }}>repaid</span>
-                          </div>
+
+                      {/* Borrowing row: ring on LEFT, text on RIGHT */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginTop: 4 }}>
+                        <Ring percent={percentPaid} color="#1D5B94" />
+                        <div style={textBlockStyle}>
+                          <div style={bigLineStyle}>You owe <span style={{ color: '#1D5B94' }}>{formatMoney(borrowOwed)}</span></div>
+                          <div style={subLineStyle}>{formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)} paid back</div>
+                          <div style={mutedLineStyle}>Across {borrowedLoans.length} active loan{borrowedLoans.length === 1 ? '' : 's'}</div>
                         </div>
-                        {/* Right text */}
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", marginBottom: 2 }}>
-                            {formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)} paid back
-                          </div>
-                          <div style={{ fontSize: 12, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>
-                            Across {borrowedLoans.length} active loan{borrowedLoans.length === 1 ? '' : 's'}
-                          </div>
+                      </div>
+
+                      {/* Thin divider between the two halves */}
+                      <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '14px 0' }} />
+
+                      {/* Lending row: text on LEFT, ring on RIGHT (mirrored) */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+                        <div style={textBlockStyle}>
+                          <div style={bigLineStyle}>You're owed <span style={{ color: '#03ACEA' }}>{formatMoney(lentOwed)}</span></div>
+                          <div style={subLineStyle}>{formatMoney(totalRepaid)} of {formatMoney(totalLentAmount)} repaid to you</div>
+                          <div style={mutedLineStyle}>Across {lentLoans.length} active loan{lentLoans.length === 1 ? '' : 's'}</div>
                         </div>
+                        <Ring percent={percentRepaid} color="#03ACEA" />
                       </div>
                     </div>
                   </div>
@@ -1595,9 +1560,20 @@ export default function Home() {
                         const otherProfile = safeAllProfiles.find(p => p.user_id === loan.lender_id);
                         const name = otherProfile?.full_name?.split(' ')[0] || otherProfile?.username || 'User';
                         const total = loan.total_amount || loan.amount || 0;
+                        // Status badge — mirrors Your Lending: "On track" vs "$X overdue"
+                        // (from the borrower's perspective it's an overdue payment YOU owe).
+                        const nextDue = loan.next_payment_date ? new Date(loan.next_payment_date) : null;
+                        const isBehind = nextDue && nextDue < today;
+                        const behindAmt = isBehind ? (loan.payment_amount || 0) : 0;
+                        const statusLabel = isBehind ? `${formatMoney(behindAmt)} overdue` : 'On track';
+                        const statusColor = isBehind ? '#E8726E' : '#03ACEA';
+                        const statusBg = isBehind ? 'rgba(232,114,110,0.08)' : 'rgba(3,172,234,0.10)';
                         return (
                           <div key={loan.id} style={{ padding: '9px 0' }}>
-                            <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                              <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
+                              <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, color: statusColor, background: statusBg, borderRadius: 5, padding: '2px 6px', lineHeight: 1.2 }}>{statusLabel}</span>
+                            </div>
                             <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               lent you {formatMoney(total)}{loan.purpose ? ` for ${loan.purpose}` : ''}
                             </div>

@@ -44,6 +44,12 @@ const DATE_OPTIONS = [
   { id: 'older', label: 'Older' },
 ];
 
+// Matches the Recent Activity sort dropdown so the Records page feels consistent
+const SORT_OPTIONS = [
+  { id: 'date_desc', label: 'Date (Newest)' },
+  { id: 'date_asc', label: 'Date (Oldest)' },
+];
+
 const SHADOW = '0px 50px 40px rgba(0,0,0,0.02), 0px 50px 40px rgba(0,0,0,0.04), 0px 20px 40px rgba(0,0,0,0.08), 0px 3px 10px rgba(0,0,0,0.12)';
 
 /* ── Single-select dropdown ────────────────────────────────── */
@@ -215,6 +221,7 @@ export default function LoanAgreements() {
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('date_desc');
   const [friendFilter, setFriendFilter] = useState('all');
   const [amountMode, setAmountMode] = useState('all');
   const [amountVal1, setAmountVal1] = useState('');
@@ -698,6 +705,13 @@ export default function LoanAgreements() {
     });
   }
 
+  // Sort (matches Recent Activity ordering)
+  filteredAgreements = [...filteredAgreements].sort((a, b) => {
+    const da = new Date(a.created_at || 0).getTime();
+    const db = new Date(b.created_at || 0).getTime();
+    return sortBy === 'date_asc' ? da - db : db - da;
+  });
+
   // Build friend options from all agreements
   const friendOptions = [{ id: 'all', label: 'All Friends' }];
   const seenIds = new Set();
@@ -1118,6 +1132,8 @@ export default function LoanAgreements() {
               </div>
             </div>
             <div className="filter-row-scroll" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, position: 'relative', zIndex: 20 }}>
+              {/* Sort-by sits to the LEFT of the date filter, mirroring Recent Activity */}
+              <SingleSelectDropdown options={SORT_OPTIONS} selected={sortBy} onChange={setSortBy} />
               <SingleSelectDropdown options={DATE_OPTIONS} selected={dateFilter} onChange={setDateFilter} />
               {friendOptions.length > 1 && (
                 <SingleSelectDropdown options={friendOptions} selected={friendFilter} onChange={setFriendFilter} />
@@ -1157,10 +1173,10 @@ export default function LoanAgreements() {
                     display: 'flex', alignItems: 'center', gap: 12, padding: '0 0 12px',
                     borderBottom: '1px solid rgba(0,0,0,0.06)', marginBottom: 4,
                   }}>
-                    <span style={{ width: 90, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', flexShrink: 0 }}>Date</span>
+                    <span style={{ width: 100, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', flexShrink: 0 }}>Date Signed</span>
                     <span style={{ flex: 1.5, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', minWidth: 0 }}>Friend</span>
                     <span style={{ flex: 1.4, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', minWidth: 0 }}>Category</span>
-                    <span style={{ width: 90, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'center', flexShrink: 0 }}>Status</span>
+                    <span style={{ flex: 1.2, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', minWidth: 0 }}>Reason</span>
                     <span style={{ width: 100, fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right', flexShrink: 0 }}>Amount</span>
                     <div style={{ width: 28, flexShrink: 0 }} />
                   </div>
@@ -1185,8 +1201,8 @@ export default function LoanAgreements() {
                               transition: 'background 0.15s', cursor: 'pointer',
                             }}
                           >
-                            {/* Date */}
-                            <span className="la-col-date" style={{ width: 90, fontSize: 12, fontWeight: 500, color: '#787776', flexShrink: 0 }}>
+                            {/* Date Signed */}
+                            <span className="la-col-date" style={{ width: 100, fontSize: 12, fontWeight: 500, color: '#787776', flexShrink: 0 }}>
                               <span className="la-date-text">{dateFormatted}</span>
                               <ChevronDown className="la-date-chevron" size={16} style={{ color: '#9B9A98' }} />
                             </span>
@@ -1215,14 +1231,15 @@ export default function LoanAgreements() {
                                 {isLender ? 'You are the Lender' : 'You are the Borrower'}
                               </span>
                             </div>
-                            {/* Status */}
-                            <div className="la-col-status" style={{ display: 'flex', width: 90, justifyContent: 'center', flexShrink: 0, alignItems: 'center', gap: 6 }}>
-                              <span style={{
-                                ...badgeStyle, display: 'inline-flex', alignItems: 'center',
-                                padding: '3px 8px', borderRadius: 7,
-                                fontSize: 11, fontWeight: 600, textTransform: 'capitalize', whiteSpace: 'nowrap',
+                            {/* Reason (replaces the old Status column on desktop);
+                                the mobile date chip still lives here so it lines up
+                                with the other mobile-only badges on the right. */}
+                            <div className="la-col-status" style={{ display: 'flex', flex: 1.2, minWidth: 0, alignItems: 'center', gap: 6 }}>
+                              <span className="la-reason-desktop" style={{
+                                fontSize: 12, color: '#1A1918', overflow: 'hidden',
+                                textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                               }}>
-                                {loanStatus}
+                                {agreement.purpose || <span style={{ color: '#C7C6C4' }}>—</span>}
                               </span>
                               <span className="la-mobile-date" style={{ fontSize: 11, color: '#787776' }}>{dateFormatted}</span>
                             </div>

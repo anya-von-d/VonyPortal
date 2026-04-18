@@ -298,7 +298,6 @@ input[type="date"] {
     display: contents !important;
   }
   .home-two-col-row .home-card-tasks,
-  .home-two-col-row .home-card-upcoming,
   .home-two-col-row .home-card-howmonth,
   .home-two-col-row .home-card-recent,
   .home-two-col-row .home-card-bor-overview,
@@ -369,12 +368,11 @@ input[type="date"] {
   .home-card-npi       { order: 2 !important; }
   .home-card-overview  { order: 3 !important; }
   .home-card-tasks          { order: 4 !important; }
-  .home-card-upcoming       { order: 5 !important; }
-  .home-card-howmonth       { order: 6 !important; }
-  .home-card-recent         { order: 7 !important; }
-  .home-card-bor-overview   { order: 8 !important; }
-  .home-card-lending-loans  { order: 9 !important; }
-  .home-card-your-borrowing { order: 10 !important; }
+  .home-card-howmonth       { order: 5 !important; }
+  .home-card-recent         { order: 6 !important; }
+  .home-card-bor-overview   { order: 7 !important; }
+  .home-card-lending-loans  { order: 8 !important; }
+  .home-card-your-borrowing { order: 9 !important; }
   /* Record Payment: stack loan selector above form on mobile */
   .rp-two-col { grid-template-columns: 1fr !important; }
   /* Create Loan: hide Borrower Will Pay + Loan Summary from top row; show below blue box */
@@ -542,6 +540,9 @@ input[type="date"] {
 /* Hide mobile-only date/chevron on desktop */
 .la-mobile-date { display: none; }
 .la-date-chevron { display: none; }
+/* Reason column is desktop-only; on mobile the status-area slot is taken by
+   the little date chip next to the friend line */
+.la-reason-desktop { display: inline; }
 
 
 /* ============================================================
@@ -628,6 +629,7 @@ input[type="date"] {
     justify-content: flex-start !important;
   }
   .la-mobile-date { display: inline !important; }
+  .la-reason-desktop { display: none !important; }
   .la-col-amount { display: none !important; }
   .la-col-arrow { display: none !important; }
   .la-friend-desktop { display: none !important; }
