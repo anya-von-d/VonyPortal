@@ -269,10 +269,10 @@ export default function Upcoming() {
             <div style={{ height: 1, background: 'rgba(0,0,0,0.08)', marginLeft: -32, marginRight: -32, marginBottom: 20 }} />
           </div>
 
-          {/* Two-column: section boxes left, calendar right */}
-          <div className="upcoming-two-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'start' }}>
+          {/* Three-column: overdue+7days | coming later | calendar */}
+          <div className="upcoming-three-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, alignItems: 'start' }}>
 
-            {/* Left: Overdue + Next 7 Days + Coming Later */}
+            {/* Col 1: Overdue + Next 7 Days */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {/* Overdue */}
               {overdue.length > 0 && (
@@ -332,7 +332,10 @@ export default function Upcoming() {
                 </div>
               </div>
 
-              {/* Coming Later */}
+            </div>{/* end col 1 */}
+
+            {/* Col 2: Coming Later */}
+            <div>
               <div style={{ position: 'relative' }}>
                 <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
               <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
@@ -345,9 +348,9 @@ export default function Upcoming() {
                 ) : comingLater.map(event => <PaymentRow key={event.loanId + '-later'} event={event} />)}
               </div>
               </div>
-            </div>
+            </div>{/* end col 2 */}
 
-            {/* Right: Calendar */}
+            {/* Col 3: Calendar */}
             <div style={{ position: 'relative' }}>
               <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
             <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>

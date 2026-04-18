@@ -1413,7 +1413,7 @@ export default function Lending({ initialTab }) {
   const PageCard = ({ title, headerRight, children, style, highlight }) => (
     <div style={{ marginBottom: 24, ...style }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 5, marginBottom: 2 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: highlight ? '#03ACEA' : '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>{title}</div>
+        <div style={{ fontSize: 12, fontWeight: 600, color: highlight ? '#03ACEA' : '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>{title}</div>
         {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
       </div>
       <div style={{ position: 'relative' }}>
@@ -1442,7 +1442,7 @@ export default function Lending({ initialTab }) {
               <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(3,172,234,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
                 <CheckCircle size={32} style={{ color: '#03ACEA' }} />
               </div>
-              <h3 style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: '0 0 8px', letterSpacing: '-0.02em' }}>Loan Sent!</h3>
+              <h3 style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', margin: '0 0 8px', letterSpacing: '-0.02em' }}>Loan Sent!</h3>
               <p style={{ fontSize: 12, color: '#787776', margin: '0 0 28px', lineHeight: 1.6 }}>
                 Your loan has been created and sent. The other party will need to sign to make it active.
               </p>
@@ -1450,7 +1450,7 @@ export default function Lending({ initialTab }) {
                 onClick={() => setShowLoanSentModal(false)}
                 style={{
                   width: '100%', padding: '13px 0', borderRadius: 10, border: 'none',
-                  background: '#03ACEA', color: 'white', fontSize: 15, fontWeight: 600,
+                  background: '#03ACEA', color: 'white', fontSize: 12, fontWeight: 600,
                   cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", letterSpacing: '-0.01em',
                 }}
               >
@@ -1527,7 +1527,7 @@ export default function Lending({ initialTab }) {
 
           {/* Mobile-only page title (desktop shows it in top bar) */}
           <div className="mobile-page-title">
-            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Create Loan</div>
+            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>Create Loan</div>
             <div style={{ height: 1, background: 'rgba(0,0,0,0.08)', marginLeft: -32, marginRight: -32, marginBottom: 20 }} />
           </div>
 
@@ -1538,7 +1538,7 @@ export default function Lending({ initialTab }) {
               background: '#ffffff', border: 'none',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap',
             }}>
-              <div style={{ fontSize: 13, color: '#787776', fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+              <div style={{ fontSize: 12, color: '#787776', fontFamily: "'DM Sans', system-ui, sans-serif" }}>
                 🌸 You'll need a friend on Vony before you can send a loan offer. Add one to get started!
               </div>
               <div style={{ display: 'flex', gap: 8, flexShrink: 0, flexWrap: 'wrap' }}>
@@ -1562,7 +1562,7 @@ export default function Lending({ initialTab }) {
                       <a
                         href="sms:?body=Hey! Join me on Vony — an easy way to manage loans with friends. Sign up here: https://www.vony-lending.com"
                         onClick={() => setInviteOpen(false)}
-                        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 16px', fontSize: 13, color: '#1A1918', textDecoration: 'none', fontFamily: "'DM Sans', sans-serif", fontWeight: 500 }}
+                        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 16px', fontSize: 12, color: '#1A1918', textDecoration: 'none', fontFamily: "'DM Sans', sans-serif", fontWeight: 500 }}
                         onMouseEnter={e => e.currentTarget.style.background = '#f5f4f0'}
                         onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                       >
@@ -1572,7 +1572,7 @@ export default function Lending({ initialTab }) {
                       <a
                         href="mailto:?subject=Join me on Vony&body=Hey!%0A%0AI've been using Vony to manage loans with friends and wanted to invite you.%0A%0ASign up here: https://www.vony-lending.com%0A%0ASee you there!"
                         onClick={() => setInviteOpen(false)}
-                        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 16px', fontSize: 13, color: '#1A1918', textDecoration: 'none', fontFamily: "'DM Sans', sans-serif", fontWeight: 500 }}
+                        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 16px', fontSize: 12, color: '#1A1918', textDecoration: 'none', fontFamily: "'DM Sans', sans-serif", fontWeight: 500 }}
                         onMouseEnter={e => e.currentTarget.style.background = '#f5f4f0'}
                         onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                       >
@@ -1582,7 +1582,7 @@ export default function Lending({ initialTab }) {
                       <button
                         type="button"
                         onClick={() => { navigator.clipboard.writeText('https://www.vony-lending.com').then(() => { setInviteCopied(true); setTimeout(() => { setInviteCopied(false); setInviteOpen(false); }, 1500); }); }}
-                        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 16px', fontSize: 13, color: inviteCopied ? '#16A34A' : '#1A1918', background: inviteCopied ? 'rgba(22,163,74,0.05)' : 'transparent', fontFamily: "'DM Sans', sans-serif", fontWeight: 500, border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left' }}
+                        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 16px', fontSize: 12, color: inviteCopied ? '#16A34A' : '#1A1918', background: inviteCopied ? 'rgba(22,163,74,0.05)' : 'transparent', fontFamily: "'DM Sans', sans-serif", fontWeight: 500, border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left' }}
                         onMouseEnter={e => { if (!inviteCopied) e.currentTarget.style.background = '#f5f4f0'; }}
                         onMouseLeave={e => { if (!inviteCopied) e.currentTarget.style.background = 'transparent'; }}
                       >
@@ -1702,14 +1702,14 @@ export default function Lending({ initialTab }) {
                           {nextPaymentLoan ? (
                             <>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                                <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{format(nextPaymentLoan.date, 'MMM d')}</span>
+                                <span style={{ fontSize: 12, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{format(nextPaymentLoan.date, 'MMM d')}</span>
                                 {daysLabel && <span style={{ fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '2px 6px', flexShrink: 0 }}>{daysLabel}</span>}
                               </div>
                               <div style={{ fontSize: 11, color: '#9B9A98', textAlign: 'right' }}>{format(nextPaymentLoan.date, 'do MMMM')}</div>
                             </>
                           ) : (
                             <>
-                              <div style={{ fontSize: 13, fontWeight: 700, color: '#C5C3C0', marginBottom: 4 }}>—</div>
+                              <div style={{ fontSize: 12, fontWeight: 700, color: '#C5C3C0', marginBottom: 4 }}>—</div>
                               <div style={{ fontSize: 11, color: '#9B9A98' }}>None incoming ✨</div>
                             </>
                           )}
@@ -1731,7 +1731,7 @@ export default function Lending({ initialTab }) {
                             <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Active Lending</span>
                           </div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
-                            <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{formatMoney(totalOwed)}</span>
+                            <span style={{ fontSize: 12, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{formatMoney(totalOwed)}</span>
                             <span style={{ fontSize: 11, fontWeight: 700, color: '#03ACEA' }}>{pct}%</span>
                           </div>
                           <div style={{ width: '100%', height: 6, borderRadius: 3, background: '#D9EAF4', overflow: 'hidden', marginBottom: 6 }}>
@@ -1747,7 +1747,7 @@ export default function Lending({ initialTab }) {
                 {/* Upcoming Payments */}
                 <div style={{ marginBottom: 8 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Upcoming</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Upcoming</span>
                     <Link to={createPageUrl("Upcoming")} style={{ fontSize: 11, fontWeight: 500, color: '#03ACEA', textDecoration: 'none' }}>Full schedule →</Link>
                   </div>
                   {(() => {
@@ -1760,7 +1760,7 @@ export default function Lending({ initialTab }) {
                       })
                       .sort((a, b) => a.days - b.days)
                       .slice(0, 5);
-                    if (rows.length === 0) return <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98', textAlign: 'center' }}>You're all clear! Nothing coming up yet 🎉</div>;
+                    if (rows.length === 0) return <div style={{ padding: '10px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>You're all clear! Nothing coming up yet 🎉</div>;
                     return rows.map((loan, idx) => {
                       const isOverdue = loan.days < 0;
                       const daysLabel = isOverdue ? `${Math.abs(loan.days)}d late` : loan.days === 0 ? 'today' : `${loan.days}d`;
@@ -1773,10 +1773,10 @@ export default function Lending({ initialTab }) {
                             background: isOverdue ? 'rgba(232,114,110,0.08)' : loan.days <= 3 ? 'rgba(245,158,11,0.08)' : 'rgba(0,0,0,0.04)',
                             borderRadius: 6, padding: '3px 6px',
                           }}>{daysLabel}</div>
-                          <div style={{ flex: 1, minWidth: 0, fontSize: 13, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <div style={{ flex: 1, minWidth: 0, fontSize: 12, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             <strong>{loan.borrowerName}</strong> pays you{loan.purpose ? <span style={{ color: '#9B9A98', fontWeight: 400 }}> · {loan.purpose}</span> : ''}
                           </div>
-                          <span style={{ fontSize: 13, fontWeight: 700, flexShrink: 0, color: '#03ACEA', letterSpacing: '-0.01em' }}>
+                          <span style={{ fontSize: 12, fontWeight: 700, flexShrink: 0, color: '#03ACEA', letterSpacing: '-0.01em' }}>
                             +{formatMoney(loan.payment_amount || 0)}
                           </span>
                         </div>
@@ -1789,7 +1789,7 @@ export default function Lending({ initialTab }) {
                   <PageCard title="Loan Progress">
                     <div style={{ padding: 0 }}>
                       {activeLoans.length === 0 ? (
-                        <p style={{ fontSize: 13, color: '#787776', margin: 0 }}>No active loans yet 🌱</p>
+                        <p style={{ fontSize: 12, color: '#787776', margin: 0 }}>No active loans yet 🌱</p>
                       ) : (() => {
                         const totalAll = activeLoans.reduce((s, l) => s + (l.total_amount || l.amount || 0), 0);
                         const paidAll = activeLoans.reduce((s, l) => s + (l.amount_paid || 0), 0);
@@ -1797,7 +1797,7 @@ export default function Lending({ initialTab }) {
                         return (
                           <div>
                             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 8 }}>
-                              <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>Active Loans</div>
+                              <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918' }}>Active Loans</div>
                               <div style={{ fontSize: 12, color: '#787776' }}>{pctAll}%</div>
                             </div>
                             <div style={{ width: '100%', height: 6, borderRadius: 3, background: '#D9EAF4', overflow: 'hidden' }}>
@@ -2076,10 +2076,10 @@ export default function Lending({ initialTab }) {
                       <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
                       <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Loan Type</span>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Loan Type</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
-                        <span style={{ fontSize: 13, fontWeight: 500, color: loanType === 'scheduled' ? '#1A1918' : '#9B9A98' }}>Loan</span>
+                        <span style={{ fontSize: 12, fontWeight: 500, color: loanType === 'scheduled' ? '#1A1918' : '#9B9A98' }}>Loan</span>
                         <button
                           type="button"
                           onClick={() => setLoanType(loanType === 'flexible' ? 'scheduled' : 'flexible')}
@@ -2087,7 +2087,7 @@ export default function Lending({ initialTab }) {
                         >
                           <div style={{ position: 'absolute', top: 3, left: loanType === 'flexible' ? 23 : 3, width: 18, height: 18, borderRadius: '50%', background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.2)', transition: 'left 0.2s' }} />
                         </button>
-                        <span style={{ fontSize: 13, fontWeight: 500, color: loanType === 'flexible' ? '#1A1918' : '#9B9A98' }}>Quick Pay</span>
+                        <span style={{ fontSize: 12, fontWeight: 500, color: loanType === 'flexible' ? '#1A1918' : '#9B9A98' }}>Quick Pay</span>
                       </div>
                       <p style={{ fontSize: 11, color: '#9B9A98', lineHeight: 1.5, margin: 0 }}>
                         {loanType === 'flexible' ? 'One-time payment, perfect for splitting expenses' : 'Structured repayment plan with interest'}
@@ -2100,23 +2100,23 @@ export default function Lending({ initialTab }) {
                       <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
                       <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Loan Summary</span>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Loan Summary</span>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                         {formData.purpose && (
                           <div>
                             <div style={{ fontSize: 11, color: '#9B9A98', marginBottom: 1 }}>For</div>
-                            <div style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{formData.purpose}</div>
+                            <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{formData.purpose}</div>
                           </div>
                         )}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                           <span style={{ fontSize: 12, color: '#9B9A98' }}>Amount</span>
-                          <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>{formData.amount ? `$${parseFloat(formData.amount).toLocaleString()}` : '$0.00'}</span>
+                          <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918' }}>{formData.amount ? `$${parseFloat(formData.amount).toLocaleString()}` : '$0.00'}</span>
                         </div>
                         {loanType === 'scheduled' && (
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                             <span style={{ fontSize: 12, color: '#9B9A98' }}>Interest</span>
-                            <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>{formData.amount && formData.interest_rate ? `$${details.totalInterest.toFixed(2)}` : '$0.00'}</span>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918' }}>{formData.amount && formData.interest_rate ? `$${details.totalInterest.toFixed(2)}` : '$0.00'}</span>
                           </div>
                         )}
                       </div>
@@ -2128,17 +2128,17 @@ export default function Lending({ initialTab }) {
                       <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
                       <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Borrower Will Pay</span>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Borrower Will Pay</span>
                       </div>
                       {loanType === 'scheduled' ? (
                         <>
-                          <div style={{ fontSize: 15, fontWeight: 700, color: '#03ACEA', letterSpacing: '-0.03em', lineHeight: 1, marginBottom: 4 }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: '#03ACEA', letterSpacing: '-0.03em', lineHeight: 1, marginBottom: 4 }}>
                             {formData.amount && details.monthlyPayment > 0 ? `$${details.monthlyPayment.toFixed(2)}` : '$0.00'}
                           </div>
                           <div style={{ fontSize: 12, color: '#9B9A98' }}>{formData.payment_frequency || 'monthly'} after interest</div>
                         </>
                       ) : (
-                        <div style={{ fontSize: 13, color: '#9B9A98' }}>N/A for Quick Pay</div>
+                        <div style={{ fontSize: 12, color: '#9B9A98' }}>N/A for Quick Pay</div>
                       )}
                       </div>
                     </div>
@@ -2596,39 +2596,39 @@ export default function Lending({ initialTab }) {
                           {/* Borrower Will Pay */}
                           <div style={{ background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                              <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Borrower Will Pay</span>
+                              <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Borrower Will Pay</span>
                             </div>
                             {loanType === 'scheduled' ? (
                               <>
-                                <div style={{ fontSize: 15, fontWeight: 700, color: '#03ACEA', letterSpacing: '-0.03em', lineHeight: 1, marginBottom: 4 }}>
+                                <div style={{ fontSize: 12, fontWeight: 700, color: '#03ACEA', letterSpacing: '-0.03em', lineHeight: 1, marginBottom: 4 }}>
                                   {formData.amount && details.monthlyPayment > 0 ? `$${details.monthlyPayment.toFixed(2)}` : '$0.00'}
                                 </div>
                                 <div style={{ fontSize: 12, color: '#9B9A98' }}>{formData.payment_frequency || 'monthly'} after interest</div>
                               </>
                             ) : (
-                              <div style={{ fontSize: 13, color: '#9B9A98' }}>N/A for Quick Pay</div>
+                              <div style={{ fontSize: 12, color: '#9B9A98' }}>N/A for Quick Pay</div>
                             )}
                           </div>
                           {/* Loan Summary */}
                           <div style={{ background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                              <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Loan Summary</span>
+                              <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Loan Summary</span>
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                               {formData.purpose && (
                                 <div>
                                   <div style={{ fontSize: 11, color: '#9B9A98', marginBottom: 1 }}>For</div>
-                                  <div style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{formData.purpose}</div>
+                                  <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{formData.purpose}</div>
                                 </div>
                               )}
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                                 <span style={{ fontSize: 12, color: '#9B9A98' }}>Amount</span>
-                                <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>{formData.amount ? `$${parseFloat(formData.amount).toLocaleString()}` : '$0.00'}</span>
+                                <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918' }}>{formData.amount ? `$${parseFloat(formData.amount).toLocaleString()}` : '$0.00'}</span>
                               </div>
                               {loanType === 'scheduled' && (
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                                   <span style={{ fontSize: 12, color: '#9B9A98' }}>Interest</span>
-                                  <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>{formData.amount && formData.interest_rate ? `$${details.totalInterest.toFixed(2)}` : '$0.00'}</span>
+                                  <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918' }}>{formData.amount && formData.interest_rate ? `$${details.totalInterest.toFixed(2)}` : '$0.00'}</span>
                                 </div>
                               )}
                             </div>
@@ -2658,7 +2658,7 @@ export default function Lending({ initialTab }) {
                                   background: isDisabled ? 'rgba(26,25,24,0.45)' : '#1A1918',
                                   color: 'white', border: 'none', borderRadius: 10,
                                   cursor: isDisabled ? 'not-allowed' : 'pointer',
-                                  fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif",
+                                  fontSize: 12, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif",
                                   letterSpacing: '-0.01em', textAlign: 'center',
                                   transition: 'background 0.2s',
                                 }}

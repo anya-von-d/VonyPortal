@@ -792,7 +792,7 @@ export default function Borrowing() {
   const PageCard = ({ title, headerRight, children, style }) => (
     <div style={{ marginBottom: 24, ...style }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 5, marginBottom: 2 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>{title}</div>
+        <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>{title}</div>
         {headerRight && <div style={{ flexShrink: 0 }}>{headerRight}</div>}
       </div>
       <div style={{ position: 'relative' }}>
@@ -870,7 +870,7 @@ export default function Borrowing() {
 
           {/* Mobile-only page title (desktop shows it in top bar) */}
           <div className="mobile-page-title">
-            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>My Loans</div>
+            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 12 }}>My Loans</div>
             <div style={{ height: 1, background: 'rgba(0,0,0,0.08)', marginLeft: -32, marginRight: -32, marginBottom: 20 }} />
           </div>
 
@@ -880,7 +880,7 @@ export default function Borrowing() {
               {[{key:'summary',label:'Summary'},{key:'details',label:'Individual Loan Details'}].map(tab => (
                 <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{
                   padding: '6px 16px', borderRadius: 8, border: 'none', cursor: 'pointer',
-                  fontSize: 13, fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 12, fontFamily: "'DM Sans', sans-serif",
                   fontWeight: activeTab === tab.key ? 600 : 500,
                   color: activeTab === tab.key ? '#1A1918' : '#787776',
                   background: activeTab === tab.key ? 'white' : 'transparent',
@@ -898,7 +898,7 @@ export default function Borrowing() {
                 <div style={{ width: 32, height: 32, borderRadius: '50%', background: nextPaymentDays < 0 ? 'rgba(232,114,110,0.1)' : 'rgba(3,172,234,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Clock style={{ width: 16, height: 16, color: nextPaymentDays < 0 ? '#E8726E' : '#03ACEA' }} />
                 </div>
-                <p style={{ fontSize: 13, color: '#1A1918', margin: 0 }}>
+                <p style={{ fontSize: 12, color: '#1A1918', margin: 0 }}>
                   {nextPaymentDays > 0
                     ? <>Your next payment is due in <span style={{ fontWeight: 700 }}>{nextPaymentDays} {nextPaymentDays === 1 ? 'day' : 'days'}</span></>
                     : nextPaymentDays === 0
@@ -907,7 +907,7 @@ export default function Borrowing() {
                   }
                 </p>
               </div>
-              <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', margin: 0 }}>
                 ${nextPaymentAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
@@ -945,14 +945,14 @@ export default function Borrowing() {
                     {nextPaymentLoan ? (
                       <>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                          <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{format(nextPaymentLoan.date, 'MMM d')}</span>
+                          <span style={{ fontSize: 12, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{format(nextPaymentLoan.date, 'MMM d')}</span>
                           {daysLabel && <span style={{ fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '2px 6px', flexShrink: 0 }}>{daysLabel}</span>}
                         </div>
                         <div style={{ fontSize: 11, color: '#9B9A98', textAlign: 'right' }}>{format(nextPaymentLoan.date, 'do MMMM')}</div>
                       </>
                     ) : (
                       <>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: '#C5C3C0', marginBottom: 4 }}>—</div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: '#C5C3C0', marginBottom: 4 }}>—</div>
                         <div style={{ fontSize: 11, color: '#9B9A98' }}>Nothing due 🎉</div>
                       </>
                     )}
@@ -977,7 +977,7 @@ export default function Borrowing() {
                       <span style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Active Borrowing</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
-                      <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{formatMoney(totalOwed)}</span>
+                      <span style={{ fontSize: 12, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em' }}>{formatMoney(totalOwed)}</span>
                       <span style={{ fontSize: 11, fontWeight: 700, color: '#03ACEA' }}>{pct}%</span>
                     </div>
                     <div style={{ width: '100%', height: 6, borderRadius: 3, background: '#D9EAF4', overflow: 'hidden', marginBottom: 6 }}>
@@ -996,7 +996,7 @@ export default function Borrowing() {
                 <PageCard title="Loan Progress">
                   <div style={{ padding: 0 }}>
                     {activeLoans.length === 0 ? (
-                      <p style={{ fontSize: 13, color: '#787776', margin: 0 }}>No active loans yet 🌱</p>
+                      <p style={{ fontSize: 12, color: '#787776', margin: 0 }}>No active loans yet 🌱</p>
                     ) : (() => {
                       const totalAll = activeLoans.reduce((s, l) => s + (l.total_amount || l.amount || 0), 0);
                       const paidAll = activeLoans.reduce((s, l) => s + (l.amount_paid || 0), 0);
@@ -1004,7 +1004,7 @@ export default function Borrowing() {
                       return (
                         <div>
                           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 8 }}>
-                            <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1918' }}>Active Borrowing</div>
+                            <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918' }}>Active Borrowing</div>
                             <div style={{ fontSize: 12, color: '#787776' }}>{pctAll}%</div>
                           </div>
                           <div style={{ width: '100%', height: 6, borderRadius: 3, background: '#D9EAF4', overflow: 'hidden' }}>
@@ -1021,7 +1021,7 @@ export default function Borrowing() {
                 <PageCard title="Active Loans">
                   <div style={{ padding: 0 }}>
                     {activeLoans.length === 0 ? (
-                      <p style={{ fontSize: 13, color: '#787776', margin: 0 }}>No active loans yet</p>
+                      <p style={{ fontSize: 12, color: '#787776', margin: 0 }}>No active loans yet</p>
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                         {activeLoans.slice(0, 5).map(loan => {
@@ -1041,7 +1041,7 @@ export default function Borrowing() {
                 {/* Upcoming Payments */}
                 <div style={{ marginBottom: 8 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Upcoming</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Upcoming</span>
                     <Link to={createPageUrl("Upcoming")} style={{ fontSize: 11, fontWeight: 500, color: '#03ACEA', textDecoration: 'none' }}>Full schedule →</Link>
                   </div>
                   {(() => {
@@ -1054,7 +1054,7 @@ export default function Borrowing() {
                       })
                       .sort((a, b) => a.days - b.days)
                       .slice(0, 5);
-                    if (rows.length === 0) return <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98', textAlign: 'center' }}>You're all clear! Nothing coming up yet</div>;
+                    if (rows.length === 0) return <div style={{ padding: '10px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>You're all clear! Nothing coming up yet</div>;
                     return rows.map((loan, idx) => {
                       const isOverdue = loan.days < 0;
                       const daysLabel = isOverdue ? `${Math.abs(loan.days)}d late` : loan.days === 0 ? 'today' : `${loan.days}d`;
@@ -1067,10 +1067,10 @@ export default function Borrowing() {
                             background: isOverdue ? 'rgba(232,114,110,0.08)' : loan.days <= 3 ? 'rgba(245,158,11,0.08)' : 'rgba(0,0,0,0.04)',
                             borderRadius: 6, padding: '3px 6px',
                           }}>{daysLabel}</div>
-                          <div style={{ flex: 1, minWidth: 0, fontSize: 13, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <div style={{ flex: 1, minWidth: 0, fontSize: 12, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             Pay <strong>{loan.lenderName}</strong>{loan.purpose ? <span style={{ color: '#9B9A98', fontWeight: 400 }}> · {loan.purpose}</span> : ''}
                           </div>
-                          <span style={{ fontSize: 13, fontWeight: 700, flexShrink: 0, color: '#1A1918', letterSpacing: '-0.01em' }}>
+                          <span style={{ fontSize: 12, fontWeight: 700, flexShrink: 0, color: '#1A1918', letterSpacing: '-0.01em' }}>
                             -{formatMoney(loan.payment_amount || 0)}
                           </span>
                         </div>
@@ -1090,7 +1090,7 @@ export default function Borrowing() {
                         <div>
                           <p style={{ fontSize: 11, color: '#787776', marginBottom: 2 }}>Next Payment Date</p>
                           <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                            <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>{format(new Date(nextPaymentLoan.next_payment_date), 'EEE, MMM d')}</p>
+                            <p style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', margin: 0 }}>{format(new Date(nextPaymentLoan.next_payment_date), 'EEE, MMM d')}</p>
                             {nextPaymentDays !== null && (
                               <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>{nextPaymentDays > 0 ? `${nextPaymentDays}d away` : nextPaymentDays === 0 ? 'Due today' : `${Math.abs(nextPaymentDays)}d overdue`}</p>
                             )}
@@ -1099,7 +1099,7 @@ export default function Borrowing() {
                         <div>
                           <p style={{ fontSize: 11, color: '#787776', marginBottom: 2 }}>Next Payment Amount</p>
                           <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                            <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(nextPaymentAmount)}</p>
+                            <p style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', margin: 0 }}>{formatMoney(nextPaymentAmount)}</p>
                             <p style={{ fontSize: 11, color: '#787776', margin: 0 }}>to {nextPaymentLenderUsername}</p>
                           </div>
                         </div>
@@ -1128,7 +1128,7 @@ export default function Borrowing() {
                         return (
                           <div key={`overdue-${loan.id}`} className="glass-hero-alert" style={{ padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
                             <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#E8726E', flexShrink: 0 }} />
-                            <div style={{ flex: 1, fontSize: 13, color: '#787776', lineHeight: 1.5 }}>
+                            <div style={{ flex: 1, fontSize: 12, color: '#787776', lineHeight: 1.5 }}>
                               <strong style={{ color: '#1A1918', fontWeight: 600 }}>Just a reminder</strong> you have a payment to {firstName} that is overdue. If you've already paid, make sure to record the payment so it's up to date.
                             </div>
                             <Link to={createPageUrl("RecordPayment")} style={{
@@ -1291,7 +1291,7 @@ export default function Borrowing() {
                             return (
                               <div className="glass-hero-alert" style={{ padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
                                 <UserAvatar name={selLender?.full_name || selLender?.username} src={selLender?.profile_picture_url || selLender?.avatar_url} size={28} />
-                                <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', margin: 0 }}>
+                                <p style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', margin: 0 }}>
                                   {selLender?.full_name || 'User'} lent you ${(manageLoanSelected.amount || 0).toLocaleString()} to help with {manageLoanSelected.purpose || 'personal expenses'}
                                 </p>
                               </div>
@@ -1331,7 +1331,7 @@ export default function Borrowing() {
                                             <path d={`M ${dCx} ${dCy - outerR} A ${outerR} ${outerR} 0 ${largeArc} 1 ${paidEndXo} ${paidEndYo} L ${paidEndXi} ${paidEndYi} A ${innerR} ${innerR} 0 ${largeArc} 0 ${dCx} ${dCy - innerR} Z`} fill="#03ACEA" />
                                           )}
                                           {paidPct >= 100 && (<circle cx={dCx} cy={dCy} r={(outerR + innerR) / 2} fill="none" stroke="#03ACEA" strokeWidth={outerR - innerR} />)}
-                                          <text x={dCx} y={dCy - 5} textAnchor="middle" dominantBaseline="middle" style={{ fontSize: 15, fontWeight: 700, fill: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>{Math.round(paidPct)}%</text>
+                                          <text x={dCx} y={dCy - 5} textAnchor="middle" dominantBaseline="middle" style={{ fontSize: 12, fontWeight: 700, fill: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>{Math.round(paidPct)}%</text>
                                           <text x={dCx} y={dCy + 10} textAnchor="middle" dominantBaseline="middle" style={{ fontSize: 8, fontWeight: 500, fill: '#787776', fontFamily: "'DM Sans', sans-serif" }}>repaid</text>
                                         </svg>
                                         <p style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', marginTop: 6, margin: 0 }}>
@@ -1345,7 +1345,7 @@ export default function Borrowing() {
                                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                                           </div>
                                           <div style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 2 }}>Next Payment</div>
-                                          <div style={{ fontSize: 13, fontWeight: 700, color: '#1A1918' }}>
+                                          <div style={{ fontSize: 12, fontWeight: 700, color: '#1A1918' }}>
                                             {nextPmtDate ? format(nextPmtDate, 'MMM d, yyyy') : 'No date'}
                                           </div>
                                           {daysUntil !== null && nextPmtDate && (
@@ -1359,7 +1359,7 @@ export default function Borrowing() {
                                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                                           </div>
                                           <div style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 2 }}>Amount Due</div>
-                                          <div style={{ fontSize: 13, fontWeight: 700, color: '#1A1918' }}>
+                                          <div style={{ fontSize: 12, fontWeight: 700, color: '#1A1918' }}>
                                             ${nextPmtAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                           </div>
                                           <div style={{ fontSize: 10, color: '#787776', marginTop: 1 }}>to {lenderUsername}</div>
@@ -1464,7 +1464,7 @@ export default function Borrowing() {
                                 <PageCard title="" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 200, padding: 26 }}>
                                   <div style={{ textAlign: 'center' }}>
                                     <ClipboardList style={{ width: 40, height: 40, margin: '0 auto 8px', color: '#C7C6C4' }} />
-                                    <p style={{ fontSize: 13, color: '#787776' }}>Select a loan to view details</p>
+                                    <p style={{ fontSize: 12, color: '#787776' }}>Select a loan to view details</p>
                                   </div>
                                 </PageCard>
                               ) : (
@@ -1489,7 +1489,7 @@ export default function Borrowing() {
                                           {items.map((item, idx) => (
                                             <div key={idx} style={{ textAlign: 'center' }}>
                                               <p style={{ fontSize: 10, color: '#787776', fontWeight: 500, marginBottom: 2 }}>{item.label}</p>
-                                              <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>{item.value}</p>
+                                              <p style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', margin: 0 }}>{item.value}</p>
                                             </div>
                                           ))}
                                         </div>
@@ -1544,7 +1544,7 @@ export default function Borrowing() {
                                           {items.map((item, idx) => (
                                             <div key={idx} style={{ textAlign: 'center' }}>
                                               <p style={{ fontSize: 10, color: '#787776', fontWeight: 500, marginBottom: 2 }}>{item.label}</p>
-                                              <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>{item.value}</p>
+                                              <p style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', margin: 0 }}>{item.value}</p>
                                               {item.sub && <p style={{ fontSize: 9, color: '#787776', marginTop: 2 }}>{item.sub}</p>}
                                             </div>
                                           ))}

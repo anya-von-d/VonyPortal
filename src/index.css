@@ -331,7 +331,8 @@ input[type="date"] {
 
 /* Upcoming page responsive */
 @media (max-width: 768px) {
-  .upcoming-two-col {
+  .upcoming-two-col,
+  .upcoming-three-col {
     grid-template-columns: 1fr !important;
   }
 }
