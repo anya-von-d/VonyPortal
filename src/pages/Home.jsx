@@ -1305,18 +1305,18 @@ export default function Home() {
                   const C = 2 * Math.PI * 45;
                   const offset = C - (percent / 100) * C;
                   return (
-                    <div style={{ position: 'relative', width: 80, height: 80, flexShrink: 0 }}>
-                      <svg width="80" height="80" viewBox="0 0 128 128" style={{ transform: 'rotate(-90deg)' }}>
-                        <circle cx="64" cy="64" r="45" fill="none" stroke={`${color}26`} strokeWidth="12" />
+                    <div style={{ position: 'relative', width: 68, height: 68, flexShrink: 0 }}>
+                      <svg width="68" height="68" viewBox="0 0 128 128" style={{ transform: 'rotate(-90deg)' }}>
+                        <circle cx="64" cy="64" r="45" fill="none" stroke={`${color}26`} strokeWidth="10" />
                         <circle
                           cx="64" cy="64" r="45" fill="none"
-                          stroke={color} strokeWidth="12" strokeLinecap="round"
+                          stroke={color} strokeWidth="10" strokeLinecap="round"
                           strokeDasharray={C} strokeDashoffset={offset}
                         />
                       </svg>
                       <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', gap: 1 }}>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif", lineHeight: 1 }}>{percent}%</span>
-                        <span style={{ fontSize: 9, fontWeight: 500, color: '#787776', fontFamily: "'DM Sans', sans-serif", lineHeight: 1 }}>{label}</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif", lineHeight: 1 }}>{percent}%</span>
+                        <span style={{ fontSize: 8, fontWeight: 500, color: '#787776', fontFamily: "'DM Sans', sans-serif", lineHeight: 1 }}>{label}</span>
                       </div>
                     </div>
                   );
@@ -1338,12 +1338,12 @@ export default function Home() {
                           <div style={subLineStyle}>{formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)} paid back</div>
                         </div>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 6 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 10 }}>
+                        <Ring percent={percentRepaid} color="#03ACEA" label="Repaid" />
                         <div style={textBlockStyle}>
                           <div style={bigLineStyle}>You're owed <span style={{ color: '#03ACEA' }}>{formatMoney(lentOwed)}</span></div>
                           <div style={subLineStyle}>{formatMoney(totalRepaid)} of {formatMoney(totalLentAmount)} repaid to you</div>
                         </div>
-                        <Ring percent={percentRepaid} color="#03ACEA" label="Repaid" />
                       </div>
                     </div>
                   </div>

@@ -366,7 +366,10 @@ input[type="date"] {
   .ra-mobile-filters { display: block !important; }
   /* YourLoans lending/borrowing tab: stack all cards */
   .loans-top-cards { grid-template-columns: 1fr !important; }
+  .loans-top-layout { grid-template-columns: 1fr !important; gap: 20px !important; }
   .loans-bottom-row { grid-template-columns: 1fr !important; }
+  /* Loan Progress: 2 columns on mobile (was 4) so labels/values don't wrap */
+  .loan-progress-grid { grid-template-columns: 1fr 1fr !important; row-gap: 14px !important; }
   /* Friends page: stack with search on top */
   .friends-two-col { grid-template-columns: 1fr !important; }
   .friends-search-col { order: -1; }

@@ -859,8 +859,8 @@ export default function Borrowing() {
         )}
       </AnimatePresence>
 
-      <div style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", background: '#ffffff' }}>
-        <MeshMobileNav user={user} activePage="My Loans" />
+      <MeshMobileNav user={user} activePage="My Loans" />
+      <div style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", background: 'transparent' }}>
         <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '200px 1fr 300px', gap: 0, minHeight: '100vh' }}>
           {/* COL 1 - left nav */}
           <DesktopSidebar />
