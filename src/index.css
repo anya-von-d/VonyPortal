@@ -424,6 +424,7 @@ input[type="date"] {
 }
 .pill-nav-scroll::-webkit-scrollbar { display: none; }
 .loan-card-scroll::-webkit-scrollbar { display: none; }
+.home-upcoming-scroll::-webkit-scrollbar { display: none; }
 
 
 /* Loan detail: desktop/mobile layout toggle */
