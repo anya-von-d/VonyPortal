@@ -1033,7 +1033,8 @@ export default function Home() {
           )}
 
           {/* Three summary cards */}
-          <div className="home-summary-cards" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 24, alignItems: 'stretch' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+          <div className="home-summary-cards" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, alignItems: 'stretch', width: '100%', maxWidth: 540 }}>
             {/* Next Payment Due */}
             {(() => {
               const days = nextBorrowerPayment ? Math.ceil((nextBorrowerPayment.date.getTime() - Date.now()) / 86400000) : null;
@@ -1167,10 +1168,11 @@ export default function Home() {
             })()}
 
           </div>
+          </div>{/* end centering wrapper */}
 
-          {/* Masonry two-column layout */}
-          <div className="home-two-col-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
-            {/* Left column: Upcoming → Recent Activity → Active Lending */}
+          {/* Masonry three-column layout */}
+          <div className="home-two-col-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24 }}>
+            {/* Col 1: Coming Up This Week */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
               {/* Tasks for the Week */}
               {(() => {
@@ -1296,7 +1298,7 @@ export default function Home() {
 
             </div>
 
-            {/* Right column: Overview → How April → Your Lending → Your Borrowing */}
+            {/* Col 2: Overview + How April is Going */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
               {/* Borrowing Overview — borrowing ring (pie left / text right),
                   then lending ring below it (text left / pie right, mirrored) */}
@@ -1447,6 +1449,11 @@ export default function Home() {
               </div>
               </div>{/* end how-month aurora wrapper */}
 
+            </div>{/* end col 2 */}
+
+            {/* Col 3: Your Lending + Your Borrowing */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+
               {/* Lending Loans */}
               <div className="home-card-lending-loans" style={{ position: 'relative' }}>
                 <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
@@ -1521,7 +1528,7 @@ export default function Home() {
                 </div>
               </div>
 
-            </div>
+            </div>{/* end col 3 */}
           </div>
         </div>
 
