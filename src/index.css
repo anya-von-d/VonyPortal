@@ -274,6 +274,10 @@ input[type="date"] {
   .mobile-page-title {
     display: none !important;
   }
+  /* Desktop-only page title — show on desktop */
+  .desktop-page-title {
+    display: block !important;
+  }
   /* Elements only needed on mobile — hidden on desktop */
   .desktop-hide {
     display: none !important;
@@ -340,6 +344,9 @@ input[type="date"] {
     display: flex !important;
     flex-direction: column !important;
     gap: 20px !important;
+  }
+  .desktop-page-title {
+    display: none !important;
   }
   /* Flatten Home card containers so all 9 cards become direct children of
      .mesh-center and can be reordered via `order`. */

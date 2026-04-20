@@ -63,14 +63,16 @@ export default function MeshMobileNav({ user, activePage }) {
         height: 56, display: 'flex', alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 14px 0 18px',
-        background: '#1A1918',
+        background: '#FDFCFA url("/tile.png.jpeg") repeat',
+        backgroundSize: '50px 50px',
+        borderBottom: '1px solid rgba(0,0,0,0.08)',
         fontFamily: "'DM Sans', sans-serif",
       }}>
         {/* Logo */}
         <Link to="/" style={{
           fontFamily: "'Cormorant Garamond', Georgia, serif",
           fontWeight: 600, fontStyle: 'italic', fontSize: '1.4rem',
-          color: 'white', textDecoration: 'none', lineHeight: 1,
+          color: '#1A1918', textDecoration: 'none', lineHeight: 1,
           letterSpacing: '-0.02em', flexShrink: 0,
         }}>Vony</Link>
 
@@ -82,7 +84,7 @@ export default function MeshMobileNav({ user, activePage }) {
             position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center',
             width: 36, height: 36, borderRadius: 10, textDecoration: 'none', flexShrink: 0,
           }}>
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" strokeWidth="1.8" strokeLinecap="round">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.55)" strokeWidth="1.8" strokeLinecap="round">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
               <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
             </svg>
@@ -100,7 +102,7 @@ export default function MeshMobileNav({ user, activePage }) {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             width: 36, height: 36, borderRadius: 10, textDecoration: 'none', flexShrink: 0,
           }}>
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.55)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
               <circle cx="9" cy="7" r="4"/>
               <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
@@ -112,7 +114,7 @@ export default function MeshMobileNav({ user, activePage }) {
           <Link to={createPageUrl("LoanAgreements")} style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             height: 36, padding: '0 8px', borderRadius: 10, textDecoration: 'none', flexShrink: 0,
-            fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.75)',
+            fontSize: 13, fontWeight: 600, color: 'rgba(0,0,0,0.55)',
             fontFamily: "'DM Sans', sans-serif", letterSpacing: '-0.01em',
           }}>Records</Link>
 
@@ -140,9 +142,9 @@ export default function MeshMobileNav({ user, activePage }) {
             aria-label="Settings"
           >
             <svg width="19" height="14" viewBox="0 0 19 14" fill="none">
-              <line x1="0" y1="1"  x2="19" y2="1"  stroke="rgba(255,255,255,0.75)" strokeWidth="1.6" strokeLinecap="round"/>
-              <line x1="0" y1="7"  x2="19" y2="7"  stroke="rgba(255,255,255,0.75)" strokeWidth="1.6" strokeLinecap="round"/>
-              <line x1="0" y1="13" x2="19" y2="13" stroke="rgba(255,255,255,0.75)" strokeWidth="1.6" strokeLinecap="round"/>
+              <line x1="0" y1="1"  x2="19" y2="1"  stroke="rgba(0,0,0,0.55)" strokeWidth="1.6" strokeLinecap="round"/>
+              <line x1="0" y1="7"  x2="19" y2="7"  stroke="rgba(0,0,0,0.55)" strokeWidth="1.6" strokeLinecap="round"/>
+              <line x1="0" y1="13" x2="19" y2="13" stroke="rgba(0,0,0,0.55)" strokeWidth="1.6" strokeLinecap="round"/>
             </svg>
           </button>
         </div>
