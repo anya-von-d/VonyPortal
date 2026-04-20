@@ -14,8 +14,8 @@ import { formatMoney } from "@/components/utils/formatMoney";
 export default function LendingWallet({ cards, summaryCard, onCardClick, selectedId, isLending }) {
   const WIDTH        = 280;
   const CARD_W       = 248;
-  const CARD_H       = 78;
-  const PEEK         = 14;                // how far each card behind peeks upward
+  const CARD_H       = 82;
+  const PEEK         = 52;                // enough vertical space to show name+amount AND reason on each buried card
   const WALLET_H     = 150;               // wallet body height
   const NOTCH_DEPTH  = 34;                // how deep the notch dips at the top middle
   const CARD_TUCK    = 30;                // how much of the front card is hidden inside the pocket
@@ -80,7 +80,7 @@ export default function LendingWallet({ cards, summaryCard, onCardClick, selecte
                 : isFront
                   ? '0 8px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.05)'
                   : '0 4px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)',
-              padding: '14px 18px 12px',
+              padding: '10px 18px 12px',
               boxSizing: 'border-box',
               transition: 'border-color 0.15s, box-shadow 0.15s, transform 0.15s',
               overflow: 'hidden',
@@ -94,7 +94,7 @@ export default function LendingWallet({ cards, summaryCard, onCardClick, selecte
             }} />
 
             {/* Line 1: name + amount */}
-            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10, marginTop: 2 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10, marginTop: 6 }}>
               <span style={{
                 fontSize: 13, fontWeight: 700, color: '#1A1918',
                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -137,8 +137,8 @@ export default function LendingWallet({ cards, summaryCard, onCardClick, selecte
         >
           <defs>
             <linearGradient id="walletBodyBg" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%"   stopColor="#FEFDFB" />
-              <stop offset="100%" stopColor="#F4F1EC" />
+              <stop offset="0%"   stopColor={isLending ? '#1D6FA5' : '#1D3F7A'} />
+              <stop offset="100%" stopColor={isLending ? '#0D3A5C' : '#0B1F45'} />
             </linearGradient>
             <filter id="walletShadow" x="-20%" y="-20%" width="140%" height="140%">
               <feDropShadow dx="0" dy="6" stdDeviation="10" floodColor="#000" floodOpacity="0.08" />
@@ -147,7 +147,7 @@ export default function LendingWallet({ cards, summaryCard, onCardClick, selecte
           <path
             d={walletPath}
             fill="url(#walletBodyBg)"
-            stroke="rgba(0,0,0,0.06)"
+            stroke="rgba(255,255,255,0.08)"
             strokeWidth="1"
             filter="url(#walletShadow)"
           />
@@ -165,11 +165,12 @@ export default function LendingWallet({ cards, summaryCard, onCardClick, selecte
             <div style={{
               display: 'inline-flex', alignItems: 'center',
               padding: '5px 11px', borderRadius: 999,
-              background: '#FFFFFF',
-              border: '1px solid rgba(0,0,0,0.08)',
-              fontSize: 11, fontWeight: 700, color: '#1A1918',
+              background: 'rgba(255,255,255,0.15)',
+              border: '1px solid rgba(255,255,255,0.20)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              fontSize: 11, fontWeight: 700, color: '#FFFFFF',
               letterSpacing: '-0.01em',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
             }}>
               {cards.length} card{cards.length !== 1 ? 's' : ''}
             </div>
@@ -182,18 +183,18 @@ export default function LendingWallet({ cards, summaryCard, onCardClick, selecte
               style={{ cursor: 'pointer', flex: 1, minWidth: 0 }}
             >
               <div style={{
-                fontSize: 11, color: '#9B9A98', fontWeight: 600,
+                fontSize: 11, color: 'rgba(255,255,255,0.65)', fontWeight: 600,
                 marginBottom: 3, letterSpacing: '-0.01em',
               }}>
                 {summaryCard?.label || (isLending ? "You're owed" : 'You owe')}
                 {summaryCard?.sublabel && (
-                  <span style={{ color: accentColor, fontWeight: 700, marginLeft: 6 }}>
+                  <span style={{ color: '#7DD3FC', fontWeight: 700, marginLeft: 6 }}>
                     {summaryCard.sublabel}
                   </span>
                 )}
               </div>
               <div style={{
-                fontSize: 22, fontWeight: 800, color: '#1A1918',
+                fontSize: 22, fontWeight: 800, color: '#FFFFFF',
                 letterSpacing: '-0.04em', lineHeight: 1,
                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               }}>
@@ -206,15 +207,15 @@ export default function LendingWallet({ cards, summaryCard, onCardClick, selecte
               onClick={() => onCardClick && onCardClick('summary')}
               style={{
                 width: 40, height: 40, borderRadius: '50%',
-                background: accentColor,
+                background: '#FFFFFF',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 cursor: 'pointer', flexShrink: 0,
-                boxShadow: `0 4px 12px ${accentColor}50, 0 1px 3px ${accentColor}40`,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.15)',
                 transition: 'transform 0.15s',
               }}
               aria-label="Summary"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.8" strokeLinecap="round">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={isLending ? '#0D3A5C' : '#0B1F45'} strokeWidth="2.8" strokeLinecap="round">
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
