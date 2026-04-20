@@ -262,6 +262,13 @@ input[type="date"] {
   position: relative;
 }
 
+/* Hide desktop nav on mobile */
+@media (max-width: 768px) {
+  .desktop-top-nav {
+    display: none !important;
+  }
+}
+
 /* Content area: offset for fixed desktop top bar */
 @media (min-width: 901px) {
   .mesh-center {
