@@ -1069,48 +1069,46 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
 
           {/* COL 2: loan detail when a wallet card is selected, else 2×2 summary grid */}
           <div>
-          {selectedWalletLoan ? (
-            /* ── Wallet-selected loan detail panel ── */
-            (() => {
-              const detailProfile = publicProfiles.find(p => p.user_id === (isLending ? selectedWalletLoan.borrower_id : selectedWalletLoan.lender_id));
-              const detailFullName = detailProfile?.full_name || 'User';
-              const detailAmt = selectedWalletLoan.total_amount || selectedWalletLoan.amount || 0;
-              const detailPurpose = selectedWalletLoan.purpose;
-              return (
-                <div>
-                  {/* Header row */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>
-                      {isLending ? 'You lent' : 'You borrowed'}{' '}
-                      {formatMoney(detailAmt)}{' '}
-                      {isLending ? 'to' : 'from'}{' '}
-                      {detailFullName}
-                      {detailPurpose && (
-                        <span style={{ fontWeight: 400, color: '#787776' }}> · {detailPurpose}</span>
-                      )}
-                    </div>
-                    <button
-                      onClick={() => setSelectedWalletLoan(null)}
-                      style={{
-                        background: 'none', border: '1px solid rgba(0,0,0,0.12)',
-                        borderRadius: 8, cursor: 'pointer',
-                        fontSize: 11, fontWeight: 600, color: '#787776',
-                        fontFamily: "'DM Sans', sans-serif",
-                        padding: '4px 10px', flexShrink: 0, marginLeft: 12,
-                        transition: 'background 0.15s',
-                      }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.04)'}
-                      onMouseLeave={e => e.currentTarget.style.background = 'none'}
-                    >
-                      ← Summary
-                    </button>
+          {/* ── Wallet-selected loan detail panel ── */}
+          {selectedWalletLoan && (() => {
+            const detailProfile = publicProfiles.find(p => p.user_id === (isLending ? selectedWalletLoan.borrower_id : selectedWalletLoan.lender_id));
+            const detailFullName = detailProfile?.full_name || 'User';
+            const detailAmt = selectedWalletLoan.total_amount || selectedWalletLoan.amount || 0;
+            const detailPurpose = selectedWalletLoan.purpose;
+            return (
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>
+                    {isLending ? 'You lent' : 'You borrowed'}{' '}
+                    {formatMoney(detailAmt)}{' '}
+                    {isLending ? 'to' : 'from'}{' '}
+                    {detailFullName}
+                    {detailPurpose && (
+                      <span style={{ fontWeight: 400, color: '#787776' }}> · {detailPurpose}</span>
+                    )}
                   </div>
-                  {renderLoanDetailBody(selectedWalletLoan)}
+                  <button
+                    onClick={() => setSelectedWalletLoan(null)}
+                    style={{
+                      background: 'none', border: '1px solid rgba(0,0,0,0.12)',
+                      borderRadius: 8, cursor: 'pointer',
+                      fontSize: 11, fontWeight: 600, color: '#787776',
+                      fontFamily: "'DM Sans', sans-serif",
+                      padding: '4px 10px', flexShrink: 0, marginLeft: 12,
+                      transition: 'background 0.15s',
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.04)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'none'}
+                  >
+                    ← Summary
+                  </button>
                 </div>
-              );
-            })()
-          ) : (
-            /* ── Default 2×2 summary grid ── */
+                {renderLoanDetailBody(selectedWalletLoan)}
+              </div>
+            );
+          })()}
+          {/* ── Default 2×2 summary grid ── */}
+          {!selectedWalletLoan && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' }}>
           {/* Row 1 Col 1: Next Payment Incoming / Due */}
           {(() => {
@@ -1462,8 +1460,8 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
             </>
           );
         })()}
-          </div>{/* end col 2 summary grid */}
-          )}{/* end selectedWalletLoan conditional */}
+          </div>
+          )}{/* end !selectedWalletLoan grid */}
           </div>{/* end col 2 wrapper */}
         </div>{/* end loans-top-layout grid */}
 
