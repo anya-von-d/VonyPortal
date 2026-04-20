@@ -37,8 +37,8 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [loanToCancel, setLoanToCancel] = useState(null);
   const [manageLoanSelected, setManageLoanSelected] = useState(null);
-  const [rankingFilterLending, setRankingFilterLending] = useState('highest_interest');
-  const [rankingFilterBorrowing, setRankingFilterBorrowing] = useState('highest_interest');
+  const [rankingFilterLending, setRankingFilterLending] = useState('status');
+  const [rankingFilterBorrowing, setRankingFilterBorrowing] = useState('status');
   const [activeDocPopup, setActiveDocPopup] = useState(null);
   const [docPopupAgreement, setDocPopupAgreement] = useState(null);
   const [reminderSlide, setReminderSlide] = useState(0);
@@ -1051,6 +1051,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                     label: isLending ? "You're owed" : 'You owe',
                     amount: formatMoney(isLending ? lentOwed : borrowOwedAmt),
                     sublabel: `across ${sourceLoans.length} loan${sourceLoans.length !== 1 ? 's' : ''}`,
+                    chips: walletCards.slice(0, 3).map(c => ({ name: c.name, amount: c.amount })),
                   }}
                   onCardClick={(id) => {
                     if (id === 'summary') {
@@ -1305,13 +1306,38 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                 })}
               </PageCard>
 
-              {/* Active Lending (lending) / Loans Ranked By (borrowing) — right of Upcoming */}
-              {activeLoans.length > 0 && (
-                isLending ? (
-                  <PageCard tone="lending" title="Active Lending Summary" style={{ marginBottom: 0 }} headerRight={
+              {/* Your Lending / Your Borrowing summary */}
+              {activeLoans.length > 0 && (() => {
+                const tone = isLending ? 'lending' : 'borrowing';
+                const titleStr = isLending ? 'Your Lending' : 'Your Borrowing';
+                const accent = isLending ? '#03ACEA' : '#1D5B94';
+                const accentBg = isLending ? 'rgba(3,172,234,0.10)' : 'rgba(29,91,148,0.10)';
+
+                const sortedLoans = [...activeLoans].sort((a, b) => {
+                  if (rankingFilter === 'status') {
+                    const aOv = a.next_payment_date && new Date(a.next_payment_date) < new Date();
+                    const bOv = b.next_payment_date && new Date(b.next_payment_date) < new Date();
+                    if (aOv && !bOv) return -1; if (!aOv && bOv) return 1; return 0;
+                  }
+                  if (rankingFilter === 'highest_interest') return (b.interest_rate || 0) - (a.interest_rate || 0);
+                  if (rankingFilter === 'lowest_interest') return (a.interest_rate || 0) - (b.interest_rate || 0);
+                  if (rankingFilter === 'highest_payment') return (b.payment_amount || 0) - (a.payment_amount || 0);
+                  if (rankingFilter === 'lowest_payment') return (a.payment_amount || 0) - (b.payment_amount || 0);
+                  if (rankingFilter === 'soonest_deadline') { const dA = a.next_payment_date ? new Date(a.next_payment_date) : new Date('2099-01-01'); const dB = b.next_payment_date ? new Date(b.next_payment_date) : new Date('2099-01-01'); return dA - dB; }
+                  if (rankingFilter === 'largest_amount') return (b.total_amount || b.amount || 0) - (a.total_amount || a.amount || 0);
+                  if (rankingFilter === 'smallest_amount') return (a.total_amount || a.amount || 0) - (b.total_amount || b.amount || 0);
+                  if (rankingFilter === 'most_repaid') { const pA = (a.total_amount||a.amount||0)>0?(a.amount_paid||0)/(a.total_amount||a.amount||1):0; const pB = (b.total_amount||b.amount||0)>0?(b.amount_paid||0)/(b.total_amount||b.amount||1):0; return pB-pA; }
+                  if (rankingFilter === 'least_repaid') { const pA = (a.total_amount||a.amount||0)>0?(a.amount_paid||0)/(a.total_amount||a.amount||1):0; const pB = (b.total_amount||b.amount||0)>0?(b.amount_paid||0)/(b.total_amount||b.amount||1):0; return pA-pB; }
+                  if (rankingFilter === 'most_recent') return new Date(b.created_at) - new Date(a.created_at);
+                  return 0;
+                });
+
+                return (
+                  <PageCard tone={tone} title={titleStr} style={{ marginBottom: 0 }} headerRight={
                     <Select value={rankingFilter} onValueChange={setRankingFilter}>
-                      <SelectTrigger className="w-auto h-7 px-2 border-0 text-xs font-medium rounded-lg" style={{ background: 'rgba(3,172,234,0.10)', color: '#03ACEA' }}><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="w-auto h-7 px-2 border-0 text-xs font-medium rounded-lg" style={{ background: accentBg, color: accent }}><SelectValue /></SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="status">Status</SelectItem>
                         <SelectItem value="highest_interest">Highest Interest Rate</SelectItem>
                         <SelectItem value="lowest_interest">Lowest Interest Rate</SelectItem>
                         <SelectItem value="highest_payment">Highest Payment</SelectItem>
@@ -1325,138 +1351,66 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                       </SelectContent>
                     </Select>
                   }>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      {(() => {
-                        const RPC = ({ percentage, number, size = 32 }) => {
-                          const cx = size / 2; const r = cx - 3; const circ = 2 * Math.PI * r;
-                          const dash = (percentage / 100) * circ; const sw = 4;
-                          return (
-                            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ flexShrink: 0 }}>
-                              <circle cx={cx} cy={cx} r={r} fill="none" stroke="#E5E4E2" strokeWidth={sw} />
-                              {percentage > 0 && <circle cx={cx} cy={cx} r={r} fill="none" stroke="#03ACEA" strokeWidth={sw} strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round" transform={`rotate(-90 ${cx} ${cx})`} />}
-                              <text x={cx} y={cx} textAnchor="middle" dominantBaseline="central" fill="#1A1918" fontSize="11" fontWeight="bold" fontFamily="'DM Sans', sans-serif">{number}</text>
-                            </svg>
-                          );
-                        };
-                        const sorted = [...activeLoans].sort((a, b) => {
-                          if (rankingFilter === 'highest_interest') return (b.interest_rate || 0) - (a.interest_rate || 0);
-                          if (rankingFilter === 'lowest_interest') return (a.interest_rate || 0) - (b.interest_rate || 0);
-                          if (rankingFilter === 'highest_payment') return (b.payment_amount || 0) - (a.payment_amount || 0);
-                          if (rankingFilter === 'lowest_payment') return (a.payment_amount || 0) - (b.payment_amount || 0);
-                          if (rankingFilter === 'soonest_deadline') { const dA = a.next_payment_date ? new Date(a.next_payment_date) : new Date('2099-01-01'); const dB = b.next_payment_date ? new Date(b.next_payment_date) : new Date('2099-01-01'); return dA - dB; }
-                          if (rankingFilter === 'largest_amount') return (b.total_amount || b.amount || 0) - (a.total_amount || a.amount || 0);
-                          if (rankingFilter === 'smallest_amount') return (a.total_amount || a.amount || 0) - (b.total_amount || b.amount || 0);
-                          if (rankingFilter === 'most_repaid') { const pA = (a.total_amount||a.amount||0)>0?(a.amount_paid||0)/(a.total_amount||a.amount||1):0; const pB = (b.total_amount||b.amount||0)>0?(b.amount_paid||0)/(b.total_amount||b.amount||1):0; return pB-pA; }
-                          if (rankingFilter === 'least_repaid') { const pA = (a.total_amount||a.amount||0)>0?(a.amount_paid||0)/(a.total_amount||a.amount||1):0; const pB = (b.total_amount||b.amount||0)>0?(b.amount_paid||0)/(b.total_amount||b.amount||1):0; return pA-pB; }
-                          if (rankingFilter === 'most_recent') return new Date(b.created_at) - new Date(a.created_at);
-                          return 0;
-                        });
-                        return sorted.slice(0, 5).map((loan, idx) => {
-                          const op = publicProfiles.find(p => p.user_id === loan.borrower_id);
-                          const totalAmt = loan.total_amount || loan.amount || 0;
-                          const paidAmt = loan.amount_paid || 0;
-                          const pct = totalAmt > 0 ? Math.round((paidAmt / totalAmt) * 100) : 0;
-                          const name = op?.full_name?.split(' ')[0] || op?.username || 'User';
-                          const purpose = loan.purpose ? ` for ${loan.purpose}` : '';
-                          let lv = '';
-                          if (rankingFilter === 'highest_interest' || rankingFilter === 'lowest_interest') lv = `${loan.interest_rate || 0}%`;
-                          else if (rankingFilter === 'highest_payment' || rankingFilter === 'lowest_payment') lv = formatMoney(loan.payment_amount || 0);
-                          else if (rankingFilter === 'soonest_deadline') { const d = loan.next_payment_date ? daysUntilDate(loan.next_payment_date) : null; lv = d === null ? '—' : d < 0 ? `${Math.abs(d)}d late` : d === 0 ? 'today' : `${d}d`; }
-                          else if (rankingFilter === 'largest_amount' || rankingFilter === 'smallest_amount') lv = formatMoney(totalAmt);
-                          else if (rankingFilter === 'most_repaid' || rankingFilter === 'least_repaid') lv = `${pct}%`;
-                          else if (rankingFilter === 'most_recent') lv = loan.created_at ? format(new Date(loan.created_at), 'MMM d') : '—';
-                          return (
-                            <div key={loan.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0', borderBottom: idx < 4 ? '1px solid rgba(0,0,0,0.04)' : 'none' }}>
-                              <RPC percentage={pct} number={idx + 1} size={32} />
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
-                                  <div style={{ fontSize: 13, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>You lent {name} {formatMoney(totalAmt)}{purpose}</div>
-                                </div>
-                                <div style={{ fontSize: 11, color: '#9B9A98' }}>{formatMoney(paidAmt)} of {formatMoney(totalAmt)} paid back</div>
-                              </div>
-                              <span style={{ fontSize: 12, fontWeight: 700, color: '#03ACEA', flexShrink: 0 }}>{lv}</span>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      {sortedLoans.slice(0, 5).map((loan) => {
+                        const otherUserId = isLending ? loan.borrower_id : loan.lender_id;
+                        const op = publicProfiles.find(p => p.user_id === otherUserId);
+                        const name = op?.full_name?.split(' ')[0] || op?.username || 'User';
+                        const totalAmt = loan.total_amount || loan.amount || 0;
+                        const paidAmt = loan.amount_paid || 0;
+                        const pct = totalAmt > 0 ? Math.round((paidAmt / totalAmt) * 100) : 0;
+                        const isOverdue = loan.next_payment_date && new Date(loan.next_payment_date) < new Date();
+                        const overdueAmt = isOverdue ? (loan.payment_amount || 0) : 0;
+
+                        // Right-side label with context
+                        let badgeLabel = '';
+                        let badgeColor = accent;
+                        let badgeBg = accentBg;
+                        if (rankingFilter === 'status') {
+                          badgeLabel = isOverdue ? `${formatMoney(overdueAmt)} overdue` : 'On track';
+                          badgeColor = isOverdue ? '#E8726E' : accent;
+                          badgeBg = isOverdue ? 'rgba(232,114,110,0.08)' : accentBg;
+                        } else if (rankingFilter === 'highest_interest' || rankingFilter === 'lowest_interest') {
+                          badgeLabel = `${loan.interest_rate || 0}% interest`;
+                        } else if (rankingFilter === 'highest_payment' || rankingFilter === 'lowest_payment') {
+                          badgeLabel = `${formatMoney(loan.payment_amount || 0)}/period`;
+                        } else if (rankingFilter === 'soonest_deadline') {
+                          const d = loan.next_payment_date ? daysUntilDate(loan.next_payment_date) : null;
+                          badgeLabel = d === null ? '—' : d < 0 ? `${Math.abs(d)}d late` : d === 0 ? 'today' : `${d}d`;
+                          if (d !== null && d < 0) { badgeColor = '#E8726E'; badgeBg = 'rgba(232,114,110,0.08)'; }
+                        } else if (rankingFilter === 'largest_amount' || rankingFilter === 'smallest_amount') {
+                          badgeLabel = `${formatMoney(totalAmt)} total`;
+                        } else if (rankingFilter === 'most_repaid' || rankingFilter === 'least_repaid') {
+                          badgeLabel = `${pct}% repaid`;
+                        } else if (rankingFilter === 'most_recent') {
+                          badgeLabel = loan.created_at ? format(new Date(loan.created_at), 'MMM d') : '—';
+                        }
+
+                        return (
+                          <div key={loan.id} style={{ padding: '9px 0' }}>
+                            {/* Line 1: name | badge */}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                              <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {name}
+                              </span>
+                              <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '2px 6px', lineHeight: 1.2 }}>
+                                {badgeLabel}
+                              </span>
                             </div>
-                          );
-                        });
-                      })()}
+                            {/* Line 2: context sentence */}
+                            <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {isLending
+                                ? `Borrowed ${formatMoney(totalAmt)} from you${loan.purpose ? ` for ${loan.purpose}` : ''}`
+                                : `Lent you ${formatMoney(totalAmt)}${loan.purpose ? ` for ${loan.purpose}` : ''}`
+                              }
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </PageCard>
-                ) : (
-                  <PageCard tone="borrowing" title="Active Borrowing Summary" style={{ marginBottom: 0 }} headerRight={
-                    <Select value={rankingFilter} onValueChange={setRankingFilter}>
-                      <SelectTrigger className="w-auto h-7 px-2 border-0 text-xs font-medium rounded-lg" style={{ background: 'rgba(29,91,148,0.10)', color: '#1D5B94' }}><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="highest_interest">Highest Interest Rate</SelectItem>
-                        <SelectItem value="lowest_interest">Lowest Interest Rate</SelectItem>
-                        <SelectItem value="highest_payment">Highest Payment</SelectItem>
-                        <SelectItem value="lowest_payment">Lowest Payment</SelectItem>
-                        <SelectItem value="soonest_deadline">Soonest Deadline</SelectItem>
-                        <SelectItem value="largest_amount">Largest Amount</SelectItem>
-                        <SelectItem value="smallest_amount">Smallest Amount</SelectItem>
-                        <SelectItem value="most_repaid">Most Repaid</SelectItem>
-                        <SelectItem value="least_repaid">Least Repaid</SelectItem>
-                        <SelectItem value="most_recent">Most Recently Created</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  }>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      {(() => {
-                        const RPC = ({ percentage, number, size = 32 }) => {
-                          const cx = size / 2; const r = cx - 3; const circ = 2 * Math.PI * r;
-                          const dash = (percentage / 100) * circ; const sw = 4;
-                          return (
-                            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ flexShrink: 0 }}>
-                              <circle cx={cx} cy={cx} r={r} fill="none" stroke="#E5E4E2" strokeWidth={sw} />
-                              {percentage > 0 && <circle cx={cx} cy={cx} r={r} fill="none" stroke="#1D5B94" strokeWidth={sw} strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round" transform={`rotate(-90 ${cx} ${cx})`} />}
-                              <text x={cx} y={cx} textAnchor="middle" dominantBaseline="central" fill="#1A1918" fontSize="11" fontWeight="bold" fontFamily="'DM Sans', sans-serif">{number}</text>
-                            </svg>
-                          );
-                        };
-                        const sorted = [...activeLoans].sort((a, b) => {
-                          if (rankingFilter === 'highest_interest') return (b.interest_rate || 0) - (a.interest_rate || 0);
-                          if (rankingFilter === 'lowest_interest') return (a.interest_rate || 0) - (b.interest_rate || 0);
-                          if (rankingFilter === 'highest_payment') return (b.payment_amount || 0) - (a.payment_amount || 0);
-                          if (rankingFilter === 'lowest_payment') return (a.payment_amount || 0) - (b.payment_amount || 0);
-                          if (rankingFilter === 'soonest_deadline') { const dA = a.next_payment_date ? new Date(a.next_payment_date) : new Date('2099-01-01'); const dB = b.next_payment_date ? new Date(b.next_payment_date) : new Date('2099-01-01'); return dA - dB; }
-                          if (rankingFilter === 'largest_amount') return (b.total_amount || b.amount || 0) - (a.total_amount || a.amount || 0);
-                          if (rankingFilter === 'smallest_amount') return (a.total_amount || a.amount || 0) - (b.total_amount || b.amount || 0);
-                          if (rankingFilter === 'most_repaid') { const pA = (a.total_amount||a.amount||0)>0?(a.amount_paid||0)/(a.total_amount||a.amount||1):0; const pB = (b.total_amount||b.amount||0)>0?(b.amount_paid||0)/(b.total_amount||b.amount||1):0; return pB-pA; }
-                          if (rankingFilter === 'least_repaid') { const pA = (a.total_amount||a.amount||0)>0?(a.amount_paid||0)/(a.total_amount||a.amount||1):0; const pB = (b.total_amount||b.amount||0)>0?(b.amount_paid||0)/(b.total_amount||b.amount||1):0; return pA-pB; }
-                          if (rankingFilter === 'most_recent') return new Date(b.created_at) - new Date(a.created_at);
-                          return 0;
-                        });
-                        return sorted.slice(0, 5).map((loan, idx) => {
-                          const op = publicProfiles.find(p => p.user_id === loan.lender_id);
-                          const totalAmt = loan.total_amount || loan.amount || 0;
-                          const paidAmt = loan.amount_paid || 0;
-                          const pct = totalAmt > 0 ? Math.round((paidAmt / totalAmt) * 100) : 0;
-                          const name = op?.full_name?.split(' ')[0] || op?.username || 'User';
-                          const purpose = loan.purpose ? ` for ${loan.purpose}` : '';
-                          let lv = '';
-                          if (rankingFilter === 'highest_interest' || rankingFilter === 'lowest_interest') lv = `${loan.interest_rate || 0}%`;
-                          else if (rankingFilter === 'highest_payment' || rankingFilter === 'lowest_payment') lv = formatMoney(loan.payment_amount || 0);
-                          else if (rankingFilter === 'soonest_deadline') { const d = loan.next_payment_date ? daysUntilDate(loan.next_payment_date) : null; lv = d === null ? '—' : d < 0 ? `${Math.abs(d)}d late` : d === 0 ? 'today' : `${d}d`; }
-                          else if (rankingFilter === 'largest_amount' || rankingFilter === 'smallest_amount') lv = formatMoney(totalAmt);
-                          else if (rankingFilter === 'most_repaid' || rankingFilter === 'least_repaid') lv = `${pct}%`;
-                          else if (rankingFilter === 'most_recent') lv = loan.created_at ? format(new Date(loan.created_at), 'MMM d') : '—';
-                          return (
-                            <div key={loan.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0', borderBottom: idx < 4 ? '1px solid rgba(0,0,0,0.04)' : 'none' }}>
-                              <RPC percentage={pct} number={idx + 1} size={32} />
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
-                                  <div style={{ fontSize: 13, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name} lent you {formatMoney(totalAmt)}{purpose}</div>
-                                </div>
-                                <div style={{ fontSize: 11, color: '#9B9A98' }}>{formatMoney(paidAmt)} of {formatMoney(totalAmt)} repaid</div>
-                              </div>
-                              <span style={{ fontSize: 12, fontWeight: 700, color: '#1D5B94', flexShrink: 0 }}>{lv}</span>
-                            </div>
-                          );
-                        });
-                      })()}
-                    </div>
-                  </PageCard>
-                )
-              )}
+                );
+              })()}
             </>
           );
         })()}
@@ -1465,133 +1419,6 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
           </div>{/* end col 2 wrapper */}
         </div>{/* end loans-top-layout grid */}
 
-        {/* Scrollable loan card row — full bleed */}
-        {activeLoans.length > 0 && (
-          <div className="loans-selector-fullbleed" style={{ borderTop: '1px solid rgba(0,0,0,0.06)', borderBottom: '1px solid rgba(0,0,0,0.06)', background: 'rgba(3,172,234,0.03)', paddingTop: 14, paddingBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 600, color: '#9B9A98', letterSpacing: '0.06em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif", marginBottom: 10, paddingLeft: 2 }}>
-              Select a Loan
-            </div>
-            <div className="loan-card-scroll" style={{
-              display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 4,
-              scrollbarWidth: 'none', msOverflowStyle: 'none',
-              WebkitOverflowScrolling: 'touch',
-            }}>
-              {activeLoans.map(loan => {
-                const otherProfile = publicProfiles.find(p => p.user_id === (isLending ? loan.borrower_id : loan.lender_id));
-                const fullName = otherProfile?.full_name || otherProfile?.username || 'User';
-                const firstName = fullName.split(' ')[0];
-                const totalAmt = loan.total_amount || loan.amount || 0;
-                const paidAmt = loan.amount_paid || 0;
-                const purpose = loan.purpose || '';
-                const daysLeft = loan.next_payment_date ? daysUntilDate(loan.next_payment_date) : null;
-                const isOverdue = daysLeft !== null && daysLeft < 0;
-                const statusLabel = isOverdue ? 'Overdue' : 'On Track';
-                const statusBg = isOverdue ? 'rgba(232,114,110,0.12)' : 'rgba(3,172,234,0.12)';
-                const statusColor = isOverdue ? '#B94040' : '#0A7AB0';
-                const daysLabel = daysLeft === null ? null : isOverdue ? `${Math.abs(daysLeft)}d late` : daysLeft === 0 ? 'today' : `${daysLeft}d`;
-                return (
-                  <div
-                    key={loan.id}
-                    onClick={() => setSelectedScrollLoan(loan)}
-                    style={{
-                      flexShrink: 0, width: 220,
-                      background: 'white', borderRadius: 12,
-                      border: selectedScrollLoan?.id === loan.id ? '1.5px solid rgba(3,172,234,0.5)' : '1px solid rgba(0,0,0,0.07)',
-                      boxShadow: selectedScrollLoan?.id === loan.id ? '0 2px 12px rgba(3,172,234,0.12)' : '0 2px 8px rgba(0,0,0,0.04)',
-                      padding: '12px 14px',
-                      display: 'flex', flexDirection: 'column', gap: 8,
-                      cursor: 'pointer',
-                      transition: 'box-shadow 0.15s, transform 0.15s',
-                      fontFamily: "'DM Sans', sans-serif",
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.10)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.boxShadow = selectedScrollLoan?.id === loan.id ? '0 2px 12px rgba(3,172,234,0.12)' : '0 2px 8px rgba(0,0,0,0.04)'; e.currentTarget.style.transform = 'none'; }}
-                  >
-                    {/* Single row: avatar | name (flex:1) | status badge */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <UserAvatar
-                        name={fullName}
-                        src={otherProfile?.profile_picture_url}
-                        size={26}
-                        radius={5}
-                      />
-                      <div style={{
-                        flex: 1, fontSize: 13, fontWeight: 600, color: '#1A1918',
-                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                      }}>
-                        {firstName}
-                      </div>
-                      <div style={{
-                        fontSize: 10, fontWeight: 700,
-                        color: statusColor, background: statusBg,
-                        borderRadius: 6, padding: '2px 7px', letterSpacing: '0.01em', flexShrink: 0,
-                      }}>
-                        {statusLabel}
-                      </div>
-                    </div>
-
-                    {/* "You lent/borrowed $X for reason" */}
-                    <div style={{ fontSize: 11, color: '#787776', lineHeight: 1.4 }}>
-                      {isLending ? 'You lent' : 'You borrowed'}{' '}
-                      <span style={{ fontWeight: 600, color: '#1A1918' }}>{formatMoney(totalAmt)}</span>
-                      {purpose && <span style={{ color: '#9B9A98' }}> for {purpose}</span>}
-                    </div>
-
-                    {/* next payment line */}
-                    {daysLabel !== null && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', fontSize: 11, color: '#787776' }}>
-                        <span>{isLending ? 'Next payment incoming' : 'Next payment due'}</span>
-                        <span style={{
-                          fontSize: 10, fontWeight: 700,
-                          color: isOverdue ? '#D97706' : '#6B3FA0',
-                          background: isOverdue ? 'rgba(217,119,6,0.10)' : 'rgba(107,63,160,0.10)',
-                          borderRadius: 6, padding: '2px 7px',
-                          letterSpacing: '0.01em', whiteSpace: 'nowrap',
-                        }}>
-                          {daysLabel}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Loan details — inside the blue box, shown when a loan is selected */}
-            {selectedScrollLoan && (() => {
-              const detailProfile = publicProfiles.find(p => p.user_id === (isLending ? selectedScrollLoan.borrower_id : selectedScrollLoan.lender_id));
-              const detailFullName = detailProfile?.full_name || 'User';
-              const detailAmt = selectedScrollLoan.total_amount || selectedScrollLoan.amount || 0;
-              const detailPurpose = selectedScrollLoan.purpose;
-              return (
-                <>
-                  {/* Full-width loan header banner */}
-                  <div style={{
-                    marginTop: 16, marginBottom: 20,
-                    padding: '13px 16px',
-                    background: 'rgba(3,172,234,0.08)',
-                    borderRadius: 10,
-                    border: '1px solid rgba(3,172,234,0.15)',
-                    width: '100%', boxSizing: 'border-box',
-                  }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>
-                      {isLending ? 'You lent' : 'You borrowed'}{' '}
-                      {formatMoney(detailAmt)}{' '}
-                      {isLending ? 'to' : 'from'}{' '}
-                      {detailFullName}
-                    </span>
-                    {detailPurpose && (
-                      <span style={{ fontSize: 14, fontWeight: 400, color: '#787776', fontFamily: "'DM Sans', sans-serif" }}>
-                        {' '}for {detailPurpose}
-                      </span>
-                    )}
-                  </div>
-                  {renderLoanDetailBody(selectedScrollLoan)}
-                </>
-              );
-            })()}
-          </div>
-        )}
 
       </>
     );
