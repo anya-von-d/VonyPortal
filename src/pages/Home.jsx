@@ -1507,6 +1507,61 @@ export default function Home() {
 
             {/* Col 2: Overview + How April is Going */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+              {/* What Needs Attention */}
+              {(() => {
+                const attentionItems = [];
+                if (overdueYouOwe.length === 1) {
+                  attentionItems.push({ type: 'overdue', text: 'You have an overdue payment' });
+                } else if (overdueYouOwe.length > 1) {
+                  attentionItems.push({ type: 'overdue', text: `You have ${overdueYouOwe.length} overdue payments` });
+                }
+                overdueOwedToYou.forEach(loan => {
+                  const prof = safeAllProfiles.find(p => p.user_id === loan.borrower_id);
+                  const name = prof?.full_name?.split(' ')[0] || 'Someone';
+                  attentionItems.push({ type: 'overdue_incoming', text: `${name}'s payment to you is overdue` });
+                });
+                if (upcomingEvents.length > 0) {
+                  const s = upcomingEvents[0];
+                  const dText = s.days === 0 ? 'today' : `in ${s.days} day${s.days === 1 ? '' : 's'}`;
+                  attentionItems.push({ type: 'due', text: `You have a payment due ${dText}` });
+                }
+                pendingOffers.forEach(offer => {
+                  const prof = safeAllProfiles.find(p => p.user_id === offer.lender_id);
+                  const name = prof?.full_name?.split(' ')[0] || 'Someone';
+                  attentionItems.push({ type: 'offer', text: `${name} sent you a loan offer` });
+                });
+                const items = attentionItems.slice(0, 4);
+
+                const AIcon = ({ type }) => {
+                  const red = '#E8726E', blue = '#03ACEA';
+                  const c = type === 'overdue' ? red : blue;
+                  if (type === 'overdue') return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:2}}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>;
+                  if (type === 'overdue_incoming') return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:2}}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>;
+                  if (type === 'due') return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:2}}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>;
+                  return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:2}}><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>;
+                };
+
+                return (
+                  <div className="home-card-attention" style={{ position: 'relative' }}>
+                    <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+                    <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '14px 18px' }}>
+                      <SectionHeader title="What Needs Attention" />
+                      {items.length === 0 ? (
+                        <p style={{ fontSize: 12, color: '#C5C3C0', margin: 0, lineHeight: 1.45 }}>All clear, nothing needs attention right now 🎉</p>
+                      ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                          {items.map((item, i) => (
+                            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '3px 0' }}>
+                              <AIcon type={item.type} />
+                              <span style={{ fontSize: 12, fontWeight: 500, color: '#787776', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4 }}>{item.text}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
               {/* Borrowing Overview — borrowing ring (pie left / text right),
                   then lending ring below it (text left / pie right, mirrored) */}
               {(() => {

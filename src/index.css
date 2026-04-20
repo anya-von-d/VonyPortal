@@ -290,6 +290,9 @@ input[type="date"] {
     border-right: none !important;
   }
   /* Home: summary row (NPI/NPD) — React sets maxWidth and centers. */
+  /* Sidebar replaced by fixed top nav — collapse sidebar column */
+  .mesh-layout { grid-template-columns: 1fr !important; }
+  .mesh-left { display: none !important; }
 }
 
 /* Loan details responsive */
@@ -349,14 +352,15 @@ input[type="date"] {
   .home-card-npd            { order: 1 !important; }
   .home-card-npi            { order: 2 !important; }
   .home-card-inbox          { order: 3 !important; }
-  .home-card-upcoming-strip { order: 4 !important; }
-  .home-card-overview       { order: 5 !important; }
-  .home-card-tasks          { order: 6 !important; }
-  .home-card-howmonth       { order: 7 !important; }
-  .home-card-recent         { order: 8 !important; }
-  .home-card-bor-overview   { order: 9 !important; }
-  .home-card-lending-loans  { order: 10 !important; }
-  .home-card-your-borrowing { order: 11 !important; }
+  .home-card-attention      { order: 4 !important; }
+  .home-card-upcoming-strip { order: 5 !important; }
+  .home-card-overview       { order: 6 !important; }
+  .home-card-tasks          { order: 7 !important; }
+  .home-card-howmonth       { order: 8 !important; }
+  .home-card-recent         { order: 9 !important; }
+  .home-card-bor-overview   { order: 10 !important; }
+  .home-card-lending-loans  { order: 11 !important; }
+  .home-card-your-borrowing { order: 12 !important; }
   /* Upcoming stack: desktop shows stacked card, mobile shows carousel row */
   .upcoming-stack-desktop { display: block; }
   .upcoming-stack-mobile  { display: none !important; }
