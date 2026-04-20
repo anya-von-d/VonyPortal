@@ -318,32 +318,131 @@ export default function Upcoming() {
                 </div>
               )}
 
-              {/* Next 7 Days */}
-              <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
-                <div style={{
-                  position: 'absolute', top: '50%', left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  width: 'calc(100% + 10px)', height: 'calc(100% + 10px)',
-                  background: 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(6,182,212) 30%, rgb(20,184,166) 60%, rgb(3,172,234) 100%)',
-                  filter: 'blur(5px) saturate(1.2)', opacity: 0.35,
-                  borderRadius: 18, zIndex: 0, pointerEvents: 'none',
-                }} />
-                <div style={{
-                  position: 'relative', zIndex: 1, flex: 1,
-                  background: 'linear-gradient(to right, rgba(3,172,234,0) 0%, #03ACEA 67%, #03ACEA 100%)',
-                  padding: 1, borderRadius: 11, display: 'flex', flexDirection: 'column',
-                }}>
-                <div style={{ flex: 1, padding: '14px 18px', borderRadius: 10, background: '#ffffff', display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Next 7 Days</span>
-                    {next7Days.length > 0 && <span style={{ fontSize: 11, color: '#9B9A98' }}>{next7Days.length} · {formatMoney(next7Days.reduce((s, e) => s + e.amount, 0))}</span>}
+              {/* Next 7 Days — vertical date strip */}
+              {(() => {
+                const sevenDays = Array.from({ length: 7 }, (_, i) => addDays(today, i));
+                const next7Total = next7Days.reduce((s, e) => s + e.amount, 0);
+                return (
+                  <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
+                    <div style={{
+                      position: 'absolute', top: '50%', left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      width: 'calc(100% + 10px)', height: 'calc(100% + 10px)',
+                      background: 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(6,182,212) 30%, rgb(20,184,166) 60%, rgb(3,172,234) 100%)',
+                      filter: 'blur(5px) saturate(1.2)', opacity: 0.35,
+                      borderRadius: 18, zIndex: 0, pointerEvents: 'none',
+                    }} />
+                    <div style={{
+                      position: 'relative', zIndex: 1, flex: 1,
+                      background: 'linear-gradient(to right, rgba(3,172,234,0) 0%, #03ACEA 67%, #03ACEA 100%)',
+                      padding: 1, borderRadius: 11, display: 'flex', flexDirection: 'column',
+                    }}>
+                    <div style={{ flex: 1, padding: '14px 18px', borderRadius: 10, background: '#ffffff', display: 'flex', flexDirection: 'column' }}>
+
+                      {/* Card header */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Next 7 Days</span>
+                        {next7Days.length > 0 && <span style={{ fontSize: 11, color: '#9B9A98' }}>{next7Days.length} · {formatMoney(next7Total)}</span>}
+                      </div>
+
+                      {/* Summary line */}
+                      {next7Days.length > 0 && (
+                        <div style={{ fontSize: 11, color: '#787776', marginBottom: 12, fontFamily: "'DM Sans', sans-serif", lineHeight: 1.45 }}>
+                          You have <span style={{ fontWeight: 600, color: '#1A1918' }}>{next7Days.length} payment{next7Days.length !== 1 ? 's' : ''}</span> due in the next 7 days for <span style={{ fontWeight: 600, color: '#1A1918' }}>{formatMoney(next7Total)}</span>.
+                        </div>
+                      )}
+
+                      {/* 7-day rows */}
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        {sevenDays.map((day, i) => {
+                          const dayEvents = next7Days.filter(e => isSameDay(e.date, day));
+                          const isToday = i === 0;
+                          const dayName = isToday ? 'Today' : format(day, 'EEE');
+                          const dateNum = format(day, 'd');
+                          return (
+                            <div key={i} style={{
+                              display: 'flex', alignItems: 'center',
+                              minHeight: 44,
+                              borderBottom: i < 6 ? '1px solid rgba(0,0,0,0.05)' : 'none',
+                              gap: 0,
+                            }}>
+                              {/* Date box */}
+                              <div style={{ width: 44, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingRight: 0 }}>
+                                <div style={{
+                                  width: 36, height: 36, borderRadius: 9,
+                                  display: 'flex', flexDirection: 'column',
+                                  alignItems: 'center', justifyContent: 'center',
+                                  background: isToday ? '#1A1918' : 'rgba(0,0,0,0.03)',
+                                  flexShrink: 0,
+                                }}>
+                                  <span style={{
+                                    fontSize: 7, fontWeight: 700,
+                                    color: isToday ? 'rgba(255,255,255,0.6)' : '#9B9A98',
+                                    lineHeight: 1, textTransform: 'uppercase',
+                                    letterSpacing: '0.05em',
+                                    fontFamily: "'DM Sans', sans-serif",
+                                  }}>{dayName}</span>
+                                  <span style={{
+                                    fontSize: 14, fontWeight: 700,
+                                    color: isToday ? '#ffffff' : '#1A1918',
+                                    lineHeight: 1, marginTop: 1,
+                                    fontFamily: "'DM Sans', sans-serif",
+                                  }}>{dateNum}</span>
+                                </div>
+                              </div>
+
+                              {/* Divider */}
+                              <div style={{ width: 1, alignSelf: 'stretch', background: 'rgba(0,0,0,0.06)', marginRight: 12, marginTop: 6, marginBottom: 6 }} />
+
+                              {/* Events */}
+                              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4, paddingLeft: 0 }}>
+                                {dayEvents.length === 0 ? (
+                                  <span style={{ fontSize: 11, color: '#D4D2D0', fontFamily: "'DM Sans', sans-serif" }}>—</span>
+                                ) : dayEvents.map((event, ei) => (
+                                  <div key={ei} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                      <span style={{
+                                        fontSize: 12, fontWeight: 500, color: '#1A1918',
+                                        fontFamily: "'DM Sans', sans-serif",
+                                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                                        display: 'block',
+                                      }}>
+                                        {event.isLender ? `from ${event.firstName}` : `to ${event.firstName}`}
+                                      </span>
+                                      {event.purpose && (
+                                        <span style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", display: 'block' }}>
+                                          {event.purpose}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <span style={{
+                                      fontSize: 11, fontWeight: 700,
+                                      color: event.isLender ? '#03ACEA' : '#1D5B94',
+                                      background: event.isLender ? 'rgba(3,172,234,0.09)' : 'rgba(29,91,148,0.09)',
+                                      borderRadius: 5, padding: '2px 7px',
+                                      flexShrink: 0, fontFamily: "'DM Sans', sans-serif",
+                                    }}>
+                                      {formatMoney(event.amount)}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {next7Days.length === 0 && (
+                        <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center', fontFamily: "'DM Sans', sans-serif" }}>
+                          You're all caught up this week! 🎉
+                        </div>
+                      )}
+
+                    </div>
+                    </div>
                   </div>
-                  {next7Days.length === 0 ? (
-                    <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>You're all caught up this week! 🎉</div>
-                  ) : next7Days.map(event => <PaymentRow key={event.loanId + '-7'} event={event} />)}
-                </div>
-                </div>
-              </div>
+                );
+              })()}
 
               {/* Coming Later */}
               <div style={{ position: 'relative' }}>

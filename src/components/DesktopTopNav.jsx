@@ -207,9 +207,9 @@ export default function DesktopTopNav() {
       {/* desktop-top-nav class is hidden on mobile via index.css */}
       <div className="desktop-top-nav" style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 300,
-        height: 54, background: '#FDFCFA',
+        height: 62, background: '#FDFCFA',
         display: 'flex', alignItems: 'center',
-        padding: '0 20px', gap: 12,
+        padding: '0 56px', gap: 12,
       }}>
         {/* Logo */}
         <Link to="/" style={{
