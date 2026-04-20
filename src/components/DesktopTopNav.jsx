@@ -133,9 +133,7 @@ export default function DesktopTopNav() {
     <>
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 300,
-        height: 54, background: '#FDFCFA url("/tile.png.jpeg") repeat',
-        backgroundSize: '50px 50px',
-        borderBottom: '1px solid rgba(0,0,0,0.08)',
+        height: 54, background: '#FDFCFA',
         display: 'flex', alignItems: 'center',
         padding: '0 20px', gap: 12,
       }}>

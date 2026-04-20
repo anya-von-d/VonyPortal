@@ -34,9 +34,6 @@ input[type="date"] {
   html {
     scroll-behavior: smooth;
     background-color: #FDFCFA;
-    background-image: url('/tile.png.jpeg');
-    background-repeat: repeat;
-    background-size: 50px 50px;
   }
 
   /* Scrollbar styling */

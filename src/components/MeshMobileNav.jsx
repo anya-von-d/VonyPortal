@@ -63,9 +63,8 @@ export default function MeshMobileNav({ user, activePage }) {
         height: 56, display: 'flex', alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 14px 0 18px',
-        background: '#FDFCFA url("/tile.png.jpeg") repeat',
-        backgroundSize: '50px 50px',
-        borderBottom: '1px solid rgba(0,0,0,0.08)',
+        background: '#FDFCFA',
+        borderBottom: '1px solid rgba(0,0,0,0.06)',
         fontFamily: "'DM Sans', sans-serif",
       }}>
         {/* Logo */}
