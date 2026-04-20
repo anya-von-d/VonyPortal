@@ -1503,13 +1503,6 @@ export default function Home() {
                 );
               })()}
 
-              {/* Upcoming payment stack */}
-              {allPaymentEvents.length > 0 && (
-                <div className="home-card-upcoming-strip">
-                  <UpcomingPaymentStack events={allPaymentEvents} />
-                </div>
-              )}
-
             </div>
 
             {/* Col 2: Overview + How April is Going */}

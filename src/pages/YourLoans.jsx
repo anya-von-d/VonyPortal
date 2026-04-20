@@ -1266,36 +1266,39 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
             <>
               <PageCard tone={isLending ? 'lending' : 'borrowing'} title="Upcoming" headerRight={<Link to={createPageUrl("Upcoming")} style={{ fontSize: 11, fontWeight: 500, color: isLending ? '#03ACEA' : '#1D5B94', textDecoration: 'none' }}>Full schedule →</Link>} style={{ marginBottom: 0 }}>
                 {combinedLoans.length === 0 ? (
-                  <div style={{ padding: '10px 0', fontSize: 13, color: '#9B9A98', textAlign: 'center' }}>You're all clear! Nothing coming up yet 🎉</div>
+                  <div style={{ padding: '10px 0', fontSize: 12, color: '#787776', textAlign: 'center', fontFamily: "'DM Sans', sans-serif" }}>You're all caught up! 🎉</div>
                 ) : combinedLoans.map((loan) => {
                   const isOverdue = loan.days < 0;
-                  const daysLbl = isOverdue ? `${Math.abs(loan.days)}d late` : loan.days === 0 ? 'today' : `${loan.days}d`;
-                  const amtSign = isLending ? '+' : '-';
+                  const isToday = loan.days === 0;
+                  const dayName = isOverdue ? 'Late' : isToday ? 'Today' : format(loan.payDate, 'EEE');
+                  const dateNum = format(loan.payDate, 'd');
+                  const dateBg = isOverdue ? 'rgba(232,114,110,0.10)' : isToday ? '#1A1918' : 'rgba(0,0,0,0.04)';
+                  const dayNameColor = isOverdue ? '#E8726E' : isToday ? 'rgba(255,255,255,0.6)' : '#9B9A98';
+                  const dateNumColor = isOverdue ? '#E8726E' : isToday ? '#ffffff' : '#1A1918';
+                  const amtStr = formatMoney(loan.payment_amount || 0);
+                  const primaryLine = isOverdue
+                    ? (isLending
+                        ? <>{loan.firstName}'s <strong>{amtStr}</strong> payment is overdue</>
+                        : <>Your <strong>{amtStr}</strong> payment to {loan.firstName} is overdue</>)
+                    : (isLending
+                        ? <>Due to receive <strong>{amtStr}</strong> from {loan.firstName}</>
+                        : <><strong>{amtStr}</strong> due to {loan.firstName}</>);
                   return (
-                    <div key={loan.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '9px 0' }}>
-                      <div style={{
-                        flexShrink: 0, alignSelf: 'center',
-                        fontSize: 10, fontWeight: 700, lineHeight: 1.2,
-                        color: isOverdue ? '#E8726E' : loan.days <= 3 ? '#F59E0B' : '#9B9A98',
-                        background: isOverdue ? 'rgba(232,114,110,0.08)' : loan.days <= 3 ? 'rgba(245,158,11,0.08)' : 'rgba(0,0,0,0.04)',
-                        borderRadius: 6, padding: '2px 5px',
-                      }}>
-                        {daysLbl}
+                    <div key={loan.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
+                      {/* Date icon */}
+                      <div style={{ width: 36, height: 36, borderRadius: 9, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: dateBg, flexShrink: 0 }}>
+                        <span style={{ fontSize: 7, fontWeight: 700, color: dayNameColor, lineHeight: 1, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: "'DM Sans', sans-serif" }}>{dayName}</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: dateNumColor, lineHeight: 1, marginTop: 1, fontFamily: "'DM Sans', sans-serif" }}>{dateNum}</span>
                       </div>
+                      {/* Vertical divider */}
+                      <div style={{ width: 1, alignSelf: 'stretch', background: 'rgba(0,0,0,0.06)', marginTop: 4, marginBottom: 4 }} />
+                      {/* Text */}
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', marginRight: 4 }}>
-                            {formatMoney(loan.payment_amount || 0)}
-                          </span>
-                          <span style={{ fontSize: 12, fontWeight: 400, color: '#1A1918' }}>
-                            {isOverdue
-                              ? (isLending ? `from ${loan.firstName} is overdue` : `to ${loan.firstName} is overdue`)
-                              : (isLending ? `due from ${loan.firstName}` : `due to ${loan.firstName}`)
-                            }
-                          </span>
+                        <div style={{ fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {primaryLine}
                         </div>
                         {loan.purpose && (
-                          <div style={{ fontSize: 12, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          <div style={{ fontSize: 11, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {loan.purpose}
                           </div>
                         )}
@@ -1351,7 +1354,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                     </Select>
                   }>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      {sortedLoans.slice(0, 5).map((loan) => {
+                      {sortedLoans.slice(0, 5).map((loan, idx) => {
                         const otherUserId = isLending ? loan.borrower_id : loan.lender_id;
                         const op = publicProfiles.find(p => p.user_id === otherUserId);
                         const name = op?.full_name?.split(' ')[0] || op?.username || 'User';
@@ -1386,22 +1389,28 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                         }
 
                         return (
-                          <div key={loan.id} style={{ padding: '9px 0' }}>
-                            {/* Line 1: name | badge */}
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-                              <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                {name}
-                              </span>
-                              <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '2px 6px', lineHeight: 1.2 }}>
-                                {badgeLabel}
-                              </span>
-                            </div>
-                            {/* Line 2: context sentence */}
-                            <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {isLending
-                                ? `Borrowed ${formatMoney(totalAmt)} from you${loan.purpose ? ` for ${loan.purpose}` : ''}`
-                                : `Lent you ${formatMoney(totalAmt)}${loan.purpose ? ` for ${loan.purpose}` : ''}`
-                              }
+                          <div key={loan.id} style={{ padding: '9px 0', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                            {/* Number */}
+                            <span style={{ fontSize: 11, fontWeight: 700, color: '#C5C3C0', minWidth: 14, textAlign: 'right', flexShrink: 0, lineHeight: '17px' }}>
+                              {idx + 1}
+                            </span>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              {/* Line 1: name | badge */}
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                                <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {name}
+                                </span>
+                                <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '2px 6px', lineHeight: 1.2 }}>
+                                  {badgeLabel}
+                                </span>
+                              </div>
+                              {/* Line 2: context sentence */}
+                              <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {isLending
+                                  ? `Borrowed ${formatMoney(totalAmt)} from you${loan.purpose ? ` for ${loan.purpose}` : ''}`
+                                  : `Lent you ${formatMoney(totalAmt)}${loan.purpose ? ` for ${loan.purpose}` : ''}`
+                                }
+                              </div>
                             </div>
                           </div>
                         );

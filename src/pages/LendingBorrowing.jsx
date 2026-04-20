@@ -34,7 +34,7 @@ export default function LendingBorrowing() {
           </div>
 
           {/* ── Action buttons ── */}
-          <div style={{ display: 'flex', gap: 12, marginBottom: 28 }}>
+          <div style={{ display: 'flex', gap: 12, marginBottom: 28, justifyContent: 'center' }}>
             <button
               onClick={() => navigate(createPageUrl('CreateOffer'))}
               style={{
