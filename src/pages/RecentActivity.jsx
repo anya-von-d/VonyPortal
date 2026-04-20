@@ -279,7 +279,7 @@ function ExportDropdown({ filteredCount, totalCount, hasAnyFilter, onExport }) {
 /* ══════════════════════════════════════════════════════════════
    MAIN COMPONENT
    ══════════════════════════════════════════════════════════════ */
-export default function RecentActivityPage() {
+export default function RecentActivity({ embeddedMode }) {
   const [loans, setLoans] = useState([]);
   const [payments, setPayments] = useState([]);
   const [user, setUser] = useState(null);
@@ -645,6 +645,208 @@ export default function RecentActivityPage() {
   /* ══════════════════════════════════════════════════════════
      RENDER
      ══════════════════════════════════════════════════════════ */
+
+  if (embeddedMode) {
+    return (
+      <>
+        {/* Filters */}
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8, padding: '0 12px', background: 'transparent', borderRadius: 18, border: '1px solid rgba(0,0,0,0.06)', height: 36 }}>
+              <Search size={14} style={{ color: '#787776', flexShrink: 0 }} />
+              <input type="text" placeholder="Search..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+                style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, fontFamily: "'DM Sans', sans-serif", color: '#1A1918', background: 'transparent' }} />
+            </div>
+          </div>
+          <div className="filter-row-scroll" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, position: 'relative', zIndex: 20 }}>
+            <SortDropdown sortBy={sortBy} onChange={setSortBy} />
+            <SingleSelectDropdown options={DATE_OPTIONS} selected={dateFilter} onChange={setDateFilter} />
+            <MultiSelectDropdown label="All Categories" options={CATEGORY_OPTIONS} selected={categoryFilter} onChange={setCategoryFilter} />
+            {friendOptions.length > 0 && (
+              <MultiSelectDropdown label="All Friends" options={friendOptions} selected={friendFilter} onChange={setFriendFilter} />
+            )}
+            <ExportDropdown filteredCount={filtered.length} totalCount={totalCount} hasAnyFilter={hasAnyFilter} onExport={handleExportCSV} />
+            <button onClick={clearFilters} style={{ padding: '6px 10px', borderRadius: 8, border: hasAnyFilter ? '1px solid rgba(232,114,110,0.3)' : '1px solid rgba(0,0,0,0.08)', background: hasAnyFilter ? 'rgba(232,114,110,0.06)' : 'transparent', fontSize: 12, fontWeight: 500, color: hasAnyFilter ? '#E8726E' : '#787776', cursor: hasAnyFilter ? 'pointer' : 'default', opacity: hasAnyFilter ? 1 : 0.5, fontFamily: "'DM Sans', sans-serif" }}>Clear</button>
+          </div>
+        </div>
+
+        {/* Activity List */}
+        <div style={{ position: 'relative' }}>
+          <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, padding: '10px 16px' }}>
+            <span style={{ fontSize: 11, fontWeight: 500, color: '#787776', marginRight: 4 }}>Page {raSafePage + 1} of {raTotalPages}</span>
+            <button onClick={() => setRaPage(Math.max(0, raSafePage - 1))} disabled={raSafePage === 0} style={{ width: 22, height: 22, borderRadius: 6, border: '1px solid rgba(0,0,0,0.09)', background: 'white', cursor: raSafePage === 0 ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: raSafePage === 0 ? 0.3 : 1, flexShrink: 0 }}>
+              <ChevronLeft size={13} style={{ color: '#787776' }} />
+            </button>
+            <button onClick={() => setRaPage(Math.min(raTotalPages - 1, raSafePage + 1))} disabled={raSafePage >= raTotalPages - 1} style={{ width: 22, height: 22, borderRadius: 6, border: '1px solid rgba(0,0,0,0.09)', background: 'white', cursor: raSafePage >= raTotalPages - 1 ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: raSafePage >= raTotalPages - 1 ? 0.3 : 1, flexShrink: 0 }}>
+              <ChevronRight size={13} style={{ color: '#787776' }} />
+            </button>
+          </div>
+          <div style={{ padding: '0 16px' }}>
+          {filtered.length === 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 0' }}>
+              <p style={{ fontSize: 13, color: '#787776', margin: 0, textAlign: 'center' }}>Nothing to show here yet ✨</p>
+              {hasAnyFilter && <p style={{ fontSize: 12, color: '#C7C6C4', margin: '4px 0 0' }}>Try adjusting your filters</p>}
+            </div>
+          ) : (
+            <>
+              {/* Table header */}
+              <div className="ra-table-header" style={{
+                display: 'grid',
+                gridTemplateColumns: '120px 1fr 200px',
+                alignItems: 'center',
+                padding: '0 0 12px',
+                borderBottom: '1px solid rgba(0,0,0,0.06)',
+                marginBottom: 8,
+              }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Date</span>
+                <span style={{ fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'center' }}>Category</span>
+                <span style={{ fontSize: 11, fontWeight: 600, color: '#787776', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'center' }}>Status</span>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {raPageItems.map((activity, index) => {
+                  const { title, description, icon: Icon, status, friendName, amount, category } = getActivityInfo(activity);
+                  const { bg: iconBg, color: iconColor } = getIconStyle(Icon);
+                  const dateDisplay = activity.date ? format(new Date(activity.date), 'MMM d, yyyy') : '';
+
+                  return (
+                    <div
+                      key={`${activity.type}-${activity.id}-${index}`}
+                      className="ra-table-row"
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '120px 1fr 200px',
+                        alignItems: 'center',
+                        padding: '9px 0',
+                        borderBottom: 'none',
+                      }}
+                    >
+                      {/* Col 1: Date */}
+                      <span className="ra-col-date" style={{ fontSize: 12, color: '#787776', fontWeight: 500 }}>
+                        {dateDisplay}
+                      </span>
+
+                      {/* Col 2: Category — icon + title */}
+                      <div className="ra-col-main" style={{ display: 'flex', alignItems: 'center' }}>
+                        <div style={{ width: 20, height: 20, borderRadius: 6, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginRight: 8 }}>
+                          <Icon size={13} style={{ color: iconColor }} />
+                        </div>
+                        <span style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {title}
+                        </span>
+                      </div>
+
+                      {/* Col 3: Status badge */}
+                      <div className="ra-col-status" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {renderStatusBadge(activity, status)}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+          </div>
+        </div>
+        </div>
+
+        {/* Loan Offer View Modal */}
+        {viewingLoanOffer && (
+          <div
+            onClick={() => setViewingLoanOffer(null)}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 50,
+              background: 'rgba(0,0,0,0.5)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <div
+              onClick={e => e.stopPropagation()}
+              style={{
+                background: 'white', borderRadius: 12, padding: 24,
+                maxWidth: 420, width: '90%',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1A1918', margin: '0 0 16px' }}>
+                Loan Offer from {getUserById(viewingLoanOffer.lender_id)?.full_name || 'Lender'}
+              </h2>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+                <div style={{ background: '#F5F4F0', borderRadius: 10, padding: '12px 14px' }}>
+                  <p style={{ fontSize: 11, color: '#787776', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>Amount</p>
+                  <p style={{ fontSize: 16, fontWeight: 700, color: '#1A1918', margin: 0 }}>${viewingLoanOffer.amount?.toLocaleString() || '0'}</p>
+                </div>
+                <div style={{ background: '#F5F4F0', borderRadius: 10, padding: '12px 14px' }}>
+                  <p style={{ fontSize: 11, color: '#787776', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>Interest Rate</p>
+                  <p style={{ fontSize: 16, fontWeight: 700, color: '#1A1918', margin: 0 }}>{viewingLoanOffer.interest_rate ?? '0'}%</p>
+                </div>
+                <div style={{ background: '#F5F4F0', borderRadius: 10, padding: '12px 14px' }}>
+                  <p style={{ fontSize: 11, color: '#787776', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>Repayment Period</p>
+                  <p style={{ fontSize: 16, fontWeight: 700, color: '#1A1918', margin: 0 }}>{viewingLoanOffer.repayment_period_months ?? viewingLoanOffer.duration_months ?? '—'} mo</p>
+                </div>
+                <div style={{ background: '#F5F4F0', borderRadius: 10, padding: '12px 14px' }}>
+                  <p style={{ fontSize: 11, color: '#787776', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>Purpose</p>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{viewingLoanOffer.purpose || '—'}</p>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button
+                  onClick={() => {
+                    setShowSignModal(true);
+                  }}
+                  style={{
+                    flex: 1, padding: '12px 20px', borderRadius: 22, border: 'none', cursor: 'pointer',
+                    background: '#1A1918', color: 'white', fontSize: 13, fontWeight: 600,
+                    fontFamily: "'DM Sans', sans-serif",
+                  }}
+                >
+                  Sign & Accept
+                </button>
+                <button
+                  onClick={() => setViewingLoanOffer(null)}
+                  style={{
+                    padding: '12px 20px', borderRadius: 22,
+                    border: '1px solid rgba(0,0,0,0.12)', cursor: 'pointer',
+                    background: 'white', color: '#1A1918', fontSize: 13, fontWeight: 600,
+                    fontFamily: "'DM Sans', sans-serif",
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Borrower Signature Modal */}
+        {showSignModal && viewingLoanOffer && (
+          <BorrowerSignatureModal
+            isOpen={showSignModal}
+            onClose={() => {
+              setShowSignModal(false);
+              setViewingLoanOffer(null);
+            }}
+            onSign={async (signature) => {
+              try {
+                await Loan.update(viewingLoanOffer.id, { status: 'active', borrower_signature: signature });
+                setShowSignModal(false);
+                setViewingLoanOffer(null);
+                loadData();
+              } catch (e) {
+                console.error('Failed to sign loan:', e);
+              }
+            }}
+            loanDetails={viewingLoanOffer}
+            userFullName={user?.full_name || ''}
+            lenderName={getUserById(viewingLoanOffer.lender_id)?.full_name || 'Lender'}
+          />
+        )}
+      </>
+    );
+  }
+
   return (
     <>
       <MeshMobileNav user={user} activePage="Recent Activity" />

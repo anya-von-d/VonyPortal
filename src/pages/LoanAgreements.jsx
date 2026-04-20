@@ -4,7 +4,8 @@ import { FileText, CheckCircle, Download, ChevronDown, ChevronRight, ChevronLeft
 import { motion, AnimatePresence } from "framer-motion";
 import { format, addMonths, addWeeks, addDays } from "date-fns";
 import { jsPDF } from "jspdf";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import RecentActivity from './RecentActivity';
 import { createPageUrl } from "@/utils";
 import { useAuth } from "@/lib/AuthContext";
 import LoanActivity from "../components/loans/LoanActivity";
@@ -234,6 +235,10 @@ export default function LoanAgreements() {
   const [laPage, setLaPage] = useState(0);
 
   const { logout } = useAuth();
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'documents';
+  const setTab = (t) => setSearchParams({ tab: t });
 
   useEffect(() => {
     loadData();
@@ -1114,7 +1119,14 @@ export default function LoanAgreements() {
         <DesktopSidebar />
 
         {/* Col 2: center content */}
-        <div className="mesh-center" style={{ background: 'transparent', padding: '24px 32px 80px' }}>
+        <div className="mesh-center" style={{ background: 'transparent', padding: '24px 56px 80px' }}>
+
+          {/* Desktop page title */}
+          <div className="desktop-page-title" style={{ marginBottom: 20 }}>
+            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 22, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.2, color: '#1A1918' }}>
+              Records
+            </div>
+          </div>
 
           {/* Mobile-only page title (desktop shows it in top bar) */}
           <div className="mobile-page-title">
@@ -1122,6 +1134,46 @@ export default function LoanAgreements() {
             <div style={{ height: 1, background: 'rgba(0,0,0,0.08)', marginLeft: -32, marginRight: -32, marginBottom: 20 }} />
           </div>
 
+          {/* Tab nav */}
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ display: 'flex', gap: 0 }}>
+              {[
+                { key: 'documents', label: 'Loan Documents' },
+                { key: 'activity', label: 'Transactions & Activity' },
+              ].map(({ key, label }) => {
+                const active = activeTab === key;
+                return (
+                  <button
+                    key={key}
+                    onClick={() => setTab(key)}
+                    style={{
+                      position: 'relative',
+                      flex: 1,
+                      background: 'none', border: 'none', cursor: 'pointer',
+                      padding: '10px 0 12px',
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: 14, fontWeight: active ? 700 : 500,
+                      color: active ? '#1A1918' : '#9B9A98',
+                      letterSpacing: '-0.02em',
+                      transition: 'color 0.15s',
+                    }}
+                  >
+                    {label}
+                    {active && (
+                      <div style={{
+                        position: 'absolute', bottom: 0, left: 0, right: 0,
+                        height: 2, borderRadius: 2, background: '#1A1918',
+                      }} />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            <div style={{ height: 1, background: '#E8E7E5' }} />
+          </div>
+
+          {activeTab === 'documents' ? (
+          <>
           {/* Filters */}
           <div style={{ marginBottom: 16 }}>
             <div style={{ marginBottom: 8 }}>
@@ -1346,6 +1398,9 @@ export default function LoanAgreements() {
               .la-desktop-amount { display: block !important; }
             }
           `}</style>
+          </>) : (
+            <RecentActivity embeddedMode />
+          )}
 
         </div>
 

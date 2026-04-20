@@ -19,11 +19,11 @@ const NavBtn = ({ to, children, onClick, active }) => {
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
     padding: '7px 11px', borderRadius: 24, cursor: 'pointer', border: 'none',
     background: active
-      ? 'rgba(255,255,255,0.12)'
-      : hovered ? 'rgba(255,255,255,0.07)' : 'transparent',
+      ? 'rgba(0,0,0,0.08)'
+      : hovered ? 'rgba(0,0,0,0.05)' : 'transparent',
     color: active
-      ? '#ffffff'
-      : hovered ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.5)',
+      ? '#1A1918'
+      : hovered ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.5)',
     fontWeight: active ? 600 : 500,
     fontSize: 13,
     fontFamily: "'DM Sans', sans-serif",
@@ -90,13 +90,6 @@ const UsersIcon = () => (
   </svg>
 );
 
-const ClockIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10"/>
-    <polyline points="12 6 12 12 16 14"/>
-  </svg>
-);
-
 const BookIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
@@ -122,7 +115,7 @@ const MenuIcon = () => (
 const Pill = ({ children }) => (
   <div style={{
     display: 'inline-flex', alignItems: 'center', gap: 2,
-    background: '#2A2928', borderRadius: 30, padding: 4,
+    background: 'rgba(0,0,0,0.06)', borderRadius: 30, padding: 4,
   }}>
     {children}
   </div>
@@ -140,7 +133,9 @@ export default function DesktopTopNav() {
     <>
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 300,
-        height: 54, background: '#1A1918',
+        height: 54, background: '#FDFCFA url("/tile.png.jpeg") repeat',
+        backgroundSize: '50px 50px',
+        borderBottom: '1px solid rgba(0,0,0,0.08)',
         display: 'flex', alignItems: 'center',
         padding: '0 20px', gap: 12,
       }}>
@@ -148,7 +143,7 @@ export default function DesktopTopNav() {
         <Link to="/" style={{
           fontFamily: "'Cormorant Garamond', Georgia, serif",
           fontStyle: 'italic', fontWeight: 600, fontSize: '1.5rem',
-          color: '#ffffff', textDecoration: 'none', lineHeight: 1,
+          color: '#1A1918', textDecoration: 'none', lineHeight: 1,
           letterSpacing: '-0.02em', marginRight: 8, flexShrink: 0,
         }}>
           Vony
@@ -171,19 +166,16 @@ export default function DesktopTopNav() {
         <div style={{ flex: 1 }} />
 
         {/* Notifications bubble */}
-        <div style={{ display: 'inline-flex', alignItems: 'center', background: '#2A2928', borderRadius: 30, padding: '6px 10px' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(0,0,0,0.06)', borderRadius: 30, padding: '6px 10px' }}>
           <NavBtn onClick={() => setNotifOpen(v => !v)} active={notifOpen}>
             <BellIcon />
           </NavBtn>
         </div>
 
-        {/* Right pill: Friends, Recent Activity, Learn, Records, Profile, Menu */}
+        {/* Right pill: Friends, Learn, Records, Profile, Menu */}
         <Pill>
           <NavBtn onClick={() => setFriendsOpen(v => !v)} active={friendsOpen}>
             <UsersIcon />
-          </NavBtn>
-          <NavBtn to={createPageUrl('RecentActivity')} active={isActive(location, createPageUrl('RecentActivity'))}>
-            <ClockIcon />
           </NavBtn>
           <NavBtn to={createPageUrl('ComingSoon')} active={isActive(location, createPageUrl('ComingSoon'))}>
             <BookIcon />
