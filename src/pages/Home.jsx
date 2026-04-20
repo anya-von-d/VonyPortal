@@ -1532,11 +1532,6 @@ export default function Home() {
                   const dText = s.days === 0 ? 'today' : `in ${s.days} day${s.days === 1 ? '' : 's'}`;
                   attentionItems.push({ type: 'due', text: `You have a payment due ${dText}` });
                 }
-                pendingOffers.forEach(offer => {
-                  const prof = safeAllProfiles.find(p => p.user_id === offer.lender_id);
-                  const name = prof?.full_name?.split(' ')[0] || 'Someone';
-                  attentionItems.push({ type: 'offer', text: `${name} sent you a loan offer` });
-                });
                 const items = attentionItems.slice(0, 4);
 
                 const AIcon = ({ type }) => {
@@ -1602,110 +1597,37 @@ export default function Home() {
                     <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
                     <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
                       <SectionHeader title="Overview" />
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 4 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginTop: 4 }}>
                         <Ring percent={percentPaid} color="#1D5B94" label="Paid back" />
                         <div style={textBlockStyle}>
                           <div style={bigLineStyle}>You owe <span style={{ color: '#1D5B94' }}>{formatMoney(borrowOwed)}</span></div>
                           <div style={subLineStyle}>{formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)} paid back</div>
                         </div>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 10 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginTop: 6 }}>
+                        <Ring percent={percentRepaid} color="#03ACEA" label="Repaid" />
                         <div style={textBlockStyle}>
                           <div style={bigLineStyle}>You're owed <span style={{ color: '#03ACEA' }}>{formatMoney(lentOwed)}</span></div>
                           <div style={subLineStyle}>{formatMoney(totalRepaid)} of {formatMoney(totalLentAmount)} repaid to you</div>
                         </div>
-                        <Ring percent={percentRepaid} color="#03ACEA" label="Repaid" />
                       </div>
                     </div>
                   </div>
                 );
               })()}
 
-              {/* How month is going */}
+              {/* April at a Glance */}
               <div className="home-card-howmonth" style={{ position: 'relative' }}>
               <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
               <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
-                {/* Centered title */}
-                <div style={{ textAlign: 'center', paddingBottom: 5, marginBottom: 2 }}>
+                {/* Left-aligned title */}
+                <div style={{ paddingBottom: 5, marginBottom: 4 }}>
                   <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>
-                    {`How ${format(today, 'MMMM')} is Going`}
+                    {`${format(today, 'MMMM')} at a Glance`}
                   </span>
                 </div>
-                {/* Summary lines — each gets a leading bullet colored to match the numeric accent */}
-                {(() => {
-                  // Icon helpers: background-less symbol glyphs, color-matched to the line accent.
-                  const iconWrap = { flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginTop: 2 };
-                  const OverdueIcon = ({ color }) => (
-                    <span style={iconWrap}>
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="10" />
-                        <line x1="12" y1="8" x2="12" y2="12" />
-                        <line x1="12" y1="16" x2="12.01" y2="16" />
-                      </svg>
-                    </span>
-                  );
-                  const OutIcon = ({ color }) => (
-                    <span style={iconWrap}>
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                        <line x1="7" y1="17" x2="17" y2="7" />
-                        <polyline points="7 7 17 7 17 17" />
-                      </svg>
-                    </span>
-                  );
-                  const InIcon = ({ color }) => (
-                    <span style={iconWrap}>
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                        <line x1="17" y1="7" x2="7" y2="17" />
-                        <polyline points="17 17 7 17 7 7" />
-                      </svg>
-                    </span>
-                  );
-                  const rowStyle = { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontSize: 12, color: '#1A1918', textAlign: 'center' };
-                  return (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 2, alignItems: 'center' }}>
-                      {overdueYouOwe.length > 0 && (
-                        <div style={rowStyle}>
-<span>You have <strong style={{ color: '#E8726E' }}>{overdueYouOwe.length}</strong> overdue payment{overdueYouOwe.length === 1 ? '' : 's'}</span>
-                        </div>
-                      )}
-                      {overdueOwedToYou.length > 0 && (
-                        <div style={rowStyle}>
-<span><strong style={{ color: '#E8726E' }}>{overdueOwedToYou.length}</strong> payment{overdueOwedToYou.length === 1 ? '' : 's'} to you {overdueOwedToYou.length === 1 ? 'is' : 'are'} overdue</span>
-                        </div>
-                      )}
-                      {outScheduledTotal > 0 && (
-                        <div style={rowStyle}>
-<span>
-                            {outCompletedCount > 0
-                              ? <>You've completed <strong style={{ color: '#1D5B94' }}>{outCompletedCount}</strong> of <strong style={{ color: '#1D5B94' }}>{outScheduledTotal}</strong> scheduled payments</>
-                              : <>You have <strong style={{ color: '#1D5B94' }}>{outScheduledTotal}</strong> payment{outScheduledTotal === 1 ? '' : 's'} this month</>}
-                          </span>
-                        </div>
-                      )}
-                      {leftToPay > 0 && (
-                        <div style={rowStyle}>
-<span><strong style={{ color: '#1D5B94' }}>{formatMoney(leftToPay)}</strong> left to pay this month</span>
-                        </div>
-                      )}
-                      {inScheduledTotal > 0 && (
-                        <div style={rowStyle}>
-<span>
-                            {inCompletedCount > 0
-                              ? <>You've received <strong style={{ color: '#03ACEA' }}>{inCompletedCount}</strong> of <strong style={{ color: '#03ACEA' }}>{inScheduledTotal}</strong> payments</>
-                              : <>You're due to receive <strong style={{ color: '#03ACEA' }}>{inScheduledTotal}</strong> payment{inScheduledTotal === 1 ? '' : 's'} this month</>}
-                          </span>
-                        </div>
-                      )}
-                      {leftToReceive > 0 && (
-                        <div style={rowStyle}>
-<span>You're expected to receive <strong style={{ color: '#03ACEA' }}>{formatMoney(leftToReceive)}</strong> before the end of the month</span>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })()}
-                {/* Insight */}
-                <div style={{ marginTop: 10, textAlign: 'center' }}>
+                {/* Insight at the top */}
+                <div style={{ marginBottom: 10 }}>
                   <span style={{
                     display: 'inline-block',
                     background: '#EBF4FA',
@@ -1720,8 +1642,46 @@ export default function Home() {
                     {howMonthMessage.text}{howMonthMessage.emoji ? ` ${howMonthMessage.emoji}` : ''}
                   </span>
                 </div>
+                {/* Summary lines */}
+                {(() => {
+                  const rowStyle = { display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#1A1918' };
+                  return (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {monthlyExpectedReceive > 0 && (
+                        <div style={rowStyle}>
+                          <span>Expected to receive <strong style={{ color: '#03ACEA' }}>{formatMoney(monthlyExpectedReceive)}</strong> this month</span>
+                        </div>
+                      )}
+                      {monthlyExpectedPay > 0 && (
+                        <div style={rowStyle}>
+                          <span>Due to pay out <strong style={{ color: '#1D5B94' }}>{formatMoney(monthlyExpectedPay)}</strong> this month</span>
+                        </div>
+                      )}
+                      {outScheduledTotal > 0 && (
+                        <div style={rowStyle}>
+                          <span>You have <strong style={{ color: '#1D5B94' }}>{outScheduledTotal}</strong> payment{outScheduledTotal === 1 ? '' : 's'} this month</span>
+                        </div>
+                      )}
+                      {leftToPay > 0 && (
+                        <div style={rowStyle}>
+                          <span><strong style={{ color: '#1D5B94' }}>{formatMoney(leftToPay)}</strong> left to pay this month</span>
+                        </div>
+                      )}
+                      {inScheduledTotal > 0 && (
+                        <div style={rowStyle}>
+                          <span>You're due to receive <strong style={{ color: '#03ACEA' }}>{inScheduledTotal}</strong> payment{inScheduledTotal === 1 ? '' : 's'} this month</span>
+                        </div>
+                      )}
+                      {leftToReceive > 0 && (
+                        <div style={rowStyle}>
+                          <span>You're expected to receive <strong style={{ color: '#03ACEA' }}>{formatMoney(leftToReceive)}</strong> before the end of the month</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
-              </div>{/* end how-month aurora wrapper */}
+              </div>{/* end april-at-a-glance aurora wrapper */}
 
             </div>{/* end col 2 */}
 
