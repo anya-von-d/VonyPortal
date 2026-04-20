@@ -6,41 +6,9 @@ import { useAuth } from "@/lib/AuthContext";
 import UserAvatar from "@/components/ui/UserAvatar";
 import SettingsModal from "@/components/SettingsModal";
 
-const PAGE_LABELS = {
-  'Home': 'Home',
-  'Upcoming': 'Upcoming',
-  'CreateOffer': 'Create Loan',
-  'RecordPayment': 'Log Payment',
-  'Lending': 'Lending',
-  'Borrowing': 'Borrowing',
-  'Friends': 'Friends',
-  'RecentActivity': 'Recent Activity',
-  'LoanAgreements': 'Records',
-  'Requests': 'Notifications',
-  'ComingSoon': 'Learn',
-  'LoanHelp': 'Loan Help',
-  'Profile': 'Profile',
-};
-
-const NAV_ITEMS = [
-  { label: 'Home',            to: '/' },
-  { label: 'Upcoming',        to: createPageUrl("Upcoming") },
-  { label: 'Create Loan',     to: createPageUrl("CreateOffer") },
-  { label: 'Log Payment',     to: createPageUrl("RecordPayment") },
-  { label: 'Lending',         to: createPageUrl("Lending") },
-  { label: 'Borrowing',       to: createPageUrl("Borrowing") },
-  { label: 'Friends',         to: createPageUrl("Friends") },
-  { label: 'Records',         to: createPageUrl("LoanAgreements") },
-  { label: 'Recent Activity', to: createPageUrl("RecentActivity") },
-  { label: 'Learn',           to: createPageUrl("ComingSoon") },
-];
-
-const SOON_ITEMS = [];
-
 export default function MeshMobileNav({ user, activePage }) {
   const { logout } = useAuth();
   const location = useLocation();
-  const [menuOpen, setMenuOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [notifCount, setNotifCount] = useState(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -50,11 +18,6 @@ export default function MeshMobileNav({ user, activePage }) {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [menuOpen]);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -78,203 +41,186 @@ export default function MeshMobileNav({ user, activePage }) {
     fetchCounts();
   }, [user?.id]);
 
+  const isActivePage = (page) => {
+    if (page === 'Home') return location.pathname === '/' || location.pathname === '';
+    const url = createPageUrl(page);
+    return location.pathname.includes(url.replace(/^\//, ''));
+  };
+
+  const isLendingActive = isActivePage('LendingBorrowing') || isActivePage('Lending') || isActivePage('Borrowing');
+
+  // ── Desktop: handled by DesktopTopNav, nothing to render here
+  if (!isMobile) return (
+    <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
+  );
+
+  // ── Mobile only ──
   return (
     <>
-      {/* ── Desktop: top bar ── */}
-      {!isMobile && (
-        <div style={{
-          position: 'fixed', top: 0, left: 200, right: 0, zIndex: 100, height: 54,
-          background: '#FDFCFA url("/tile.png.jpeg") repeat',
-          backgroundSize: '50px 50px',
-          borderBottom: '1px solid rgba(0,0,0,0.08)',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 24px 0 28px',
-          fontFamily: "'DM Sans', sans-serif",
-        }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em' }}>
-            {activePage === 'Home' ? (() => {
-              const h = new Date().getHours();
-              const g = h >= 5 && h < 12 ? 'Good morning' : h >= 12 && h < 18 ? 'Good afternoon' : 'Good night';
-              const name = user?.full_name?.split(' ')[0] || user?.username || '';
-              return `${g}, ${name}`;
-            })() : (PAGE_LABELS[activePage] || activePage)}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <Link to={createPageUrl("Requests")} style={{
-              position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              width: 32, height: 32, borderRadius: 9, textDecoration: 'none',
-            }}>
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#787776" strokeWidth="1.8" strokeLinecap="round">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-              </svg>
-              {notifCount > 0 && (
-                <span style={{
-                  position: 'absolute', top: 5, right: 5,
-                  width: 7, height: 7, borderRadius: '50%',
-                  background: '#03ACEA',
-                }} />
-              )}
-            </Link>
-            <Link to={createPageUrl("Profile")} style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              width: 32, height: 32, borderRadius: 9, textDecoration: 'none',
-            }}>
-              <UserAvatar name={user?.full_name || user?.username} src={user?.avatar_url || user?.profile_picture_url} size={26} />
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {/* ── Mobile: fixed top bar + slide-out menu ── */}
-      {isMobile && user && <>
-      {/* Fixed top bar */}
+      {/* ── Fixed top bar ── */}
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200,
         height: 56, display: 'flex', alignItems: 'center',
-        padding: '0 16px',
+        justifyContent: 'space-between',
+        padding: '0 14px 0 18px',
         background: '#1A1918',
         fontFamily: "'DM Sans', sans-serif",
       }}>
-        {/* Left: Hamburger */}
-        <button
-          onClick={() => setMenuOpen(o => !o)}
-          style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            width: 36, height: 36, borderRadius: 10, border: 'none', cursor: 'pointer',
-            background: 'transparent', flexShrink: 0,
-          }}
-          aria-label="Menu"
-        >
-          {menuOpen ? (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
-              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-          ) : (
-            <svg width="20" height="14" viewBox="0 0 20 14" fill="none">
-              <line x1="0" y1="1" x2="20" y2="1" stroke="white" strokeWidth="1.6" strokeLinecap="round"/>
-              <line x1="0" y1="7" x2="20" y2="7" stroke="white" strokeWidth="1.6" strokeLinecap="round"/>
-              <line x1="0" y1="13" x2="20" y2="13" stroke="white" strokeWidth="1.6" strokeLinecap="round"/>
-            </svg>
-          )}
-        </button>
-
-        {/* Center: Vony logo */}
-        <Link to="/" onClick={() => setMenuOpen(false)} style={{
-          flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        {/* Logo */}
+        <Link to="/" style={{
           fontFamily: "'Cormorant Garamond', Georgia, serif",
           fontWeight: 600, fontStyle: 'italic', fontSize: '1.4rem',
           color: 'white', textDecoration: 'none', lineHeight: 1,
-          letterSpacing: '-0.02em',
+          letterSpacing: '-0.02em', flexShrink: 0,
         }}>Vony</Link>
 
-        {/* Right: bell + profile */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-          {/* Bell */}
-          <Link to={createPageUrl("Requests")} onClick={() => setMenuOpen(false)} style={{
+        {/* Right icons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+
+          {/* Notifications bell */}
+          <Link to={createPageUrl("Requests")} style={{
             position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            width: 36, height: 36, borderRadius: 10, textDecoration: 'none',
+            width: 36, height: 36, borderRadius: 10, textDecoration: 'none', flexShrink: 0,
           }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" strokeWidth="1.8" strokeLinecap="round">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
               <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
             </svg>
             {notifCount > 0 && (
               <span style={{
-                position: 'absolute', top: 4, right: 4,
-                width: 8, height: 8, borderRadius: '50%',
-                background: 'white', border: '1.5px solid #1A1918',
+                position: 'absolute', top: 6, right: 6,
+                width: 7, height: 7, borderRadius: '50%',
+                background: '#03ACEA',
               }} />
             )}
           </Link>
 
-          {/* Profile */}
-          <Link to={createPageUrl("Profile")} onClick={() => setMenuOpen(false)} style={{
+          {/* Friends */}
+          <Link to={createPageUrl("Friends")} style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            width: 36, height: 36, borderRadius: 10, textDecoration: 'none',
+            width: 36, height: 36, borderRadius: 10, textDecoration: 'none', flexShrink: 0,
           }}>
-            <UserAvatar name={user?.full_name || user?.username} src={user?.avatar_url || user?.profile_picture_url} size={28} />
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
           </Link>
+
+          {/* Records text */}
+          <Link to={createPageUrl("LoanAgreements")} style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            height: 36, padding: '0 8px', borderRadius: 10, textDecoration: 'none', flexShrink: 0,
+            fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.75)',
+            fontFamily: "'DM Sans', sans-serif", letterSpacing: '-0.01em',
+          }}>Records</Link>
+
+          {/* Profile avatar */}
+          <Link to={createPageUrl("Profile")} style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            width: 36, height: 36, borderRadius: 10, textDecoration: 'none', flexShrink: 0,
+          }}>
+            <UserAvatar
+              name={user?.full_name || user?.username}
+              src={user?.avatar_url || user?.profile_picture_url}
+              size={26}
+              radius={13}
+            />
+          </Link>
+
+          {/* Hamburger → settings */}
+          <button
+            onClick={() => setSettingsOpen(true)}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: 36, height: 36, borderRadius: 10, border: 'none', cursor: 'pointer',
+              background: 'transparent', flexShrink: 0,
+            }}
+            aria-label="Settings"
+          >
+            <svg width="19" height="14" viewBox="0 0 19 14" fill="none">
+              <line x1="0" y1="1"  x2="19" y2="1"  stroke="rgba(255,255,255,0.75)" strokeWidth="1.6" strokeLinecap="round"/>
+              <line x1="0" y1="7"  x2="19" y2="7"  stroke="rgba(255,255,255,0.75)" strokeWidth="1.6" strokeLinecap="round"/>
+              <line x1="0" y1="13" x2="19" y2="13" stroke="rgba(255,255,255,0.75)" strokeWidth="1.6" strokeLinecap="round"/>
+            </svg>
+          </button>
         </div>
       </div>
 
-      {/* Full-screen menu overlay */}
-      {menuOpen && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 199,
-          background: 'rgba(250,250,250,0.96)',
-          backdropFilter: 'blur(18px) saturate(1.5)',
-          WebkitBackdropFilter: 'blur(18px) saturate(1.5)',
-          display: 'flex', flexDirection: 'column',
-          overflowY: 'auto',
-          fontFamily: "'DM Sans', sans-serif",
-        }}>
-          <nav style={{
-            flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center',
-            padding: '80px 32px 32px',
-          }}>
-            {NAV_ITEMS.map(({ label, to }) => (
-              <div key={label} style={{ borderBottom: '0.5px solid rgba(0,0,0,0.06)' }}>
-                <Link
-                  to={to}
-                  onClick={() => setMenuOpen(false)}
-                  style={{
-                    display: 'block', padding: '16px 0',
-                    fontSize: 12, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase',
-                    color: '#1A1918', textDecoration: 'none',
-                    opacity: activePage === label ? 1 : 0.55,
-                  }}
-                >{label}</Link>
-              </div>
-            ))}
+      {/* ── Floating bottom pill nav ── */}
+      <div style={{
+        position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)',
+        zIndex: 200,
+        background: '#1A1918',
+        borderRadius: 40,
+        padding: '6px 8px',
+        display: 'flex', alignItems: 'center', gap: 2,
+        boxShadow: '0 4px 24px rgba(0,0,0,0.28), 0 1px 6px rgba(0,0,0,0.18)',
+        fontFamily: "'DM Sans', sans-serif",
+        whiteSpace: 'nowrap',
+      }}>
+        {/* Home */}
+        <BottomNavItem
+          to="/"
+          active={isActivePage('Home')}
+          icon={
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          }
+        />
 
-            {SOON_ITEMS.map(({ label, to }) => (
-              <div key={label} style={{ borderBottom: '0.5px solid rgba(0,0,0,0.06)' }}>
-                <Link
-                  to={to}
-                  onClick={() => setMenuOpen(false)}
-                  style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: '16px 0',
-                    fontSize: 12, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase',
-                    color: '#1A1918', textDecoration: 'none', opacity: 0.55,
-                  }}
-                >
-                  {label}
-                  <span style={{ fontSize: 8, fontWeight: 700, color: '#9B9A98', background: 'rgba(0,0,0,0.05)', borderRadius: 4, padding: '2px 6px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>SOON</span>
-                </Link>
-              </div>
-            ))}
+        {/* Upcoming */}
+        <BottomNavItem
+          to={createPageUrl('Upcoming')}
+          active={isActivePage('Upcoming')}
+          icon={
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          }
+        />
 
-            {/* Settings */}
-            <div style={{ marginTop: 20 }}>
-              <button
-                onClick={() => { setMenuOpen(false); setSettingsOpen(true); }}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 8, padding: '14px 0',
-                  width: '100%', background: 'none', border: 'none', cursor: 'pointer',
-                  fontSize: 12, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase',
-                  color: '#787776', textAlign: 'left',
-                  fontFamily: "'DM Sans', sans-serif",
-                }}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9B9A98" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                Settings
-              </button>
-            </div>
-          </nav>
-
-          <div style={{ padding: '24px', textAlign: 'center' }}>
-            <p style={{ fontFamily: 'monospace', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.15em', color: 'rgba(0,0,0,0.3)', margin: 0 }}>
-              Vony · Lending Made Simple
-            </p>
-          </div>
-        </div>
-      )}
-
-      </>}
+        {/* Lending & Borrowing — text label */}
+        <Link
+          to={createPageUrl('LendingBorrowing')}
+          style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            padding: '8px 16px', borderRadius: 30, cursor: 'pointer', textDecoration: 'none',
+            background: isLendingActive ? 'rgba(255,255,255,0.15)' : 'transparent',
+            color: isLendingActive ? '#ffffff' : 'rgba(255,255,255,0.5)',
+            fontSize: 13, fontWeight: isLendingActive ? 700 : 500,
+            letterSpacing: '-0.01em',
+            transition: 'background 0.15s, color 0.15s',
+          }}
+        >
+          Lending &amp; Borrowing
+        </Link>
+      </div>
 
       <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </>
+  );
+}
+
+function BottomNavItem({ to, active, icon }) {
+  return (
+    <Link
+      to={to}
+      style={{
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        width: 40, height: 40, borderRadius: 30, textDecoration: 'none',
+        background: active ? 'rgba(255,255,255,0.15)' : 'transparent',
+        color: active ? '#ffffff' : 'rgba(255,255,255,0.5)',
+        transition: 'background 0.15s, color 0.15s',
+      }}
+    >
+      {icon}
+    </Link>
   );
 }

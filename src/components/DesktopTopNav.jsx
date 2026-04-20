@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { useAuth } from '@/lib/AuthContext';
 import SettingsModal from './SettingsModal';
 import NotificationsPopup from './NotificationsPopup';
 import FriendsPopup from './FriendsPopup';
+import UserAvatar from './ui/UserAvatar';
 
 const isActive = (location, to) => {
   if (to === '/') return location.pathname === '/';
@@ -128,6 +130,8 @@ const Pill = ({ children }) => (
 
 export default function DesktopTopNav() {
   const location = useLocation();
+  const { userProfile, user: authUser } = useAuth();
+  const user = userProfile ? { ...userProfile, id: authUser?.id } : null;
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [friendsOpen, setFriendsOpen] = useState(false);
@@ -188,7 +192,16 @@ export default function DesktopTopNav() {
             Records
           </NavBtn>
           <NavBtn to={createPageUrl('Profile')} active={isActive(location, createPageUrl('Profile'))}>
-            <UserIcon />
+            {user ? (
+              <UserAvatar
+                name={user.full_name || user.username}
+                src={user.avatar_url || user.profile_picture_url}
+                size={22}
+                radius={11}
+              />
+            ) : (
+              <UserIcon />
+            )}
           </NavBtn>
           <NavBtn onClick={() => setSettingsOpen(true)}>
             <MenuIcon />
@@ -196,9 +209,7 @@ export default function DesktopTopNav() {
         </Pill>
       </div>
 
-      {settingsOpen && (
-        <SettingsModal onClose={() => setSettingsOpen(false)} />
-      )}
+      <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
       {notifOpen && (
         <NotificationsPopup onClose={() => setNotifOpen(false)} />
       )}
