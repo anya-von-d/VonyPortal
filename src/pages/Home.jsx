@@ -422,6 +422,23 @@ export default function Home() {
       return next;
     });
   };
+  const [customTasks, setCustomTasks] = useState(() => {
+    try {
+      const raw = localStorage.getItem(`vony.custom-tasks.${weekStartKey}`);
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+  });
+  const addCustomTask = (label) => {
+    if (!label.trim()) return;
+    const task = { id: `custom-${Date.now()}`, label: label.trim() };
+    setCustomTasks(prev => {
+      const next = [...prev, task];
+      try { localStorage.setItem(`vony.custom-tasks.${weekStartKey}`, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  };
+  const [addingTask, setAddingTask] = useState(false);
+  const [newTaskText, setNewTaskText] = useState('');
   const loansWasOut = useRef(true);
   const activeWasOut = useRef(true);
   const [bigScreen, setBigScreen] = useState(window.innerWidth > 900);
@@ -1389,14 +1406,14 @@ export default function Home() {
                   .map(l => {
                     const p = safeAllProfiles.find(pp => pp.user_id === l.borrower_id);
                     const name = p?.full_name?.split(' ')[0] || p?.username || 'User';
-                    return { id: l.id, direction: 'in', name, amount: l.payment_amount || 0, date: new Date(l.next_payment_date) };
+                    return { id: l.id, direction: 'in', name, avatar: p?.avatar_url || p?.profile_picture_url, amount: l.payment_amount || 0, date: new Date(l.next_payment_date) };
                   });
                 const outgoing = borrowedLoans
                   .filter(l => l.next_payment_date && new Date(l.next_payment_date) >= new Date(now.getFullYear(), now.getMonth(), now.getDate()))
                   .map(l => {
                     const p = safeAllProfiles.find(pp => pp.user_id === l.lender_id);
                     const name = p?.full_name?.split(' ')[0] || p?.username || 'User';
-                    return { id: l.id, direction: 'out', name, amount: l.payment_amount || 0, date: new Date(l.next_payment_date) };
+                    return { id: l.id, direction: 'out', name, avatar: p?.avatar_url || p?.profile_picture_url, amount: l.payment_amount || 0, date: new Date(l.next_payment_date) };
                   });
                 const upcoming = [...incoming, ...outgoing]
                   .sort((a, b) => a.date - b.date)
@@ -1419,26 +1436,28 @@ export default function Home() {
                         {upcoming.map(item => {
                           const isIncoming = item.direction === 'in';
                           const signColor = isIncoming ? '#03ACEA' : '#1D5B94';
-                          const prefixLabel = isIncoming ? `From ${item.name}` : `To ${item.name}`;
-                          const dateStr = `${format(item.date, 'MMM')} ${ordinal(item.date.getDate())}`;
+                          const dirLabel = isIncoming ? `From ${item.name}` : `To ${item.name}`;
                           const amtStr = `${isIncoming ? '+' : '-'}${formatMoney(item.amount)}`;
+                          const daysUntil = differenceInDays(item.date, new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()));
+                          const daysLabel = daysUntil <= 0 ? 'TODAY' : daysUntil === 1 ? '1 DAY' : `${daysUntil} DAYS`;
                           return (
                             <div key={item.id} style={{
                               background: '#FAFAF8',
                               border: '1px solid rgba(0,0,0,0.06)',
                               borderRadius: 10,
-                              padding: '10px 10px',
-                              display: 'flex', flexDirection: 'column', gap: 3,
-                              minWidth: 0,
+                              padding: '12px 8px 10px',
+                              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                              minWidth: 0, textAlign: 'center',
                             }}>
-                              <div style={{ fontSize: 11, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                {prefixLabel}
+                              <UserAvatar name={item.name} src={item.avatar} size={34} radius={17} />
+                              <div style={{ fontSize: 11, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' }}>
+                                {dirLabel}
                               </div>
-                              <div style={{ fontSize: 15, fontWeight: 800, color: signColor, letterSpacing: '-0.03em', lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              <div style={{ fontSize: 15, fontWeight: 800, color: signColor, letterSpacing: '-0.03em', lineHeight: 1.1 }}>
                                 {amtStr}
                               </div>
-                              <div style={{ fontSize: 10, fontWeight: 500, color: '#9B9A98', letterSpacing: '-0.01em' }}>
-                                {dateStr}
+                              <div style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em' }}>
+                                {daysLabel}
                               </div>
                             </div>
                           );
@@ -1496,13 +1515,14 @@ export default function Home() {
                 }
 
                 // Show unchecked first, checked last; hide empty state if nothing.
-                const sortedTasks = [...tasks].sort((a, b) => Number(checkedTasks.has(a.id)) - Number(checkedTasks.has(b.id)));
+                const allTasks = [...tasks, ...customTasks];
+                const sortedTasks = [...allTasks].sort((a, b) => Number(checkedTasks.has(a.id)) - Number(checkedTasks.has(b.id)));
 
                 return (
                   <div className="home-card-tasks" style={{ position: 'relative' }}>
                     <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
                     <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
-                      <SectionHeader title="Coming Up this Week" />
+                      <SectionHeader title="To Do This Week" />
                       {/* Day strip */}
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, marginTop: 2, marginBottom: 10 }}>
                         {days.map((d, i) => {
@@ -1566,6 +1586,49 @@ export default function Home() {
                           })}
                         </div>
                       )}
+                      {/* Add task inline input */}
+                      {addingTask && (
+                        <form
+                          onSubmit={e => { e.preventDefault(); addCustomTask(newTaskText); setNewTaskText(''); setAddingTask(false); }}
+                          style={{ display: 'flex', alignItems: 'center', gap: 8, paddingTop: 6 }}
+                        >
+                          <input
+                            autoFocus
+                            value={newTaskText}
+                            onChange={e => setNewTaskText(e.target.value)}
+                            onKeyDown={e => { if (e.key === 'Escape') { setAddingTask(false); setNewTaskText(''); } }}
+                            placeholder="Add a to-do…"
+                            style={{
+                              flex: 1, fontSize: 12, fontFamily: "'DM Sans', sans-serif",
+                              border: 'none', borderBottom: '1.5px solid #03ACEA',
+                              outline: 'none', background: 'transparent',
+                              color: '#1A1918', padding: '2px 0',
+                            }}
+                          />
+                          <button type="submit" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                          </button>
+                        </form>
+                      )}
+                      {/* + button bottom-right */}
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+                        <button
+                          type="button"
+                          onClick={() => { setAddingTask(v => !v); setNewTaskText(''); }}
+                          style={{
+                            width: 26, height: 26, borderRadius: '50%',
+                            background: addingTask ? '#EBF4FA' : '#F4F3F1',
+                            border: 'none', cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            transition: 'background 0.15s',
+                          }}
+                          aria-label="Add to-do"
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={addingTask ? '#03ACEA' : '#787776'} strokeWidth="2.8" strokeLinecap="round">
+                            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );

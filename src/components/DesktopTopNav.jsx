@@ -218,19 +218,17 @@ export default function DesktopTopNav() {
       <div className="desktop-top-nav" style={{
         position: 'fixed', top: 18, left: 0, right: 0, zIndex: 300,
         display: 'flex', alignItems: 'center',
-        padding: '0 24px', gap: 12,
+        padding: '0 56px', gap: 12,
         background: 'none',
         pointerEvents: 'none',  // let clicks pass through gaps between bubbles
       }}>
-        {/* Logo bubble */}
+        {/* Logo — plain, no bubble */}
         <Link to="/" style={{
-          ...glassPill,
-          padding: '0 14px', height: 40,
           fontFamily: "'Cormorant Garamond', Georgia, serif",
-          fontStyle: 'italic', fontWeight: 600, fontSize: '1.35rem',
+          fontStyle: 'italic', fontWeight: 600, fontSize: '1.5rem',
           color: '#1A1918', textDecoration: 'none', lineHeight: 1,
           letterSpacing: '-0.02em', flexShrink: 0,
-          borderRadius: 14,
+          pointerEvents: 'auto', marginRight: 8,
         }}>Vony</Link>
 
         {/* Left pill */}
