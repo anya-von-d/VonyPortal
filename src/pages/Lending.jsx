@@ -160,7 +160,8 @@ export default function Lending({ initialTab }) {
     lender_username: '',
     borrower_username: '',
     amount: '',
-    interest_rate: '',
+    interest_rate: '5',
+    currency: 'USD',
     repayment_period: '',
     repayment_unit: 'months',
     custom_due_date: '',
@@ -257,37 +258,21 @@ export default function Lending({ initialTab }) {
   const calculateLoanDetails = () => {
     const amount = parseFloat(formData.amount) || 0;
     const interestRate = parseFloat(formData.interest_rate) || 0;
-    const period = parseInt(formData.repayment_period) || 0;
+    const numPayments = parseInt(formData.repayment_period) || 0;
 
-    let periodInMonths = period;
-    if (formData.repayment_unit === 'days') {
-      periodInMonths = period / 30;
-    } else if (formData.repayment_unit === 'weeks') {
-      periodInMonths = period / 4.33;
-    } else if (formData.repayment_unit === 'custom' && formData.custom_due_date) {
-      const diffDays = Math.abs(daysUntilDate(formData.custom_due_date));
-      periodInMonths = diffDays / 30;
+    // Convert num payments → months for interest calculation
+    let periodInMonths;
+    if (formData.payment_frequency === 'weekly') {
+      periodInMonths = numPayments / 4.33;
+    } else if (formData.payment_frequency === 'biweekly') {
+      periodInMonths = numPayments / (26 / 12);
+    } else {
+      periodInMonths = numPayments; // monthly
     }
 
-    if (amount > 0 && interestRate >= 0 && periodInMonths > 0) {
+    if (amount > 0 && interestRate >= 0 && numPayments > 0) {
       const totalAmount = amount * (1 + (interestRate / 100) * (periodInMonths / 12));
-      let paymentAmount;
-      switch (formData.payment_frequency) {
-        case 'none':
-          paymentAmount = 0;
-          break;
-        case 'daily':
-          paymentAmount = totalAmount / (periodInMonths * 30);
-          break;
-        case 'weekly':
-          paymentAmount = totalAmount / (periodInMonths * (52 / 12));
-          break;
-        case 'biweekly':
-          paymentAmount = totalAmount / (periodInMonths * (26 / 12));
-          break;
-        default:
-          paymentAmount = totalAmount / periodInMonths;
-      }
+      const paymentAmount = totalAmount / numPayments;
       return { totalAmount, paymentAmount, monthlyPayment: paymentAmount, totalInterest: totalAmount - amount };
     }
     return { totalAmount: 0, paymentAmount: 0, monthlyPayment: 0, totalInterest: 0 };
@@ -296,6 +281,18 @@ export default function Lending({ initialTab }) {
   // Determine user role based on lender/borrower selection
   const isUserLender = !!(formData.lender_username && currentUserProfile && formData.lender_username === currentUserProfile.username);
   const isUserBorrower = !!(formData.borrower_username && currentUserProfile && formData.borrower_username === currentUserProfile.username);
+
+  // Resolved display names for the loan agreement text
+  const lenderDisplayName = (() => {
+    if (!formData.lender_username) return null;
+    const p = usersWithSelf.find(u => u.username === formData.lender_username);
+    return p ? (p.full_name || p.username).replace(' (You)', '') : formData.lender_username;
+  })();
+  const borrowerDisplayName = (() => {
+    if (!formData.borrower_username) return null;
+    const p = usersWithSelf.find(u => u.username === formData.borrower_username);
+    return p ? (p.full_name || p.username).replace(' (You)', '') : formData.borrower_username;
+  })();
 
   // Build users list with self at top, starred friends next, then other friends
   const usersWithSelf = React.useMemo(() => {
@@ -2054,85 +2051,43 @@ export default function Lending({ initialTab }) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
               >
-                {/* Form + stacked summary cards (desktop 2-col; mobile stacks) */}
-                <div className="lending-create-layout" style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 24, alignItems: 'start' }}>
-                  {/* Left column: Loan Type + Loan Summary + Borrower Will Pay */}
-                  <div className="lending-summary-cards" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>
-                    {/* Loan Type */}
-                    <div style={{ position: 'relative' }}>
-                      <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
-                      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                        <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Loan Type</span>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
-                        <span style={{ fontSize: 12, fontWeight: 500, color: loanType === 'scheduled' ? '#1A1918' : '#9B9A98' }}>Loan</span>
-                        <button
-                          type="button"
-                          onClick={() => setLoanType(loanType === 'flexible' ? 'scheduled' : 'flexible')}
-                          style={{ position: 'relative', width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', flexShrink: 0, background: loanType === 'flexible' ? '#03ACEA' : 'rgba(0,0,0,0.12)', transition: 'background 0.2s' }}
-                        >
-                          <div style={{ position: 'absolute', top: 3, left: loanType === 'flexible' ? 23 : 3, width: 18, height: 18, borderRadius: '50%', background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.2)', transition: 'left 0.2s' }} />
-                        </button>
-                        <span style={{ fontSize: 12, fontWeight: 500, color: loanType === 'flexible' ? '#1A1918' : '#9B9A98' }}>Quick Pay</span>
-                      </div>
-                      <p style={{ fontSize: 11, color: '#9B9A98', lineHeight: 1.5, margin: 0 }}>
-                        {loanType === 'flexible' ? 'One-time payment, perfect for splitting expenses' : 'Structured repayment plan with interest'}
-                      </p>
-                      </div>
-                    </div>
-
-                    {/* Loan Summary */}
-                    <div className="lending-loan-summary-card" style={{ position: 'relative' }}>
-                      <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
-                      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                        <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Loan Summary</span>
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                        {formData.purpose && (
-                          <div>
-                            <div style={{ fontSize: 11, color: '#9B9A98', marginBottom: 1 }}>For</div>
-                            <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{formData.purpose}</div>
-                          </div>
-                        )}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                          <span style={{ fontSize: 12, color: '#9B9A98' }}>Amount</span>
-                          <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918' }}>{formData.amount ? `$${parseFloat(formData.amount).toLocaleString()}` : '$0.00'}</span>
-                        </div>
-                        {loanType === 'scheduled' && (
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                            <span style={{ fontSize: 12, color: '#9B9A98' }}>Interest</span>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918' }}>{formData.amount && formData.interest_rate ? `$${details.totalInterest.toFixed(2)}` : '$0.00'}</span>
-                          </div>
-                        )}
-                      </div>
-                      </div>
-                    </div>
-
-                    {/* Borrower Will Pay */}
-                    <div className="lending-pay-card" style={{ position: 'relative' }}>
-                      <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
-                      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                        <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Borrower Will Pay</span>
-                      </div>
-                      {loanType === 'scheduled' ? (
-                        <>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: '#03ACEA', letterSpacing: '-0.03em', lineHeight: 1, marginBottom: 4 }}>
-                            {formData.amount && details.monthlyPayment > 0 ? `$${details.monthlyPayment.toFixed(2)}` : '$0.00'}
-                          </div>
-                          <div style={{ fontSize: 12, color: '#9B9A98' }}>{formData.payment_frequency || 'monthly'} after interest</div>
-                        </>
-                      ) : (
-                        <div style={{ fontSize: 12, color: '#9B9A98' }}>N/A for Quick Pay</div>
-                      )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Right column: actual form */}
+                {/* Form + summary cards (column layout) */}
+                <div className="lending-create-layout" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 0 }}>
+                    {/* ── Main Create a Loan box ── */}
+                    <div style={{ position: 'relative' }}>
+                      <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 14, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+                      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 12, border: 'none', padding: '20px 22px', fontSize: 12, fontFamily: "'DM Sans', sans-serif" }}>
+                        {/* Title */}
+                        <div style={{ fontSize: 15, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 2 }}>
+                          Create a Loan
+                        </div>
+                        {/* Subtitle — changes based on slider */}
+                        <div style={{ fontSize: 12, color: '#9B9A98', marginBottom: 14 }}>
+                          {loanType === 'flexible'
+                            ? 'Request a one-time payment — perfect for splitting expenses.'
+                            : 'Set up a structured loan with interest and a repayment schedule.'}
+                        </div>
+                        {/* Pill slider (Loan / Quick Pay) */}
+                        <div style={{ display: 'inline-flex', alignItems: 'center', background: '#F3F1EE', borderRadius: 999, padding: 4, marginBottom: 16, border: '1px solid rgba(0,0,0,0.05)' }}>
+                          {[{ v: 'scheduled', label: 'Loan' }, { v: 'flexible', label: 'Quick Pay' }].map(o => (
+                            <button
+                              key={o.v}
+                              type="button"
+                              onClick={() => setLoanType(o.v)}
+                              style={{
+                                padding: '7px 24px', borderRadius: 999, border: 'none',
+                                background: loanType === o.v ? '#fff' : 'transparent',
+                                boxShadow: loanType === o.v ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                                color: loanType === o.v ? '#1A1918' : '#9B9A98',
+                                fontSize: 12, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+                                cursor: 'pointer', transition: 'all 0.15s',
+                              }}
+                            >
+                              {o.label}
+                            </button>
+                          ))}
+                        </div>
                         {/* Lender + Borrower — side by side with persistent labels */}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                           {/* Lender */}
@@ -2209,37 +2164,10 @@ export default function Lending({ initialTab }) {
                           </div>
                         )}
 
-                        {/* Repeating Request Toggle - Only for Quick Payment Request */}
-                        {loanType === 'flexible' && (
-                          <div className="space-y-4">
-                            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                              <div>
-                                <Label className="flex items-center gap-2 text-sm font-medium">
-                                  Repeating Request
-                                </Label>
-                                <p className="text-xs text-slate-500 mt-0.5">Will this payment repeat regularly?</p>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => handleInputChange('is_repeating', !formData.is_repeating)}
-                                className={`relative w-12 h-6 rounded-full transition-all ${
-                                  formData.is_repeating ? 'bg-[#03ACEA]' : 'bg-slate-300'
-                                }`}
-                              >
-                                <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow transition-all ${
-                                  formData.is_repeating ? 'translate-x-6' : 'translate-x-0'
-                                }`} />
-                              </button>
-                            </div>
-
-                            {/* Repeating Options */}
-                            {formData.is_repeating && (
-                              <div style={{ position: 'relative' }}>
-                                {/* Aurora glow */}
-                                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'calc(100% + 10px)', height: 'calc(100% + 10px)', background: 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(6,182,212) 30%, rgb(20,184,166) 60%, rgb(3,172,234) 100%)', filter: 'blur(5px) saturate(1.2)', opacity: 0.35, borderRadius: 18, zIndex: 0, pointerEvents: 'none' }} />
-                                {/* Gradient border */}
-                                <div style={{ position: 'relative', zIndex: 1, background: 'linear-gradient(to right, rgba(3,172,234,0) 0%, #03ACEA 67%, #03ACEA 100%)', padding: 1, borderRadius: 11 }}>
-                                <div style={{ padding: '18px 20px 6px', borderRadius: 10, background: '#ffffff' }}>
+                        {/* Repeating Options — only when Quick Pay + is_repeating toggle is on */}
+                        {loanType === 'flexible' && formData.is_repeating && (
+                          <div>
+                            <div style={{ padding: '4px 0 6px' }}>
                                 <p className="text-sm text-slate-700 leading-[4.2] [&_input]:inline-flex [&_input]:align-baseline [&_input]:my-[2px] [&_input[type=number]]:appearance-none [&_input[type=number]]:[-moz-appearance:textfield] [&_input[type=number]::-webkit-outer-spin-button]:appearance-none [&_input[type=number]::-webkit-inner-spin-button]:appearance-none [&_.inline-flex]:my-[2px]">
                                   Payments of ${' '}
                                   <Input
@@ -2352,275 +2280,244 @@ export default function Lending({ initialTab }) {
                                     maxLength={100}
                                   />.
                                 </p>
-                                </div>
-                                </div>
-                              </div>
-                            )}
+                            </div>
                           </div>
                         )}
 
-                        {/* Scheduled loan fields - Sentence format */}
-                        {loanType === 'scheduled' && (
-                          <div style={{ position: 'relative' }}>
-                            {/* Aurora glow */}
-                            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'calc(100% + 10px)', height: 'calc(100% + 10px)', background: 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(6,182,212) 30%, rgb(20,184,166) 60%, rgb(3,172,234) 100%)', filter: 'blur(5px) saturate(1.2)', opacity: 0.35, borderRadius: 18, zIndex: 0, pointerEvents: 'none' }} />
-                            {/* Gradient border */}
-                            <div style={{ position: 'relative', zIndex: 1, background: 'linear-gradient(to right, rgba(3,172,234,0) 0%, #03ACEA 67%, #03ACEA 100%)', padding: 1, borderRadius: 11 }}>
-                            <div style={{ padding: '18px 20px 6px', borderRadius: 10, background: '#ffffff' }}>
-                            <p className="text-sm text-slate-700 leading-[4.2] [&_input]:inline-flex [&_input]:align-baseline [&_input]:my-[2px] [&_input[type=number]]:appearance-none [&_input[type=number]]:[-moz-appearance:textfield] [&_input[type=number]::-webkit-outer-spin-button]:appearance-none [&_input[type=number]::-webkit-inner-spin-button]:appearance-none [&_.inline-flex]:my-[2px] [&:last-child]:mb-0">
-                              {isUserBorrower ? (
-                                <>
-                                  The borrower requests to receive a loan of ${' '}
-                                  <Input
-                                    type="number"
-                                    step="0.01"
-                                    min="0"
-                                    max="5000"
-                                    placeholder=""
-                                    value={formData.amount}
-                                    onChange={(e) => handleInputChange('amount', e.target.value)}
-                                    className="w-24 h-8 px-3 bg-white inline-flex"
-                                    style={{ MozAppearance: 'textfield' }}
-                                  />{' '}
-                                  from{' '}
-                                  <span className="font-medium" style={{ color: '#54A6CF' }}>
-                                    {formData.lender_username ? formData.lender_username : 'the lender'}
-                                  </span>{' '}
-                                </>
-                              ) : (
-                                <>
-                                  The lender agrees to lend{' '}
-                                  <span className="font-medium" style={{ color: '#54A6CF' }}>
-                                    {formData.borrower_username ? formData.borrower_username : 'the borrower'}
-                                  </span>{' '}
-                                  ${' '}
-                                  <Input
-                                    type="number"
-                                    step="0.01"
-                                    min="0"
-                                    max="5000"
-                                    placeholder=""
-                                    value={formData.amount}
-                                    onChange={(e) => handleInputChange('amount', e.target.value)}
-                                    className="w-24 h-8 px-3 bg-white inline-flex"
-                                    style={{ MozAppearance: 'textfield' }}
-                                  />{' '}
-                                </>
-                              )}
-                              before{' '}
-                              <Input
-                                type="date"
-                                value={formData.lender_send_funds_date}
-                                onChange={(e) => handleInputChange('lender_send_funds_date', e.target.value)}
-                                min={format(new Date(), 'yyyy-MM-dd')}
-                                className="w-auto h-8 px-3 bg-white/80 inline-flex border-0 shadow-none rounded-md"
-                              />{' '}
-                              at an interest rate of{' '}
-                              <Input
-                                type="number"
-                                step="0.1"
-                                min="0"
-                                max="8"
-                                placeholder=""
-                                value={formData.interest_rate}
-                                onChange={(e) => handleInputChange('interest_rate', e.target.value)}
-                                className="w-16 h-8 px-3 bg-white inline-flex"
-                                style={{ MozAppearance: 'textfield' }}
-                              />
-                              . The loan will be repaid over{' '}
-                              <Input
-                                type="number"
-                                min="1"
-                                placeholder=""
-                                value={formData.repayment_period}
-                                onChange={(e) => handleInputChange('repayment_period', e.target.value)}
-                                className="w-16 h-8 px-3 bg-white inline-flex"
-                                style={{ MozAppearance: 'textfield' }}
-                              />{' '}
-                              <Select
-                                value={formData.repayment_unit}
-                                onValueChange={(value) => handleInputChange('repayment_unit', value)}
-                              >
-                                <SelectTrigger className="w-auto h-8 px-3 bg-white/80 inline-flex border-0 shadow-none rounded-md">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="weeks">weeks</SelectItem>
-                                  <SelectItem value="months">months</SelectItem>
-                                </SelectContent>
-                              </Select>{' '}
-                              in{' '}
-                              <Select
-                                value={formData.payment_frequency}
-                                onValueChange={(value) => handleInputChange('payment_frequency', value)}
-                              >
-                                <SelectTrigger className="w-auto h-8 px-3 bg-white/80 inline-flex border-0 shadow-none rounded-md">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="weekly">weekly</SelectItem>
-                                  <SelectItem value="monthly">monthly</SelectItem>
-                                </SelectContent>
-                              </Select>{' '}
-                              payments of{' '}
-                              <span className="font-bold" style={{ color: '#54A6CF' }}>
-                                ${details.monthlyPayment.toFixed(2)}
-                              </span>
-                              . Payments will be due{' '}
-                              {formData.payment_frequency === 'monthly' ? 'on the ' : 'on '}
-                              {formData.payment_frequency === 'weekly' ? (
-                                <Select
-                                  value={formData.loan_day_of_week}
-                                  onValueChange={(value) => handleInputChange('loan_day_of_week', value)}
-                                >
-                                  <SelectTrigger className="w-auto h-8 px-3 bg-white/80 inline-flex border-0 shadow-none rounded-md">
-                                    <SelectValue />
-                                  </SelectTrigger>
+                        {/* Scheduled loan fields — 5-paragraph agreement format */}
+                        {loanType === 'scheduled' && (() => {
+                          const numPayments = parseInt(formData.repayment_period) || 0;
+                          const firstPaymentDate = formData.first_payment_date ? new Date(formData.first_payment_date + 'T00:00:00') : null;
+                          let lastPaymentDate = null;
+                          if (firstPaymentDate && numPayments > 0) {
+                            if (formData.payment_frequency === 'weekly') {
+                              lastPaymentDate = addWeeks(firstPaymentDate, numPayments - 1);
+                            } else if (formData.payment_frequency === 'biweekly') {
+                              lastPaymentDate = addWeeks(firstPaymentDate, (numPayments - 1) * 2);
+                            } else {
+                              lastPaymentDate = addMonths(firstPaymentDate, numPayments - 1);
+                            }
+                          }
+                          const isWeeklyLike = formData.payment_frequency === 'weekly' || formData.payment_frequency === 'biweekly';
+                          const currencySymbols = { USD: '$', EUR: '€', GBP: '£', CAD: 'C$', AUD: 'A$', JPY: '¥', CHF: 'Fr' };
+                          const currSym = currencySymbols[formData.currency] || '$';
+                          return (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: 4 }}>
+                              {/* ¶1 */}
+                              <p className="loan-para">
+                                <span className="loan-name">{lenderDisplayName || 'The lender'}</span>
+                                {' '}agrees to lend{' '}
+                                <span className="loan-name">{borrowerDisplayName || 'the borrower'}</span>
+                                {' '}
+                                <Select value={formData.currency} onValueChange={v => handleInputChange('currency', v)}>
+                                  <SelectTrigger className="loan-select-trigger">{currSym}</SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="monday">Monday</SelectItem>
-                                    <SelectItem value="tuesday">Tuesday</SelectItem>
-                                    <SelectItem value="wednesday">Wednesday</SelectItem>
-                                    <SelectItem value="thursday">Thursday</SelectItem>
-                                    <SelectItem value="friday">Friday</SelectItem>
-                                    <SelectItem value="saturday">Saturday</SelectItem>
-                                    <SelectItem value="sunday">Sunday</SelectItem>
+                                    <SelectItem value="USD">$ USD</SelectItem>
+                                    <SelectItem value="EUR">€ EUR</SelectItem>
+                                    <SelectItem value="GBP">£ GBP</SelectItem>
+                                    <SelectItem value="CAD">C$ CAD</SelectItem>
+                                    <SelectItem value="AUD">A$ AUD</SelectItem>
+                                    <SelectItem value="JPY">¥ JPY</SelectItem>
+                                    <SelectItem value="CHF">Fr CHF</SelectItem>
                                   </SelectContent>
                                 </Select>
-                              ) : (
-                                <Select
-                                  value={formData.loan_day_of_month}
-                                  onValueChange={(value) => handleInputChange('loan_day_of_month', value)}
-                                >
-                                  <SelectTrigger className="w-auto h-8 px-3 bg-white/80 inline-flex border-0 shadow-none rounded-md">
-                                    <SelectValue />
-                                  </SelectTrigger>
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  min="0"
+                                  placeholder="0.00"
+                                  value={formData.amount}
+                                  onChange={(e) => handleInputChange('amount', e.target.value)}
+                                  className="loan-input loan-input-sm"
+                                  style={{ MozAppearance: 'textfield', width: 90 }}
+                                />
+                                {' '}on or before{' '}
+                                <input
+                                  type="date"
+                                  value={formData.lender_send_funds_date}
+                                  onChange={(e) => handleInputChange('lender_send_funds_date', e.target.value)}
+                                  min={format(new Date(), 'yyyy-MM-dd')}
+                                  className="loan-input loan-input-date"
+                                />
+                                {', '}at an annual interest rate of{' '}
+                                <Select value={formData.interest_rate} onValueChange={v => handleInputChange('interest_rate', v)}>
+                                  <SelectTrigger className="loan-select-trigger">{formData.interest_rate || '5'}%</SelectTrigger>
                                   <SelectContent>
-                                    {Array.from({ length: 28 }, (_, i) => i + 1).map((day) => (
-                                      <SelectItem key={day} value={day.toString()}>
-                                        {day}{day === 1 ? 'st' : day === 2 ? 'nd' : day === 3 ? 'rd' : 'th'}
-                                      </SelectItem>
+                                    {[1,2,3,4,5,6,7,8].map(n => (
+                                      <SelectItem key={n} value={String(n)}>{n}%</SelectItem>
                                     ))}
                                   </SelectContent>
                                 </Select>
-                              )}{' '}
-                              at{' '}
-                              <Input
-                                type="time"
-                                value={formData.loan_time}
-                                onChange={(e) => handleInputChange('loan_time', e.target.value)}
-                                className="w-auto h-8 px-3 bg-white/80 inline-flex border-0 shadow-none rounded-md"
-                              />{' '}
-                              <Select
-                                value={formData.loan_timezone}
-                                onValueChange={(value) => handleInputChange('loan_timezone', value)}
-                              >
-                                <SelectTrigger className="w-auto h-8 px-3 bg-white/80 inline-flex border-0 shadow-none rounded-md">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="EST">EST</SelectItem>
-                                  <SelectItem value="CST">CST</SelectItem>
-                                  <SelectItem value="MST">MST</SelectItem>
-                                  <SelectItem value="PST">PST</SelectItem>
-                                  <SelectItem value="HST">HST</SelectItem>
-                                  <SelectItem value="AKST">AKST</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              {(() => {
-                                const numPayments = formData.payment_frequency === 'weekly'
-                                  ? Math.ceil(parseInt(formData.repayment_period || 0) * (formData.repayment_unit === 'months' ? 4 : 1))
-                                  : parseInt(formData.repayment_period || 0);
+                                .
+                              </p>
 
-                                const firstPaymentDate = formData.first_payment_date ? new Date(formData.first_payment_date) : null;
-                                let lastPaymentDate = null;
+                              {/* ¶2 */}
+                              <p className="loan-para">
+                                <span className="loan-name">{borrowerDisplayName || 'The borrower'}</span>
+                                {' '}agrees to repay this loan in{' '}
+                                <input
+                                  type="number"
+                                  min="1"
+                                  placeholder="12"
+                                  value={formData.repayment_period}
+                                  onChange={(e) => handleInputChange('repayment_period', e.target.value)}
+                                  className="loan-input loan-input-sm"
+                                  style={{ MozAppearance: 'textfield', width: 60 }}
+                                />
+                                {' '}
+                                <Select value={formData.payment_frequency} onValueChange={v => handleInputChange('payment_frequency', v)}>
+                                  <SelectTrigger className="loan-select-trigger">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="weekly">weekly</SelectItem>
+                                    <SelectItem value="biweekly">biweekly</SelectItem>
+                                    <SelectItem value="monthly">monthly</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                {' '}payments of{' '}
+                                <span className="loan-calc">{currSym}{details.monthlyPayment > 0 ? details.monthlyPayment.toFixed(2) : '0.00'}</span>
+                                {' '}each.
+                              </p>
 
-                                if (firstPaymentDate && numPayments > 0) {
-                                  if (formData.payment_frequency === 'weekly') {
-                                    lastPaymentDate = addWeeks(firstPaymentDate, numPayments - 1);
-                                  } else {
-                                    lastPaymentDate = addMonths(firstPaymentDate, numPayments - 1);
-                                  }
-                                }
+                              {/* ¶3 */}
+                              <p className="loan-para">
+                                Payments will be due{isWeeklyLike ? ' on ' : ' on the '}
+                                {isWeeklyLike ? (
+                                  <Select value={formData.loan_day_of_week} onValueChange={v => handleInputChange('loan_day_of_week', v)}>
+                                    <SelectTrigger className="loan-select-trigger"><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                      {['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(d => (
+                                        <SelectItem key={d} value={d.toLowerCase()}>{d}</SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                ) : (
+                                  <Select value={formData.loan_day_of_month} onValueChange={v => handleInputChange('loan_day_of_month', v)}>
+                                    <SelectTrigger className="loan-select-trigger"><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                      {Array.from({ length: 28 }, (_, i) => i + 1).map(day => (
+                                        <SelectItem key={day} value={String(day)}>
+                                          {day}{day === 1 ? 'st' : day === 2 ? 'nd' : day === 3 ? 'rd' : 'th'}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                )}
+                                {' '}of each period at{' '}
+                                <input
+                                  type="time"
+                                  value={formData.loan_time}
+                                  onChange={(e) => handleInputChange('loan_time', e.target.value)}
+                                  className="loan-input loan-input-time"
+                                />
+                                {' '}
+                                <Select value={formData.loan_timezone} onValueChange={v => handleInputChange('loan_timezone', v)}>
+                                  <SelectTrigger className="loan-select-trigger"><SelectValue /></SelectTrigger>
+                                  <SelectContent>
+                                    {['EST','CST','MST','PST','HST','AKST'].map(tz => (
+                                      <SelectItem key={tz} value={tz}>{tz}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                {', '}beginning on{' '}
+                                <input
+                                  type="date"
+                                  value={formData.first_payment_date}
+                                  onChange={(e) => handleInputChange('first_payment_date', e.target.value)}
+                                  min={format(new Date(), 'yyyy-MM-dd')}
+                                  className="loan-input loan-input-date"
+                                />
+                                {'. '}The final payment will be due on{' '}
+                                <span className="loan-calc">{lastPaymentDate ? format(lastPaymentDate, 'MMM d, yyyy') : '—'}</span>.
+                              </p>
 
-                                return (
-                                  <>
-                                    , with the first of the{' '}
-                                    <span className="font-bold" style={{ color: '#54A6CF' }}>{numPayments || '_'}</span>{' '}
-                                    payments due on{' '}
-                                    <Input
-                                      type="date"
-                                      value={formData.first_payment_date}
-                                      onChange={(e) => handleInputChange('first_payment_date', e.target.value)}
-                                      min={format(new Date(), 'yyyy-MM-dd')}
-                                      className="w-auto h-8 px-3 bg-white/80 inline-flex border-0 shadow-none rounded-md"
-                                    />{' '}
-                                    and the last payment due on{' '}
-                                    <span className="font-bold" style={{ color: '#54A6CF' }}>
-                                      {lastPaymentDate ? format(lastPaymentDate, 'MMM d, yyyy') : '_'}
-                                    </span>
-                                    .
-                                  </>
-                                );
-                              })()}
-                              {' '}This loan is for{' '}
-                              <Input
-                                type="text"
-                                placeholder={purposePlaceholder}
-                                value={formData.purpose}
-                                onChange={(e) => handleInputChange('purpose', e.target.value)}
-                                className="flex-1 h-8 px-3 bg-white min-w-[200px] inline-flex"
-                                maxLength={100}
-                              />
-                              .
-                            </p>
+                              {/* ¶4 — static */}
+                              <p className="loan-para loan-para-static">
+                                {borrowerDisplayName || 'The borrower'} may repay this loan early, in whole or in part, at any time without penalty.
+                              </p>
+
+                              {/* ¶5 */}
+                              <p className="loan-para">
+                                This loan is for{' '}
+                                <input
+                                  type="text"
+                                  placeholder="e.g., rent, car repair…"
+                                  value={formData.purpose}
+                                  onChange={(e) => handleInputChange('purpose', e.target.value)}
+                                  maxLength={100}
+                                  className="loan-input loan-input-purpose"
+                                />
+                                .
+                              </p>
                             </div>
-                            </div>
-                          </div>
-                        )}
+                          );
+                        })()}
+                      </div>{/* end main white card */}
+                    </div>{/* end main Create a Loan box */}
 
-                        {/* Mobile-only: Borrower Will Pay + Loan Summary (shown below blue box on mobile) */}
-                        <div className="lending-mobile-pay-summary" style={{ display: 'none', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                          {/* Borrower Will Pay */}
-                          <div style={{ background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                              <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Borrower Will Pay</span>
+                    {/* ── Summary row (Loan Summary + Borrower Will Pay / Repeating Request) ── */}
+                    <div className="lending-summary-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                      {/* Loan Summary */}
+                      <div style={{ position: 'relative' }}>
+                        <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+                        <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
+                          <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif", marginBottom: 10 }}>Loan Summary</div>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                            {formData.purpose && (
+                              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, maxWidth: '100%' }}>
+                                <span style={{ fontSize: 12, color: '#9B9A98' }}>For</span>
+                                <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{formData.purpose}</span>
+                              </div>
+                            )}
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                              <span style={{ fontSize: 12, color: '#9B9A98' }}>Amount</span>
+                              <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918' }}>{formData.amount ? `$${parseFloat(formData.amount).toLocaleString()}` : '$0.00'}</span>
                             </div>
-                            {loanType === 'scheduled' ? (
-                              <>
-                                <div style={{ fontSize: 12, fontWeight: 700, color: '#03ACEA', letterSpacing: '-0.03em', lineHeight: 1, marginBottom: 4 }}>
-                                  {formData.amount && details.monthlyPayment > 0 ? `$${details.monthlyPayment.toFixed(2)}` : '$0.00'}
-                                </div>
-                                <div style={{ fontSize: 12, color: '#9B9A98' }}>{formData.payment_frequency || 'monthly'} after interest</div>
-                              </>
-                            ) : (
-                              <div style={{ fontSize: 12, color: '#9B9A98' }}>N/A for Quick Pay</div>
+                            {loanType === 'scheduled' && (
+                              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                                <span style={{ fontSize: 12, color: '#9B9A98' }}>Expected Interest</span>
+                                <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918' }}>{formData.amount && formData.interest_rate ? `$${details.totalInterest.toFixed(2)}` : '$0.00'}</span>
+                              </div>
                             )}
                           </div>
-                          {/* Loan Summary */}
-                          <div style={{ background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                              <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Loan Summary</span>
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                              {formData.purpose && (
-                                <div>
-                                  <div style={{ fontSize: 11, color: '#9B9A98', marginBottom: 1 }}>For</div>
-                                  <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{formData.purpose}</div>
-                                </div>
-                              )}
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                                <span style={{ fontSize: 12, color: '#9B9A98' }}>Amount</span>
-                                <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918' }}>{formData.amount ? `$${parseFloat(formData.amount).toLocaleString()}` : '$0.00'}</span>
-                              </div>
-                              {loanType === 'scheduled' && (
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                                  <span style={{ fontSize: 12, color: '#9B9A98' }}>Interest</span>
-                                  <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918' }}>{formData.amount && formData.interest_rate ? `$${details.totalInterest.toFixed(2)}` : '$0.00'}</span>
-                                </div>
-                              )}
+                        </div>
+                      </div>
+
+                      {loanType === 'scheduled' ? (
+                        /* Borrower Will Pay */
+                        <div style={{ position: 'relative' }}>
+                          <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+                          <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
+                            <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif", marginBottom: 10 }}>Borrower Will Pay</div>
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+                              <span style={{ fontSize: 14, fontWeight: 700, color: '#03ACEA', letterSpacing: '-0.02em' }}>
+                                {formData.amount && details.monthlyPayment > 0 ? `$${details.monthlyPayment.toFixed(2)}` : '$0.00'}
+                              </span>
+                              <span style={{ fontSize: 12, color: '#9B9A98' }}>{formData.payment_frequency || 'monthly'} after interest</span>
                             </div>
                           </div>
                         </div>
+                      ) : (
+                        /* Repeating Request */
+                        <div style={{ position: 'relative' }}>
+                          <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+                          <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
+                            <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif", marginBottom: 10 }}>Repeating Request</div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                              <span style={{ fontSize: 12, color: '#9B9A98' }}>Will this payment repeat regularly?</span>
+                              <button
+                                type="button"
+                                onClick={() => handleInputChange('is_repeating', !formData.is_repeating)}
+                                style={{ position: 'relative', width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', flexShrink: 0, background: formData.is_repeating ? '#03ACEA' : 'rgba(0,0,0,0.12)', transition: 'background 0.2s' }}
+                              >
+                                <div style={{ position: 'absolute', top: 3, left: formData.is_repeating ? 23 : 3, width: 18, height: 18, borderRadius: '50%', background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.2)', transition: 'left 0.2s' }} />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
 
                         {(() => {
                           const isDisabled = isSubmitting || !formData.lender_username || !formData.borrower_username || !formData.amount || !formData.purpose || (loanType === 'scheduled' && (!formData.interest_rate || !formData.repayment_period || !formData.lender_send_funds_date || !formData.first_payment_date)) || (loanType === 'flexible' && formData.is_repeating && (!formData.repeating_start_date || !formData.repeating_num_payments));

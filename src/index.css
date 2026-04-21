@@ -728,4 +728,82 @@ input[type="date"] {
   /* ── Upcoming payment stack: swap to mobile carousel layout ── */
   .upcoming-stack-desktop { display: none !important; }
   .upcoming-stack-mobile  { display: flex !important; }
+
+  /* Loan agreement form: stack summary cards on mobile */
+  .lending-summary-row { grid-template-columns: 1fr !important; }
+}
+
+/* ─── Loan agreement paragraph + inline input styles ─── */
+.loan-para {
+  font-size: 12px;
+  line-height: 2.4;
+  color: #3a3937;
+  font-family: 'DM Sans', sans-serif;
+  display: block;
+}
+.loan-para-static {
+  color: #9B9A98;
+  font-style: italic;
+}
+.loan-name {
+  font-weight: 600;
+  color: #1A1918;
+}
+.loan-calc {
+  font-weight: 700;
+  color: #03ACEA;
+}
+
+/* Base inline input */
+.loan-input {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  height: 30px;
+  padding: 0 9px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(0,0,0,0.1);
+  background: rgba(0,0,0,0.025);
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  color: #1A1918;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  box-shadow: none;
+}
+.loan-input::placeholder { color: #B0AEAc; }
+.loan-input:focus {
+  border-color: rgba(0,0,0,0.28);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
+}
+.loan-input-sm  { width: 88px; }
+.loan-input-date { width: auto; }
+.loan-input-time { width: auto; }
+.loan-input-purpose { width: 220px; }
+
+/* Inline Select trigger (no border, pill-shaped) */
+.loan-select-trigger {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 30px !important;
+  padding: 0 8px 0 9px !important;
+  border-radius: 8px !important;
+  border: 1.5px solid rgba(0,0,0,0.1) !important;
+  background: rgba(0,0,0,0.025) !important;
+  font-size: 12px !important;
+  font-family: 'DM Sans', sans-serif !important;
+  color: #1A1918 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  vertical-align: middle !important;
+  transition: border-color 0.15s, background 0.15s !important;
+  cursor: pointer !important;
+  gap: 4px !important;
+  white-space: nowrap !important;
+}
+.loan-select-trigger:hover,
+.loan-select-trigger[data-state="open"] {
+  border-color: rgba(0,0,0,0.28) !important;
+  background: #ffffff !important;
 }
