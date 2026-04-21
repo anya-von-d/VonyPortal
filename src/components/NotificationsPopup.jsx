@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Payment, Loan, PublicProfile, LoanAgreement, Friendship } from '@/entities/all';
 import { useAuth } from '@/lib/AuthContext';
-import { CheckCircle, Clock, X } from 'lucide-react';
+import { CheckCircle, X } from 'lucide-react';
 import { format, addMonths, parseISO } from 'date-fns';
 import { toLocalDate, daysUntil as daysUntilDate } from '@/components/utils/dateUtils';
 import BorrowerSignatureModal from '@/components/loans/BorrowerSignatureModal';
 import confetti from 'canvas-confetti';
 
-export default function NotificationsPopup({ onClose, positionOverride }) {
+export default function NotificationsPopup({ onClose, positionOverride, onOpenFriends }) {
   const { user: authUser, userProfile } = useAuth();
   const user = userProfile ? { ...userProfile, id: authUser?.id } : null;
+  const navigate = useNavigate();
 
   const [paymentsToConfirm, setPaymentsToConfirm] = useState([]);
   const [termChangeRequests, setTermChangeRequests] = useState([]);
@@ -28,12 +29,9 @@ export default function NotificationsPopup({ onClose, positionOverride }) {
 
   const popupRef = useRef(null);
 
-  // Click outside to close
   useEffect(() => {
     const handler = (e) => {
-      if (popupRef.current && !popupRef.current.contains(e.target)) {
-        onClose();
-      }
+      if (popupRef.current && !popupRef.current.contains(e.target)) onClose();
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
@@ -57,9 +55,7 @@ export default function NotificationsPopup({ onClose, positionOverride }) {
 
       setAllPayments(fetchedPayments);
 
-      const userLoans = allLoans.filter(
-        loan => loan.lender_id === user.id || loan.borrower_id === user.id
-      );
+      const userLoans = allLoans.filter(l => l.lender_id === user.id || l.borrower_id === user.id);
       const userLoanIds = userLoans.map(l => l.id);
 
       const pendingPayments = fetchedPayments.filter(p => p.status === 'pending_confirmation');
@@ -68,14 +64,14 @@ export default function NotificationsPopup({ onClose, positionOverride }) {
         if (!userLoanIds.includes(payment.loan_id)) return false;
         const loan = userLoans.find(l => l.id === payment.loan_id);
         if (!loan) return false;
-        if (payment.recorded_by === user.id) return false;
-        return true;
+        return payment.recorded_by !== user.id;
       });
 
-      const termChanges = allLoans.filter(loan => {
-        if (!userLoanIds.includes(loan.id)) return false;
-        return loan.status === 'pending_borrower_approval' && loan.borrower_id === user.id;
-      });
+      const termChanges = allLoans.filter(loan =>
+        userLoanIds.includes(loan.id) &&
+        loan.status === 'pending_borrower_approval' &&
+        loan.borrower_id === user.id
+      );
 
       const offersReceived = allLoans.filter(loan =>
         loan.borrower_id === user.id && loan.status === 'pending'
@@ -119,19 +115,19 @@ export default function NotificationsPopup({ onClose, positionOverride }) {
       if (paymentAmount <= 0) return;
       if (isBorrower) {
         if (daysUntil < 0) {
-          reminders.push({ id: `reminder-owe-${loan.id}`, type: 'overdue_owe', loan, title: `Your payment to ${otherName} is overdue`, subtitle: `If you've already paid, make sure to record it.`, daysUntil, paymentAmount, otherName });
+          reminders.push({ id: `reminder-owe-${loan.id}`, type: 'overdue_owe', loan, title: `Your payment to ${otherName} is overdue`, daysUntil, paymentAmount, otherName });
         } else if (daysUntil === 0) {
-          reminders.push({ id: `reminder-owe-${loan.id}`, type: 'due_today_owe', loan, title: `You have a payment due today to ${otherName}`, subtitle: `Make sure to record the payment once it's made.`, daysUntil, paymentAmount, otherName });
+          reminders.push({ id: `reminder-owe-${loan.id}`, type: 'due_today_owe', loan, title: `You have a payment due today to ${otherName}`, daysUntil, paymentAmount, otherName });
         } else {
-          reminders.push({ id: `reminder-owe-${loan.id}`, type: 'upcoming_owe', loan, title: `You have an upcoming payment to ${otherName}`, subtitle: `Make sure to record the payment once it's made.`, daysUntil, paymentAmount, otherName });
+          reminders.push({ id: `reminder-owe-${loan.id}`, type: 'upcoming_owe', loan, title: `You have an upcoming payment to ${otherName}`, daysUntil, paymentAmount, otherName });
         }
       } else {
         if (daysUntil < 0) {
-          reminders.push({ id: `reminder-receive-${loan.id}`, type: 'overdue_receive', loan, title: `${otherName}'s payment to you is overdue`, subtitle: `If they've already paid, make sure to record it.`, daysUntil, paymentAmount, otherName });
+          reminders.push({ id: `reminder-receive-${loan.id}`, type: 'overdue_receive', loan, title: `${otherName}'s payment to you is overdue`, daysUntil, paymentAmount, otherName });
         } else if (daysUntil === 0) {
-          reminders.push({ id: `reminder-receive-${loan.id}`, type: 'due_today_receive', loan, title: `You are due to receive a payment from ${otherName} today`, subtitle: `Make sure to record the payment once it's received.`, daysUntil, paymentAmount, otherName });
+          reminders.push({ id: `reminder-receive-${loan.id}`, type: 'due_today_receive', loan, title: `You are due to receive a payment from ${otherName} today`, daysUntil, paymentAmount, otherName });
         } else {
-          reminders.push({ id: `reminder-receive-${loan.id}`, type: 'upcoming_receive', loan, title: `You are due to receive a payment from ${otherName}`, subtitle: `Make sure to record the payment once it's received.`, daysUntil, paymentAmount, otherName });
+          reminders.push({ id: `reminder-receive-${loan.id}`, type: 'upcoming_receive', loan, title: `You are due to receive a payment from ${otherName}`, daysUntil, paymentAmount, otherName });
         }
       }
     });
@@ -140,9 +136,7 @@ export default function NotificationsPopup({ onClose, positionOverride }) {
   };
 
   const reminders = buildReminders();
-
   const getUserById = (userId) => profiles.find(p => p.user_id === userId) || { full_name: 'Unknown', username: 'unknown' };
-
   const getLoanOtherParty = (loan) => {
     const otherUserId = loan.lender_id === user?.id ? loan.borrower_id : loan.lender_id;
     const profile = profiles.find(p => p.user_id === otherUserId);
@@ -154,28 +148,18 @@ export default function NotificationsPopup({ onClose, positionOverride }) {
     try {
       await Payment.update(payment.id, { status: 'completed' });
       setPaymentsToConfirm(prev => prev.filter(p => p.id !== payment.id));
-      confetti({ particleCount: 80, spread: 65, origin: { y: 0.5 }, colors: ['#35B276', '#03ACEA', '#03ACEA', '#ffffff'], zIndex: 9999 });
-      try {
-        const loan = loans.find(l => l.id === payment.loan_id);
-        if (loan) {
-          const newAmountPaid = (loan.amount_paid || 0) + payment.amount;
-          const newRemainingBalance = (loan.total_amount || 0) - newAmountPaid;
-          const loanUpdate = { amount_paid: newAmountPaid };
-          if (newRemainingBalance <= 0.01) {
-            loanUpdate.status = 'completed';
-            loanUpdate.next_payment_date = null;
-          } else {
-            loanUpdate.next_payment_date = format(addMonths(new Date(), 1), 'yyyy-MM-dd');
-          }
-          await Loan.update(loan.id, loanUpdate);
-        }
-      } catch (loanError) {
-        console.error('Error updating loan after payment confirmation:', loanError);
+      confetti({ particleCount: 80, spread: 65, origin: { y: 0.5 }, colors: ['#35B276', '#03ACEA', '#ffffff'], zIndex: 9999 });
+      const loan = loans.find(l => l.id === payment.loan_id);
+      if (loan) {
+        const newAmountPaid = (loan.amount_paid || 0) + payment.amount;
+        const newRemainingBalance = (loan.total_amount || 0) - newAmountPaid;
+        const loanUpdate = { amount_paid: newAmountPaid };
+        if (newRemainingBalance <= 0.01) { loanUpdate.status = 'completed'; loanUpdate.next_payment_date = null; }
+        else { loanUpdate.next_payment_date = format(addMonths(new Date(), 1), 'yyyy-MM-dd'); }
+        await Loan.update(loan.id, loanUpdate);
       }
       loadRequests();
-    } catch (error) {
-      console.error('Error confirming payment:', error);
-    }
+    } catch (error) { console.error('Error confirming payment:', error); }
     setProcessingId(null);
   };
 
@@ -188,9 +172,7 @@ export default function NotificationsPopup({ onClose, positionOverride }) {
       await Payment.update(payment.id, { status: 'denied' });
       setPaymentsToConfirm(prev => prev.filter(p => p.id !== payment.id));
       loadRequests();
-    } catch (error) {
-      console.error('Error denying payment:', error);
-    }
+    } catch (error) { console.error('Error denying payment:', error); }
     setProcessingId(null);
   };
 
@@ -211,9 +193,7 @@ export default function NotificationsPopup({ onClose, positionOverride }) {
       setShowSignatureModal(false);
       setSelectedOffer(null);
       loadRequests();
-    } catch (error) {
-      console.error('Error signing loan offer:', error);
-    }
+    } catch (error) { console.error('Error signing loan offer:', error); }
     setProcessingId(null);
   };
 
@@ -225,32 +205,53 @@ export default function NotificationsPopup({ onClose, positionOverride }) {
       setShowSignatureModal(false);
       setSelectedOffer(null);
       loadRequests();
-    } catch (error) {
-      console.error('Error declining loan offer:', error);
-    }
+    } catch (error) { console.error('Error declining loan offer:', error); }
     setProcessingId(null);
   };
 
-  const typeIconMap = {
-    friend:          { color: '#7C3AED', bg: 'rgba(124,58,237,0.12)', svg: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
-    offer_received:  { color: '#2563EB', bg: 'rgba(37,99,235,0.12)',  svg: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> },
-    payment_confirm: { color: '#16A34A', bg: 'rgba(22,163,74,0.12)',  svg: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> },
-    term_change:     { color: '#D97706', bg: 'rgba(217,119,6,0.12)',  svg: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> },
+  // ── Icon map — plain symbols, no background ──────────────────
+  const TypeIcon = ({ type }) => {
+    const isOverdue = type.startsWith('overdue');
+    if (type === 'overdue_owe' || type === 'due_today_owe' || type === 'upcoming_owe') {
+      return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={isOverdue ? '#E8726E' : '#03ACEA'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:1}}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>;
+    }
+    if (type === 'overdue_receive' || type === 'due_today_receive' || type === 'upcoming_receive') {
+      return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={isOverdue ? '#D97706' : '#03ACEA'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:1}}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>;
+    }
+    if (type === 'friend') return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:1}}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
+    if (type === 'offer_received') return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:1}}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>;
+    if (type === 'payment_confirm') return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:1}}><polyline points="20 6 9 17 4 12"/></svg>;
+    if (type === 'term_change') return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:1}}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>;
+    return null;
   };
 
-  const rowStyle = { background: '#F8F8F8', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 14, padding: '9px 16px' };
+  // ── Action button — plain text link style ────────────────────
+  const ActionBtn = ({ label, color = '#03ACEA', onClick, disabled }) => (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        background: 'none', border: 'none', padding: 0, cursor: disabled ? 'default' : 'pointer',
+        fontSize: 12, fontWeight: 600, color: disabled ? '#C7C6C4' : color,
+        fontFamily: "'DM Sans', sans-serif", flexShrink: 0, whiteSpace: 'nowrap',
+      }}
+    >
+      {label}
+    </button>
+  );
 
-  // Build allItems
+  // ── Build allItems ───────────────────────────────────────────
   const allItems = [];
   friendRequestsReceived.forEach(request => {
     const senderProfile = profiles.find(p => p.user_id === request.user_id);
     const name = senderProfile?.full_name || senderProfile?.username || 'Unknown';
-    allItems.push({ type: 'friend', id: `friend-${request.id}`, timestamp: new Date(request.created_at || 0), data: request, name, purpose: null, amount: null });
+    allItems.push({ type: 'friend', id: `friend-${request.id}`, timestamp: new Date(request.created_at || 0), data: request, name });
   });
   loanOffersReceived.forEach(offer => {
     const lender = getUserById(offer.lender_id);
     const name = lender?.full_name || lender?.username || 'Unknown';
-    allItems.push({ type: 'offer_received', id: `offer-recv-${offer.id}`, timestamp: new Date(offer.created_at || 0), data: offer, name, purpose: offer.purpose, amount: null });
+    allItems.push({ type: 'offer_received', id: `offer-recv-${offer.id}`, timestamp: new Date(offer.created_at || 0), data: offer, name, purpose: offer.purpose, lenderName: name });
   });
   paymentsToConfirm.forEach(payment => {
     const recorderProfile = profiles.find(p => p.user_id === payment.recorded_by);
@@ -259,12 +260,13 @@ export default function NotificationsPopup({ onClose, positionOverride }) {
     allItems.push({ type: 'payment_confirm', id: `pmt-confirm-${payment.id}`, timestamp: new Date(payment.created_at || payment.payment_date || 0), data: payment, name, purpose: pmtLoan?.purpose || null, amount: payment.amount, paymentMethod: payment.payment_method || null, paymentDate: payment.payment_date || null });
   });
   termChangeRequests.forEach(loan => {
-    const otherUserId = loan.lender_id === user?.id ? loan.borrower_id : loan.lender_id;
-    const otherProfile = profiles.find(p => p.user_id === otherUserId);
+    const otherProfile = profiles.find(p => p.user_id === (loan.lender_id === user?.id ? loan.borrower_id : loan.lender_id));
     const name = otherProfile?.full_name || otherProfile?.username || getLoanOtherParty(loan);
-    allItems.push({ type: 'term_change', id: `term-${loan.id}`, timestamp: new Date(loan.updated_at || loan.created_at || 0), data: loan, name, purpose: null, amount: null });
+    allItems.push({ type: 'term_change', id: `term-${loan.id}`, timestamp: new Date(loan.updated_at || loan.created_at || 0), data: loan, name });
   });
   allItems.sort((a, b) => b.timestamp - a.timestamp);
+
+  const isEmpty = reminders.length === 0 && allItems.length === 0;
 
   return (
     <>
@@ -272,10 +274,9 @@ export default function NotificationsPopup({ onClose, positionOverride }) {
         ref={popupRef}
         style={{
           position: 'fixed',
-          top: 58,
-          right: 20,
+          top: 58, right: 20,
           zIndex: 400,
-          width: 380,
+          width: 360,
           maxHeight: 520,
           background: 'white',
           borderRadius: 14,
@@ -290,119 +291,113 @@ export default function NotificationsPopup({ onClose, positionOverride }) {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 10px', flexShrink: 0 }}>
           <span style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.01em' }}>Notifications</span>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#9B9A98', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <X size={16} />
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#9B9A98', display: 'flex', alignItems: 'center' }}>
+            <X size={15} />
           </button>
         </div>
 
+        {/* Divider */}
+        <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', flexShrink: 0 }} />
+
         {/* Content */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '12px 14px 16px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '10px 16px 14px' }}>
           {isLoading ? (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0' }}>
-              <div style={{ width: 24, height: 24, border: '2px solid #03ACEA', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+              <div style={{ width: 22, height: 22, border: '2px solid #03ACEA', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
             </div>
-          ) : reminders.length === 0 && allItems.length === 0 ? (
-            <div style={rowStyle}>
-              <div style={{ width: 24, height: 24, borderRadius: 6, background: 'rgba(3,172,234,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#03ACEA' }}>
-                <CheckCircle style={{ width: 11, height: 11 }} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1918', margin: '0 0 2px' }}>All caught up!</p>
-                <p style={{ fontSize: 12, color: '#787776', margin: 0 }}>You have no notifications.</p>
-              </div>
+          ) : isEmpty ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 0' }}>
+              <CheckCircle size={12} style={{ color: '#03ACEA', flexShrink: 0 }} />
+              <span style={{ fontSize: 12, color: '#787776' }}>You're all caught up!</span>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {/* Payment reminders */}
               {reminders.map(reminder => {
                 const isOverdue = reminder.type.startsWith('overdue');
                 return (
-                  <div key={reminder.id} style={rowStyle}>
-                    <div style={{ width: 24, height: 24, borderRadius: 6, background: isOverdue ? 'rgba(232,114,110,0.12)' : 'rgba(3,172,234,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: isOverdue ? '#E8726E' : '#03ACEA' }}>
-                      <Clock style={{ width: 11, height: 11 }} />
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', lineHeight: 1.4, margin: '0 0 2px' }}>{reminder.title}</p>
-                      <p style={{ fontSize: 11, color: '#787776', lineHeight: 1.4, margin: 0 }}>{reminder.subtitle}</p>
-                    </div>
-                    <Link to={createPageUrl('RecordPayment')} onClick={onClose} style={{ display: 'inline-flex', padding: '5px 10px', borderRadius: 20, background: isOverdue ? '#E8726E' : '#03ACEA', color: 'white', fontSize: 10, fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                  <div key={reminder.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '7px 0' }}>
+                    <TypeIcon type={reminder.type} />
+                    <span style={{ flex: 1, fontSize: 12, fontWeight: 500, color: '#787776', lineHeight: 1.4 }}>
+                      {reminder.title}
+                    </span>
+                    <Link
+                      to={createPageUrl('RecordPayment')}
+                      onClick={onClose}
+                      style={{ fontSize: 12, fontWeight: 600, color: isOverdue ? '#E8726E' : '#03ACEA', textDecoration: 'none', flexShrink: 0 }}
+                    >
                       Record
                     </Link>
                   </div>
                 );
               })}
 
-              {allItems.map(item => {
-                const ti = typeIconMap[item.type] || { color: '#9B9A98', bg: 'rgba(155,154,152,0.12)', svg: null };
-                return (
-                  <div key={item.id} style={rowStyle}>
-                    <div style={{ width: 24, height: 24, borderRadius: 6, background: ti.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: ti.color }}>
-                      {ti.svg}
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', lineHeight: 1.4, margin: '0 0 2px' }}>
-                        {item.type === 'friend' && `${item.name} sent you a friend request`}
-                        {item.type === 'offer_received' && `${item.name} sent you a loan offer${item.purpose ? ` for ${item.purpose}` : ''}`}
-                        {item.type === 'payment_confirm' && `${item.name} paid you $${item.amount?.toFixed(2)}${item.paymentMethod ? ` via ${item.paymentMethod}` : ''}`}
-                        {item.type === 'term_change' && `${item.name} sent you a loan change request`}
-                      </p>
-                      {item.type === 'payment_confirm' && item.paymentDate && (
-                        <p style={{ fontSize: 10, color: '#9B9A98', margin: '0 0 1px', fontWeight: 400 }}>
-                          {format(parseISO(item.paymentDate), 'do MMMM')}
-                        </p>
-                      )}
-                    </div>
-                    <div style={{ flexShrink: 0 }}>
-                      {item.type === 'friend' && (
-                        <Link to={createPageUrl('Friends')} onClick={onClose} style={{ fontSize: 11, fontWeight: 600, color: '#03ACEA', textDecoration: 'none' }}>View</Link>
-                      )}
-                      {item.type === 'offer_received' && (
-                        <button
-                          onClick={() => { setSelectedOffer(item.data); setShowSignatureModal(true); }}
+              {/* Action items */}
+              {allItems.map(item => (
+                <div key={item.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '7px 0' }}>
+                  <TypeIcon type={item.type} />
+                  <span style={{ flex: 1, fontSize: 12, fontWeight: 500, color: '#787776', lineHeight: 1.4 }}>
+                    {item.type === 'friend' && `${item.name} sent you a friend request`}
+                    {item.type === 'offer_received' && `${item.name} sent you a loan offer${item.purpose ? ` for ${item.purpose}` : ''}`}
+                    {item.type === 'payment_confirm' && `${item.name} paid you $${item.amount?.toFixed(2)}${item.paymentMethod ? ` via ${item.paymentMethod}` : ''}`}
+                    {item.type === 'term_change' && `${item.name} sent you a loan change request`}
+                  </span>
+                  <div style={{ display: 'flex', gap: 8, flexShrink: 0, alignItems: 'center' }}>
+                    {item.type === 'friend' && (
+                      <ActionBtn
+                        label="View"
+                        onClick={() => {
+                          onClose();
+                          onOpenFriends?.();
+                        }}
+                      />
+                    )}
+                    {item.type === 'offer_received' && (
+                      <ActionBtn
+                        label="View offer"
+                        disabled={processingId === item.data.id}
+                        onClick={() => {
+                          setSelectedOffer(item.data);
+                          setShowSignatureModal(true);
+                        }}
+                      />
+                    )}
+                    {item.type === 'payment_confirm' && (
+                      <>
+                        <ActionBtn
+                          label="Confirm"
+                          color="#16A34A"
                           disabled={processingId === item.data.id}
-                          style={{ fontSize: 11, fontWeight: 600, color: '#03ACEA', background: 'none', border: 'none', cursor: 'pointer', padding: 0, opacity: processingId === item.data.id ? 0.5 : 1 }}
-                        >
-                          View offer
-                        </button>
-                      )}
-                      {item.type === 'payment_confirm' && (
-                        <div style={{ display: 'flex', gap: 5, flexShrink: 0 }}>
-                          <button
-                            onClick={() => handleConfirmPayment(item.data)}
-                            disabled={processingId === item.data.id}
-                            style={{ fontSize: 10, fontWeight: 600, color: 'white', background: '#03ACEA', border: 'none', borderRadius: 6, padding: '4px 8px', cursor: 'pointer', opacity: processingId === item.data.id ? 0.5 : 1, whiteSpace: 'nowrap' }}
-                          >
-                            Confirm
-                          </button>
-                          <button
-                            onClick={() => setConfirmingDeny(item.data)}
-                            disabled={processingId === item.data.id}
-                            style={{ fontSize: 10, fontWeight: 600, color: '#E8726E', background: 'rgba(232,114,110,0.1)', border: 'none', borderRadius: 6, padding: '4px 8px', cursor: 'pointer', opacity: processingId === item.data.id ? 0.5 : 1, whiteSpace: 'nowrap' }}
-                          >
-                            Reject
-                          </button>
-                        </div>
-                      )}
-                      {item.type === 'term_change' && (
-                        <Link to={createPageUrl('Requests')} onClick={onClose} style={{ fontSize: 11, fontWeight: 600, color: '#03ACEA', textDecoration: 'none' }}>View</Link>
-                      )}
-                    </div>
+                          onClick={() => handleConfirmPayment(item.data)}
+                        />
+                        <ActionBtn
+                          label="Reject"
+                          color="#E8726E"
+                          disabled={processingId === item.data.id}
+                          onClick={() => setConfirmingDeny(item.data)}
+                        />
+                      </>
+                    )}
+                    {item.type === 'term_change' && (
+                      <ActionBtn label="View" onClick={() => { onClose(); navigate(createPageUrl('Requests')); }} />
+                    )}
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           )}
         </div>
       </div>
 
-      {/* Deny confirmation inline */}
+      {/* Deny confirmation */}
       {confirmingDeny && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={() => setConfirmingDeny(null)}>
           <div style={{ background: 'white', borderRadius: 16, padding: 24, maxWidth: 320, width: '100%' }} onClick={e => e.stopPropagation()}>
-            <h3 style={{ fontWeight: 600, fontSize: 14, color: '#1A1918', marginBottom: 8, marginTop: 0 }}>Deny Payment?</h3>
-            <p style={{ fontSize: 13, color: '#787776', marginBottom: 20 }}>Are you sure you want to deny this payment of ${confirmingDeny.amount?.toFixed(2)}?</p>
+            <h3 style={{ fontWeight: 600, fontSize: 14, color: '#1A1918', marginBottom: 8, marginTop: 0 }}>Reject Payment?</h3>
+            <p style={{ fontSize: 13, color: '#787776', marginBottom: 20 }}>Are you sure you didn't receive this payment of ${confirmingDeny.amount?.toFixed(2)}?</p>
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => setConfirmingDeny(null)} style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: 'transparent', color: '#1A1918', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer' }}>Cancel</button>
-              <button onClick={handleDenyPayment} style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: '#dc2626', color: 'white', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer' }}>Deny</button>
+              <button onClick={() => setConfirmingDeny(null)} style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: 'transparent', color: '#1A1918', fontSize: 13, fontWeight: 600, border: '1px solid rgba(0,0,0,0.1)', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}>Cancel</button>
+              <button onClick={handleDenyPayment} style={{ flex: 1, padding: '8px 16px', borderRadius: 8, background: '#E8726E', color: 'white', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}>Reject</button>
             </div>
           </div>
         </div>

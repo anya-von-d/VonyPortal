@@ -45,10 +45,10 @@ const NavBtn = ({ to, children, onClick, active }) => {
 
 const glassPill = {
   display: 'inline-flex', alignItems: 'center', gap: 2,
-  background: 'rgba(255,255,255,0.72)',
-  backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-  border: '1px solid rgba(255,255,255,0.55)',
-  boxShadow: '0 2px 10px rgba(0,0,0,0.07)',
+  background: 'rgba(255,255,255,0.38)',
+  backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+  border: '1px solid rgba(255,255,255,0.28)',
+  boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
   borderRadius: 30, padding: 4,
   pointerEvents: 'auto',
 };
@@ -174,7 +174,12 @@ export default function DesktopTopNav() {
       </div>
 
       <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
-      {notifOpen && <NotificationsPopup onClose={() => setNotifOpen(false)} />}
+      {notifOpen && (
+        <NotificationsPopup
+          onClose={() => setNotifOpen(false)}
+          onOpenFriends={() => { setNotifOpen(false); setFriendsOpen(true); }}
+        />
+      )}
       {friendsOpen && <FriendsPopup onClose={() => { setFriendsOpen(false); setFriendsInitialTab(null); }} initialTab={friendsInitialTab} />}
     </>
   );

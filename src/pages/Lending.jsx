@@ -1530,7 +1530,7 @@ export default function Lending({ initialTab }) {
           style={initialTab === 'create' ? {
             display: 'block',
             maxWidth: 1000, margin: '0 auto',
-            background: '#F5F4F0', borderRadius: 20,
+            background: '#FDFCFA', borderRadius: 20,
             boxShadow: '0 24px 80px rgba(0,0,0,0.28), 0 4px 16px rgba(0,0,0,0.08)',
             position: 'relative',
             padding: '28px 32px 40px',
