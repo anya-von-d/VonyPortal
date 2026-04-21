@@ -782,6 +782,31 @@ input[type="date"] {
 .loan-input-time { width: auto; }
 .loan-input-purpose { width: 220px; }
 
+/* Native <select> for inline loan agreement fields */
+.loan-select {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  height: 30px;
+  padding: 0 6px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(0,0,0,0.1);
+  background: rgba(0,0,0,0.025);
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  color: #1A1918;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  -webkit-appearance: auto;
+  appearance: auto;
+}
+.loan-select:focus {
+  border-color: rgba(0,0,0,0.28);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
+}
+
 /* Inline Select trigger (no border, pill-shaped) */
 .loan-select-trigger {
   display: inline-flex !important;

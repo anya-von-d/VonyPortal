@@ -282,18 +282,6 @@ export default function Lending({ initialTab }) {
   const isUserLender = !!(formData.lender_username && currentUserProfile && formData.lender_username === currentUserProfile.username);
   const isUserBorrower = !!(formData.borrower_username && currentUserProfile && formData.borrower_username === currentUserProfile.username);
 
-  // Resolved display names for the loan agreement text
-  const lenderDisplayName = (() => {
-    if (!formData.lender_username) return null;
-    const p = usersWithSelf.find(u => u.username === formData.lender_username);
-    return p ? (p.full_name || p.username).replace(' (You)', '') : formData.lender_username;
-  })();
-  const borrowerDisplayName = (() => {
-    if (!formData.borrower_username) return null;
-    const p = usersWithSelf.find(u => u.username === formData.borrower_username);
-    return p ? (p.full_name || p.username).replace(' (You)', '') : formData.borrower_username;
-  })();
-
   // Build users list with self at top, starred friends next, then other friends
   const usersWithSelf = React.useMemo(() => {
     const list = [];
@@ -307,6 +295,18 @@ export default function Lending({ initialTab }) {
   // All users appear in both dropdowns — selection logic handles swapping
   const lenderUsers = usersWithSelf;
   const borrowerUsers = usersWithSelf;
+
+  // Resolved display names for the loan agreement text
+  const lenderDisplayName = (() => {
+    if (!formData.lender_username) return null;
+    const p = usersWithSelf.find(u => u.username === formData.lender_username);
+    return p ? (p.full_name || p.username).replace(' (You)', '') : formData.lender_username;
+  })();
+  const borrowerDisplayName = (() => {
+    if (!formData.borrower_username) return null;
+    const p = usersWithSelf.find(u => u.username === formData.borrower_username);
+    return p ? (p.full_name || p.username).replace(' (You)', '') : formData.borrower_username;
+  })();
 
   const selfUsername = currentUserProfile?.username || '';
 
@@ -1598,7 +1598,7 @@ export default function Lending({ initialTab }) {
                   {inviteOpen && (
                     <div style={{ position: 'absolute', top: 'calc(100% + 6px)', right: 0, background: 'white', borderRadius: 12, border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 200, minWidth: 180, overflow: 'hidden' }}>
                       <a
-                        href="sms:?body=Hey! Join me on Vony — an easy way to manage loans with friends. Sign up here: https://www.vony-lending.com"
+                        href="sms:?body=Hey! Join me on Vony, an easy way to manage loans with friends. Sign up here: https://www.vony-lending.com"
                         onClick={() => setInviteOpen(false)}
                         style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 16px', fontSize: 12, color: '#1A1918', textDecoration: 'none', fontFamily: "'DM Sans', sans-serif", fontWeight: 500 }}
                         onMouseEnter={e => e.currentTarget.style.background = '#f5f4f0'}
@@ -2054,77 +2054,57 @@ export default function Lending({ initialTab }) {
                 {/* Form + summary cards (column layout) */}
                 <div className="lending-create-layout" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 0 }}>
-                    {/* ── Main Create a Loan box ── */}
-                    <div style={{ position: 'relative' }}>
-                      <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 14, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
-                      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 12, border: 'none', padding: '20px 22px', fontSize: 12, fontFamily: "'DM Sans', sans-serif" }}>
-                        {/* Title */}
-                        <div style={{ fontSize: 15, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 2 }}>
+                    {/* ── Create a Loan — title / slider / people outside white box ── */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, fontFamily: "'DM Sans', sans-serif" }}>
+
+                      {/* Title + subtitle */}
+                      <div>
+                        <div style={{ fontSize: 15, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', marginBottom: 3 }}>
                           Create a Loan
                         </div>
-                        {/* Subtitle — changes based on slider */}
-                        <div style={{ fontSize: 12, color: '#9B9A98', marginBottom: 14 }}>
+                        <div style={{ fontSize: 12, color: '#9B9A98' }}>
                           {loanType === 'flexible'
                             ? 'Request a one-time payment — perfect for splitting expenses.'
                             : 'Set up a structured loan with interest and a repayment schedule.'}
                         </div>
-                        {/* Pill slider (Loan / Quick Pay) */}
-                        <div style={{ display: 'inline-flex', alignItems: 'center', background: '#F3F1EE', borderRadius: 999, padding: 4, marginBottom: 16, border: '1px solid rgba(0,0,0,0.05)' }}>
-                          {[{ v: 'scheduled', label: 'Loan' }, { v: 'flexible', label: 'Quick Pay' }].map(o => (
-                            <button
-                              key={o.v}
-                              type="button"
-                              onClick={() => setLoanType(o.v)}
-                              style={{
-                                padding: '7px 24px', borderRadius: 999, border: 'none',
-                                background: loanType === o.v ? '#fff' : 'transparent',
-                                boxShadow: loanType === o.v ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-                                color: loanType === o.v ? '#1A1918' : '#9B9A98',
-                                fontSize: 12, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
-                                cursor: 'pointer', transition: 'all 0.15s',
-                              }}
-                            >
-                              {o.label}
-                            </button>
-                          ))}
-                        </div>
-                        {/* Lender + Borrower — side by side with persistent labels */}
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                          {/* Lender */}
-                          <div>
-                            <div style={{ fontSize: 11, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 7 }}>Lender</div>
-                            {isLoadingUsers ? (
-                              <div style={{ height: 38, background: 'transparent', borderRadius: 10 }} />
-                            ) : (
-                              <UserSelector
-                                users={lenderUsers}
-                                value={formData.lender_username}
-                                onSelect={handleLenderSelect}
-                                placeholder="Choose a person..."
-                                showAddFriends={true}
-                                onAddFriends={() => navigate(createPageUrl('Friends') + '?tab=add')}
-                              />
-                            )}
-                          </div>
-                          {/* Borrower */}
-                          <div>
-                            <div style={{ fontSize: 11, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 7 }}>Borrower</div>
-                            {isLoadingUsers ? (
-                              <div style={{ height: 38, background: 'transparent', borderRadius: 10 }} />
-                            ) : (
-                              <UserSelector
-                                users={borrowerUsers}
-                                value={formData.borrower_username}
-                                onSelect={handleBorrowerSelect}
-                                placeholder="Choose a person..."
-                                showAddFriends={true}
-                                onAddFriends={() => navigate(createPageUrl('Friends') + '?tab=add')}
-                              />
-                            )}
-                          </div>
-                        </div>
+                      </div>
 
-                        {/* Amount and Purpose - Only for Quick Payment Request (non-repeating) */}
+                      {/* Pill slider */}
+                      <div style={{ display: 'inline-flex', alignItems: 'center', background: '#F3F1EE', borderRadius: 999, padding: 4, border: '1px solid rgba(0,0,0,0.05)', alignSelf: 'flex-start' }}>
+                        {[{ v: 'scheduled', label: 'Loan' }, { v: 'flexible', label: 'Quick Pay' }].map(o => (
+                          <button key={o.v} type="button" onClick={() => setLoanType(o.v)} style={{
+                            padding: '7px 24px', borderRadius: 999, border: 'none',
+                            background: loanType === o.v ? '#fff' : 'transparent',
+                            boxShadow: loanType === o.v ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                            color: loanType === o.v ? '#1A1918' : '#9B9A98',
+                            fontSize: 12, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+                            cursor: 'pointer', transition: 'all 0.15s',
+                          }}>{o.label}</button>
+                        ))}
+                      </div>
+
+                      {/* Lender + Borrower */}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                        <div>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 7 }}>Lender</div>
+                          {isLoadingUsers ? <div style={{ height: 38 }} /> : (
+                            <UserSelector users={lenderUsers} value={formData.lender_username} onSelect={handleLenderSelect} placeholder="Choose a person..." showAddFriends onAddFriends={() => navigate(createPageUrl('Friends') + '?tab=add')} />
+                          )}
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 7 }}>Borrower</div>
+                          {isLoadingUsers ? <div style={{ height: 38 }} /> : (
+                            <UserSelector users={borrowerUsers} value={formData.borrower_username} onSelect={handleBorrowerSelect} placeholder="Choose a person..." showAddFriends onAddFriends={() => navigate(createPageUrl('Friends') + '?tab=add')} />
+                          )}
+                        </div>
+                      </div>
+
+                      {/* ── White form card — only the fill-in fields ── */}
+                      <div style={{ position: 'relative' }}>
+                        <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 14, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+                        <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 12, border: 'none', padding: '18px 20px', fontSize: 12, fontFamily: "'DM Sans', sans-serif" }}>
+
+                        {/* Quick Pay — non-repeating amount + purpose */}
                         {loanType === 'flexible' && !formData.is_repeating && (
                           <div className="grid sm:grid-cols-2 gap-4">
                             <div className="space-y-2">
@@ -2290,171 +2270,98 @@ export default function Lending({ initialTab }) {
                           const firstPaymentDate = formData.first_payment_date ? new Date(formData.first_payment_date + 'T00:00:00') : null;
                           let lastPaymentDate = null;
                           if (firstPaymentDate && numPayments > 0) {
-                            if (formData.payment_frequency === 'weekly') {
-                              lastPaymentDate = addWeeks(firstPaymentDate, numPayments - 1);
-                            } else if (formData.payment_frequency === 'biweekly') {
-                              lastPaymentDate = addWeeks(firstPaymentDate, (numPayments - 1) * 2);
-                            } else {
-                              lastPaymentDate = addMonths(firstPaymentDate, numPayments - 1);
-                            }
+                            if (formData.payment_frequency === 'weekly') lastPaymentDate = addWeeks(firstPaymentDate, numPayments - 1);
+                            else if (formData.payment_frequency === 'biweekly') lastPaymentDate = addWeeks(firstPaymentDate, (numPayments - 1) * 2);
+                            else lastPaymentDate = addMonths(firstPaymentDate, numPayments - 1);
                           }
                           const isWeeklyLike = formData.payment_frequency === 'weekly' || formData.payment_frequency === 'biweekly';
-                          const currencySymbols = { USD: '$', EUR: '€', GBP: '£', CAD: 'C$', AUD: 'A$', JPY: '¥', CHF: 'Fr' };
-                          const currSym = currencySymbols[formData.currency] || '$';
+                          const currSym = { USD:'$', EUR:'€', GBP:'£', CAD:'C$', AUD:'A$', JPY:'¥', CHF:'Fr' }[formData.currency] || '$';
+                          const R = ({ style, ...props }) => (
+                            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 4, fontSize: 12, lineHeight: 1.9, color: '#3a3937', ...style }} {...props} />
+                          );
                           return (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: 4 }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                               {/* ¶1 */}
-                              <p className="loan-para">
+                              <R>
                                 <span className="loan-name">{lenderDisplayName || 'The lender'}</span>
-                                {' '}agrees to lend{' '}
+                                <span>agrees to lend</span>
                                 <span className="loan-name">{borrowerDisplayName || 'the borrower'}</span>
-                                {' '}
-                                <Select value={formData.currency} onValueChange={v => handleInputChange('currency', v)}>
-                                  <SelectTrigger className="loan-select-trigger">{currSym}</SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="USD">$ USD</SelectItem>
-                                    <SelectItem value="EUR">€ EUR</SelectItem>
-                                    <SelectItem value="GBP">£ GBP</SelectItem>
-                                    <SelectItem value="CAD">C$ CAD</SelectItem>
-                                    <SelectItem value="AUD">A$ AUD</SelectItem>
-                                    <SelectItem value="JPY">¥ JPY</SelectItem>
-                                    <SelectItem value="CHF">Fr CHF</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <input
-                                  type="number"
-                                  step="0.01"
-                                  min="0"
-                                  placeholder="0.00"
-                                  value={formData.amount}
-                                  onChange={(e) => handleInputChange('amount', e.target.value)}
-                                  className="loan-input loan-input-sm"
-                                  style={{ MozAppearance: 'textfield', width: 90 }}
-                                />
-                                {' '}on or before{' '}
-                                <input
-                                  type="date"
-                                  value={formData.lender_send_funds_date}
-                                  onChange={(e) => handleInputChange('lender_send_funds_date', e.target.value)}
-                                  min={format(new Date(), 'yyyy-MM-dd')}
-                                  className="loan-input loan-input-date"
-                                />
-                                {', '}at an annual interest rate of{' '}
-                                <Select value={formData.interest_rate} onValueChange={v => handleInputChange('interest_rate', v)}>
-                                  <SelectTrigger className="loan-select-trigger">{formData.interest_rate || '5'}%</SelectTrigger>
-                                  <SelectContent>
-                                    {[1,2,3,4,5,6,7,8].map(n => (
-                                      <SelectItem key={n} value={String(n)}>{n}%</SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                .
-                              </p>
+                                <select className="loan-select" value={formData.currency} onChange={e => handleInputChange('currency', e.target.value)}>
+                                  <option value="USD">$ USD</option>
+                                  <option value="EUR">€ EUR</option>
+                                  <option value="GBP">£ GBP</option>
+                                  <option value="CAD">C$ CAD</option>
+                                  <option value="AUD">A$ AUD</option>
+                                  <option value="JPY">¥ JPY</option>
+                                  <option value="CHF">Fr CHF</option>
+                                </select>
+                                <input type="number" step="0.01" min="0" placeholder="0.00" value={formData.amount} onChange={e => handleInputChange('amount', e.target.value)} className="loan-input" style={{ width: 86, MozAppearance: 'textfield' }} />
+                                <span>on or before</span>
+                                <input type="date" value={formData.lender_send_funds_date} onChange={e => handleInputChange('lender_send_funds_date', e.target.value)} min={format(new Date(), 'yyyy-MM-dd')} className="loan-input" style={{ width: 'auto' }} />
+                                <span>, at an annual interest rate of</span>
+                                <select className="loan-select" value={formData.interest_rate} onChange={e => handleInputChange('interest_rate', e.target.value)}>
+                                  {[1,2,3,4,5,6,7,8].map(n => <option key={n} value={String(n)}>{n}%</option>)}
+                                </select>
+                                <span>.</span>
+                              </R>
 
                               {/* ¶2 */}
-                              <p className="loan-para">
+                              <R>
                                 <span className="loan-name">{borrowerDisplayName || 'The borrower'}</span>
-                                {' '}agrees to repay this loan in{' '}
-                                <input
-                                  type="number"
-                                  min="1"
-                                  placeholder="12"
-                                  value={formData.repayment_period}
-                                  onChange={(e) => handleInputChange('repayment_period', e.target.value)}
-                                  className="loan-input loan-input-sm"
-                                  style={{ MozAppearance: 'textfield', width: 60 }}
-                                />
-                                {' '}
-                                <Select value={formData.payment_frequency} onValueChange={v => handleInputChange('payment_frequency', v)}>
-                                  <SelectTrigger className="loan-select-trigger">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="weekly">weekly</SelectItem>
-                                    <SelectItem value="biweekly">biweekly</SelectItem>
-                                    <SelectItem value="monthly">monthly</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                {' '}payments of{' '}
+                                <span>agrees to repay this loan in</span>
+                                <input type="number" min="1" placeholder="12" value={formData.repayment_period} onChange={e => handleInputChange('repayment_period', e.target.value)} className="loan-input" style={{ width: 54, MozAppearance: 'textfield' }} />
+                                <select className="loan-select" value={formData.payment_frequency} onChange={e => handleInputChange('payment_frequency', e.target.value)}>
+                                  <option value="weekly">weekly</option>
+                                  <option value="biweekly">biweekly</option>
+                                  <option value="monthly">monthly</option>
+                                </select>
+                                <span>payments of</span>
                                 <span className="loan-calc">{currSym}{details.monthlyPayment > 0 ? details.monthlyPayment.toFixed(2) : '0.00'}</span>
-                                {' '}each.
-                              </p>
+                                <span>each.</span>
+                              </R>
 
                               {/* ¶3 */}
-                              <p className="loan-para">
-                                Payments will be due{isWeeklyLike ? ' on ' : ' on the '}
+                              <R>
+                                <span>Payments will be due{isWeeklyLike ? ' on' : ' on the'}</span>
                                 {isWeeklyLike ? (
-                                  <Select value={formData.loan_day_of_week} onValueChange={v => handleInputChange('loan_day_of_week', v)}>
-                                    <SelectTrigger className="loan-select-trigger"><SelectValue /></SelectTrigger>
-                                    <SelectContent>
-                                      {['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(d => (
-                                        <SelectItem key={d} value={d.toLowerCase()}>{d}</SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
+                                  <select className="loan-select" value={formData.loan_day_of_week} onChange={e => handleInputChange('loan_day_of_week', e.target.value)}>
+                                    {['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].map(d => <option key={d} value={d}>{d.charAt(0).toUpperCase()+d.slice(1)}</option>)}
+                                  </select>
                                 ) : (
-                                  <Select value={formData.loan_day_of_month} onValueChange={v => handleInputChange('loan_day_of_month', v)}>
-                                    <SelectTrigger className="loan-select-trigger"><SelectValue /></SelectTrigger>
-                                    <SelectContent>
-                                      {Array.from({ length: 28 }, (_, i) => i + 1).map(day => (
-                                        <SelectItem key={day} value={String(day)}>
-                                          {day}{day === 1 ? 'st' : day === 2 ? 'nd' : day === 3 ? 'rd' : 'th'}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
+                                  <select className="loan-select" value={formData.loan_day_of_month} onChange={e => handleInputChange('loan_day_of_month', e.target.value)}>
+                                    {Array.from({length:28},(_,i)=>i+1).map(d => <option key={d} value={String(d)}>{d}{d===1?'st':d===2?'nd':d===3?'rd':'th'}</option>)}
+                                  </select>
                                 )}
-                                {' '}of each period at{' '}
-                                <input
-                                  type="time"
-                                  value={formData.loan_time}
-                                  onChange={(e) => handleInputChange('loan_time', e.target.value)}
-                                  className="loan-input loan-input-time"
-                                />
-                                {' '}
-                                <Select value={formData.loan_timezone} onValueChange={v => handleInputChange('loan_timezone', v)}>
-                                  <SelectTrigger className="loan-select-trigger"><SelectValue /></SelectTrigger>
-                                  <SelectContent>
-                                    {['EST','CST','MST','PST','HST','AKST'].map(tz => (
-                                      <SelectItem key={tz} value={tz}>{tz}</SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                {', '}beginning on{' '}
-                                <input
-                                  type="date"
-                                  value={formData.first_payment_date}
-                                  onChange={(e) => handleInputChange('first_payment_date', e.target.value)}
-                                  min={format(new Date(), 'yyyy-MM-dd')}
-                                  className="loan-input loan-input-date"
-                                />
-                                {'. '}The final payment will be due on{' '}
-                                <span className="loan-calc">{lastPaymentDate ? format(lastPaymentDate, 'MMM d, yyyy') : '—'}</span>.
-                              </p>
+                                <span>of each period at</span>
+                                <input type="time" value={formData.loan_time} onChange={e => handleInputChange('loan_time', e.target.value)} className="loan-input" style={{ width: 'auto' }} />
+                                <select className="loan-select" value={formData.loan_timezone} onChange={e => handleInputChange('loan_timezone', e.target.value)}>
+                                  {['EST','CST','MST','PST','HST','AKST'].map(tz => <option key={tz} value={tz}>{tz}</option>)}
+                                </select>
+                                <span>, beginning on</span>
+                                <input type="date" value={formData.first_payment_date} onChange={e => handleInputChange('first_payment_date', e.target.value)} min={format(new Date(), 'yyyy-MM-dd')} className="loan-input" style={{ width: 'auto' }} />
+                                <span>. The final payment will be due on</span>
+                                <span className="loan-calc">{lastPaymentDate ? format(lastPaymentDate, 'MMM d, yyyy') : '—'}</span>
+                                <span>.</span>
+                              </R>
 
                               {/* ¶4 — static */}
-                              <p className="loan-para loan-para-static">
+                              <div style={{ fontSize: 12, color: '#9B9A98', fontStyle: 'italic', lineHeight: 1.6 }}>
                                 {borrowerDisplayName || 'The borrower'} may repay this loan early, in whole or in part, at any time without penalty.
-                              </p>
+                              </div>
 
                               {/* ¶5 */}
-                              <p className="loan-para">
-                                This loan is for{' '}
-                                <input
-                                  type="text"
-                                  placeholder="e.g., rent, car repair…"
-                                  value={formData.purpose}
-                                  onChange={(e) => handleInputChange('purpose', e.target.value)}
-                                  maxLength={100}
-                                  className="loan-input loan-input-purpose"
-                                />
-                                .
-                              </p>
+                              <R>
+                                <span>This loan is for</span>
+                                <input type="text" placeholder="e.g., rent, car repair…" value={formData.purpose} onChange={e => handleInputChange('purpose', e.target.value)} maxLength={100} className="loan-input" style={{ flex: 1, minWidth: 140 }} />
+                                <span>.</span>
+                              </R>
                             </div>
                           );
                         })()}
-                      </div>{/* end main white card */}
-                    </div>{/* end main Create a Loan box */}
+
+                        </div>{/* end white form card */}
+                      </div>{/* end white card aura wrapper */}
+                    </div>{/* end outer create-a-loan column */}
 
                     {/* ── Summary row (Loan Summary + Borrower Will Pay / Repeating Request) ── */}
                     <div className="lending-summary-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>

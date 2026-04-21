@@ -309,7 +309,7 @@ export default function FriendsPopup({ onClose, positionOverride, initialTab }) 
             <p style={{ fontSize: 12, color: '#787776', marginBottom: 16, marginTop: 4 }}>Don't see your friends on Vony? Invite them to join you.</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <a
-                href="sms:?body=Hey! Join me on Vony — an easy way to manage loans with friends. Sign up here: https://www.vony-lending.com"
+                href="sms:?body=Hey! Join me on Vony, an easy way to manage loans with friends. Sign up here: https://www.vony-lending.com"
                 style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 14px', borderRadius: 10, background: '#F8F8F8', fontSize: 13, color: '#1A1918', textDecoration: 'none', fontWeight: 500 }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#787776" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>

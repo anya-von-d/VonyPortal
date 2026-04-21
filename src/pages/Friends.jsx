@@ -305,7 +305,7 @@ export default function Friends() {
               {inviteOpen && (
                 <div style={{ position: 'absolute', top: 'calc(100% + 6px)', right: 0, background: 'white', borderRadius: 12, border: '1px solid rgba(0,0,0,0.09)', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 200, minWidth: 180, overflow: 'hidden' }}>
                   <a
-                    href="sms:?body=Hey! Join me on Vony — an easy way to manage loans with friends. Sign up here: https://www.vony-lending.com"
+                    href="sms:?body=Hey! Join me on Vony, an easy way to manage loans with friends. Sign up here: https://www.vony-lending.com"
                     onClick={() => setInviteOpen(false)}
                     style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 16px', fontSize: 13, color: '#1A1918', textDecoration: 'none', fontFamily: "'DM Sans', sans-serif", fontWeight: 500 }}
                     onMouseEnter={e => e.currentTarget.style.background = '#f5f4f0'}

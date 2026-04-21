@@ -105,6 +105,7 @@ export default function RecordPayment() {
 
   // Payment form
   const [amount, setAmount] = useState('');
+  const [currency, setCurrency] = useState('USD');
   const [paymentMethod, setPaymentMethod] = useState('');
   const [paymentDate, setPaymentDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [isProcessing, setIsProcessing] = useState(false);
@@ -513,8 +514,8 @@ export default function RecordPayment() {
           {/* ── Two-col: Select Your Loan | Payment Form ── */}
           <div className="rp-two-col" style={{ display: 'grid', gridTemplateColumns: '360px 1fr', gap: 20, alignItems: 'start' }}>
 
-            {/* Left: Select Your Loan */}
-            <div style={{ position: 'relative' }}>
+            {/* Left: Select Your Loan — hidden on confirm/success steps */}
+            <div style={{ position: 'relative', display: currentStep >= 2 ? 'none' : 'block' }}>
               <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
             <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
@@ -535,7 +536,7 @@ export default function RecordPayment() {
                     <p style={{ fontSize: 12, color: '#787776', margin: 0, textAlign: 'center' }}>No active loans yet 🌱</p>
                   </div>
                 ) : (
-                  <div className="rp-loan-list" style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div className="rp-loan-list" style={{ display: 'flex', flexDirection: 'column', maxHeight: 138, overflowY: 'auto' }}>
                     {filteredLoans.map(loan => {
                       const other = getOtherParty(loan);
                       const remaining = getRemainingBalance(loan);
@@ -543,12 +544,11 @@ export default function RecordPayment() {
                       const isLender = isUserLender(loan);
                       const firstName = other.full_name?.split(' ')[0] || other.username;
                       const loanAmt = (loan.amount || 0).toLocaleString();
-                      const createdDate = loan.created_at ? format(new Date(loan.created_at), 'MMMM do yyyy') : '—';
                       return (
                         <button key={loan.id} onClick={() => handleSelectLoan(loan)} style={{
                           display: 'block', width: '100%', textAlign: 'left', padding: '10px 0',
                           background: 'transparent', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-                          border: 'none',
+                          border: 'none', borderBottom: '1px solid rgba(0,0,0,0.04)',
                         }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                             {other.profile_picture_url ? (
@@ -556,13 +556,13 @@ export default function RecordPayment() {
                                 src={other.profile_picture_url}
                                 alt={other.full_name || other.username}
                                 style={{
-                                  width: 28, height: 22, borderRadius: 4, objectFit: 'cover', flexShrink: 0,
+                                  width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0,
                                   outline: isSelected ? '2px solid #03ACEA' : 'none', outlineOffset: 1,
                                 }}
                               />
                             ) : (
                               <div style={{
-                                width: 28, height: 22, borderRadius: 4, flexShrink: 0,
+                                width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
                                 background: '#EBF4FA', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                                 fontSize: 10, fontWeight: 700, color: '#03ACEA', fontFamily: "'DM Sans', sans-serif",
                                 outline: isSelected ? '2px solid #03ACEA' : 'none', outlineOffset: 1,
@@ -572,10 +572,7 @@ export default function RecordPayment() {
                             )}
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <p style={{ fontSize: 12, fontWeight: isSelected ? 600 : 500, color: isSelected ? '#1A1918' : '#3A3938', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                {isLender ? `You lent ${firstName} $${loanAmt}${loan.purpose ? ` for ${loan.purpose}` : ''}` : `${firstName} lent you $${loanAmt}${loan.purpose ? ` for ${loan.purpose}` : ''}`}
-                              </p>
-                              <p style={{ fontSize: 11, color: '#9B9A98', margin: '1px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                {loan.purpose || 'No reason specified'}
+                                {isLender ? `You lent ${firstName} $${loanAmt}` : `${firstName} lent you $${loanAmt}`}
                               </p>
                             </div>
                           </div>
@@ -601,7 +598,7 @@ export default function RecordPayment() {
                   {currentStep === 0 && !selectedLoan && (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 0', color: '#C7C6C4' }}>
                       <p style={{ fontSize: 12, fontWeight: 500, color: '#787776', margin: 0, fontFamily: "'DM Sans', sans-serif" }}>Select a loan to get started</p>
-                      <p style={{ fontSize: 12, color: '#C7C6C4', margin: '4px 0 0', fontFamily: "'DM Sans', sans-serif" }}>Choose from your active loans on the left</p>
+                      <p style={{ fontSize: 12, color: '#C7C6C4', margin: '4px 0 0', fontFamily: "'DM Sans', sans-serif" }}>Choose from your active loans above</p>
                     </div>
                   )}
 
@@ -618,44 +615,65 @@ export default function RecordPayment() {
                         </p>
                       </div>
 
-                      {/* Amount + Date on the same row */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                        <div>
-                          <label style={{ fontSize: 12, fontWeight: 600, color: '#787776', marginBottom: 6, display: 'block', fontFamily: "'DM Sans', sans-serif" }}>Payment Amount</label>
-                          <div style={{ position: 'relative' }}>
-                            <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 12, fontWeight: 600, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>$</span>
-                            <input
-                              type="number" step="0.01" min="0" value={amount}
-                              onChange={e => { setAmount(e.target.value); setError(''); }}
-                              style={{
-                                width: '100%', padding: '10px 14px 10px 26px', borderRadius: 12,
-                                border: '1px solid rgba(0,0,0,0.06)', background: 'white',
-                                fontSize: 12, fontWeight: 500, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", outline: 'none',
-                              }}
-                              onFocus={e => e.target.style.borderColor = 'rgba(3,172,234,0.4)'}
-                              onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.06)'}
-                            />
-                          </div>
-                          {selectedLoan && (() => {
-                            const payAmt = selectedLoan.payment_amount || selectedLoan.next_payment_amount || getRemainingBalance(selectedLoan);
-                            const payAmtStr = `$${Number(payAmt).toFixed(2)}`;
-                            if (selectedLoan.next_payment_date) {
-                              const due = new Date(selectedLoan.next_payment_date);
-                              const today = new Date();
-                              today.setHours(0, 0, 0, 0);
-                              const days = Math.ceil((due - today) / 86400000);
-                              if (days < 0) {
-                                const n = Math.abs(days);
-                                return <p style={{ fontSize: 11, color: '#E8726E', margin: '6px 0 0', fontFamily: "'DM Sans', sans-serif" }}>{payAmtStr} overdue by {n} day{n === 1 ? '' : 's'}</p>;
-                              }
-                              if (days === 0) {
-                                return <p style={{ fontSize: 11, color: '#787776', margin: '6px 0 0', fontFamily: "'DM Sans', sans-serif" }}>{payAmtStr} due today</p>;
-                              }
-                              return <p style={{ fontSize: 11, color: '#787776', margin: '6px 0 0', fontFamily: "'DM Sans', sans-serif" }}>{payAmtStr} due in {days} day{days === 1 ? '' : 's'}</p>;
-                            }
-                            return null;
-                          })()}
+                      {/* Row 1: Payment Amount (full width, currency + number) */}
+                      <div>
+                        <label style={{ fontSize: 12, fontWeight: 600, color: '#787776', marginBottom: 6, display: 'block', fontFamily: "'DM Sans', sans-serif" }}>Payment Amount</label>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          {/* Currency dropdown */}
+                          <select
+                            value={currency}
+                            onChange={e => setCurrency(e.target.value)}
+                            style={{
+                              padding: '10px 8px', borderRadius: 12, border: '1px solid rgba(0,0,0,0.06)',
+                              background: 'white', fontSize: 12, fontWeight: 600, color: '#1A1918',
+                              fontFamily: "'DM Sans', sans-serif", outline: 'none', cursor: 'pointer', flexShrink: 0,
+                            }}
+                            onFocus={e => e.target.style.borderColor = 'rgba(3,172,234,0.4)'}
+                            onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.06)'}
+                          >
+                            <option value="USD">$ USD</option>
+                            <option value="EUR">€ EUR</option>
+                            <option value="GBP">£ GBP</option>
+                            <option value="CAD">C$ CAD</option>
+                            <option value="AUD">A$ AUD</option>
+                            <option value="JPY">¥ JPY</option>
+                            <option value="CHF">Fr CHF</option>
+                          </select>
+                          {/* Amount input */}
+                          <input
+                            type="number" step="0.01" min="0" value={amount}
+                            onChange={e => { setAmount(e.target.value); setError(''); }}
+                            placeholder="0.00"
+                            style={{
+                              flex: 1, padding: '10px 14px', borderRadius: 12,
+                              border: '1px solid rgba(0,0,0,0.06)', background: 'white',
+                              fontSize: 12, fontWeight: 500, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", outline: 'none',
+                            }}
+                            onFocus={e => e.target.style.borderColor = 'rgba(3,172,234,0.4)'}
+                            onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.06)'}
+                          />
                         </div>
+                        {selectedLoan && (() => {
+                          const payAmt = selectedLoan.payment_amount || selectedLoan.next_payment_amount || getRemainingBalance(selectedLoan);
+                          const payAmtStr = `$${Number(payAmt).toFixed(2)}`;
+                          if (selectedLoan.next_payment_date) {
+                            const due = new Date(selectedLoan.next_payment_date);
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            const days = Math.ceil((due - today) / 86400000);
+                            if (days < 0) {
+                              const n = Math.abs(days);
+                              return <p style={{ fontSize: 11, color: '#E8726E', margin: '6px 0 0', fontFamily: "'DM Sans', sans-serif" }}>{payAmtStr} overdue by {n} day{n === 1 ? '' : 's'}</p>;
+                            }
+                            if (days === 0) return <p style={{ fontSize: 11, color: '#787776', margin: '6px 0 0', fontFamily: "'DM Sans', sans-serif" }}>{payAmtStr} due today</p>;
+                            return <p style={{ fontSize: 11, color: '#787776', margin: '6px 0 0', fontFamily: "'DM Sans', sans-serif" }}>{payAmtStr} due in {days} day{days === 1 ? '' : 's'}</p>;
+                          }
+                          return null;
+                        })()}
+                      </div>
+
+                      {/* Row 2: Payment Date + Payment Method side by side */}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                         <div>
                           <label style={{ fontSize: 12, fontWeight: 600, color: '#787776', marginBottom: 6, display: 'block', fontFamily: "'DM Sans', sans-serif" }}>Payment Date</label>
                           <input
@@ -666,38 +684,28 @@ export default function RecordPayment() {
                               border: '1px solid rgba(0,0,0,0.06)', background: 'white',
                               fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", outline: 'none',
                             }}
+                            onFocus={e => e.target.style.borderColor = 'rgba(3,172,234,0.4)'}
+                            onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.06)'}
                           />
                         </div>
-                      </div>
-
-                      {/* Payment Method */}
-                      <div>
-                        <label style={{ fontSize: 12, fontWeight: 600, color: '#787776', marginBottom: 8, display: 'block', fontFamily: "'DM Sans', sans-serif" }}>Payment Method</label>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-                          {PAYMENT_METHODS.map(method => {
-                            const Icon = method.icon;
-                            const isSelected = paymentMethod === method.id;
-                            return (
-                              <motion.button
-                                key={method.id}
-                                onClick={() => { setPaymentMethod(method.id); setError(''); }}
-                                whileHover={{ scale: 1.03, y: -1 }}
-                                whileTap={{ scale: 0.94 }}
-                                animate={isSelected ? { scale: [1, 1.08, 1] } : { scale: 1 }}
-                                transition={{ type: 'spring', stiffness: 420, damping: 18 }}
-                                style={{
-                                  display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', borderRadius: 12,
-                                  border: isSelected ? '2px solid #03ACEA' : '1px solid rgba(0,0,0,0.06)',
-                                  background: isSelected ? 'rgba(3,172,234,0.1)' : 'white',
-                                  cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", fontSize: 12, fontWeight: 500, color: '#1A1918',
-                                  boxShadow: isSelected ? '0 0 0 3px rgba(3,172,234,0.2)' : 'none',
-                                }}
-                              >
-                                <Icon size={16} style={{ color: isSelected ? '#03ACEA' : method.color }} />
-                                {method.label}
-                              </motion.button>
-                            );
-                          })}
+                        <div>
+                          <label style={{ fontSize: 12, fontWeight: 600, color: '#787776', marginBottom: 6, display: 'block', fontFamily: "'DM Sans', sans-serif" }}>Payment Method</label>
+                          <select
+                            value={paymentMethod}
+                            onChange={e => { setPaymentMethod(e.target.value); setError(''); }}
+                            style={{
+                              width: '100%', padding: '10px 14px', borderRadius: 12,
+                              border: '1px solid rgba(0,0,0,0.06)', background: 'white',
+                              fontSize: 12, color: paymentMethod ? '#1A1918' : '#9B9A98', fontFamily: "'DM Sans', sans-serif", outline: 'none', cursor: 'pointer',
+                            }}
+                            onFocus={e => e.target.style.borderColor = 'rgba(3,172,234,0.4)'}
+                            onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.06)'}
+                          >
+                            <option value="" disabled>Select method…</option>
+                            {PAYMENT_METHODS.map(m => (
+                              <option key={m.id} value={m.id}>{m.label}</option>
+                            ))}
+                          </select>
                         </div>
                       </div>
 
