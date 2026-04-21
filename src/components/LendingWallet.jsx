@@ -1,4 +1,6 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import { formatMoney } from "@/components/utils/formatMoney";
 
 /**
@@ -156,42 +158,27 @@ export default function LendingWallet({ cards, summaryCard, onCardClick, selecte
         {/* Content layer */}
         <div style={{
           position: 'absolute', inset: 0,
-          padding: `${NOTCH_DEPTH + 18}px 20px 18px`,
+          padding: `${NOTCH_DEPTH + 14}px 20px 16px`,
           boxSizing: 'border-box',
           display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
         }}>
-          {/* Top row: card count pill */}
-          <div>
-            <div style={{
-              display: 'inline-flex', alignItems: 'center',
-              padding: '5px 11px', borderRadius: 999,
-              background: 'rgba(255,255,255,0.15)',
-              border: '1px solid rgba(255,255,255,0.20)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              fontSize: 11, fontWeight: 700, color: '#FFFFFF',
-              letterSpacing: '-0.01em',
-            }}>
-              {cards.length} card{cards.length !== 1 ? 's' : ''}
-            </div>
+          {/* Top: "select a loan" hint */}
+          <div style={{
+            fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.55)',
+            letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif",
+            textAlign: 'center',
+          }}>
+            Select a loan above for more details
           </div>
 
-          {/* Bottom row: label + amount on left, + button on right */}
+          {/* Bottom row: label + amount on left, View Summary button on right */}
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12 }}>
-            <div
-              onClick={() => onCardClick && onCardClick('summary')}
-              style={{ cursor: 'pointer', flex: 1, minWidth: 0 }}
-            >
+            <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{
                 fontSize: 11, color: 'rgba(255,255,255,0.65)', fontWeight: 600,
                 marginBottom: 3, letterSpacing: '-0.01em',
               }}>
                 {summaryCard?.label || (isLending ? "You're owed" : 'You owe')}
-                {summaryCard?.sublabel && (
-                  <span style={{ color: '#7DD3FC', fontWeight: 700, marginLeft: 6 }}>
-                    {summaryCard.sublabel}
-                  </span>
-                )}
               </div>
               <div style={{
                 fontSize: 22, fontWeight: 800, color: '#FFFFFF',
@@ -202,24 +189,23 @@ export default function LendingWallet({ cards, summaryCard, onCardClick, selecte
               </div>
             </div>
 
-            {/* Circular + button */}
-            <div
-              onClick={() => onCardClick && onCardClick('summary')}
+            {/* View Summary button */}
+            <Link
+              to={createPageUrl(isLending ? 'LendingSummary' : 'BorrowingSummary')}
               style={{
-                width: 40, height: 40, borderRadius: '50%',
-                background: '#FFFFFF',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', flexShrink: 0,
-                boxShadow: '0 4px 12px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.15)',
-                transition: 'transform 0.15s',
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                padding: '7px 12px', borderRadius: 20,
+                background: 'rgba(255,255,255,0.18)',
+                border: '1px solid rgba(255,255,255,0.28)',
+                backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+                fontSize: 10, fontWeight: 700, color: '#FFFFFF',
+                letterSpacing: '-0.01em', textDecoration: 'none',
+                flexShrink: 0, whiteSpace: 'nowrap',
+                fontFamily: "'DM Sans', sans-serif",
               }}
-              aria-label="Summary"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={isLending ? '#0D3A5C' : '#0B1F45'} strokeWidth="2.8" strokeLinecap="round">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
-            </div>
+              View {isLending ? 'Lending' : 'Borrowing'} Summary
+            </Link>
           </div>
         </div>
       </div>
