@@ -395,6 +395,14 @@ input[type="date"] {
   .loans-top-cards { grid-template-columns: 1fr !important; }
   .loans-top-layout { grid-template-columns: 1fr !important; gap: 20px !important; }
   .loans-top-layout > div:last-child { grid-template-columns: 1fr !important; }
+  /* Lending/Borrowing wallet + summary on mobile: center wallet, reorder panels */
+  .ylo-wallet-wrap { justify-content: center !important; }
+  .loans-summary-row { flex-direction: column !important; gap: 20px !important; align-items: stretch !important; }
+  .loans-summary-col-a, .loans-summary-col-b { display: contents !important; }
+  .loans-summary-overview  { order: 1; }
+  .loans-summary-snapshot  { order: 2; }
+  .loans-summary-upcoming  { order: 3; }
+  .loans-summary-ylending  { order: 4; }
   .loans-bottom-row { grid-template-columns: 1fr !important; }
   /* Loan Progress: 2 columns on mobile (was 4) so labels/values don't wrap */
   .loan-progress-grid { grid-template-columns: 1fr 1fr !important; row-gap: 14px !important; }

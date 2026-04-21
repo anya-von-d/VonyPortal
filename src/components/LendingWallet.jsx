@@ -15,7 +15,7 @@ export default function LendingWallet({ cards, summaryCard, onCardClick, selecte
   const WIDTH        = 280;
   const CARD_W       = 248;
   const CARD_H       = 82;
-  const PEEK         = 52;                // enough vertical space to show name+amount AND reason on each buried card
+  const PEEK         = 64;                // enough vertical space to show name+amount AND reason on each buried card
   const WALLET_H     = 150;               // wallet body height
   const NOTCH_DEPTH  = 34;                // how deep the notch dips at the top middle
   const CARD_TUCK    = 30;                // how much of the front card is hidden inside the pocket
@@ -70,6 +70,11 @@ export default function LendingWallet({ cards, summaryCard, onCardClick, selecte
         const isActive = selectedId === card.id;
         const isFront  = i === 0;
 
+        const isSummaryCard = !!card.isSummary;
+        const cardBg        = isSummaryCard ? '#1A1918' : '#FFFFFF';
+        const primaryText   = isSummaryCard ? '#FFFFFF' : '#1A1918';
+        const secondaryText = isSummaryCard ? 'rgba(255,255,255,0.7)' : (card.purpose ? '#9B9A98' : '#C5C3C0');
+
         return (
           <div
             key={card.id}
@@ -82,9 +87,9 @@ export default function LendingWallet({ cards, summaryCard, onCardClick, selecte
               height: CARD_H,
               zIndex: zIdx,
               cursor: 'pointer',
-              background: '#FFFFFF',
+              background: cardBg,
               borderRadius: 18,
-              border: isActive ? `1.5px solid ${accentColor}` : '1px solid rgba(0,0,0,0.05)',
+              border: isActive ? `1.5px solid ${accentColor}` : (isSummaryCard ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.05)'),
               boxShadow: isActive
                 ? `0 6px 18px ${accentColor}40`
                 : isFront
@@ -106,14 +111,14 @@ export default function LendingWallet({ cards, summaryCard, onCardClick, selecte
             {/* Line 1: name + amount */}
             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10, marginTop: 6 }}>
               <span style={{
-                fontSize: 13, fontWeight: 700, color: '#1A1918',
+                fontSize: 13, fontWeight: 700, color: primaryText,
                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 flex: 1, letterSpacing: '-0.01em',
               }}>
                 {card.name}
               </span>
               <span style={{
-                fontSize: 14, fontWeight: 800, color: '#1A1918',
+                fontSize: 14, fontWeight: 800, color: primaryText,
                 letterSpacing: '-0.03em', flexShrink: 0,
               }}>
                 {card.isSummary ? card.amount : formatMoney(card.amount)}
@@ -123,11 +128,11 @@ export default function LendingWallet({ cards, summaryCard, onCardClick, selecte
             {/* Line 2: purpose/reason */}
             <div style={{
               fontSize: 11, marginTop: 5,
-              color: card.purpose ? '#9B9A98' : '#C5C3C0',
+              color: secondaryText,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               fontWeight: 500,
             }}>
-              {card.purpose || 'No reason specified'}
+              {card.purpose || (isSummaryCard ? '' : 'No reason specified')}
             </div>
           </div>
         );

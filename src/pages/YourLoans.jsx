@@ -943,7 +943,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
               .sort((a, b) => b.amount - a.amount);
 
             return (
-              <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+              <div className="ylo-wallet-wrap" style={{ display: 'flex', justifyContent: 'flex-start' }}>
                 <LendingWallet
                   cards={walletCards}
                   summaryCard={{
@@ -1008,10 +1008,11 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
           })()}
           {/* ── Default 2-col summary layout ── */}
           {!selectedWalletLoan && (
-            <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
+            <div className="loans-summary-row" style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
             {/* Col 1: Snapshot + Upcoming */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div className="loans-summary-col-a" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 20 }}>
           {/* Snapshot */}
+          <div className="loans-summary-snapshot">
           {(() => {
             const today = new Date();
             const accentColor = isLending ? '#03ACEA' : '#1D5B94';
@@ -1077,7 +1078,9 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
               </div>
             );
           })()}
+          </div>{/* end snapshot wrap */}
       {/* Upcoming — Col 1 */}
+      <div className="loans-summary-upcoming">
       {(() => {
         const sourceLoans2 = isLending ? activeLendingLoans : activeBorrowingLoans;
         const otherPartyKey2 = isLending ? 'borrower_id' : 'lender_id';
@@ -1133,11 +1136,13 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
           </PageCard>
         );
       })()}
+      </div>{/* end upcoming wrap */}
     </div>{/* end Col 1 */}
 
     {/* Col 2: Overview + Your Lending/Borrowing */}
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div className="loans-summary-col-b" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 20 }}>
       {/* Overview */}
+      <div className="loans-summary-overview">
       {(() => {
         const percentPaid   = totalOwedBorrowing   > 0 ? Math.round((totalPaidBorrowing   / totalOwedBorrowing)   * 100) : 0;
         const percentRepaid = totalExpectedLending > 0 ? Math.round((totalReceivedLending / totalExpectedLending) * 100) : 0;
@@ -1185,8 +1190,11 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
           </div>
         );
       })()}
+      </div>{/* end overview wrap */}
       {/* Your Lending / Your Borrowing summary */}
-      {activeLoans.length > 0 && (() => {
+      {activeLoans.length > 0 && (
+      <div className="loans-summary-ylending">
+      {(() => {
         const tone = isLending ? 'lending' : 'borrowing';
         const titleStr = isLending ? 'Your Lending' : 'Your Borrowing';
         const accent = isLending ? '#03ACEA' : '#1D5B94';
@@ -1279,6 +1287,8 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
           </PageCard>
         );
       })()}
+      </div>
+      )}{/* end ylending wrap */}
     </div>{/* end Col 2 */}
           )}{/* end !selectedWalletLoan */}
           </div>{/* end col 2 wrapper */}
