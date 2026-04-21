@@ -1019,7 +1019,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
     return (
       <>
         {/* Desktop: wallet in col 1 | stacked (NPI + Upcoming + Active Summary) in col 2 */}
-        <div className="loans-top-layout" style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 24, alignItems: 'start' }}>
+        <div className="loans-top-layout" style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 40, alignItems: 'start' }}>
 
           {/* COL 1: Wallet — standalone, no outer white box */}
           {(() => {
@@ -1110,78 +1110,70 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
           {/* ── Default 2×2 summary grid ── */}
           {!selectedWalletLoan && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' }}>
-          {/* Row 1 Col 1: Next Payment Incoming / Due */}
+          {/* Row 1 Col 1: Month at a Glance (lending/borrowing specific) */}
           {(() => {
-            const auroraBg = isLending
-              ? 'linear-gradient(135deg, rgb(3,172,234) 0%, rgb(6,182,212) 30%, rgb(20,184,166) 60%, rgb(3,172,234) 100%)'
-              : 'linear-gradient(135deg, rgb(30,58,138) 0%, rgb(29,78,216) 10%, rgb(37,99,235) 20%, rgb(59,130,246) 30%, rgb(96,165,250) 40%, rgb(56,189,248) 50%, rgb(59,130,246) 60%, rgb(37,99,235) 70%, rgb(29,78,216) 80%, rgb(30,64,175) 90%, rgb(37,99,235) 100%)';
-            const auroraOpacity = isLending ? 0.35 : 0.45;
-            const otherFirstName = otherPartyUsername ? String(otherPartyUsername).split(' ')[0] : 'User';
+            const today = new Date();
+            const accentColor = isLending ? '#03ACEA' : '#1D5B94';
+            const accentBg = isLending ? '#EBF4FA' : 'rgba(29,91,148,0.08)';
+
+            // Insight logic
+            const overdueCount = (isLending ? activeLendingLoans : activeBorrowingLoans)
+              .filter(l => l.next_payment_date && new Date(l.next_payment_date) < today).length;
+            const sourceLoans = isLending ? activeLendingLoans : activeBorrowingLoans;
+            let insightText = '';
+            if (sourceLoans.length === 0) {
+              insightText = isLending ? 'No active loans yet' : 'You have no active borrowing';
+            } else if (overdueCount > 1) {
+              insightText = isLending
+                ? `${overdueCount} borrowers are behind on payments`
+                : `${overdueCount} payments need your attention`;
+            } else if (overdueCount === 1) {
+              insightText = isLending
+                ? 'One borrower is behind — follow up when ready'
+                : "One quick payment and you're back on track";
+            } else {
+              insightText = isLending ? 'All your lent money is on track' : 'All your payments are on track';
+            }
+
+            // This-month scheduled counts
+            const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+            const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59);
+            const lendingThisMonth = activeLendingLoans.filter(l => l.next_payment_date && new Date(l.next_payment_date) >= monthStart && new Date(l.next_payment_date) <= monthEnd);
+            const borrowingThisMonth = activeBorrowingLoans.filter(l => l.next_payment_date && new Date(l.next_payment_date) >= monthStart && new Date(l.next_payment_date) <= monthEnd);
+
             return (
-              <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
-                {/* Aurora glow */}
-                <div style={{
-                  position: 'absolute',
-                  top: '50%', left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  width: 'calc(100% + 10px)',
-                  height: 'calc(100% + 10px)',
-                  background: auroraBg,
-                  filter: 'blur(5px) saturate(1.2)',
-                  opacity: auroraOpacity,
-                  borderRadius: 18,
-                  zIndex: 0,
-                  pointerEvents: 'none',
-                }} />
-                {/* Card */}
-                <div style={{
-                  position: 'relative', zIndex: 1, flex: 1,
-                  padding: '12px 14px', borderRadius: 10,
-                  background: '#ffffff',
-                  border: '1px solid rgba(50,138,182,0.65)',
-                  display: 'flex', flexDirection: 'column', justifyContent: 'center',
-                }}>
-                  {daysLabel && nextPaymentLoan && (
-                    <span style={{ position: 'absolute', top: 10, right: 12, fontSize: 9, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 4, padding: '2px 5px', lineHeight: 1.2 }}>{daysLabel}</span>
+              <div style={{ background: '#ffffff', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', padding: '12px 14px' }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif", marginBottom: 6 }}>
+                  {format(today, 'MMMM')} {isLending ? 'Lending' : 'Borrowing'} Snapshot
+                </div>
+                {/* Insight badge */}
+                <div style={{ marginBottom: 8 }}>
+                  <span style={{ display: 'inline-block', background: accentBg, color: accentColor, padding: '2px 6px', fontSize: 11, fontWeight: 500, lineHeight: 1.35, fontFamily: "'DM Sans', sans-serif" }}>
+                    {insightText}
+                  </span>
+                </div>
+                {/* Summary lines */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {isLending && monthlyExpectedReceive > 0 && (
+                    <div style={{ fontSize: 11, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>
+                      Expected to receive <strong style={{ color: accentColor }}>{formatMoney(monthlyExpectedReceive)}</strong> this month
+                      {lendingThisMonth.length > 0 && <span style={{ color: '#9B9A98' }}> across {lendingThisMonth.length} payment{lendingThisMonth.length !== 1 ? 's' : ''}</span>}
+                    </div>
                   )}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, paddingBottom: 5, marginBottom: 2 }}>
-                    <span style={{ width: 20, height: 20, borderRadius: 6, background: '#EBF4FA', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      {isLending
-                        ? <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><polyline points="19 12 12 19 5 12"/></svg>
-                        : <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5"/><polyline points="5 12 12 5 19 12"/></svg>
-                      }
-                    </span>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>
-                      {isLending ? 'Next Payment Incoming' : 'Next Payment Due'}
-                    </span>
-                  </div>
-                  {nextPaymentLoan ? (
-                    <>
-                      <div style={{ textAlign: 'center', fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {isLending ? (
-                          <>
-                            <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1918', letterSpacing: '-0.02em', marginRight: 4 }}>
-                              {formatMoney(nextPaymentAmount)}
-                            </span>
-                            <span style={{ fontSize: 12, fontWeight: 400, color: '#1A1918' }}>from {otherFirstName}</span>
-                          </>
-                        ) : (
-                          <>
-                            <span style={{ fontSize: 13, fontWeight: 800, color: '#03ACEA', letterSpacing: '-0.02em', marginRight: 6, background: '#EBF4FA', padding: '2px 7px', borderRadius: 5, display: 'inline-block' }}>
-                              {formatMoney(nextPaymentAmount)}
-                            </span>
-                            <span style={{ fontSize: 12, fontWeight: 400, color: '#1A1918' }}>to {otherFirstName}</span>
-                          </>
-                        )}
-                      </div>
-                      <div style={{ textAlign: 'left', marginTop: 6, fontSize: 8, fontWeight: 700, color: '#03ACEA', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>
-                        {isLending ? 'Expect before' : 'Send before'} {format(new Date(nextPaymentLoan.next_payment_date), 'MMMM do')}
-                      </div>
-                    </>
-                  ) : (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 15, fontWeight: 700, color: '#C5C3C0' }}>—</span>
-                      <span style={{ fontSize: 11, color: '#9B9A98' }}>{isLending ? 'None incoming ✨' : 'Nothing due 🎉'}</span>
+                  {!isLending && monthlyExpectedPay > 0 && (
+                    <div style={{ fontSize: 11, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>
+                      Due to pay <strong style={{ color: accentColor }}>{formatMoney(monthlyExpectedPay)}</strong> this month
+                      {borrowingThisMonth.length > 0 && <span style={{ color: '#9B9A98' }}> across {borrowingThisMonth.length} payment{borrowingThisMonth.length !== 1 ? 's' : ''}</span>}
+                    </div>
+                  )}
+                  {isLending && monthlyReceived > 0 && (
+                    <div style={{ fontSize: 11, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>
+                      <span style={{ color: '#1A1918', fontWeight: 600 }}>{formatMoney(monthlyReceived)}</span> received so far this month
+                    </div>
+                  )}
+                  {!isLending && monthlyPaidOut > 0 && (
+                    <div style={{ fontSize: 11, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>
+                      <span style={{ color: '#1A1918', fontWeight: 600 }}>{formatMoney(monthlyPaidOut)}</span> paid out so far this month
                     </div>
                   )}
                 </div>
@@ -1219,28 +1211,25 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
           const bL  = { fontSize: 11, fontWeight: 600, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", letterSpacing: '-0.01em' };
           const sL  = { fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" };
           return (
-            <div style={{ position: 'relative' }}>
-              <div style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
-              <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '12px 14px' }}>
+            <div style={{ background: '#ffffff', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', padding: '12px 14px' }}>
                 <div style={{ fontSize: 11, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif", marginBottom: 8 }}>Overview</div>
                 {isLending ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <OvRing percent={percentRepaid} color="#03ACEA" label="Repaid" />
                     <div style={tbS}>
-                      <div style={bL}>{formatMoney(totalReceivedLending)} <span style={{ color: '#03ACEA' }}>of {formatMoney(totalExpectedLending)}</span> repaid</div>
-                      <div style={sL}>{paymentsLeft} payment{paymentsLeft !== 1 ? 's' : ''} left</div>
+                      <div style={bL}>You're owed <span style={{ color: '#03ACEA' }}>{formatMoney(lentOwed)}</span></div>
+                      <div style={sL}>{formatMoney(totalReceivedLending)} of {formatMoney(totalExpectedLending)} repaid to you</div>
                     </div>
                   </div>
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <OvRing percent={percentPaid} color="#1D5B94" label="Paid back" />
                     <div style={tbS}>
-                      <div style={bL}>{formatMoney(totalPaidBorrowing)} <span style={{ color: '#1D5B94' }}>of {formatMoney(totalOwedBorrowing)}</span> paid back</div>
-                      <div style={sL}>{paymentsLeft} payment{paymentsLeft !== 1 ? 's' : ''} left</div>
+                      <div style={bL}>You owe <span style={{ color: '#1D5B94' }}>{formatMoney(borrowOwed)}</span></div>
+                      <div style={sL}>{formatMoney(totalPaidBorrowing)} of {formatMoney(totalOwedBorrowing)} paid back</div>
                     </div>
                   </div>
                 )}
-              </div>
             </div>
           );
         })()}
@@ -1270,7 +1259,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                 ) : combinedLoans.map((loan) => {
                   const isOverdue = loan.days < 0;
                   const isToday = loan.days === 0;
-                  const dayName = isOverdue ? 'Late' : isToday ? 'Today' : format(loan.payDate, 'EEE');
+                  const dayName = isOverdue ? 'Late' : isToday ? 'Today' : format(loan.payDate, 'MMM');
                   const dateNum = format(loan.payDate, 'd');
                   const dateBg = isOverdue ? 'rgba(232,114,110,0.10)' : isToday ? '#1A1918' : 'rgba(0,0,0,0.04)';
                   const dayNameColor = isOverdue ? '#E8726E' : isToday ? 'rgba(255,255,255,0.6)' : '#9B9A98';
@@ -1436,21 +1425,14 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
   const LENDER_GREEN = '#03ACEA';
 
   const PageCard = ({ title, headerRight, children, style, highlight, tone }) => {
-    const toneCfg = tone === 'lending'
-      ? { aura: '#B8E4F7', border: 'rgba(3,172,234,0.35)', bg: '#F5FBFE' }
-      : tone === 'borrowing'
-      ? { aura: '#B7C8E3', border: 'rgba(29,91,148,0.35)', bg: '#F4F7FC' }
-      : { aura: '#CFDCE7', border: 'rgba(207,220,231,0.6)', bg: '#ffffff' };
     return (
     <div style={{ position: 'relative', marginBottom: 24 }}>
-      <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: toneCfg.aura, borderRadius: 12, filter: 'blur(4px)', opacity: 0.55, zIndex: 0, pointerEvents: 'none' }} />
     <div style={{
       position: 'relative', zIndex: 1,
-      background: toneCfg.bg,
-      backdropFilter: 'blur(12px) saturate(1.4)',
-      WebkitBackdropFilter: 'blur(12px) saturate(1.4)',
+      background: '#ffffff',
       borderRadius: 10,
-      border: highlight ? '1px solid rgba(3,172,234,0.25)' : `1px solid ${toneCfg.border}`,
+      border: '1px solid rgba(0,0,0,0.07)',
+      boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
       padding: '14px 18px',
       ...style
     }}>

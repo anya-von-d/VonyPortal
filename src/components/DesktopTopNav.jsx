@@ -43,8 +43,18 @@ const NavBtn = ({ to, children, onClick, active }) => {
   );
 };
 
+const glassPill = {
+  display: 'inline-flex', alignItems: 'center', gap: 2,
+  background: 'rgba(255,255,255,0.72)',
+  backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+  border: '1px solid rgba(255,255,255,0.55)',
+  boxShadow: '0 2px 10px rgba(0,0,0,0.07)',
+  borderRadius: 30, padding: 4,
+  pointerEvents: 'auto',
+};
+
 const Pill = ({ children }) => (
-  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 2, background: 'rgba(0,0,0,0.06)', borderRadius: 30, padding: 4 }}>
+  <div style={glassPill}>
     {children}
   </div>
 );
@@ -206,17 +216,21 @@ export default function DesktopTopNav() {
     <>
       {/* desktop-top-nav class is hidden on mobile via index.css */}
       <div className="desktop-top-nav" style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 300,
-        height: 62, background: '#FDFCFA',
+        position: 'fixed', top: 18, left: 0, right: 0, zIndex: 300,
         display: 'flex', alignItems: 'center',
-        padding: '0 56px', gap: 12,
+        padding: '0 24px', gap: 12,
+        background: 'none',
+        pointerEvents: 'none',  // let clicks pass through gaps between bubbles
       }}>
-        {/* Logo */}
+        {/* Logo bubble */}
         <Link to="/" style={{
+          ...glassPill,
+          padding: '0 14px', height: 40,
           fontFamily: "'Cormorant Garamond', Georgia, serif",
-          fontStyle: 'italic', fontWeight: 600, fontSize: '1.5rem',
+          fontStyle: 'italic', fontWeight: 600, fontSize: '1.35rem',
           color: '#1A1918', textDecoration: 'none', lineHeight: 1,
-          letterSpacing: '-0.02em', marginRight: 8, flexShrink: 0,
+          letterSpacing: '-0.02em', flexShrink: 0,
+          borderRadius: 14,
         }}>Vony</Link>
 
         {/* Left pill */}
@@ -231,7 +245,7 @@ export default function DesktopTopNav() {
         <div style={{ flex: 1 }} />
 
         {/* Notifications */}
-        <div style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(0,0,0,0.06)', borderRadius: 30, padding: '6px 10px' }}>
+        <div style={{ ...glassPill, padding: '4px 6px' }}>
           <NavBtn onClick={() => { setNotifOpen(v => !v); setFriendsOpen(false); setMenuOpen(false); }} active={notifOpen}>
             <BellIcon />
           </NavBtn>
@@ -252,7 +266,7 @@ export default function DesktopTopNav() {
           </NavBtn>
 
           {/* ≡ Menu button + dropdown */}
-          <div ref={menuRef} style={{ position: 'relative' }}>
+          <div ref={menuRef} style={{ position: 'relative', pointerEvents: 'auto' }}>
             <NavBtn onClick={() => { setMenuOpen(v => !v); setNotifOpen(false); setFriendsOpen(false); }} active={menuOpen}>
               <MenuIcon />
             </NavBtn>

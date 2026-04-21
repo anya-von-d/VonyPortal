@@ -269,10 +269,10 @@ input[type="date"] {
   }
 }
 
-/* Content area: offset for fixed desktop top bar */
+/* Content area: offset for floating desktop nav bubbles (top:18 + ~44px bubble + 18px breathing room) */
 @media (min-width: 901px) {
   .mesh-center {
-    padding-top: 80px !important;
+    padding-top: 88px !important;
   }
   /* Page title shown in top bar on desktop — hide in-content version */
   .mobile-page-title {
