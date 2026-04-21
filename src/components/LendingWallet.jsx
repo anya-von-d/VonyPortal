@@ -1,6 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
 import { formatMoney } from "@/components/utils/formatMoney";
 
 /**
@@ -25,7 +23,17 @@ export default function LendingWallet({ cards, summaryCard, onCardClick, selecte
   const accentColor  = isLending ? '#03ACEA' : '#4B8EC8';
   const rainbowEdge  = 'linear-gradient(90deg, #FFB06B 0%, #E8726E 25%, #B088D4 55%, #7BAFE0 80%, #4B8EC8 100%)';
 
-  const N            = Math.max(cards.length, 1);
+  // Summary card sits at the front (i=0, closest to wallet body), followed by loan cards
+  const summaryItem  = {
+    id: 'summary',
+    name: isLending ? 'Lending Summary' : 'Borrowing Summary',
+    amount: summaryCard?.amount || formatMoney(0),   // already-formatted string
+    purpose: summaryCard?.sublabel || '',
+    isSummary: true,
+  };
+  const allCards     = [summaryItem, ...cards];
+
+  const N            = Math.max(allCards.length, 1);
   const stackHeight  = CARD_H + (N - 1) * PEEK;
   const containerH   = stackHeight + WALLET_H - CARD_TUCK;
 
@@ -54,7 +62,7 @@ export default function LendingWallet({ cards, summaryCard, onCardClick, selecte
     <div style={{ position: 'relative', width: WIDTH, height: containerH, flexShrink: 0, fontFamily: "'DM Sans', sans-serif" }}>
 
       {/* ── Card stack (rendered before wallet so wallet overlays the bottom) ── */}
-      {cards.map((card, i) => {
+      {allCards.map((card, i) => {
         // i=0 is the front card (lowest, tucked deepest into pocket)
         // i=N-1 is the back card (highest, most peeked above)
         const topPx   = stackHeight - CARD_H - i * PEEK;
@@ -108,7 +116,7 @@ export default function LendingWallet({ cards, summaryCard, onCardClick, selecte
                 fontSize: 14, fontWeight: 800, color: '#1A1918',
                 letterSpacing: '-0.03em', flexShrink: 0,
               }}>
-                {formatMoney(card.amount)}
+                {card.isSummary ? card.amount : formatMoney(card.amount)}
               </span>
             </div>
 
@@ -160,34 +168,14 @@ export default function LendingWallet({ cards, summaryCard, onCardClick, selecte
           position: 'absolute', inset: 0,
           padding: `${NOTCH_DEPTH + 14}px 20px 16px`,
           boxSizing: 'border-box',
-          display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          {/* Top: "select a loan" hint */}
           <div style={{
             fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.75)',
             letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif",
             textAlign: 'center', lineHeight: 1.4,
           }}>
             Select a loan above for more details
-          </div>
-
-          {/* Bottom row: View Summary button centered */}
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <Link
-              to={createPageUrl(isLending ? 'LendingSummary' : 'BorrowingSummary')}
-              style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                padding: '5px 10px', borderRadius: 20,
-                background: 'rgba(255,255,255,0.14)',
-                border: '1px solid rgba(255,255,255,0.22)',
-                backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
-                fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.7)',
-                letterSpacing: '-0.01em', textDecoration: 'none',
-                whiteSpace: 'nowrap', fontFamily: "'DM Sans', sans-serif",
-              }}
-            >
-              View {isLending ? 'Lending' : 'Borrowing'} Summary
-            </Link>
           </div>
         </div>
       </div>
