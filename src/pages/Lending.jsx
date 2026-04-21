@@ -53,6 +53,84 @@ const STAR_CIRCLES = [
   {cx:685,cy:178,o:0.4},{cx:905,cy:289,o:0.55},{cx:1125,cy:45,o:0.7},{cx:1345,cy:145,o:0.5},
 ];
 
+/* ── InlineLoanSelect ──────────────────────────────────────────
+   Inline dropdown styled to match the filter dropdowns on the
+   Records (LoanAgreements) page. Used for the contract-style
+   fill-in-the-blanks fields on Create a Loan.
+   -------------------------------------------------------------- */
+function InlineLoanSelect({ value, onChange, options, minWidth }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const currentOpt = options.find(o => String(o.value) === String(value));
+  const currentLabel = currentOpt?.label ?? value ?? '';
+
+  return (
+    <div ref={ref} style={{ position: 'relative', display: 'inline-block', verticalAlign: 'middle' }}>
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        style={{
+          display: 'inline-flex', alignItems: 'center', gap: 5,
+          padding: '6px 11px', borderRadius: 10,
+          border: '1px solid rgba(0,0,0,0.06)',
+          background: value ? 'rgba(3,172,234,0.08)' : 'white',
+          fontSize: 12, fontWeight: 500, color: '#1A1918',
+          fontFamily: "'DM Sans', sans-serif",
+          cursor: 'pointer', whiteSpace: 'nowrap',
+          transition: 'background 0.15s',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+          minWidth,
+        }}
+      >
+        {currentLabel}
+        <ChevronDown size={12} style={{ opacity: 0.5, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+      </button>
+      {open && (
+        <div style={{
+          position: 'absolute', top: 'calc(100% + 6px)', left: 0,
+          background: 'white', borderRadius: 12, border: '1px solid rgba(0,0,0,0.06)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
+          zIndex: 50, padding: '6px 0', maxHeight: 260, overflowY: 'auto',
+          minWidth: '100%',
+        }}>
+          {options.map(opt => {
+            const isActive = String(value) === String(opt.value);
+            return (
+              <button
+                key={String(opt.value)}
+                type="button"
+                onClick={() => { onChange(opt.value); setOpen(false); }}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  width: '100%', textAlign: 'left', padding: '8px 14px', border: 'none', cursor: 'pointer',
+                  fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif",
+                  background: isActive ? 'rgba(0,0,0,0.03)' : 'transparent',
+                  fontWeight: isActive ? 600 : 400,
+                  whiteSpace: 'nowrap', gap: 12,
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.03)'}
+                onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
+              >
+                <span>{opt.label}</span>
+                {isActive && (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1A1918" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Lending({ initialTab }) {
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -2286,22 +2364,28 @@ export default function Lending({ initialTab }) {
                                 <span className="loan-name">{lenderDisplayName || 'The lender'}</span>
                                 <span>agrees to lend</span>
                                 <span className="loan-name">{borrowerDisplayName || 'the borrower'}</span>
-                                <select className="loan-select" value={formData.currency} onChange={e => handleInputChange('currency', e.target.value)}>
-                                  <option value="USD">$ USD</option>
-                                  <option value="EUR">€ EUR</option>
-                                  <option value="GBP">£ GBP</option>
-                                  <option value="CAD">C$ CAD</option>
-                                  <option value="AUD">A$ AUD</option>
-                                  <option value="JPY">¥ JPY</option>
-                                  <option value="CHF">Fr CHF</option>
-                                </select>
+                                <InlineLoanSelect
+                                  value={formData.currency}
+                                  onChange={v => handleInputChange('currency', v)}
+                                  options={[
+                                    { value: 'USD', label: '$ USD' },
+                                    { value: 'EUR', label: '€ EUR' },
+                                    { value: 'GBP', label: '£ GBP' },
+                                    { value: 'CAD', label: 'C$ CAD' },
+                                    { value: 'AUD', label: 'A$ AUD' },
+                                    { value: 'JPY', label: '¥ JPY' },
+                                    { value: 'CHF', label: 'Fr CHF' },
+                                  ]}
+                                />
                                 <input type="number" step="0.01" min="0" placeholder="0.00" value={formData.amount} onChange={e => handleInputChange('amount', e.target.value)} className="loan-input" style={{ width: 86, MozAppearance: 'textfield' }} />
                                 <span>on or before</span>
                                 <input type="date" value={formData.lender_send_funds_date} onChange={e => handleInputChange('lender_send_funds_date', e.target.value)} min={format(new Date(), 'yyyy-MM-dd')} className="loan-input" style={{ width: 'auto' }} />
                                 <span>, at an annual interest rate of</span>
-                                <select className="loan-select" value={formData.interest_rate} onChange={e => handleInputChange('interest_rate', e.target.value)}>
-                                  {[1,2,3,4,5,6,7,8].map(n => <option key={n} value={String(n)}>{n}%</option>)}
-                                </select>
+                                <InlineLoanSelect
+                                  value={formData.interest_rate}
+                                  onChange={v => handleInputChange('interest_rate', v)}
+                                  options={[1,2,3,4,5,6,7,8].map(n => ({ value: String(n), label: `${n}%` }))}
+                                />
                                 <span>.</span>
                               </R>
 
@@ -2310,11 +2394,15 @@ export default function Lending({ initialTab }) {
                                 <span className="loan-name">{borrowerDisplayName || 'The borrower'}</span>
                                 <span>agrees to repay this loan in</span>
                                 <input type="number" min="1" placeholder="12" value={formData.repayment_period} onChange={e => handleInputChange('repayment_period', e.target.value)} className="loan-input" style={{ width: 54, MozAppearance: 'textfield' }} />
-                                <select className="loan-select" value={formData.payment_frequency} onChange={e => handleInputChange('payment_frequency', e.target.value)}>
-                                  <option value="weekly">weekly</option>
-                                  <option value="biweekly">biweekly</option>
-                                  <option value="monthly">monthly</option>
-                                </select>
+                                <InlineLoanSelect
+                                  value={formData.payment_frequency}
+                                  onChange={v => handleInputChange('payment_frequency', v)}
+                                  options={[
+                                    { value: 'weekly', label: 'weekly' },
+                                    { value: 'biweekly', label: 'biweekly' },
+                                    { value: 'monthly', label: 'monthly' },
+                                  ]}
+                                />
                                 <span>payments of</span>
                                 <span className="loan-calc">{currSym}{details.monthlyPayment > 0 ? details.monthlyPayment.toFixed(2) : '0.00'}</span>
                                 <span>each.</span>
@@ -2324,19 +2412,25 @@ export default function Lending({ initialTab }) {
                               <R>
                                 <span>Payments will be due{isWeeklyLike ? ' on' : ' on the'}</span>
                                 {isWeeklyLike ? (
-                                  <select className="loan-select" value={formData.loan_day_of_week} onChange={e => handleInputChange('loan_day_of_week', e.target.value)}>
-                                    {['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].map(d => <option key={d} value={d}>{d.charAt(0).toUpperCase()+d.slice(1)}</option>)}
-                                  </select>
+                                  <InlineLoanSelect
+                                    value={formData.loan_day_of_week}
+                                    onChange={v => handleInputChange('loan_day_of_week', v)}
+                                    options={['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].map(d => ({ value: d, label: d.charAt(0).toUpperCase()+d.slice(1) }))}
+                                  />
                                 ) : (
-                                  <select className="loan-select" value={formData.loan_day_of_month} onChange={e => handleInputChange('loan_day_of_month', e.target.value)}>
-                                    {Array.from({length:28},(_,i)=>i+1).map(d => <option key={d} value={String(d)}>{d}{d===1?'st':d===2?'nd':d===3?'rd':'th'}</option>)}
-                                  </select>
+                                  <InlineLoanSelect
+                                    value={formData.loan_day_of_month}
+                                    onChange={v => handleInputChange('loan_day_of_month', v)}
+                                    options={Array.from({length:28},(_,i)=>i+1).map(d => ({ value: String(d), label: `${d}${d===1?'st':d===2?'nd':d===3?'rd':'th'}` }))}
+                                  />
                                 )}
                                 <span>of each period at</span>
                                 <input type="time" value={formData.loan_time} onChange={e => handleInputChange('loan_time', e.target.value)} className="loan-input" style={{ width: 'auto' }} />
-                                <select className="loan-select" value={formData.loan_timezone} onChange={e => handleInputChange('loan_timezone', e.target.value)}>
-                                  {['EST','CST','MST','PST','HST','AKST'].map(tz => <option key={tz} value={tz}>{tz}</option>)}
-                                </select>
+                                <InlineLoanSelect
+                                  value={formData.loan_timezone}
+                                  onChange={v => handleInputChange('loan_timezone', v)}
+                                  options={['EST','CST','MST','PST','HST','AKST'].map(tz => ({ value: tz, label: tz }))}
+                                />
                                 <span>, beginning on</span>
                                 <input type="date" value={formData.first_payment_date} onChange={e => handleInputChange('first_payment_date', e.target.value)} min={format(new Date(), 'yyyy-MM-dd')} className="loan-input" style={{ width: 'auto' }} />
                                 <span>. The final payment will be due on</span>
