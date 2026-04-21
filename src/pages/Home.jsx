@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { format, startOfMonth, endOfMonth, addMonths, addDays, isBefore, isAfter, isSameDay, differenceInDays } from "date-fns";
 import { formatMoney } from "@/components/utils/formatMoney";
 import { toLocalDate, getLocalToday, daysUntil as daysUntilDate } from "@/components/utils/dateUtils";
+import { countNotifications } from "@/components/utils/notificationCount";
 
 import { CardEntrance, CountUp } from "@/components/ui/animations";
 import DesktopSidebar from '../components/DesktopSidebar';
@@ -710,7 +711,13 @@ export default function Home() {
     l && myLoanIds.includes(l.id) && l.extension_requested && l.extension_requested_by !== user.id
   );
   const friendRequestsInbox = friendships.filter(f => f && f.friend_id === user.id && f.status === 'pending');
-  const notifCount = paymentsToConfirm.length + termChanges.length + extensionRequests.length + pendingOffers.length + friendRequestsInbox.length;
+  // Shared count — matches the bell bubble & NotificationsPopup
+  const notifCount = countNotifications({
+    userId: user.id,
+    loans: safeLoans,
+    payments: safePayments,
+    friendships: Array.isArray(friendships) ? friendships : [],
+  });
 
   // Time-based greeting
   const hour = new Date().getHours();
@@ -1112,8 +1119,8 @@ export default function Home() {
 
           {/* Mobile-only page title */}
           <div className="mobile-page-title">
-            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.2, color: '#1A1918', marginBottom: 12 }}>
-              {greeting}, {firstName}
+            <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.2, color: '#1A1918', marginBottom: 12 }}>
+              {greeting}, {firstName} 👋
             </div>
           </div>
 

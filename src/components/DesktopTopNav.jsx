@@ -7,6 +7,7 @@ import NotificationsPopup from './NotificationsPopup';
 import FriendsPopup from './FriendsPopup';
 import AppMenuDropdown from './AppMenuDropdown';
 import UserAvatar from './ui/UserAvatar';
+import { useNotificationCount } from './utils/notificationCount';
 
 const isActive = (location, to) => {
   if (to === '/') return location.pathname === '/';
@@ -69,6 +70,7 @@ export default function DesktopTopNav() {
   const location = useLocation();
   const { userProfile, user: authUser } = useAuth();
   const user = userProfile ? { ...userProfile, id: authUser?.id } : null;
+  const notifCount = useNotificationCount(user?.id);
 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -118,10 +120,25 @@ export default function DesktopTopNav() {
         <div style={{ flex: 1 }} />
 
         {/* Notifications */}
-        <div style={{ ...glassPill, padding: '4px 6px' }}>
+        <div style={{ ...glassPill, padding: '4px 6px', position: 'relative' }}>
           <NavBtn onClick={() => { setNotifOpen(v => !v); setFriendsOpen(false); setMenuOpen(false); }} active={notifOpen}>
             <BellIcon />
           </NavBtn>
+          {notifCount > 0 && (
+            <span style={{
+              position: 'absolute', top: -2, right: -2,
+              minWidth: 17, height: 17, borderRadius: 9,
+              background: '#14324D', color: '#fff',
+              fontSize: 9, fontWeight: 800,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '0 4px', lineHeight: 1,
+              border: '1.5px solid rgba(255,255,255,0.95)',
+              boxShadow: '0 1px 4px rgba(20,50,77,0.35)',
+              pointerEvents: 'none',
+            }}>
+              {notifCount > 99 ? '99+' : notifCount}
+            </span>
+          )}
         </div>
 
         {/* Right pill */}

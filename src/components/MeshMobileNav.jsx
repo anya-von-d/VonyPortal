@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Payment, Loan, Friendship } from "@/entities/all";
 import UserAvatar from "@/components/ui/UserAvatar";
 import SettingsModal from "@/components/SettingsModal";
 import FriendsPopup from "@/components/FriendsPopup";
 import NotificationsPopup from "@/components/NotificationsPopup";
 import AppMenuDropdown from "@/components/AppMenuDropdown";
+import { useNotificationCount } from "@/components/utils/notificationCount";
 
 export default function MeshMobileNav({ user, activePage }) {
   const location = useLocation();
@@ -15,9 +15,9 @@ export default function MeshMobileNav({ user, activePage }) {
   const [friendsInitialTab, setFriendsInitialTab] = useState(null);
   const [notifOpen, setNotifOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [notifCount, setNotifCount] = useState(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const menuRef = useRef(null);
+  const notifCount = useNotificationCount(user?.id);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -34,33 +34,6 @@ export default function MeshMobileNav({ user, activePage }) {
     return () => document.removeEventListener('mousedown', handler);
   }, [menuOpen]);
 
-  useEffect(() => {
-    if (!user?.id) return;
-    const fetchCounts = async () => {
-      try {
-        const [payments, loans, friendships] = await Promise.all([
-          Payment.list('-created_at').catch(() => []),
-          Loan.list().catch(() => []),
-          Friendship.list().catch(() => []),
-        ]);
-        const userLoans = loans.filter(l => l.lender_id === user.id || l.borrower_id === user.id);
-        const userLoanIds = userLoans.map(l => l.id);
-        const toConfirm = payments.filter(p =>
-          p.status === 'pending_confirmation' && userLoanIds.includes(p.loan_id) && p.recorded_by !== user.id
-        );
-        const offers = loans.filter(l => l.borrower_id === user.id && l.status === 'pending');
-        const friendReqs = friendships.filter(f => f.friend_id === user.id && f.status === 'pending');
-        // Reminders = overdue active loans
-        const now = new Date();
-        const overdueReminders = userLoans.filter(l =>
-          l.status === 'active' && l.next_payment_date && new Date(l.next_payment_date) < now
-        );
-        setNotifCount(toConfirm.length + offers.length + friendReqs.length + overdueReminders.length);
-      } catch {}
-    };
-    fetchCounts();
-  }, [user?.id]);
-
   const isActivePage = (page) => {
     if (page === 'Home') return location.pathname === '/' || location.pathname === '';
     const url = createPageUrl(page);
@@ -75,10 +48,10 @@ export default function MeshMobileNav({ user, activePage }) {
   );
 
   // ── Mobile only ──
-  // Glassmorphism style shared by all icon bubbles
+  // Glassmorphism style shared by all icon bubbles — matches desktop `glassPill`
   const glassBubble = {
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    width: 44, height: 44, borderRadius: 14, textDecoration: 'none', flexShrink: 0,
+    width: 44, height: 44, borderRadius: 999, textDecoration: 'none', flexShrink: 0,
     background: 'rgba(255,255,255,0.72)',
     backdropFilter: 'blur(16px)',
     WebkitBackdropFilter: 'blur(16px)',
@@ -86,13 +59,19 @@ export default function MeshMobileNav({ user, activePage }) {
     boxShadow: '0 2px 10px rgba(0,0,0,0.07)',
   };
 
-  // Inner icon button style (used inside the combined bubble)
-  const innerBtn = {
+  // Inner icon button style — pill-shaped like desktop NavBtn, shaded when active
+  const innerBtnBase = {
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-    width: 36, height: 36, borderRadius: 10,
+    width: 36, height: 36, borderRadius: 24,
     background: 'transparent', border: 'none', cursor: 'pointer',
     color: 'rgba(0,0,0,0.6)', textDecoration: 'none', flexShrink: 0,
+    transition: 'background 0.15s, color 0.15s',
   };
+  const innerBtn = (active) => ({
+    ...innerBtnBase,
+    background: active ? 'rgba(0,0,0,0.08)' : 'transparent',
+    color: active ? '#1A1918' : 'rgba(0,0,0,0.6)',
+  });
 
   return (
     <>
@@ -118,21 +97,27 @@ export default function MeshMobileNav({ user, activePage }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, pointerEvents: 'auto' }}>
 
           {/* Notifications — standalone glassmorphism bubble */}
-          <button onClick={() => setNotifOpen(v => !v)} style={{ ...glassBubble, position: 'relative', border: 'none', cursor: 'pointer' }}>
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.6)" strokeWidth="1.8" strokeLinecap="round">
+          <button
+            onClick={() => { setNotifOpen(v => !v); setFriendsOpen(false); setMenuOpen(false); }}
+            style={{
+              ...glassBubble, position: 'relative', cursor: 'pointer',
+              background: notifOpen ? 'rgba(0,0,0,0.08)' : glassBubble.background,
+            }}
+          >
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke={notifOpen ? '#1A1918' : 'rgba(0,0,0,0.6)'} strokeWidth="1.8" strokeLinecap="round">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
               <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
             </svg>
             {notifCount > 0 && (
               <span style={{
-                position: 'absolute', top: 4, right: 4,
+                position: 'absolute', top: 2, right: 2,
                 minWidth: 17, height: 17, borderRadius: 9,
-                background: '#E8726E', color: '#fff',
+                background: '#14324D', color: '#fff',
                 fontSize: 9, fontWeight: 800,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 padding: '0 3px', lineHeight: 1,
                 border: '1.5px solid rgba(255,255,255,0.9)',
-                boxShadow: '0 1px 4px rgba(232,114,110,0.4)',
+                boxShadow: '0 1px 4px rgba(20,50,77,0.35)',
               }}>
                 {notifCount > 99 ? '99+' : notifCount}
               </span>
@@ -146,11 +131,14 @@ export default function MeshMobileNav({ user, activePage }) {
             backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
             border: '1px solid rgba(255,255,255,0.55)',
             boxShadow: '0 2px 10px rgba(0,0,0,0.07)',
-            borderRadius: 14, padding: 4, gap: 2,
+            borderRadius: 999, padding: 4, gap: 2,
           }}>
             {/* Friends — opens dropdown */}
-            <button onClick={() => setFriendsOpen(v => !v)} style={{ ...innerBtn, border: 'none' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.6)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <button
+              onClick={() => { setFriendsOpen(v => !v); setNotifOpen(false); setMenuOpen(false); }}
+              style={innerBtn(friendsOpen)}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                 <circle cx="9" cy="7" r="4"/>
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
@@ -159,13 +147,16 @@ export default function MeshMobileNav({ user, activePage }) {
             </button>
 
             {/* Records */}
-            <Link to={createPageUrl("LoanAgreements")} style={{
-              ...innerBtn, width: 'auto', padding: '0 8px',
-              fontSize: 13, fontWeight: 600, letterSpacing: '-0.01em',
-            }}>Records</Link>
+            <Link
+              to={createPageUrl("LoanAgreements")}
+              style={{
+                ...innerBtn(isActivePage('LoanAgreements')), width: 'auto', padding: '0 10px',
+                fontSize: 13, fontWeight: isActivePage('LoanAgreements') ? 600 : 500, letterSpacing: '-0.01em',
+              }}
+            >Records</Link>
 
             {/* Profile */}
-            <Link to={createPageUrl("Profile")} style={innerBtn}>
+            <Link to={createPageUrl("Profile")} style={innerBtn(isActivePage('Profile'))}>
               <UserAvatar
                 name={user?.full_name || user?.username}
                 src={user?.avatar_url || user?.profile_picture_url}
@@ -178,13 +169,13 @@ export default function MeshMobileNav({ user, activePage }) {
             <div ref={menuRef} style={{ position: 'relative' }}>
               <button
                 onClick={() => { setMenuOpen(v => !v); setNotifOpen(false); setFriendsOpen(false); }}
-                style={{ ...innerBtn, border: 'none' }}
+                style={innerBtn(menuOpen)}
                 aria-label="Menu"
               >
                 <svg width="17" height="13" viewBox="0 0 17 13" fill="none">
-                  <line x1="0" y1="1"   x2="17" y2="1"   stroke="rgba(0,0,0,0.55)" strokeWidth="1.6" strokeLinecap="round"/>
-                  <line x1="0" y1="6.5" x2="17" y2="6.5" stroke="rgba(0,0,0,0.55)" strokeWidth="1.6" strokeLinecap="round"/>
-                  <line x1="0" y1="12"  x2="17" y2="12"  stroke="rgba(0,0,0,0.55)" strokeWidth="1.6" strokeLinecap="round"/>
+                  <line x1="0" y1="1"   x2="17" y2="1"   stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" opacity="0.9"/>
+                  <line x1="0" y1="6.5" x2="17" y2="6.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" opacity="0.9"/>
+                  <line x1="0" y1="12"  x2="17" y2="12"  stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" opacity="0.9"/>
                 </svg>
               </button>
               {menuOpen && (
