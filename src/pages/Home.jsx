@@ -1142,6 +1142,7 @@ export default function Home() {
   );
 
   return (
+    <>
     <div style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, lineHeight: 1.5, color: '#1A1918', WebkitFontSmoothing: 'antialiased' }}>
       <MeshMobileNav user={user} activePage="Home" />
 
@@ -2103,5 +2104,6 @@ export default function Home() {
       </div>,
       document.body
     )}
+    </>
   );
 }
