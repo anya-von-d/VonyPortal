@@ -7,7 +7,7 @@ import confetti from 'canvas-confetti';
 
 const TABS = ['Your Friends', 'Find Your Friends', 'Invite'];
 
-export default function FriendsPopup({ onClose }) {
+export default function FriendsPopup({ onClose, positionOverride }) {
   const { user: authUser, userProfile } = useAuth();
   const user = userProfile ? { ...userProfile, id: authUser?.id } : null;
 
@@ -177,10 +177,11 @@ export default function FriendsPopup({ onClose }) {
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
+        ...positionOverride,
       }}
     >
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 10px', borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 10px' }}>
         <span style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.01em' }}>Friends</span>
         <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#9B9A98', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <X size={16} />
@@ -188,7 +189,7 @@ export default function FriendsPopup({ onClose }) {
       </div>
 
       {/* Tab bar */}
-      <div style={{ display: 'flex', borderBottom: '1px solid rgba(0,0,0,0.07)', padding: '0 12px' }}>
+      <div style={{ display: 'flex', padding: '0 12px' }}>
         {TABS.map(tab => (
           <button key={tab} style={tabStyle(tab)} onClick={() => setActiveTab(tab)}>{tab}</button>
         ))}
@@ -209,11 +210,11 @@ export default function FriendsPopup({ onClose }) {
                 const friendProfile = getFriendProfile(friendship);
                 if (!friendProfile) return null;
                 return (
-                  <div key={friendship.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
+                  <div key={friendship.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0' }}>
                     <UserAvatar name={friendProfile.full_name || friendProfile.username} src={friendProfile.profile_picture_url || friendProfile.avatar_url} size={30} />
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{friendProfile.full_name || friendProfile.username}</div>
-                      <div style={{ fontSize: 11, color: '#9B9A98' }}>@{friendProfile.username}</div>
+                      <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{friendProfile.full_name || friendProfile.username}</div>
+                      <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>@{friendProfile.username}</div>
                     </div>
                     <button onClick={() => handleToggleStar(friendship)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 3, color: friendship.is_starred ? '#F5A623' : '#C7C6C4', flexShrink: 0 }}>
                       <Star size={14} fill={friendship.is_starred ? 'currentColor' : 'none'} />
@@ -253,11 +254,11 @@ export default function FriendsPopup({ onClose }) {
                     const receivedRequest = getReceivedRequestFrom(profile.user_id);
                     const sentRequest = getSentRequestTo(profile.user_id);
                     return (
-                      <div key={profile.user_id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+                      <div key={profile.user_id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0' }}>
                         <UserAvatar name={profile.full_name || profile.username} src={profile.profile_picture_url || profile.avatar_url} size={30} />
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0 }}>{profile.full_name || profile.username}</p>
-                          <p style={{ fontSize: 11, color: '#9B9A98', margin: '1px 0 0' }}>@{profile.username}</p>
+                          <p style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile.full_name || profile.username}</p>
+                          <p style={{ fontSize: 11, color: '#9B9A98', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>@{profile.username}</p>
                         </div>
                         {receivedRequest ? (
                           <button onClick={() => handleAcceptRequestFromSearch(receivedRequest.id)} disabled={processingId === receivedRequest.id} style={{ padding: '5px 12px', borderRadius: 7, border: 'none', background: 'rgba(3,172,234,0.12)', fontSize: 11, fontWeight: 600, color: '#03ACEA', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontFamily: "'DM Sans', sans-serif", opacity: processingId === receivedRequest.id ? 0.5 : 1 }}>
@@ -284,11 +285,11 @@ export default function FriendsPopup({ onClose }) {
                   const profile = profiles.find(p => p.user_id === request.user_id);
                   if (!profile) return null;
                   return (
-                    <div key={request.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+                    <div key={request.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0' }}>
                       <UserAvatar name={profile.full_name || profile.username} src={profile.profile_picture_url || profile.avatar_url} size={30} />
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', margin: 0 }}>{profile.full_name || profile.username}</p>
-                        <p style={{ fontSize: 11, color: '#9B9A98', margin: '1px 0 0' }}>@{profile.username}</p>
+                        <p style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile.full_name || profile.username}</p>
+                        <p style={{ fontSize: 11, color: '#9B9A98', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>@{profile.username}</p>
                       </div>
                       <div style={{ display: 'flex', gap: 5 }}>
                         <button onClick={() => handleAcceptRequestFromSearch(request.id)} disabled={processingId === request.id} style={{ padding: '5px 10px', borderRadius: 7, border: 'none', background: 'rgba(3,172,234,0.12)', fontSize: 11, fontWeight: 600, color: '#03ACEA', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", opacity: processingId === request.id ? 0.5 : 1 }}>Confirm</button>
