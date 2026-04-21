@@ -61,12 +61,30 @@ const STAR_CIRCLES = [
 function InlineLoanSelect({ value, onChange, options, minWidth }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
+  const panelRef = useRef(null);
 
+  // Close on click outside — uses 'click' (not 'mousedown') so React synthetic
+  // handlers always fire first, ensuring selection is committed before close logic runs.
   useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
+    if (!open) return;
+    const handler = (e) => {
+      if (ref.current && ref.current.contains(e.target)) return;
+      if (panelRef.current && panelRef.current.contains(e.target)) return;
+      setOpen(false);
+    };
+    // Use capture=true so we see the event before React, but we only act when it's
+    // genuinely outside. Timeout prevents same-click-that-opened from immediately closing.
+    const id = setTimeout(() => document.addEventListener('click', handler, true), 0);
+    return () => { clearTimeout(id); document.removeEventListener('click', handler, true); };
+  }, [open]);
+
+  // Escape to close
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e) => { if (e.key === 'Escape') { setOpen(false); e.stopPropagation(); } };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [open]);
 
   const currentOpt = options.find(o => String(o.value) === String(value));
   const currentLabel = currentOpt?.label ?? value ?? '';
@@ -75,7 +93,7 @@ function InlineLoanSelect({ value, onChange, options, minWidth }) {
     <div ref={ref} style={{ position: 'relative', display: 'inline-block', verticalAlign: 'middle' }}>
       <button
         type="button"
-        onClick={() => setOpen(v => !v)}
+        onClick={(e) => { e.stopPropagation(); setOpen(v => !v); }}
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 5,
           padding: '6px 11px', borderRadius: 10,
@@ -93,20 +111,23 @@ function InlineLoanSelect({ value, onChange, options, minWidth }) {
         <ChevronDown size={12} style={{ opacity: 0.5, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
       </button>
       {open && (
-        <div style={{
-          position: 'absolute', top: 'calc(100% + 6px)', left: 0,
-          background: 'white', borderRadius: 12, border: '1px solid rgba(0,0,0,0.06)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
-          zIndex: 50, padding: '6px 0', maxHeight: 260, overflowY: 'auto',
-          minWidth: '100%',
-        }}>
+        <div
+          ref={panelRef}
+          style={{
+            position: 'absolute', top: 'calc(100% + 6px)', left: 0,
+            background: 'white', borderRadius: 12, border: '1px solid rgba(0,0,0,0.06)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
+            zIndex: 500, padding: '6px 0', maxHeight: 260, overflowY: 'auto',
+            minWidth: '100%',
+          }}
+        >
           {options.map(opt => {
             const isActive = String(value) === String(opt.value);
             return (
               <button
                 key={String(opt.value)}
                 type="button"
-                onMouseDown={e => { e.preventDefault(); onChange(opt.value); setOpen(false); }}
+                onClick={(e) => { e.stopPropagation(); onChange(opt.value); setOpen(false); }}
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   width: '100%', textAlign: 'left', padding: '8px 14px', border: 'none', cursor: 'pointer',
@@ -2378,9 +2399,9 @@ export default function Lending({ initialTab }) {
                                     { value: 'CHF', label: 'Fr CHF' },
                                   ]}
                                 />
-                                <input type="number" step="0.01" min="0" placeholder="0.00" value={formData.amount} onChange={e => handleInputChange('amount', e.target.value)} className="loan-input" style={{ width: 86, MozAppearance: 'textfield' }} />
+                                <input type="number" step="0.01" min="0" placeholder="0.00" value={formData.amount} onChange={e => handleInputChange('amount', e.target.value)} onClick={e => e.stopPropagation()} className="loan-input" style={{ width: 86, MozAppearance: 'textfield' }} />
                                 <span>on or before</span>
-                                <input type="date" value={formData.lender_send_funds_date} onChange={e => handleInputChange('lender_send_funds_date', e.target.value)} min={format(new Date(), 'yyyy-MM-dd')} className="loan-input" style={{ width: 'auto' }} />
+                                <input type="date" value={formData.lender_send_funds_date} onChange={e => handleInputChange('lender_send_funds_date', e.target.value)} min={format(new Date(), 'yyyy-MM-dd')} onClick={e => e.stopPropagation()} className="loan-input" style={{ width: 'auto' }} />
                                 <span>, at an annual interest rate of</span>
                                 <InlineLoanSelect
                                   value={formData.interest_rate}
@@ -2394,7 +2415,7 @@ export default function Lending({ initialTab }) {
                               <R>
                                 <span className="loan-name">{borrowerDisplayName || 'The borrower'}</span>
                                 <span>agrees to repay this loan in</span>
-                                <input type="number" min="1" placeholder="12" value={formData.repayment_period} onChange={e => handleInputChange('repayment_period', e.target.value)} className="loan-input" style={{ width: 54, MozAppearance: 'textfield' }} />
+                                <input type="number" min="1" placeholder="12" value={formData.repayment_period} onChange={e => handleInputChange('repayment_period', e.target.value)} onClick={e => e.stopPropagation()} className="loan-input" style={{ width: 54, MozAppearance: 'textfield' }} />
                                 <InlineLoanSelect
                                   value={formData.payment_frequency}
                                   onChange={v => handleInputChange('payment_frequency', v)}
@@ -2426,14 +2447,14 @@ export default function Lending({ initialTab }) {
                                   />
                                 )}
                                 <span>of each period at</span>
-                                <input type="time" value={formData.loan_time} onChange={e => handleInputChange('loan_time', e.target.value)} className="loan-input" style={{ width: 'auto' }} />
+                                <input type="time" value={formData.loan_time} onChange={e => handleInputChange('loan_time', e.target.value)} onClick={e => e.stopPropagation()} className="loan-input" style={{ width: 'auto' }} />
                                 <InlineLoanSelect
                                   value={formData.loan_timezone}
                                   onChange={v => handleInputChange('loan_timezone', v)}
                                   options={['EST','CST','MST','PST','HST','AKST'].map(tz => ({ value: tz, label: tz }))}
                                 />
                                 <span>, beginning on</span>
-                                <input type="date" value={formData.first_payment_date} onChange={e => handleInputChange('first_payment_date', e.target.value)} min={format(new Date(), 'yyyy-MM-dd')} className="loan-input" style={{ width: 'auto' }} />
+                                <input type="date" value={formData.first_payment_date} onChange={e => handleInputChange('first_payment_date', e.target.value)} min={format(new Date(), 'yyyy-MM-dd')} onClick={e => e.stopPropagation()} className="loan-input" style={{ width: 'auto' }} />
                                 <span>. The final payment will be due on</span>
                                 <span className="loan-calc">{lastPaymentDate ? format(lastPaymentDate, 'MMM d, yyyy') : '—'}</span>
                                 <span>.</span>
@@ -2447,7 +2468,7 @@ export default function Lending({ initialTab }) {
                               {/* ¶5 */}
                               <R>
                                 <span>This loan is for</span>
-                                <input type="text" placeholder="e.g., rent, car repair…" value={formData.purpose} onChange={e => handleInputChange('purpose', e.target.value)} maxLength={100} className="loan-input" style={{ flex: 1, minWidth: 140 }} />
+                                <input type="text" placeholder="e.g., rent, car repair…" value={formData.purpose} onChange={e => handleInputChange('purpose', e.target.value)} onClick={e => e.stopPropagation()} maxLength={100} className="loan-input" style={{ flex: 1, minWidth: 140 }} />
                                 <span>.</span>
                               </R>
                             </div>

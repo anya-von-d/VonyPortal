@@ -402,12 +402,12 @@ export default function Home() {
   const activeLoansRef = useRef(null);
   const [activeAnimKey, setActiveAnimKey] = useState(0);
   const [progressTab, setProgressTab] = useState('lending'); // 'lending' | 'borrowing'
-  const [friendsPopupOpen, setFriendsPopupOpen] = useState(false);
   const [confirmPaymentTarget, setConfirmPaymentTarget] = useState(null); // { payment, loan, profile }
   const [confirmWorking, setConfirmWorking] = useState(false);
   const [viewLoanTarget, setViewLoanTarget] = useState(null);    // { loan, borrowerProfile }
   const [viewPaymentTarget, setViewPaymentTarget] = useState(null); // { payment, loan, lenderProfile }
   const [reviewOfferTarget, setReviewOfferTarget] = useState(null); // { loan, lenderProf }
+  const [expandedPendingKey, setExpandedPendingKey] = useState(null); // key of expanded pending row
   const navigate = useNavigate();
   // Tasks-for-the-Week: checked IDs keyed by ISO date of week start (Monday).
   const weekStartKey = (() => {
@@ -605,6 +605,29 @@ export default function Home() {
       await loadData();
     } catch (e) {
       console.error('Error declining loan offer:', e);
+    }
+  };
+
+  const handleUnsendLoanOffer = async (loan) => {
+    try {
+      const agreements = await LoanAgreement.list();
+      const agreement = agreements.find(a => a.loan_id === loan.id);
+      if (agreement) await LoanAgreement.delete(agreement.id);
+      await Loan.delete(loan.id);
+      setExpandedPendingKey(null);
+      await loadData();
+    } catch (e) {
+      console.error('Error unsending loan offer:', e);
+    }
+  };
+
+  const handleDeletePayment = async (payment) => {
+    try {
+      await Payment.delete(payment.id);
+      setExpandedPendingKey(null);
+      await loadData();
+    } catch (e) {
+      console.error('Error deleting payment:', e);
     }
   };
 
@@ -1515,20 +1538,26 @@ export default function Home() {
 
                 if (upcoming.length === 0) return null;
 
+                const firstDaysAway = differenceInDays(upcoming[0].date, now);
+                const nextLabel = firstDaysAway === 0 ? 'Today' : firstDaysAway === 1 ? 'Tomorrow' : `In ${firstDaysAway} days`;
+
                 return (
                   <div className="home-card-upcoming-payments" style={{ position: 'relative' }}>
                     <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
                     <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '14px 18px' }}>
                       {/* Header row */}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
                         <div style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Upcoming Payments</div>
                         <Link
                           to={createPageUrl('Upcoming')}
-                          style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 11, fontWeight: 600, color: '#787776', textDecoration: 'none', fontFamily: "'DM Sans', sans-serif" }}
+                          style={{ fontSize: 11, fontWeight: 500, color: '#03ACEA', textDecoration: 'none', fontFamily: "'DM Sans', sans-serif" }}
                         >
-                          View full schedule
-                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                          View full schedule →
                         </Link>
+                      </div>
+                      {/* Next payment subtitle */}
+                      <div style={{ fontSize: 11, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", marginBottom: 10 }}>
+                        Next payment {nextLabel.toLowerCase()}
                       </div>
 
                       {/* Event rows */}
@@ -1536,17 +1565,21 @@ export default function Home() {
                         {upcoming.map(item => {
                           const isIncoming = item.direction === 'in';
                           const barColor = isIncoming ? '#03ACEA' : '#1D5B94';
+                          const dayOfWeek = format(item.date, 'EEE');
                           const dateNum = format(item.date, 'MMM d');
                           const label = isIncoming
                             ? `Expect ${formatMoney(item.amount)} from ${item.name}`
                             : `${formatMoney(item.amount)} due to ${item.name}`;
                           return (
-                            <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '9px 0' }}>
-                              {/* Date column — matches Your Borrowing name font style */}
-                              <div style={{ width: 52, flexShrink: 0, fontSize: 12, fontWeight: 500, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap' }}>{dateNum}</div>
+                            <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '7px 0' }}>
+                              {/* Date column — day + date stacked */}
+                              <div style={{ width: 52, flexShrink: 0, fontFamily: "'DM Sans', sans-serif" }}>
+                                <div style={{ fontSize: 10, fontWeight: 500, color: '#9B9A98', letterSpacing: '-0.01em' }}>{dayOfWeek}</div>
+                                <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918' }}>{dateNum}</div>
+                              </div>
                               {/* Colored bar */}
                               <div style={{ width: 3, alignSelf: 'stretch', borderRadius: 2, background: barColor, flexShrink: 0 }} />
-                              {/* Event label — matches Your Borrowing name font style */}
+                              {/* Event label */}
                               <div style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 500, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {label}
                               </div>
@@ -1580,11 +1613,6 @@ export default function Home() {
 
                 // Build task list.
                 const tasks = [];
-                pendingOffers.forEach(offer => {
-                  const otherProfile = safeAllProfiles.find(p => p.user_id === offer.lender_id);
-                  const name = otherProfile?.full_name?.split(' ')[0] || otherProfile?.username || 'a friend';
-                  tasks.push({ id: `offer-${offer.id}`, label: `Respond to ${name}'s loan offer` });
-                });
                 borrowedLoans.forEach(loan => {
                   if (!loan.next_payment_date) return;
                   const due = new Date(loan.next_payment_date);
@@ -1596,6 +1624,19 @@ export default function Home() {
                     id: `pay-${loan.id}`,
                     label: `Send ${amt} to ${name}`,
                     onCheck: () => navigate(createPageUrl('RecordPayment') + `?loanId=${loan.id}`),
+                  });
+                });
+                // "Plan next week" — payments due 7-14 days out
+                borrowedLoans.forEach(loan => {
+                  if (!loan.next_payment_date) return;
+                  const daysAway = differenceInDays(new Date(loan.next_payment_date), now);
+                  if (daysAway < 7 || daysAway > 14) return;
+                  const otherProfile = safeAllProfiles.find(p => p.user_id === loan.lender_id);
+                  const name = otherProfile?.full_name?.split(' ')[0] || otherProfile?.username || 'them';
+                  const amt = formatMoney(loan.payment_amount || loan.next_payment_amount || 0);
+                  tasks.push({
+                    id: `plan-${loan.id}`,
+                    label: `Plan next week's ${amt} payment to ${name}`,
                   });
                 });
                 // New-user onboarding tasks.
@@ -1792,7 +1833,7 @@ export default function Home() {
                             const arrowAction = (() => {
                               if (item.type === 'overdue' || item.type === 'due') return () => navigate(createPageUrl('RecordPayment'));
                               if (item.type === 'loan_offer') return () => setReviewOfferTarget({ loan: item.loan, lenderProf: item.lenderProf });
-                              if (item.type === 'friend_request') return () => setFriendsPopupOpen(true);
+                              if (item.type === 'friend_request') return () => window.dispatchEvent(new CustomEvent('open-friends-popup', { detail: { initialRequestsOpen: true } }));
                               if (item.type === 'payment_confirm') return () => setConfirmPaymentTarget({ payment: item.payment, loan: item.loan, profile: item.profile });
                               return null;
                             })();
@@ -1836,13 +1877,14 @@ export default function Home() {
                   const firstName = borrowerProfile?.full_name?.split(' ')[0] || borrowerProfile?.username || 'them';
                   pendingRows.push({
                     key: `loan-${loan.id}`,
+                    type: 'loan',
+                    loan,
                     icon: (
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 3 }}>
                         <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                       </svg>
                     ),
                     text: `Waiting for ${firstName} to review your loan offer`,
-                    onArrow: () => setViewLoanTarget({ loan, borrowerProfile }),
                   });
                 });
 
@@ -1853,13 +1895,14 @@ export default function Home() {
                   const firstName = otherProfile?.full_name?.split(' ')[0] || otherProfile?.username || 'them';
                   pendingRows.push({
                     key: `pay-${payment.id}`,
+                    type: 'payment',
+                    payment,
                     icon: (
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9B9A98" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9B9A98" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 3 }}>
                         <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                       </svg>
                     ),
                     text: `${firstName} has not confirmed your ${formatMoney(payment.amount || 0)} payment yet`,
-                    onArrow: () => setViewPaymentTarget({ payment, loan, otherProfile }),
                   });
                 });
 
@@ -1868,23 +1911,52 @@ export default function Home() {
                     <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
                     <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '14px 18px' }}>
                       <SectionHeader title="Your pending requests" />
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                        {pendingRows.map(row => (
-                          <div key={row.key} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '3px 0' }}>
-                            {row.icon}
-                            <span style={{ flex: 1, fontSize: 12, fontWeight: 500, color: '#787776', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4 }}>{row.text}</span>
-                            <button
-                              type="button"
-                              onClick={row.onArrow}
-                              aria-label="View"
-                              style={{ flexShrink: 0, background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', color: '#9B9A98', marginTop: 1 }}
-                              onMouseEnter={e => e.currentTarget.style.color = '#03ACEA'}
-                              onMouseLeave={e => e.currentTarget.style.color = '#9B9A98'}
-                            >
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                            </button>
-                          </div>
-                        ))}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        {pendingRows.map(row => {
+                          const isExpanded = expandedPendingKey === row.key;
+                          return (
+                            <div key={row.key}>
+                              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '4px 0' }}>
+                                {row.icon}
+                                <span style={{ flex: 1, fontSize: 12, fontWeight: 500, color: '#787776', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4 }}>{row.text}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => setExpandedPendingKey(isExpanded ? null : row.key)}
+                                  aria-label="Options"
+                                  style={{ flexShrink: 0, background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', color: isExpanded ? '#03ACEA' : '#9B9A98', marginTop: 1, transition: 'color 0.15s, transform 0.18s', transform: isExpanded ? 'rotate(90deg)' : 'none' }}
+                                  onMouseEnter={e => { if (!isExpanded) e.currentTarget.style.color = '#03ACEA'; }}
+                                  onMouseLeave={e => { if (!isExpanded) e.currentTarget.style.color = '#9B9A98'; }}
+                                >
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                                </button>
+                              </div>
+                              {isExpanded && (
+                                <div style={{ paddingLeft: 20, paddingBottom: 6, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                  <div style={{ fontSize: 11, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>
+                                    {row.type === 'loan'
+                                      ? 'Unsending will remove this offer from their inbox and notifications.'
+                                      : 'Deleting will remove this payment from their inbox and notifications.'}
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => row.type === 'loan' ? handleUnsendLoanOffer(row.loan) : handleDeletePayment(row.payment)}
+                                    style={{
+                                      alignSelf: 'flex-start',
+                                      fontSize: 11, fontWeight: 600, color: '#E8726E',
+                                      background: 'rgba(232,114,110,0.08)', border: '1px solid rgba(232,114,110,0.2)',
+                                      borderRadius: 7, padding: '5px 10px',
+                                      cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+                                    }}
+                                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(232,114,110,0.14)'}
+                                    onMouseLeave={e => e.currentTarget.style.background = 'rgba(232,114,110,0.08)'}
+                                  >
+                                    {row.type === 'loan' ? 'Unsend Loan Offer' : 'Delete Payment'}
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   </div>
@@ -1996,7 +2068,7 @@ export default function Home() {
               <div className="home-card-lending-loans" style={{ position: 'relative' }}>
                 <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
                 <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
-                  <SectionHeader title="Your Lending" linkTo={createPageUrl("YourLoans")} linkLabel="View all →" />
+                  <SectionHeader title="Your Lending" linkTo={createPageUrl("LendingBorrowing") + "?tab=lending"} linkLabel="View all →" />
                   {lentLoans.length === 0 ? (
                     <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>You haven't lent anything yet 🌱</div>
                   ) : (
@@ -2032,7 +2104,7 @@ export default function Home() {
               <div className="home-card-your-borrowing" style={{ position: 'relative' }}>
                 <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
                 <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
-                  <SectionHeader title="Your Borrowing" linkTo={createPageUrl("YourLoans")} linkLabel="View all →" />
+                  <SectionHeader title="Your Borrowing" linkTo={createPageUrl("LendingBorrowing") + "?tab=borrowing"} linkLabel="View all →" />
                   {borrowedLoans.length === 0 ? (
                     <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>You haven't borrowed anything yet 🤝</div>
                   ) : (
@@ -2083,16 +2155,6 @@ export default function Home() {
       </div>
 
     </div>
-
-    {/* Friends popup — opened from Inbox "friend request" row.
-        Default position (top: 58, right: 20) anchors it up by the friend
-        icon in the top nav on both desktop and mobile. */}
-    {friendsPopupOpen && (
-      <FriendsPopup
-        onClose={() => setFriendsPopupOpen(false)}
-        initialRequestsOpen={true}
-      />
-    )}
 
     {/* Loan offer accept/decline modal — opened from Inbox "loan offer" row */}
     {reviewOfferTarget && (

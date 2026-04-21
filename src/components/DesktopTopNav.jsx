@@ -89,6 +89,8 @@ export default function DesktopTopNav() {
     return () => document.removeEventListener('mousedown', handler);
   }, [menuOpen]);
 
+  const [friendsInitialRequestsOpen, setFriendsInitialRequestsOpen] = useState(false);
+
   // Global open-friends-popup event — lets any component open the friends dropdown
   useEffect(() => {
     const handler = (e) => {
@@ -96,6 +98,7 @@ export default function DesktopTopNav() {
       setNotifOpen(false);
       setMenuOpen(false);
       if (e?.detail?.initialTab) setFriendsInitialTab(e.detail.initialTab);
+      if (e?.detail?.initialRequestsOpen) setFriendsInitialRequestsOpen(true);
     };
     window.addEventListener('open-friends-popup', handler);
     return () => window.removeEventListener('open-friends-popup', handler);
@@ -192,7 +195,7 @@ export default function DesktopTopNav() {
           onOpenFriends={() => { setNotifOpen(false); setFriendsOpen(true); }}
         />
       )}
-      {friendsOpen && <FriendsPopup onClose={() => { setFriendsOpen(false); setFriendsInitialTab(null); }} initialTab={friendsInitialTab} />}
+      {friendsOpen && <FriendsPopup onClose={() => { setFriendsOpen(false); setFriendsInitialTab(null); setFriendsInitialRequestsOpen(false); }} initialTab={friendsInitialTab} initialRequestsOpen={friendsInitialRequestsOpen} />}
     </>
   );
 }
