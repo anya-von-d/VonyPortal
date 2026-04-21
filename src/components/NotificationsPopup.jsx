@@ -379,7 +379,7 @@ export default function NotificationsPopup({ onClose, positionOverride, onOpenFr
                       </>
                     )}
                     {item.type === 'term_change' && (
-                      <ActionBtn label="View" onClick={() => { onClose(); navigate(createPageUrl('Requests')); }} />
+                      <ActionBtn label="View" onClick={() => { onClose(); navigate(createPageUrl('Home')); }} />
                     )}
                   </div>
                 </div>

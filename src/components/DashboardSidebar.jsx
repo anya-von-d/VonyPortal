@@ -261,7 +261,7 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
 
         {/* Right icons: bell + settings */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <Link to={createPageUrl("Requests")} onClick={() => setMobileMenuOpen(false)} style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 8, background: 'transparent', textDecoration: 'none' }}>
+          <Link to={createPageUrl("Home")} onClick={() => setMobileMenuOpen(false)} style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 8, background: 'transparent', textDecoration: 'none' }}>
             {bellIcon('#5C5B5A')}
             {notifCount > 0 && (
               <span style={{
@@ -328,7 +328,7 @@ export default function DashboardSidebar({ activePage = "Dashboard", user }) {
         <div style={{ padding: '22px 24px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <Link to="/" style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 400, fontStyle: 'italic', fontSize: '1.5rem', letterSpacing: '-0.02em', color: 'white', textDecoration: 'none' }}>Vony</Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Link to={createPageUrl("Requests")} style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 8, background: 'transparent', transition: 'background 0.15s', textDecoration: 'none' }}>
+            <Link to={createPageUrl("Home")} style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 8, background: 'transparent', transition: 'background 0.15s', textDecoration: 'none' }}>
               {bellIcon('rgba(255,255,255,0.7)')}
               {notifCount > 0 && (
                 <span style={{

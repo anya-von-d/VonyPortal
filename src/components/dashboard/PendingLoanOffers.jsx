@@ -34,7 +34,7 @@ export default function PendingLoanOffers({ offers }) {
               </p>
             </div>
           </div>
-          <Link to="/Requests">
+          <Link to="/Home">
             <Button
               className="bg-[#00A86B] hover:bg-[#0D9B76] text-white font-semibold gap-2 text-sm"
             >

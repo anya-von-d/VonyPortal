@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Loan, Payment, PublicProfile, Friendship } from "@/entities/all";
+import { Loan, Payment, PublicProfile, Friendship, LoanAgreement } from "@/entities/all";
 import { useAuth } from "@/lib/AuthContext";
 
 
@@ -16,6 +16,7 @@ import DesktopSidebar from '../components/DesktopSidebar';
 import MeshMobileNav from "@/components/MeshMobileNav";
 import UserAvatar from "@/components/ui/UserAvatar";
 import FriendsPopup from "@/components/FriendsPopup";
+import BorrowerSignatureModal from "@/components/loans/BorrowerSignatureModal";
 import { createPortal } from 'react-dom';
 
 // SVG star field data — exact positions from mockup
@@ -406,6 +407,7 @@ export default function Home() {
   const [confirmWorking, setConfirmWorking] = useState(false);
   const [viewLoanTarget, setViewLoanTarget] = useState(null);    // { loan, borrowerProfile }
   const [viewPaymentTarget, setViewPaymentTarget] = useState(null); // { payment, loan, lenderProfile }
+  const [reviewOfferTarget, setReviewOfferTarget] = useState(null); // { loan, lenderProf }
   const navigate = useNavigate();
   // Tasks-for-the-Week: checked IDs keyed by ISO date of week start (Monday).
   const weekStartKey = (() => {
@@ -573,6 +575,37 @@ export default function Home() {
       console.error('Error rejecting payment:', e);
     }
     setConfirmWorking(false);
+  };
+
+  const handleAcceptLoanOffer = async (signature) => {
+    if (!reviewOfferTarget) return;
+    try {
+      await Loan.update(reviewOfferTarget.loan.id, { status: 'active' });
+      const agreements = await LoanAgreement.list();
+      const agreement = agreements.find(a => a.loan_id === reviewOfferTarget.loan.id);
+      if (agreement) {
+        await LoanAgreement.update(agreement.id, {
+          borrower_name: signature,
+          borrower_signed_date: new Date().toISOString(),
+          is_fully_signed: true,
+        });
+      }
+      setReviewOfferTarget(null);
+      await loadData();
+    } catch (e) {
+      console.error('Error accepting loan offer:', e);
+    }
+  };
+
+  const handleDeclineLoanOffer = async () => {
+    if (!reviewOfferTarget) return;
+    try {
+      await Loan.update(reviewOfferTarget.loan.id, { status: 'declined' });
+      setReviewOfferTarget(null);
+      await loadData();
+    } catch (e) {
+      console.error('Error declining loan offer:', e);
+    }
   };
 
   // Loading state
@@ -1199,7 +1232,7 @@ export default function Home() {
                   <span style={{ flex: 1, fontSize: 12, fontWeight: 600, color: 'white', fontFamily: "'DM Sans', sans-serif" }}>
                     You have {notifCount} new notification{notifCount !== 1 ? 's' : ''}
                   </span>
-                  <Link to={createPageUrl("Requests")} style={{ display: 'flex', alignItems: 'center', flexShrink: 0, textDecoration: 'none' }}>
+                  <Link to={createPageUrl("Home")} style={{ display: 'flex', alignItems: 'center', flexShrink: 0, textDecoration: 'none' }}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                   </Link>
                 </div>
@@ -1434,7 +1467,7 @@ export default function Home() {
                         </span>
                         <span style={{ fontSize: 12, fontWeight: 600, color: '#ffffff', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Inbox</span>
                       </div>
-                      <Link to={createPageUrl("Requests")} style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', letterSpacing: '0.01em' }}>
+                      <Link to={createPageUrl("Home")} style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', letterSpacing: '0.01em' }}>
                         View →
                       </Link>
                     </div>
@@ -1480,67 +1513,41 @@ export default function Home() {
 
                 if (upcoming.length === 0) return null;
 
-                // Calendar-style date label helpers
-                const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                const tomorrowMidnight = new Date(todayMidnight); tomorrowMidnight.setDate(todayMidnight.getDate() + 1);
-                const getDateLabel = (date) => {
-                  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-                  if (d.getTime() === todayMidnight.getTime()) return 'Today';
-                  if (d.getTime() === tomorrowMidnight.getTime()) return 'Tomorrow';
-                  return format(date, 'EEE'); // Mon, Tue, etc.
-                };
-                const firstUpcoming = upcoming[0];
-                const daysToNext = differenceInDays(
-                  new Date(firstUpcoming.date.getFullYear(), firstUpcoming.date.getMonth(), firstUpcoming.date.getDate()),
-                  todayMidnight
-                );
-                const nextLabel = daysToNext <= 0 ? 'Today' : daysToNext === 1 ? 'Tomorrow' : `in ${daysToNext} days`;
-
                 return (
                   <div className="home-card-upcoming-payments" style={{ position: 'relative' }}>
                     <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
                     <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '14px 18px' }}>
                       {/* Header row */}
-                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 }}>
-                        <div>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Upcoming Payments</div>
-                          <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 1, fontFamily: "'DM Sans', sans-serif" }}>Next payment {nextLabel}</div>
-                        </div>
-                        {/* Legend */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                          <div style={{ width: 8, height: 8, borderRadius: 2, background: '#1D5B94' }} />
-                          <div style={{ width: 8, height: 8, borderRadius: 2, background: '#03ACEA' }} />
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#9B9A98" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                        </div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Upcoming Payments</div>
+                        <Link
+                          to={createPageUrl('Upcoming')}
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 11, fontWeight: 600, color: '#787776', textDecoration: 'none', fontFamily: "'DM Sans', sans-serif" }}
+                        >
+                          View full schedule
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </Link>
                       </div>
 
                       {/* Event rows */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-                        {upcoming.map((item, idx) => {
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        {upcoming.map(item => {
                           const isIncoming = item.direction === 'in';
                           const barColor = isIncoming ? '#03ACEA' : '#1D5B94';
-                          const dateLabel = getDateLabel(item.date);
                           const dateNum = format(item.date, 'MMM d');
-                          const label = isIncoming ? `${item.name} pays you` : `Pay ${item.name}`;
-                          const amtStr = formatMoney(item.amount);
-                          const showDivider = idx < upcoming.length - 1;
+                          const label = isIncoming
+                            ? `Expect ${formatMoney(item.amount)} from ${item.name}`
+                            : `${formatMoney(item.amount)} due to ${item.name}`;
                           return (
-                            <div key={item.id}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0' }}>
-                                {/* Date column */}
-                                <div style={{ width: 56, flexShrink: 0, textAlign: 'left' }}>
-                                  <div style={{ fontSize: 10, fontWeight: 600, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.2 }}>{dateLabel}</div>
-                                  <div style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", letterSpacing: '-0.01em', lineHeight: 1.2 }}>{dateNum}</div>
-                                </div>
-                                {/* Colored bar */}
-                                <div style={{ width: 3, height: 34, borderRadius: 2, background: barColor, flexShrink: 0 }} />
-                                {/* Event info */}
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</div>
-                                  <div style={{ fontSize: 11, color: barColor, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", marginTop: 1 }}>{amtStr}</div>
-                                </div>
+                            <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '9px 0' }}>
+                              {/* Date column — matches Your Borrowing name font style */}
+                              <div style={{ width: 52, flexShrink: 0, fontSize: 12, fontWeight: 500, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap' }}>{dateNum}</div>
+                              {/* Colored bar */}
+                              <div style={{ width: 3, alignSelf: 'stretch', borderRadius: 2, background: barColor, flexShrink: 0 }} />
+                              {/* Event label — matches Your Borrowing name font style */}
+                              <div style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 500, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {label}
                               </div>
-                              {showDivider && <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', marginLeft: 68 }} />}
                             </div>
                           );
                         })}
@@ -1742,7 +1749,7 @@ export default function Home() {
                 pendingOffers.forEach(loan => {
                   const lenderProf = safeAllProfiles.find(p => p.user_id === loan.lender_id);
                   const lName = lenderProf?.full_name?.split(' ')[0] || lenderProf?.username || 'Someone';
-                  attentionItems.push({ type: 'loan_offer', text: `${lName} sent a loan offer`, loanId: loan.id });
+                  attentionItems.push({ type: 'loan_offer', text: `${lName} sent a loan offer`, loan, lenderProf });
                 });
                 // Friend requests
                 friendRequestsInbox.forEach(req => {
@@ -1782,7 +1789,7 @@ export default function Home() {
                           {items.map((item, i) => {
                             const arrowAction = (() => {
                               if (item.type === 'overdue' || item.type === 'due') return () => navigate(createPageUrl('RecordPayment'));
-                              if (item.type === 'loan_offer') return () => navigate(createPageUrl('Requests'));
+                              if (item.type === 'loan_offer') return () => setReviewOfferTarget({ loan: item.loan, lenderProf: item.lenderProf });
                               if (item.type === 'friend_request') return () => setFriendsPopupOpen(true);
                               if (item.type === 'payment_confirm') return () => setConfirmPaymentTarget({ payment: item.payment, loan: item.loan, profile: item.profile });
                               return null;
@@ -2075,12 +2082,26 @@ export default function Home() {
 
     </div>
 
-    {/* Friends popup — opened from Inbox "friend request" row */}
+    {/* Friends popup — opened from Inbox "friend request" row.
+        Default position (top: 58, right: 20) anchors it up by the friend
+        icon in the top nav on both desktop and mobile. */}
     {friendsPopupOpen && (
       <FriendsPopup
         onClose={() => setFriendsPopupOpen(false)}
         initialRequestsOpen={true}
-        positionOverride={{ top: '50%', left: '50%', right: 'auto', transform: 'translate(-50%, -50%)' }}
+      />
+    )}
+
+    {/* Loan offer accept/decline modal — opened from Inbox "loan offer" row */}
+    {reviewOfferTarget && (
+      <BorrowerSignatureModal
+        isOpen={!!reviewOfferTarget}
+        onClose={() => setReviewOfferTarget(null)}
+        onSign={handleAcceptLoanOffer}
+        onDecline={handleDeclineLoanOffer}
+        loanDetails={reviewOfferTarget.loan}
+        lenderName={reviewOfferTarget.lenderProf?.full_name || reviewOfferTarget.lenderProf?.username || 'Lender'}
+        borrowerFullName={user?.full_name || user?.username || ''}
       />
     )}
 

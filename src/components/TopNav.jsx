@@ -7,10 +7,6 @@ import { motion, AnimatePresence } from "framer-motion";
 // Top bar items (medium green #00A86B bar - secondary links + Vony logo)
 const topBarItems = [
   {
-    title: "Notifications",
-    url: createPageUrl("Requests"),
-  },
-  {
     title: "Friends",
     url: createPageUrl("Friends"),
   },

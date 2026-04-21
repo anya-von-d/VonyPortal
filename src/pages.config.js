@@ -58,7 +58,6 @@ import LoanAgreements from './pages/LoanAgreements';
 import Profile from './pages/Profile';
 import RecordPayment from './pages/RecordPayment';
 import RecentActivity from './pages/RecentActivity';
-import Requests from './pages/Requests';
 import ComingSoon from './pages/ComingSoon';
 import LoanHelp from './pages/LoanHelp';
 import Upcoming from './pages/Upcoming';
@@ -77,7 +76,6 @@ export const PAGES = {
     "Profile": Profile,
     "RecordPayment": RecordPayment,
     "RecentActivity": RecentActivity,
-    "Requests": Requests,
     "ComingSoon": ComingSoon,
     "LoanHelp": LoanHelp,
     "Upcoming": Upcoming,
