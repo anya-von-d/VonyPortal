@@ -13,7 +13,7 @@ export default function LendingBorrowing() {
   const setTab = (t) => setSearchParams({ tab: t });
 
   return (
-    <div style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", background: '#FAFAF8', color: '#1A1918' }}>
+    <div style={{ minHeight: '100vh', fontFamily: "'DM Sans', system-ui, sans-serif", background: 'transparent', color: '#1A1918' }}>
       <MeshMobileNav activePage="LendingBorrowing" />
 
       <div className="mesh-layout" style={{ display: 'grid', gridTemplateColumns: '176px 1fr', gap: 0 }}>

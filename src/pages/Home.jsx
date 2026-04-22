@@ -952,7 +952,7 @@ export default function Home() {
       transition: { duration: 0.7, delay, ease: 'easeOut' },
     });
     return (
-      <div style={{ position: 'relative', minHeight: '100vh', background: '#F5F4F0', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, overflow: 'hidden' }}>
+      <div style={{ position: 'relative', minHeight: '100vh', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, overflow: 'hidden' }}>
 
         {/* ── Floating hero items ── */}
         <div style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none' }}>
