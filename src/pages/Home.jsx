@@ -741,6 +741,18 @@ export default function Home() {
   };
   const [addingTask, setAddingTask] = useState(false);
   const [newTaskText, setNewTaskText] = useState('');
+  // Plan Your Month — custom expenses
+  const [customExpenses, setCustomExpenses] = useState(() => {
+    try { const raw = localStorage.getItem('vony.plan-expenses'); return raw ? JSON.parse(raw) : []; } catch { return []; }
+  });
+  const [addingExpense, setAddingExpense] = useState(false);
+  const [newExpenseLabel, setNewExpenseLabel] = useState('');
+  const [newExpenseAmount, setNewExpenseAmount] = useState('');
+  const addCustomExpense = (label, amount) => {
+    if (!label.trim() || !amount) return;
+    const exp = { id: `exp-${Date.now()}`, label: label.trim(), amount: -Math.abs(parseFloat(amount)) };
+    setCustomExpenses(prev => { const next = [...prev, exp]; try { localStorage.setItem('vony.plan-expenses', JSON.stringify(next)); } catch {} return next; });
+  };
   const [lbTab, setLbTab] = useState('lending'); // 'lending' | 'borrowing'
   const loansWasOut = useRef(true);
   const activeWasOut = useRef(true);
@@ -1864,6 +1876,7 @@ export default function Home() {
                 const nextLabel = firstDaysAway === 0 ? 'Today' : firstDaysAway === 1 ? 'Tomorrow' : `In ${firstDaysAway} days`;
 
                 return (
+                  <>
                   <div className="home-card-upcoming-payments" style={{ position: 'relative' }}>                    <div style={{ position: 'relative', zIndex: 1, background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.82)', boxShadow: '0 4px 20px rgba(0,0,0,0.08), inset 0 0 60px rgba(3,172,234,0.07)', padding: '14px 18px' }}>
                       {/* Header row */}
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
@@ -1909,6 +1922,17 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
+
+                  {/* Record Payment CTA */}
+                  <button
+                    type="button"
+                    onClick={() => navigate(createPageUrl('RecordPayment'))}
+                    style={{ width: '100%', padding: '11px 0', borderRadius: 10, background: '#03ACEA', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 600, color: '#ffffff', letterSpacing: '-0.01em', boxShadow: '0 4px 14px rgba(3,172,234,0.35)' }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                    Record Payment
+                  </button>
+                  </>
                 );
               })()}
 
@@ -2131,6 +2155,79 @@ export default function Home() {
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={addingTask ? '#03ACEA' : '#787776'} strokeWidth="2.8" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                         </button>
                       </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* ── Plan Your Month ── */}
+              {(() => {
+                const monthStart = startOfMonth(today);
+                const monthEnd = endOfMonth(today);
+                const monthName = format(today, 'MMMM');
+                // Loan cashflow lines for this month
+                const cashLines = [];
+                lentLoans.forEach(loan => {
+                  if (!loan.next_payment_date) return;
+                  const d = toLocalDate(loan.next_payment_date);
+                  if (d < monthStart || d > monthEnd) return;
+                  const p = safeAllProfiles.find(pp => pp.user_id === loan.borrower_id);
+                  const name = p?.full_name?.split(' ')[0] || p?.username || 'Borrower';
+                  cashLines.push({ id: `in-${loan.id}`, label: `From ${name}`, amount: loan.payment_amount || 0, date: d });
+                });
+                borrowedLoans.forEach(loan => {
+                  if (!loan.next_payment_date) return;
+                  const d = toLocalDate(loan.next_payment_date);
+                  if (d < monthStart || d > monthEnd) return;
+                  const p = safeAllProfiles.find(pp => pp.user_id === loan.lender_id);
+                  const name = p?.full_name?.split(' ')[0] || p?.username || 'Lender';
+                  cashLines.push({ id: `out-${loan.id}`, label: `To ${name}`, amount: -(loan.payment_amount || 0), date: d });
+                });
+                cashLines.sort((a, b) => a.date - b.date);
+                const allLines = [...cashLines, ...customExpenses.map(e => ({ ...e, date: null }))];
+                const total = allLines.reduce((s, l) => s + l.amount, 0);
+                return (
+                  <div style={{ background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.82)', boxShadow: '0 4px 20px rgba(0,0,0,0.08), inset 0 0 60px rgba(3,172,234,0.07)', padding: '14px 18px' }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif", marginBottom: 10 }}>Plan Your Month</div>
+                    {allLines.length === 0 ? (
+                      <div style={{ fontSize: 12, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", textAlign: 'center', padding: '8px 0' }}>No cashflow scheduled for {monthName} 🌿</div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        {allLines.map(line => {
+                          const isPos = line.amount >= 0;
+                          return (
+                            <div key={line.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 }}>
+                                <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{line.label}</span>
+                                {line.date && <span style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>{format(line.date, 'MMM d')}</span>}
+                              </div>
+                              <span style={{ fontSize: 12, fontWeight: 600, color: isPos ? '#03ACEA' : '#1D5B94', fontFamily: "'DM Sans', sans-serif", flexShrink: 0, marginLeft: 8 }}>
+                                {isPos ? '+' : ''}{formatMoney(line.amount)}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                    {/* Total row */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10, paddingTop: 8, borderTop: '1.5px solid rgba(0,0,0,0.08)' }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>Net this month</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: total >= 0 ? '#03ACEA' : '#1D5B94', fontFamily: "'DM Sans', sans-serif" }}>
+                        {total >= 0 ? '+' : ''}{formatMoney(total)}
+                      </span>
+                    </div>
+                    {/* Add expense form */}
+                    {addingExpense && (
+                      <form onSubmit={e => { e.preventDefault(); addCustomExpense(newExpenseLabel, newExpenseAmount); setNewExpenseLabel(''); setNewExpenseAmount(''); setAddingExpense(false); }} style={{ display: 'flex', alignItems: 'center', gap: 6, paddingTop: 10 }}>
+                        <input autoFocus value={newExpenseLabel} onChange={e => setNewExpenseLabel(e.target.value)} onKeyDown={e => { if (e.key === 'Escape') { setAddingExpense(false); } }} placeholder="Label…" style={{ flex: 1, fontSize: 12, fontFamily: "'DM Sans', sans-serif", border: 'none', borderBottom: '1.5px solid #03ACEA', outline: 'none', background: 'transparent', color: '#1A1918', padding: '2px 0' }} />
+                        <input value={newExpenseAmount} onChange={e => setNewExpenseAmount(e.target.value)} placeholder="$0" type="number" min="0" step="0.01" style={{ width: 56, fontSize: 12, fontFamily: "'DM Sans', sans-serif", border: 'none', borderBottom: '1.5px solid #03ACEA', outline: 'none', background: 'transparent', color: '#1A1918', padding: '2px 0', textAlign: 'right' }} />
+                        <button type="submit" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+                      </form>
+                    )}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+                      <button type="button" onClick={() => { setAddingExpense(v => !v); setNewExpenseLabel(''); setNewExpenseAmount(''); }} style={{ width: 26, height: 26, borderRadius: '50%', background: addingExpense ? '#EBF4FA' : '#F4F3F1', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} aria-label="Add expense">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={addingExpense ? '#03ACEA' : '#787776'} strokeWidth="2.8" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                      </button>
                     </div>
                   </div>
                 );
