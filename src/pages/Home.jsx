@@ -1979,7 +1979,7 @@ export default function Home() {
                     {`${format(today, 'MMMM')} at a Glance`}
                   </span>
                 </div>
-                <div style={{ marginBottom: 10 }}>
+                <div style={{ marginBottom: 10, textAlign: 'center' }}>
                   <span style={{
                     display: 'inline-block',
                     background: '#EBF4FA',
@@ -1994,17 +1994,15 @@ export default function Home() {
                     {howMonthMessage.text}{howMonthMessage.emoji ? ` ${howMonthMessage.emoji}` : ''}
                   </span>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center', textAlign: 'center' }}>
                   {monthlyExpectedReceive > 0 && (
                     <div style={{ fontSize: 12, color: '#1A1918' }}>
                       Expected to receive <strong style={{ color: '#03ACEA' }}>{formatMoney(monthlyExpectedReceive)}</strong> this month
-                      {inScheduledTotal > 0 && <span style={{ color: '#9B9A98' }}> across {inScheduledTotal} payment{inScheduledTotal !== 1 ? 's' : ''}</span>}
                     </div>
                   )}
                   {monthlyExpectedPay > 0 && (
                     <div style={{ fontSize: 12, color: '#1A1918' }}>
                       Due to pay out <strong style={{ color: '#1D5B94' }}>{formatMoney(monthlyExpectedPay)}</strong> this month
-                      {outScheduledTotal > 0 && <span style={{ color: '#9B9A98' }}> across {outScheduledTotal} payment{outScheduledTotal !== 1 ? 's' : ''}</span>}
                     </div>
                   )}
                 </div>
@@ -2305,7 +2303,7 @@ export default function Home() {
                           <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>No active loans yet 🌱</div>
                         ) : (
                           <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            {allLoans.slice(0, 6).map(loan => {
+                            {allLoans.map(loan => {
                               const isLending = loan._isLending;
                               const circleColor = isLending ? '#03ACEA' : '#1D5B94';
                               const otherId = isLending ? loan.borrower_id : loan.lender_id;
