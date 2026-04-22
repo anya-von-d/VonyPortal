@@ -1034,7 +1034,10 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
             })()}
           </div>
 
-          {/* Col 2: Upcoming — home Upcoming Payments style */}
+          {/* Col 2: Upcoming + Insights stacked */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+          {/* Upcoming — home Upcoming Payments style */}
           {(() => {
             const allPaymentLoans2 = activeLoans
               .filter(l => l.next_payment_date)
@@ -1051,7 +1054,6 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
             const nextLabel = firstDays === null ? '' : firstDays < 0 ? 'overdue' : firstDays === 0 ? 'today' : firstDays === 1 ? 'tomorrow' : `in ${firstDays} days`;
             return (
               <div style={{ background: '#ffffff', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', padding: '14px 18px' }}>
-                {/* Header */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Upcoming</div>
                   <Link to={createPageUrl('Upcoming')} style={{ fontSize: 11, fontWeight: 500, color: accent, textDecoration: 'none', fontFamily: "'DM Sans', sans-serif" }}>Full schedule →</Link>
@@ -1090,6 +1092,56 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
               </div>
             );
           })()}
+
+          {/* Insights */}
+          {(() => {
+            const overdueLoans = activeLoans.filter(l => l.next_payment_date && new Date(l.next_payment_date) < new Date());
+            const onTimeCount = activeLoans.length - overdueLoans.length;
+            const onTimePct = activeLoans.length > 0 ? Math.round((onTimeCount / activeLoans.length) * 100) : 100;
+            const avgInterest = activeLoans.length > 0
+              ? (activeLoans.reduce((s, l) => s + (l.interest_rate || 0), 0) / activeLoans.length).toFixed(1)
+              : null;
+            const highestLoan = activeLoans.length > 0
+              ? activeLoans.reduce((max, l) => ((l.total_amount || l.amount || 0) > (max.total_amount || max.amount || 0) ? l : max), activeLoans[0])
+              : null;
+            const highestProfile = highestLoan ? publicProfiles.find(p => p.user_id === (isLending ? highestLoan.borrower_id : highestLoan.lender_id)) : null;
+            const highestName = highestProfile?.full_name?.split(' ')[0] || highestProfile?.username || null;
+            const insights = [];
+            if (overdueLoans.length > 0) {
+              insights.push({ icon: '⚠️', text: `${overdueLoans.length} payment${overdueLoans.length !== 1 ? 's are' : ' is'} overdue`, color: '#E8726E' });
+            }
+            if (onTimePct === 100 && activeLoans.length > 0) {
+              insights.push({ icon: '✓', text: 'All loans are on track', color: '#22C55E' });
+            } else if (onTimePct >= 50 && overdueLoans.length > 0) {
+              insights.push({ icon: '✓', text: `${onTimeCount} of ${activeLoans.length} loans on track`, color: accent });
+            }
+            if (avgInterest !== null && parseFloat(avgInterest) > 0) {
+              insights.push({ icon: '%', text: `Avg. interest rate ${avgInterest}%`, color: accent });
+            }
+            if (highestLoan && highestName) {
+              insights.push({ icon: '↑', text: `Largest loan: ${formatMoney(highestLoan.total_amount || highestLoan.amount || 0)} with ${highestName}`, color: '#787776' });
+            }
+            if (insights.length === 0) {
+              insights.push({ icon: '💡', text: 'No active loans yet', color: '#9B9A98' });
+            }
+            return (
+              <div style={{ background: '#ffffff', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', padding: '14px 18px' }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif", marginBottom: 10 }}>Insights</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {insights.map((ins, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div style={{ width: 24, height: 24, borderRadius: '50%', background: `${ins.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <span style={{ fontSize: 11, color: ins.color, fontWeight: 700, fontFamily: "'DM Sans', sans-serif", lineHeight: 1 }}>{ins.icon}</span>
+                      </div>
+                      <span style={{ fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4 }}>{ins.text}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+
+          </div>{/* end col 2 stack */}
 
           {/* Col 3: Your Lending/Borrowing stacked */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}
