@@ -449,6 +449,7 @@ export default function Home() {
   };
   const [addingTask, setAddingTask] = useState(false);
   const [newTaskText, setNewTaskText] = useState('');
+  const [lbTab, setLbTab] = useState('lending'); // 'lending' | 'borrowing'
   const loansWasOut = useRef(true);
   const activeWasOut = useRef(true);
   const [bigScreen, setBigScreen] = useState(window.innerWidth > 900);
@@ -1636,183 +1637,9 @@ export default function Home() {
                 );
               })()}
 
-              {/* Tasks for the Week */}
-              {(() => {
-                // Build the 7-day strip (Mon..Sun) for this week.
-                const now = new Date();
-                const todayDow = now.getDay(); // 0=Sun..6=Sat
-                const mondayOffset = todayDow === 0 ? -6 : 1 - todayDow;
-                const weekMonday = new Date(now);
-                weekMonday.setDate(now.getDate() + mondayOffset);
-                weekMonday.setHours(0, 0, 0, 0);
-                const weekEnd = new Date(weekMonday);
-                weekEnd.setDate(weekMonday.getDate() + 6);
-                weekEnd.setHours(23, 59, 59, 999);
-                const days = Array.from({ length: 7 }, (_, i) => {
-                  const d = new Date(weekMonday);
-                  d.setDate(weekMonday.getDate() + i);
-                  return d;
-                });
-                const dayLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-
-                // Build task list.
-                const tasks = [];
-                borrowedLoans.forEach(loan => {
-                  if (!loan.next_payment_date) return;
-                  const due = new Date(loan.next_payment_date);
-                  if (due > weekEnd) return; // only if due before end of week
-                  const otherProfile = safeAllProfiles.find(p => p.user_id === loan.lender_id);
-                  const name = otherProfile?.full_name?.split(' ')[0] || otherProfile?.username || 'them';
-                  const amt = formatMoney(loan.payment_amount || loan.next_payment_amount || 0);
-                  tasks.push({
-                    id: `pay-${loan.id}`,
-                    label: `Send ${amt} to ${name}`,
-                    onCheck: () => navigate(createPageUrl('RecordPayment') + `?loanId=${loan.id}`),
-                  });
-                });
-                // "Plan next week" — payments due 7-14 days out
-                borrowedLoans.forEach(loan => {
-                  if (!loan.next_payment_date) return;
-                  const daysAway = differenceInDays(new Date(loan.next_payment_date), now);
-                  if (daysAway < 7 || daysAway > 14) return;
-                  const otherProfile = safeAllProfiles.find(p => p.user_id === loan.lender_id);
-                  const name = otherProfile?.full_name?.split(' ')[0] || otherProfile?.username || 'them';
-                  const amt = formatMoney(loan.payment_amount || loan.next_payment_amount || 0);
-                  tasks.push({
-                    id: `plan-${loan.id}`,
-                    label: `Plan next week's ${amt} payment to ${name}`,
-                  });
-                });
-                // New-user onboarding tasks.
-                const isNewUser = !hasFriends && !hasLoans && pendingOffers.length === 0;
-                if (isNewUser) {
-                  tasks.push({ id: 'new-connect', label: 'Connect with friends', onCheck: () => window.dispatchEvent(new CustomEvent('open-friends-popup')) });
-                  tasks.push({ id: 'new-loan', label: 'Create your first loan', onCheck: () => navigate(createPageUrl('CreateOffer')) });
-                }
-
-                // Show unchecked first, checked last; hide empty state if nothing.
-                const allTasks = [...tasks, ...customTasks];
-                const sortedTasks = [...allTasks].sort((a, b) => Number(checkedTasks.has(a.id)) - Number(checkedTasks.has(b.id)));
-
-                return (
-                  <div className="home-card-tasks" style={{ position: 'relative' }}>
-                    <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
-                    <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
-                      <SectionHeader title="To Do This Week" />
-                      {/* Day strip */}
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, marginTop: 2, marginBottom: 10 }}>
-                        {days.map((d, i) => {
-                          const isToday = isSameDay(d, now);
-                          return (
-                            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-                              <span style={{ fontSize: 10, fontWeight: 500, color: isToday ? '#03ACEA' : '#9B9A98', letterSpacing: '-0.01em' }}>{dayLabels[i]}</span>
-                              <span style={{
-                                fontSize: 11, fontWeight: isToday ? 700 : 500,
-                                color: isToday ? '#03ACEA' : '#1A1918',
-                                width: 22, height: 22, borderRadius: '50%',
-                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                                background: isToday ? '#EBF4FA' : 'transparent',
-                                border: isToday ? '1.5px solid #03ACEA' : '1.5px solid transparent',
-                              }}>{d.getDate()}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      {sortedTasks.length === 0 ? (
-                        <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>Nothing on the list right now 🌿</div>
-                      ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          {sortedTasks.map(task => {
-                            const checked = checkedTasks.has(task.id);
-                            const handleClick = () => {
-                              if (!checked && task.onCheck) { task.onCheck(); return; }
-                              toggleTask(task.id);
-                            };
-                            return (
-                              <button
-                                key={task.id}
-                                type="button"
-                                onClick={handleClick}
-                                style={{
-                                  display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0',
-                                  background: 'transparent', border: 'none', cursor: 'pointer',
-                                  textAlign: 'left', fontFamily: "'DM Sans', sans-serif", width: '100%',
-                                }}
-                              >
-                                <span style={{
-                                  width: 18, height: 18, borderRadius: 5, flexShrink: 0,
-                                  border: checked ? '1.5px solid #03ACEA' : '1.5px solid #D9D8D6',
-                                  background: checked ? '#03ACEA' : 'transparent',
-                                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                                  transition: 'background 0.15s, border-color 0.15s',
-                                }}>
-                                  {checked && (
-                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-                                      <polyline points="20 6 9 17 4 12"/>
-                                    </svg>
-                                  )}
-                                </span>
-                                <span style={{
-                                  fontSize: 12, color: checked ? '#9B9A98' : '#1A1918',
-                                  textDecoration: checked ? 'line-through' : 'none',
-                                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                                }}>{task.label}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
-                      {/* Add task inline input */}
-                      {addingTask && (
-                        <form
-                          onSubmit={e => { e.preventDefault(); addCustomTask(newTaskText); setNewTaskText(''); setAddingTask(false); }}
-                          style={{ display: 'flex', alignItems: 'center', gap: 8, paddingTop: 6 }}
-                        >
-                          <input
-                            autoFocus
-                            value={newTaskText}
-                            onChange={e => setNewTaskText(e.target.value)}
-                            onKeyDown={e => { if (e.key === 'Escape') { setAddingTask(false); setNewTaskText(''); } }}
-                            placeholder="Add a to-do…"
-                            style={{
-                              flex: 1, fontSize: 12, fontFamily: "'DM Sans', sans-serif",
-                              border: 'none', borderBottom: '1.5px solid #03ACEA',
-                              outline: 'none', background: 'transparent',
-                              color: '#1A1918', padding: '2px 0',
-                            }}
-                          />
-                          <button type="submit" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                          </button>
-                        </form>
-                      )}
-                      {/* + button bottom-right */}
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
-                        <button
-                          type="button"
-                          onClick={() => { setAddingTask(v => !v); setNewTaskText(''); }}
-                          style={{
-                            width: 26, height: 26, borderRadius: '50%',
-                            background: addingTask ? '#EBF4FA' : '#F4F3F1',
-                            border: 'none', cursor: 'pointer',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            transition: 'background 0.15s',
-                          }}
-                          aria-label="Add to-do"
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={addingTask ? '#03ACEA' : '#787776'} strokeWidth="2.8" strokeLinecap="round">
-                            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
-
             </div>
 
-            {/* Col 2: Overview + How April is Going */}
+            {/* Col 2: Inbox + Pending + April at a Glance */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
               {/* Inbox */}
               {(() => {
@@ -2028,82 +1855,188 @@ export default function Home() {
 
             </div>{/* end col 2 */}
 
-            {/* Col 3: Your Lending + Your Borrowing */}
+            {/* Col 3: To Do This Week + combined Lending/Borrowing card */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
-              {/* Lending Loans */}
-              <div className="home-card-lending-loans" style={{ position: 'relative' }}>
-                <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
-                <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
-                  <SectionHeader title="Your Lending" linkTo={createPageUrl("LendingBorrowing") + "?tab=lending"} linkLabel="View all →" />
-                  {lentLoans.length === 0 ? (
-                    <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>You haven't lent anything yet 🌱</div>
-                  ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      {lentLoans.slice(0, 5).map(loan => {
-                        const otherProfile = safeAllProfiles.find(p => p.user_id === loan.borrower_id);
-                        const name = otherProfile?.full_name?.split(' ')[0] || otherProfile?.username || 'User';
-                        const total = loan.total_amount || loan.amount || 0;
-                        const nextDue = loan.next_payment_date ? new Date(loan.next_payment_date) : null;
-                        const isBehind = nextDue && nextDue < today;
-                        const behindAmt = isBehind ? (loan.payment_amount || 0) : 0;
-                        const statusLabel = isBehind ? `${formatMoney(behindAmt)} behind` : 'On track';
-                        const statusColor = isBehind ? '#E8726E' : '#03ACEA';
-                        const statusBg = isBehind ? 'rgba(232,114,110,0.08)' : 'rgba(3,172,234,0.10)';
-                        return (
-                          <div key={loan.id} style={{ padding: '9px 0' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-                              <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
-                              <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, color: statusColor, background: statusBg, borderRadius: 5, padding: '2px 6px', lineHeight: 1.2 }}>{statusLabel}</span>
+              {/* To Do This Week */}
+              {(() => {
+                const now = new Date();
+                const todayDow = now.getDay();
+                const mondayOffset = todayDow === 0 ? -6 : 1 - todayDow;
+                const weekMonday = new Date(now);
+                weekMonday.setDate(now.getDate() + mondayOffset);
+                weekMonday.setHours(0, 0, 0, 0);
+                const weekEnd = new Date(weekMonday);
+                weekEnd.setDate(weekMonday.getDate() + 6);
+                weekEnd.setHours(23, 59, 59, 999);
+                const days = Array.from({ length: 7 }, (_, i) => {
+                  const d = new Date(weekMonday);
+                  d.setDate(weekMonday.getDate() + i);
+                  return d;
+                });
+                const dayLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+                const tasks = [];
+                borrowedLoans.forEach(loan => {
+                  if (!loan.next_payment_date) return;
+                  const due = new Date(loan.next_payment_date);
+                  if (due > weekEnd) return;
+                  const otherProfile = safeAllProfiles.find(p => p.user_id === loan.lender_id);
+                  const name = otherProfile?.full_name?.split(' ')[0] || otherProfile?.username || 'them';
+                  const amt = formatMoney(loan.payment_amount || loan.next_payment_amount || 0);
+                  tasks.push({ id: `pay-${loan.id}`, label: `Send ${amt} to ${name}`, onCheck: () => navigate(createPageUrl('RecordPayment') + `?loanId=${loan.id}`) });
+                });
+                borrowedLoans.forEach(loan => {
+                  if (!loan.next_payment_date) return;
+                  const daysAway = differenceInDays(new Date(loan.next_payment_date), now);
+                  if (daysAway < 7 || daysAway > 14) return;
+                  const otherProfile = safeAllProfiles.find(p => p.user_id === loan.lender_id);
+                  const name = otherProfile?.full_name?.split(' ')[0] || otherProfile?.username || 'them';
+                  const amt = formatMoney(loan.payment_amount || loan.next_payment_amount || 0);
+                  tasks.push({ id: `plan-${loan.id}`, label: `Plan next week's ${amt} payment to ${name}` });
+                });
+                const isNewUser = !hasFriends && !hasLoans && pendingOffers.length === 0;
+                if (isNewUser) {
+                  tasks.push({ id: 'new-connect', label: 'Connect with friends', onCheck: () => window.dispatchEvent(new CustomEvent('open-friends-popup')) });
+                  tasks.push({ id: 'new-loan', label: 'Create your first loan', onCheck: () => navigate(createPageUrl('CreateOffer')) });
+                }
+                const allTasks = [...tasks, ...customTasks];
+                const sortedTasks = [...allTasks].sort((a, b) => Number(checkedTasks.has(a.id)) - Number(checkedTasks.has(b.id)));
+                return (
+                  <div className="home-card-tasks" style={{ position: 'relative' }}>
+                    <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+                    <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '14px 18px' }}>
+                      <SectionHeader title="To Do This Week" />
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, marginTop: 2, marginBottom: 10 }}>
+                        {days.map((d, i) => {
+                          const isToday = isSameDay(d, now);
+                          return (
+                            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+                              <span style={{ fontSize: 10, fontWeight: 500, color: isToday ? '#03ACEA' : '#9B9A98', letterSpacing: '-0.01em' }}>{dayLabels[i]}</span>
+                              <span style={{ fontSize: 11, fontWeight: isToday ? 700 : 500, color: isToday ? '#03ACEA' : '#1A1918', width: 22, height: 22, borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: isToday ? '#EBF4FA' : 'transparent', border: isToday ? '1.5px solid #03ACEA' : '1.5px solid transparent' }}>{d.getDate()}</span>
                             </div>
-                            <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              Borrowed {formatMoney(total)} from you{loan.purpose ? ` for ${loan.purpose}` : ''}
-                            </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
+                      {sortedTasks.length === 0 ? (
+                        <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>Nothing on the list right now 🌿</div>
+                      ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          {sortedTasks.map(task => {
+                            const checked = checkedTasks.has(task.id);
+                            return (
+                              <button key={task.id} type="button" onClick={() => { if (!checked && task.onCheck) { task.onCheck(); return; } toggleTask(task.id); }}
+                                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', fontFamily: "'DM Sans', sans-serif", width: '100%' }}>
+                                <span style={{ width: 18, height: 18, borderRadius: 5, flexShrink: 0, border: checked ? '1.5px solid #03ACEA' : '1.5px solid #D9D8D6', background: checked ? '#03ACEA' : 'transparent', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s' }}>
+                                  {checked && <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
+                                </span>
+                                <span style={{ fontSize: 12, color: checked ? '#9B9A98' : '#1A1918', textDecoration: checked ? 'line-through' : 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{task.label}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                      {addingTask && (
+                        <form onSubmit={e => { e.preventDefault(); addCustomTask(newTaskText); setNewTaskText(''); setAddingTask(false); }} style={{ display: 'flex', alignItems: 'center', gap: 8, paddingTop: 6 }}>
+                          <input autoFocus value={newTaskText} onChange={e => setNewTaskText(e.target.value)} onKeyDown={e => { if (e.key === 'Escape') { setAddingTask(false); setNewTaskText(''); } }} placeholder="Add a to-do…" style={{ flex: 1, fontSize: 12, fontFamily: "'DM Sans', sans-serif", border: 'none', borderBottom: '1.5px solid #03ACEA', outline: 'none', background: 'transparent', color: '#1A1918', padding: '2px 0' }} />
+                          <button type="submit" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+                        </form>
+                      )}
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+                        <button type="button" onClick={() => { setAddingTask(v => !v); setNewTaskText(''); }} style={{ width: 26, height: 26, borderRadius: '50%', background: addingTask ? '#EBF4FA' : '#F4F3F1', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} aria-label="Add to-do">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={addingTask ? '#03ACEA' : '#787776'} strokeWidth="2.8" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        </button>
+                      </div>
                     </div>
-                  )}
-                </div>
-              </div>
+                  </div>
+                );
+              })()}
 
-              {/* Your Borrowing */}
-              <div className="home-card-your-borrowing" style={{ position: 'relative' }}>
-                <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
-                <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
-                  <SectionHeader title="Your Borrowing" linkTo={createPageUrl("LendingBorrowing") + "?tab=borrowing"} linkLabel="View all →" />
-                  {borrowedLoans.length === 0 ? (
-                    <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>You haven't borrowed anything yet 🤝</div>
-                  ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      {borrowedLoans.slice(0, 5).map(loan => {
-                        const otherProfile = safeAllProfiles.find(p => p.user_id === loan.lender_id);
-                        const name = otherProfile?.full_name?.split(' ')[0] || otherProfile?.username || 'User';
-                        const total = loan.total_amount || loan.amount || 0;
-                        // Status badge — mirrors Your Lending: "On track" vs "$X overdue"
-                        // (from the borrower's perspective it's an overdue payment YOU owe).
-                        const nextDue = loan.next_payment_date ? new Date(loan.next_payment_date) : null;
-                        const isBehind = nextDue && nextDue < today;
-                        const behindAmt = isBehind ? (loan.payment_amount || 0) : 0;
-                        const statusLabel = isBehind ? `${formatMoney(behindAmt)} overdue` : 'On track';
-                        const statusColor = isBehind ? '#E8726E' : '#03ACEA';
-                        const statusBg = isBehind ? 'rgba(232,114,110,0.08)' : 'rgba(3,172,234,0.10)';
-                        return (
-                          <div key={loan.id} style={{ padding: '9px 0' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-                              <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
-                              <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, color: statusColor, background: statusBg, borderRadius: 5, padding: '2px 6px', lineHeight: 1.2 }}>{statusLabel}</span>
-                            </div>
-                            <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              lent you {formatMoney(total)}{loan.purpose ? ` for ${loan.purpose}` : ''}
-                            </div>
+              {/* Combined Your Lending / Your Borrowing with left-right arrows */}
+              {(() => {
+                const isLending = lbTab === 'lending';
+                const loans = isLending ? lentLoans : borrowedLoans;
+                const title = isLending ? 'Your Lending' : 'Your Borrowing';
+                const tabLink = createPageUrl('LendingBorrowing') + (isLending ? '?tab=lending' : '?tab=borrowing');
+                const emptyMsg = isLending ? "You haven't lent anything yet 🌱" : "You haven't borrowed anything yet 🤝";
+                const arrowBtn = (dir) => (
+                  <button
+                    type="button"
+                    onClick={() => setLbTab(dir === 'left' ? 'lending' : 'borrowing')}
+                    style={{
+                      position: 'absolute',
+                      top: '50%', transform: 'translateY(-50%)',
+                      [dir === 'left' ? 'left' : 'right']: -22,
+                      width: 24, height: 24, borderRadius: '50%',
+                      background: 'rgba(255,255,255,0.9)',
+                      border: '1px solid rgba(0,0,0,0.09)',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+                      cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      zIndex: 2,
+                      opacity: (dir === 'left' && isLending) || (dir === 'right' && !isLending) ? 0.3 : 1,
+                      pointerEvents: (dir === 'left' && isLending) || (dir === 'right' && !isLending) ? 'none' : 'auto',
+                      transition: 'opacity 0.15s',
+                    }}
+                    aria-label={dir === 'left' ? 'Your Lending' : 'Your Borrowing'}
+                  >
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1A1918" strokeWidth="2.5" strokeLinecap="round">
+                      {dir === 'left'
+                        ? <polyline points="15 18 9 12 15 6" />
+                        : <polyline points="9 18 15 12 9 6" />}
+                    </svg>
+                  </button>
+                );
+                return (
+                  <div style={{ position: 'relative' }}>
+                    {arrowBtn('left')}
+                    {arrowBtn('right')}
+                    <div className="home-card-lending-loans" style={{ position: 'relative' }}>
+                      <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+                      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '14px 18px' }}>
+                        <SectionHeader title={title} linkTo={tabLink} linkLabel="View all →" />
+                        {/* Tab dots */}
+                        <div style={{ display: 'flex', gap: 4, marginBottom: 10 }}>
+                          {['lending', 'borrowing'].map(t => (
+                            <button key={t} type="button" onClick={() => setLbTab(t)}
+                              style={{ width: 6, height: 6, borderRadius: '50%', border: 'none', cursor: 'pointer', padding: 0, background: lbTab === t ? '#1A1918' : '#D9D8D6', transition: 'background 0.15s' }} />
+                          ))}
+                        </div>
+                        {loans.length === 0 ? (
+                          <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>{emptyMsg}</div>
+                        ) : (
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            {loans.slice(0, 5).map(loan => {
+                              const otherId = isLending ? loan.borrower_id : loan.lender_id;
+                              const otherProfile = safeAllProfiles.find(p => p.user_id === otherId);
+                              const name = otherProfile?.full_name?.split(' ')[0] || otherProfile?.username || 'User';
+                              const total = loan.total_amount || loan.amount || 0;
+                              const nextDue = loan.next_payment_date ? new Date(loan.next_payment_date) : null;
+                              const hasPending = safePayments.some(p => p && p.loan_id === loan.id && p.status === 'pending_confirmation');
+                              const isBehind = nextDue && nextDue < today && !hasPending;
+                              const behindAmt = isBehind ? (loan.payment_amount || 0) : 0;
+                              const statusLabel = isBehind ? `${formatMoney(behindAmt)} ${isLending ? 'behind' : 'overdue'}` : 'On track';
+                              const statusColor = isBehind ? '#E8726E' : '#03ACEA';
+                              const statusBg = isBehind ? 'rgba(232,114,110,0.08)' : 'rgba(3,172,234,0.10)';
+                              const subLine = isLending
+                                ? `Borrowed ${formatMoney(total)} from you${loan.purpose ? ` for ${loan.purpose}` : ''}`
+                                : `Lent you ${formatMoney(total)}${loan.purpose ? ` for ${loan.purpose}` : ''}`;
+                              return (
+                                <div key={loan.id} style={{ padding: '9px 0' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                                    <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
+                                    <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, color: statusColor, background: statusBg, borderRadius: 5, padding: '2px 6px', lineHeight: 1.2 }}>{statusLabel}</span>
+                                  </div>
+                                  <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{subLine}</div>
+                                </div>
+                              );
+                            })}
                           </div>
-                        );
-                      })}
+                        )}
+                      </div>
                     </div>
-                  )}
-                </div>
-              </div>
+                  </div>
+                );
+              })()}
 
             </div>{/* end col 3 */}
           </div>
