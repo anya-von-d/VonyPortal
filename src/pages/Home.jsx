@@ -1527,6 +1527,38 @@ export default function Home() {
           <div className="home-two-col-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24 }}>
             {/* Col 1: Coming Up This Week */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+              {/* ── Overview ── */}
+              {(() => {
+                const borrowOwed = Math.max(0, totalBorrowedAmount - totalPaidBack);
+                const lentOwed = Math.max(0, totalLentAmount - totalRepaid);
+                const hasOwing = borrowedLoans.length > 0 && borrowOwed > 0;
+                const hasOwed = lentLoans.length > 0 && lentOwed > 0;
+                return (
+                  <div style={{ position: 'relative' }}>
+                    <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+                    <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '14px 18px' }}>
+                      <SectionHeader title="Overview" />
+                      {!hasOwing && !hasOwed ? (
+                        <p style={{ fontSize: 12, color: '#9B9A98', margin: 0, fontFamily: "'DM Sans', sans-serif" }}>You have no active loans yet 🌱</p>
+                      ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                          {hasOwing && (
+                            <div style={{ fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>
+                              You owe <span style={{ fontWeight: 700, color: '#1D5B94' }}>{formatMoney(borrowOwed)}</span> across {borrowedLoans.length} loan{borrowedLoans.length !== 1 ? 's' : ''}
+                            </div>
+                          )}
+                          {hasOwed && (
+                            <div style={{ fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>
+                              You are owed <span style={{ fontWeight: 700, color: '#03ACEA' }}>{formatMoney(lentOwed)}</span> across {lentLoans.length} loan{lentLoans.length !== 1 ? 's' : ''}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* ── Upcoming Payments (row of up to 3 cards) ── */}
               {(() => {
                 const now = new Date();
@@ -1949,57 +1981,6 @@ export default function Home() {
                 );
               })()}
 
-              {/* Borrowing Overview — borrowing ring (pie left / text right),
-                  then lending ring below it (text left / pie right, mirrored) */}
-              {(() => {
-                const Ring = ({ percent, color, label }) => {
-                  const C = 2 * Math.PI * 45;
-                  const offset = C - (percent / 100) * C;
-                  return (
-                    <div style={{ position: 'relative', width: 68, height: 68, flexShrink: 0 }}>
-                      <svg width="68" height="68" viewBox="0 0 128 128" style={{ transform: 'rotate(-90deg)' }}>
-                        <circle cx="64" cy="64" r="45" fill="none" stroke={`${color}26`} strokeWidth="10" />
-                        <circle
-                          cx="64" cy="64" r="45" fill="none"
-                          stroke={color} strokeWidth="10" strokeLinecap="round"
-                          strokeDasharray={C} strokeDashoffset={offset}
-                        />
-                      </svg>
-                      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', gap: 1 }}>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em', fontFamily: "'DM Sans', sans-serif", lineHeight: 1 }}>{percent}%</span>
-                        <span style={{ fontSize: 8, fontWeight: 500, color: '#787776', fontFamily: "'DM Sans', sans-serif", lineHeight: 1 }}>{label}</span>
-                      </div>
-                    </div>
-                  );
-                };
-                const borrowOwed = Math.max(0, totalBorrowedAmount - totalPaidBack);
-                const lentOwed = Math.max(0, totalLentAmount - totalRepaid);
-                const textBlockStyle = { flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 };
-                const bigLineStyle  = { fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" };
-                const subLineStyle  = { fontSize: 12, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" };
-                return (
-                  <div className="home-card-bor-overview" style={{ position: 'relative' }}>
-                    <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
-                    <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
-                      <SectionHeader title="Overview" />
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginTop: 4 }}>
-                        <Ring percent={percentPaid} color="#1D5B94" label="Paid back" />
-                        <div style={textBlockStyle}>
-                          <div style={bigLineStyle}>You owe <span style={{ color: '#1D5B94' }}>{formatMoney(borrowOwed)}</span></div>
-                          <div style={subLineStyle}>{formatMoney(totalPaidBack)} of {formatMoney(totalBorrowedAmount)} paid back</div>
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginTop: 6 }}>
-                        <Ring percent={percentRepaid} color="#03ACEA" label="Repaid" />
-                        <div style={textBlockStyle}>
-                          <div style={bigLineStyle}>You're owed <span style={{ color: '#03ACEA' }}>{formatMoney(lentOwed)}</span></div>
-                          <div style={subLineStyle}>{formatMoney(totalRepaid)} of {formatMoney(totalLentAmount)} repaid to you</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
 
               {/* April at a Glance */}
               <div className="home-card-howmonth" style={{ position: 'relative' }}>
