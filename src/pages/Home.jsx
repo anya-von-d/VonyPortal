@@ -1992,79 +1992,45 @@ export default function Home() {
                 const allLines = [...cashLines, ...customExpenses.map(e => ({ ...e, date: e.date ? toLocalDate(e.date) : null, status: e.status || 'custom' }))];
                 const total = allLines.reduce((s, l) => s + l.amount, 0);
                 return (
-                  <div style={{ background: '#ffffff', borderRadius: 10, boxShadow: '2px 5px 16px rgba(0,0,0,0.13), 0 1px 3px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
+                  <div style={{ background: '#ffffff', borderRadius: 10, boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)', padding: '14px 18px' }}>
+                    <SectionHeader title="Plan Your Month" />
+                    <div style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", marginTop: -6, marginBottom: 10 }}>{monthName}</div>
 
-                    {/* ── Toolbar strip ── */}
-                    <div style={{ background: '#03ACEA', padding: '9px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                        <span style={{ fontSize: 13 }}>📊</span>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: '#ffffff', fontFamily: "'DM Sans', sans-serif", letterSpacing: '-0.01em' }}>Plan Your Month</span>
-                      </div>
-                      <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.9)', fontFamily: "'DM Sans', sans-serif", background: 'rgba(255,255,255,0.2)', borderRadius: 4, padding: '2px 8px' }}>{monthName}</span>
-                    </div>
-
-                    {/* ── Column headers ── */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '28px 1fr 46px 66px', background: '#E4F4FC', borderBottom: '2px solid rgba(3,172,234,0.18)' }}>
-                      <div />
-                      <div style={{ padding: '5px 8px', fontSize: 9, fontWeight: 700, color: '#3A8DB5', fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.07em', textTransform: 'uppercase' }}>Description</div>
-                      <div style={{ padding: '5px 6px', fontSize: 9, fontWeight: 700, color: '#3A8DB5', fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.07em', textTransform: 'uppercase', borderLeft: '1px solid rgba(3,172,234,0.18)' }}>Date</div>
-                      <div style={{ padding: '5px 10px 5px 6px', fontSize: 9, fontWeight: 700, color: '#3A8DB5', fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.07em', textTransform: 'uppercase', textAlign: 'right', borderLeft: '1px solid rgba(3,172,234,0.18)' }}>Amount</div>
-                    </div>
-
-                    {/* ── Data rows ── */}
                     {allLines.length === 0 ? (
-                      <div style={{ fontSize: 12, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", textAlign: 'center', padding: '14px 16px' }}>No cashflow scheduled 🌿</div>
-                    ) : allLines.map((line, idx) => {
-                      const isPos = line.amount >= 0;
-                      const isDone = line.status === 'done';
-                      const isOverdue = line.status === 'overdue';
-                      const dotColor = isDone ? '#03ACEA' : isOverdue ? '#E8726E' : isPos ? '#03ACEA' : '#1D5B94';
-                      return (
-                        <div key={line.id} style={{ display: 'grid', gridTemplateColumns: '28px 1fr 46px 66px', background: idx % 2 === 1 ? 'rgba(3,172,234,0.03)' : '#ffffff', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-                          {/* Status dot */}
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px 0' }}>
-                            <div style={{ width: 14, height: 14, borderRadius: '50%', background: isDone ? '#03ACEA' : `${dotColor}20`, border: `1.5px solid ${dotColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                              {isDone
-                                ? <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                                : isOverdue
-                                  ? <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke={dotColor} strokeWidth="3" strokeLinecap="round"><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                                  : null
-                              }
+                      <div style={{ fontSize: 12, color: '#9B9A98', textAlign: 'center', padding: '8px 0' }}>No cashflow scheduled 🌿</div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        {allLines.map(line => {
+                          const isPos = line.amount >= 0;
+                          const isDone = line.status === 'done';
+                          const isOverdue = line.status === 'overdue';
+                          const dotColor = isDone ? '#03ACEA' : isOverdue ? '#E8726E' : isPos ? '#03ACEA' : '#1D5B94';
+                          return (
+                            <div key={line.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+                              <div style={{ flexShrink: 0, width: 16, height: 16, borderRadius: '50%', background: isDone ? '#03ACEA' : `${dotColor}18`, border: `1.5px solid ${dotColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                {isDone
+                                  ? <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                  : isOverdue
+                                    ? <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke={dotColor} strokeWidth="3" strokeLinecap="round"><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                    : null
+                                }
+                              </div>
+                              <span style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 500, color: isDone ? '#B0AEA8' : '#1A1918', fontFamily: "'DM Sans', sans-serif", textDecoration: isDone ? 'line-through' : 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{line.label}</span>
+                              {line.date && <span style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", flexShrink: 0 }}>{format(line.date, 'MMM d')}</span>}
+                              <span style={{ fontSize: 12, fontWeight: 600, color: isPos ? '#03ACEA' : '#1D5B94', fontFamily: "'DM Sans', sans-serif", flexShrink: 0 }}>{isPos ? '+' : ''}{formatMoney(line.amount)}</span>
                             </div>
-                          </div>
-                          {/* Label */}
-                          <div style={{ padding: '8px 6px 8px 8px', borderLeft: '1px solid rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', minWidth: 0 }}>
-                            <span style={{ fontSize: 11, fontWeight: 500, color: isDone ? '#B0AEA8' : '#1A1918', fontFamily: "'DM Sans', sans-serif", textDecoration: isDone ? 'line-through' : 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{line.label}</span>
-                          </div>
-                          {/* Date */}
-                          <div style={{ padding: '8px 5px', borderLeft: '1px solid rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center' }}>
-                            <span style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>{line.date ? format(line.date, 'MMM d') : '—'}</span>
-                          </div>
-                          {/* Amount */}
-                          <div style={{ padding: '8px 10px 8px 5px', borderLeft: '1px solid rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                            <span style={{ fontSize: 11, fontWeight: 700, color: isPos ? '#03ACEA' : '#1D5B94', fontFamily: "'DM Sans', sans-serif" }}>{isPos ? '+' : ''}{formatMoney(line.amount)}</span>
-                          </div>
-                        </div>
-                      );
-                    })}
+                          );
+                        })}
+                      </div>
+                    )}
 
-                    {/* ── Σ Total row ── */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '28px 1fr 46px 66px', background: '#E4F4FC', borderTop: '2px solid rgba(3,172,234,0.18)' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ fontSize: 12, color: '#3A8DB5', fontWeight: 700 }}>Σ</span>
-                      </div>
-                      <div style={{ padding: '8px 6px 8px 8px', display: 'flex', alignItems: 'center' }}>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>Net {monthName}</span>
-                      </div>
-                      <div />
-                      <div style={{ padding: '8px 10px 8px 5px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                        <span style={{ fontSize: 12, fontWeight: 800, color: total >= 0 ? '#03ACEA' : '#1D5B94', fontFamily: "'DM Sans', sans-serif" }}>{total >= 0 ? '+' : ''}{formatMoney(total)}</span>
-                      </div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10, paddingTop: 8, borderTop: '1.5px solid rgba(0,0,0,0.07)' }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>Net {monthName}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: total >= 0 ? '#03ACEA' : '#1D5B94', fontFamily: "'DM Sans', sans-serif" }}>{total >= 0 ? '+' : ''}{formatMoney(total)}</span>
                     </div>
 
-                    {/* ── Add expense form ── */}
                     {addingExpense && (
-                      <form onSubmit={e => { e.preventDefault(); addCustomExpense(newExpenseLabel, newExpenseAmount, newExpenseDate, newExpenseDir); setNewExpenseLabel(''); setNewExpenseAmount(''); setNewExpenseDate(''); setNewExpenseDir('out'); setAddingExpense(false); }} style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '10px 14px', borderTop: '1px solid rgba(3,172,234,0.12)', background: '#F8FCFE' }}>
+                      <form onSubmit={e => { e.preventDefault(); addCustomExpense(newExpenseLabel, newExpenseAmount, newExpenseDate, newExpenseDir); setNewExpenseLabel(''); setNewExpenseAmount(''); setNewExpenseDate(''); setNewExpenseDir('out'); setAddingExpense(false); }} style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 10 }}>
                         <div style={{ display: 'flex', gap: 6 }}>
                           {['in','out'].map(d => (
                             <button key={d} type="button" onClick={() => setNewExpenseDir(d)}
@@ -2083,10 +2049,8 @@ export default function Home() {
                         </div>
                       </form>
                     )}
-
-                    {/* ── Add button ── */}
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '6px 10px 8px' }}>
-                      <button type="button" onClick={() => { setAddingExpense(v => !v); setNewExpenseLabel(''); setNewExpenseAmount(''); setNewExpenseDate(''); setNewExpenseDir('out'); }} style={{ width: 26, height: 26, borderRadius: '50%', background: addingExpense ? '#EBF4FA' : 'rgba(3,172,234,0.08)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} aria-label="Add expense">
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+                      <button type="button" onClick={() => { setAddingExpense(v => !v); setNewExpenseLabel(''); setNewExpenseAmount(''); setNewExpenseDate(''); setNewExpenseDir('out'); }} style={{ width: 26, height: 26, borderRadius: '50%', background: addingExpense ? '#EBF4FA' : '#F4F3F1', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} aria-label="Add expense">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={addingExpense ? '#03ACEA' : '#787776'} strokeWidth="2.8" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                       </button>
                     </div>
@@ -2480,24 +2444,24 @@ export default function Home() {
                       }
                     `}</style>
 
-                    {/* Your Lending — anti-clockwise, sits on top */}
-                    <div style={{ position: 'relative', zIndex: 2, transform: 'rotate(-2deg)', transformOrigin: 'center center', marginBottom: -22 }}>
-                      <div style={{ background: '#ffffff', borderRadius: 10, boxShadow: '2px 6px 20px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.09)', padding: '14px 18px 36px' }}>
-                        <SectionHeader title="Your Lending" linkTo={createPageUrl('LendingBorrowing') + '?tab=lending'} linkLabel="View all →" />
-                        {lentLoans.length === 0
-                          ? <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>No active lending 🌱</div>
-                          : <div style={{ display: 'flex', flexDirection: 'column' }}>{lentLoans.map(l => renderLoanRow(l, true))}</div>
-                        }
-                      </div>
-                    </div>
-
-                    {/* Your Borrowing — clockwise, sits behind/below */}
-                    <div style={{ position: 'relative', zIndex: 1, transform: 'rotate(1.5deg)', transformOrigin: 'center center' }}>
-                      <div style={{ background: '#ffffff', borderRadius: 10, boxShadow: '2px 6px 20px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.09)', padding: '36px 18px 14px' }}>
+                    {/* Your Borrowing — clockwise, sits on top */}
+                    <div style={{ position: 'relative', zIndex: 2, transform: 'rotate(1.5deg)', transformOrigin: 'center center', marginBottom: -22 }}>
+                      <div style={{ background: '#FEFDF7', borderRadius: 4, boxShadow: '0 1px 0 2px #edeade, 0 3px 0 3px #f5f3ea, 2px 6px 18px rgba(0,0,0,0.13)', padding: '14px 18px 36px' }}>
                         <SectionHeader title="Your Borrowing" linkTo={createPageUrl('LendingBorrowing') + '?tab=borrowing'} linkLabel="View all →" />
                         {borrowedLoans.length === 0
                           ? <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>No active borrowing 🌱</div>
                           : <div style={{ display: 'flex', flexDirection: 'column' }}>{borrowedLoans.map(l => renderLoanRow(l, false))}</div>
+                        }
+                      </div>
+                    </div>
+
+                    {/* Your Lending — anti-clockwise, sits behind */}
+                    <div style={{ position: 'relative', zIndex: 1, transform: 'rotate(-2deg)', transformOrigin: 'center center' }}>
+                      <div style={{ background: '#FEFDF7', borderRadius: 4, boxShadow: '0 1px 0 2px #edeade, 0 3px 0 3px #f5f3ea, 2px 6px 18px rgba(0,0,0,0.13)', padding: '36px 18px 14px' }}>
+                        <SectionHeader title="Your Lending" linkTo={createPageUrl('LendingBorrowing') + '?tab=lending'} linkLabel="View all →" />
+                        {lentLoans.length === 0
+                          ? <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>No active lending 🌱</div>
+                          : <div style={{ display: 'flex', flexDirection: 'column' }}>{lentLoans.map(l => renderLoanRow(l, true))}</div>
                         }
                       </div>
                     </div>
