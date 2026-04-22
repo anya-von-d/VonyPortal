@@ -1144,7 +1144,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
           </div>{/* end col 2 stack */}
 
           {/* Col 3: Your Lending/Borrowing stacked */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
             {/* Your Lending / Your Borrowing sorted list */}
             {activeLoans.length > 0 && (() => {
