@@ -1123,7 +1123,16 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                       else if (rankingFilter === 'most_recent') { badgeLabel = loan.created_at ? format(new Date(loan.created_at), 'MMM d') : '—'; }
                       return (
                         <div key={loan.id} style={{ padding: '9px 0', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-                          <span style={{ fontSize: 11, fontWeight: 700, color: '#C5C3C0', minWidth: 14, textAlign: 'right', flexShrink: 0, lineHeight: '17px' }}>{idx + 1}</span>
+                          {(() => {
+                            const lendGrad = ['#7FD9FF','#3DC4F5','#03ACEA','#0291C0','#027AA3'];
+                            const borrGrad = ['#7AAED4','#4D8DBF','#2B6EA8','#1D5B94','#154578'];
+                            const circleColor = (isLending ? lendGrad : borrGrad)[idx] || accentCol;
+                            return (
+                              <div style={{ width: 22, height: 22, borderRadius: '50%', background: circleColor, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <span style={{ fontSize: 10, fontWeight: 700, color: '#ffffff', lineHeight: 1, fontFamily: "'DM Sans', sans-serif" }}>{idx + 1}</span>
+                              </div>
+                            );
+                          })()}
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
                               <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
