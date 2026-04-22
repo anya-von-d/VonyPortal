@@ -538,7 +538,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
               </div>
 
               {/* [2fr: Loan Terms + Docs] [1fr: You're Owed + Repayment Progress] */}
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 14, marginBottom: 20, alignItems: 'start' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 14, marginBottom: 20, alignItems: 'stretch' }}>
 
                 {/* Left (2fr): Loan Terms full-width, then doc buttons below */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -561,8 +561,8 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                     </div>
                   </div>
 
-                  {/* Blue doc buttons — horizontal row, fit to text */}
-                  <div style={{ display: 'flex', flexDirection: 'row', gap: 6 }}>
+                  {/* Blue doc buttons — horizontal row, centered, fit to text */}
+                  <div style={{ display: 'flex', flexDirection: 'row', gap: 6, justifyContent: 'center' }}>
                     <div style={{ position: 'relative' }}>
                       <div style={{ background: '#03ACEA', borderRadius: 10, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 10px' }}>
                         <button onClick={() => { const ag = loanAgreements.find(a => a.loan_id === selectedLoan.id); if (ag) openDocPopup('promissory', ag); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
@@ -601,34 +601,11 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                   </div>
                 </div>
 
-                {/* Right (1fr = Activity width): You're Owed + Repayment Progress side-by-side */}
-                <div style={{ display: 'flex', gap: 10, alignItems: 'stretch' }}>
-
-                  {/* You're Owed */}
-                  <div style={{ flex: 1, minWidth: 0, ...cardBase }}>
-                    <div style={{ marginBottom: 10 }}>
-                      {isLending ? (
-                        <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
-                          <circle cx="14" cy="14" r="13" stroke="#03ACEA" strokeWidth="1.5"/>
-                          <path d="M14 9 L14 17 M10.5 12.5 L14 9 L17.5 12.5" stroke="#03ACEA" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      ) : (
-                        <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
-                          <circle cx="14" cy="14" r="13" stroke="#1D5B94" strokeWidth="1.5"/>
-                          <path d="M14 9 L14 17 M10.5 13.5 L14 17 L17.5 13.5" stroke="#1D5B94" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      )}
-                    </div>
-                    <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>
-                      {isLending
-                        ? <>You're owed <span style={{ color: '#03ACEA' }}>{formatMoney(remaining)}</span></>
-                        : <>You owe <span style={{ color: '#1D5B94' }}>{formatMoney(remaining)}</span></>
-                      }
-                    </div>
-                  </div>
+                {/* Right (1fr): Repayment Progress top, You're Owed bottom-right */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
 
                   {/* Repayment Progress */}
-                  <div style={{ flex: 1, minWidth: 0, ...cardBase }}>
+                  <div style={{ ...cardBase }}>
                     <div style={{ fontSize: 11, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif", marginBottom: 10 }}>Repayment Progress</div>
                     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
                       <div style={{ position: 'relative', width: 60, height: 60, flexShrink: 0 }}>
@@ -646,6 +623,29 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                       {formatMoney(totalPaidAmt)} of {formatMoney(totalWithInterest)} {isLending ? 'repaid to you' : 'paid back'}
                     </div>
                   </div>
+
+                  {/* You're Owed — bottom */}
+                  <div style={{ ...cardBase, marginTop: 'auto' }}>
+                    <div style={{ marginBottom: 10 }}>
+                      {isLending ? (
+                        <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+                          <circle cx="14" cy="14" r="13" stroke="#03ACEA" strokeWidth="1.5"/>
+                          <path d="M14 9 L14 17 M10.5 12.5 L14 9 L17.5 12.5" stroke="#03ACEA" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      ) : (
+                        <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+                          <circle cx="14" cy="14" r="13" stroke="#1D5B94" strokeWidth="1.5"/>
+                          <path d="M14 9 L14 17 M10.5 13.5 L14 17 L17.5 13.5" stroke="#1D5B94" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                    </div>
+                    <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>
+                      {isLending
+                        ? <><span style={{ fontWeight: 600 }}>{otherPartyUsername.split(' ')[0]}</span> owes you <span style={{ color: '#03ACEA' }}>{formatMoney(remaining)}</span></>
+                        : <>You owe <span style={{ fontWeight: 600 }}>{otherPartyUsername.split(' ')[0]}</span> <span style={{ color: '#1D5B94' }}>{formatMoney(remaining)}</span></>
+                      }
+                    </div>
+                  </div>
                 </div>
 
               </div>
@@ -656,7 +656,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
         {/* 3-col: [Payment History + Activity] | [Payments] | [Loan Progress] */}
         <div className="loan-details-masonry" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20, alignItems: 'start' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-        <PageCard title="Payment History">
+        <PageCard title="Payment History" wrapperStyle={{ marginBottom: 0 }}>
           <div>
           {chartData.length === 0 ? (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: chartHeight }}><p style={{ fontSize: 12, color: '#C7C6C4' }}>No payment schedule</p></div>
@@ -822,7 +822,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                     <div key={row.number} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 8, borderRadius: 10, background: 'transparent' }}>
                       <PieCircle percentage={row.paidPercentage} number={row.number} />
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: 13, fontWeight: 500, color: '#4B4A48', margin: 0 }}>Amount Due for Payment {row.number}: ${row.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                        <p style={{ fontSize: 13, fontWeight: 500, color: '#4B4A48', margin: 0 }}>Payment {row.number}: ${row.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                         {row.status === 'partial' && row.paidAmount > 0 && (
                           <p style={{ fontSize: 12, margin: '1px 0 0' }}>
                             <span style={{ fontWeight: 700, color: '#15803D' }}>Paid: ${row.paidAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
@@ -1261,9 +1261,9 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
 
   const LENDER_GREEN = '#03ACEA';
 
-  const PageCard = ({ title, headerRight, children, style, highlight, tone }) => {
+  const PageCard = ({ title, headerRight, children, style, highlight, tone, wrapperStyle }) => {
     return (
-    <div style={{ position: 'relative', marginBottom: 24 }}>
+    <div style={{ position: 'relative', marginBottom: 24, ...wrapperStyle }}>
     <div style={{
       position: 'relative', zIndex: 1,
       background: '#ffffff',
