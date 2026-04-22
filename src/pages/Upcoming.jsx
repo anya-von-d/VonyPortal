@@ -8,7 +8,7 @@ import {
   startOfWeek, endOfWeek, isSameMonth, isSameDay,
 } from "date-fns";
 import { formatMoney } from "@/components/utils/formatMoney";
-import { daysUntil as daysUntilDate } from "@/components/utils/dateUtils";
+import { daysUntil as daysUntilDate, toLocalDate } from "@/components/utils/dateUtils";
 import MeshMobileNav from "@/components/MeshMobileNav";
 import DesktopSidebar from '../components/DesktopSidebar';
 
@@ -24,6 +24,20 @@ export default function Upcoming() {
   const activeLoansRef = useRef(null);
   const [activeAnimKey, setActiveAnimKey] = useState(0);
   const activeWasOut = useRef(true);
+  const [customExpenses, setCustomExpenses] = useState(() => {
+    try { const raw = localStorage.getItem('vony.plan-expenses'); return raw ? JSON.parse(raw) : []; } catch { return []; }
+  });
+  const [addingExpense, setAddingExpense] = useState(false);
+  const [newExpenseLabel, setNewExpenseLabel] = useState('');
+  const [newExpenseAmount, setNewExpenseAmount] = useState('');
+  const [newExpenseDate, setNewExpenseDate] = useState('');
+  const [newExpenseDir, setNewExpenseDir] = useState('out');
+  const addCustomExpense = (label, amount, date, dir) => {
+    if (!label.trim() || !amount) return;
+    const signed = dir === 'in' ? Math.abs(parseFloat(amount)) : -Math.abs(parseFloat(amount));
+    const exp = { id: `exp-${Date.now()}`, label: label.trim(), amount: signed, date: date || null, status: 'custom' };
+    setCustomExpenses(prev => { const next = [...prev, exp]; try { localStorage.setItem('vony.plan-expenses', JSON.stringify(next)); } catch {} return next; });
+  };
 
   const user = userProfile ? { ...userProfile, id: authUser?.id, email: authUser?.email } : null;
 
@@ -453,6 +467,140 @@ export default function Upcoming() {
                   {comingLater.map(event => <PaymentRow key={event.loanId + '-later'} event={event} />)}
                 </div>
               </div>
+
+              {/* ── Plan Your Month ── */}
+              {(() => {
+  const monthStart = startOfMonth(today);
+  const monthEnd = endOfMonth(today);
+  const monthName = format(today, 'MMMM');
+  const cashLines = [];
+  safePayments.forEach(p => {
+    if (!p || p.status !== 'completed') return;
+    const d = p.payment_date ? toLocalDate(p.payment_date) : new Date(p.created_at);
+    if (d < monthStart || d > monthEnd) return;
+    const loan = myLoans.find(l => l.id === p.loan_id);
+    if (!loan) return;
+    const isLender = loan.lender_id === user.id;
+    const otherId = isLender ? loan.borrower_id : loan.lender_id;
+    const prof = safeProfiles.find(pp => pp.user_id === otherId);
+    const name = prof?.full_name?.split(' ')[0] || prof?.username || (isLender ? 'Borrower' : 'Lender');
+    cashLines.push({ id: `paid-${p.id}`, label: isLender ? `From ${name}` : `To ${name}`, amount: isLender ? (p.amount || 0) : -(p.amount || 0), date: d, status: 'done' });
+  });
+  const completedThisMonth = new Set(safePayments.filter(p => {
+    if (!p || p.status !== 'completed') return false;
+    const d = p.payment_date ? toLocalDate(p.payment_date) : new Date(p.created_at);
+    return d >= monthStart && d <= monthEnd;
+  }).map(p => p.loan_id));
+  lentLoans.forEach(loan => {
+    if (!loan.next_payment_date) return;
+    const d = toLocalDate(loan.next_payment_date);
+    if (d < monthStart || d > monthEnd) return;
+    if (completedThisMonth.has(loan.id)) return;
+    const p = safeProfiles.find(pp => pp.user_id === loan.borrower_id);
+    const name = p?.full_name?.split(' ')[0] || p?.username || 'Borrower';
+    cashLines.push({ id: `sched-in-${loan.id}`, label: `From ${name}`, amount: loan.payment_amount || 0, date: d, status: 'scheduled' });
+  });
+  borrowedLoans.forEach(loan => {
+    if (!loan.next_payment_date) return;
+    const d = toLocalDate(loan.next_payment_date);
+    if (d < monthStart || d > monthEnd) return;
+    if (completedThisMonth.has(loan.id)) return;
+    const p = safeProfiles.find(pp => pp.user_id === loan.lender_id);
+    const name = p?.full_name?.split(' ')[0] || p?.username || 'Lender';
+    cashLines.push({ id: `sched-out-${loan.id}`, label: `To ${name}`, amount: -(loan.payment_amount || 0), date: d, status: 'scheduled' });
+  });
+  lentLoans.forEach(loan => {
+    if (!loan.next_payment_date) return;
+    const d = toLocalDate(loan.next_payment_date);
+    if (d >= monthStart) return;
+    if (completedThisMonth.has(loan.id)) return;
+    const p = safeProfiles.find(pp => pp.user_id === loan.borrower_id);
+    const name = p?.full_name?.split(' ')[0] || p?.username || 'Borrower';
+    cashLines.push({ id: `overdue-in-${loan.id}`, label: `From ${name}`, amount: loan.payment_amount || 0, date: d, status: 'overdue' });
+  });
+  borrowedLoans.forEach(loan => {
+    if (!loan.next_payment_date) return;
+    const d = toLocalDate(loan.next_payment_date);
+    if (d >= monthStart) return;
+    if (completedThisMonth.has(loan.id)) return;
+    const p = safeProfiles.find(pp => pp.user_id === loan.lender_id);
+    const name = p?.full_name?.split(' ')[0] || p?.username || 'Lender';
+    cashLines.push({ id: `overdue-out-${loan.id}`, label: `To ${name}`, amount: -(loan.payment_amount || 0), date: d, status: 'overdue' });
+  });
+  cashLines.sort((a, b) => (a.date || new Date(0)) - (b.date || new Date(0)));
+  const allLines = [...cashLines, ...customExpenses.map(e => ({ ...e, date: e.date ? toLocalDate(e.date) : null, status: e.status || 'custom' }))];
+  const total = allLines.reduce((s, l) => s + l.amount, 0);
+  return (
+    <div style={{ position: 'relative' }}>
+      <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif", marginBottom: 10 }}>Plan Your Month</div>
+        {allLines.length === 0 ? (
+          <div style={{ fontSize: 12, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", textAlign: 'center', padding: '8px 0' }}>No cashflow scheduled for {monthName} 🌿</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {allLines.map(line => {
+              const isPos = line.amount >= 0;
+              const isDone = line.status === 'done';
+              const isOverdue = line.status === 'overdue';
+              const dotColor = isDone ? '#03ACEA' : isOverdue ? '#E8726E' : isPos ? '#03ACEA' : '#1D5B94';
+              return (
+                <div key={line.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0' }}>
+                  <div style={{ flexShrink: 0, width: 20, height: 20, borderRadius: '50%', background: isDone ? '#03ACEA' : `${dotColor}18`, border: `1.5px solid ${dotColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {isDone
+                      ? <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      : isOverdue
+                        ? <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={dotColor} strokeWidth="3" strokeLinecap="round"><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        : null
+                    }
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ fontSize: 12, fontWeight: 500, color: isDone ? '#9B9A98' : '#1A1918', fontFamily: "'DM Sans', sans-serif", textDecoration: isDone ? 'line-through' : 'none', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{line.label}</span>
+                    {line.date && <span style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>{format(line.date, 'MMM d')}</span>}
+                  </div>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: isPos ? '#03ACEA' : '#1D5B94', fontFamily: "'DM Sans', sans-serif", flexShrink: 0 }}>
+                    {isPos ? '+' : ''}{formatMoney(line.amount)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10, paddingTop: 8, borderTop: '1.5px solid rgba(0,0,0,0.08)' }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>Net this month</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: total >= 0 ? '#03ACEA' : '#1D5B94', fontFamily: "'DM Sans', sans-serif" }}>
+            {total >= 0 ? '+' : ''}{formatMoney(total)}
+          </span>
+        </div>
+        {addingExpense && (
+          <form onSubmit={e => { e.preventDefault(); addCustomExpense(newExpenseLabel, newExpenseAmount, newExpenseDate, newExpenseDir); setNewExpenseLabel(''); setNewExpenseAmount(''); setNewExpenseDate(''); setNewExpenseDir('out'); setAddingExpense(false); }} style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 10 }}>
+            <div style={{ display: 'flex', gap: 6 }}>
+              {['in','out'].map(d => (
+                <button key={d} type="button" onClick={() => setNewExpenseDir(d)}
+                  style={{ flex: 1, padding: '5px 0', borderRadius: 6, border: `1.5px solid ${newExpenseDir === d ? '#03ACEA' : '#D9D8D6'}`, background: newExpenseDir === d ? '#EBF4FA' : 'transparent', color: newExpenseDir === d ? '#03ACEA' : '#9B9A98', fontSize: 11, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", cursor: 'pointer' }}>
+                  {d === 'in' ? '+ Money in' : '− Money out'}
+                </button>
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <input autoFocus value={newExpenseLabel} onChange={e => setNewExpenseLabel(e.target.value)} onKeyDown={e => { if (e.key === 'Escape') setAddingExpense(false); }} placeholder="Label…" style={{ flex: 1, fontSize: 12, fontFamily: "'DM Sans', sans-serif", border: 'none', borderBottom: '1.5px solid #03ACEA', outline: 'none', background: 'transparent', color: '#1A1918', padding: '2px 0' }} />
+              <input value={newExpenseAmount} onChange={e => setNewExpenseAmount(e.target.value)} placeholder="$0" type="number" min="0" step="0.01" style={{ width: 56, fontSize: 12, fontFamily: "'DM Sans', sans-serif", border: 'none', borderBottom: '1.5px solid #03ACEA', outline: 'none', background: 'transparent', color: '#1A1918', padding: '2px 0', textAlign: 'right' }} />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <input value={newExpenseDate} onChange={e => setNewExpenseDate(e.target.value)} type="date" style={{ flex: 1, fontSize: 11, fontFamily: "'DM Sans', sans-serif", border: 'none', borderBottom: '1px solid #D9D8D6', outline: 'none', background: 'transparent', color: newExpenseDate ? '#1A1918' : '#9B9A98', padding: '2px 0' }} />
+              <button type="submit" style={{ background: '#03ACEA', border: 'none', cursor: 'pointer', borderRadius: 6, padding: '4px 10px', color: '#fff', fontSize: 11, fontWeight: 600, fontFamily: "'DM Sans', sans-serif" }}>Add</button>
+            </div>
+          </form>
+        )}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+          <button type="button" onClick={() => { setAddingExpense(v => !v); setNewExpenseLabel(''); setNewExpenseAmount(''); setNewExpenseDate(''); setNewExpenseDir('out'); }} style={{ width: 26, height: 26, borderRadius: '50%', background: addingExpense ? '#EBF4FA' : '#F4F3F1', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} aria-label="Add expense">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={addingExpense ? '#03ACEA' : '#787776'} strokeWidth="2.8" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+})()}
 
             </div>{/* end col 2 */}
 

@@ -757,6 +757,7 @@ export default function Home() {
     setCustomExpenses(prev => { const next = [...prev, exp]; try { localStorage.setItem('vony.plan-expenses', JSON.stringify(next)); } catch {} return next; });
   };
   const [lbTab, setLbTab] = useState('lending'); // 'lending' | 'borrowing'
+  const [selectedBubblePerson, setSelectedBubblePerson] = useState(null);
   const loansWasOut = useRef(true);
   const activeWasOut = useRef(true);
   const [bigScreen, setBigScreen] = useState(window.innerWidth > 900);
@@ -1928,71 +1929,172 @@ export default function Home() {
                 );
               })()}
 
-              {/* ── Reminders ── */}
+              {/* ── People Bubble ── */}
               {(() => {
-                const attentionItems = [];
-                if (overdueYouOwe.length === 1) {
-                  attentionItems.push({ type: 'overdue', text: 'You have an overdue payment' });
-                } else if (overdueYouOwe.length > 1) {
-                  attentionItems.push({ type: 'overdue', text: `You have ${overdueYouOwe.length} overdue payments` });
+  // Count interactions (payments) per partner
+  const interactionCount = {};
+  safePayments.forEach(p => {
+    if (!p) return;
+    const loan = myLoans.find(l => l.id === p.loan_id);
+    if (!loan) return;
+    const isLndr = loan.lender_id === user.id;
+    const otherId = isLndr ? loan.borrower_id : loan.lender_id;
+    interactionCount[otherId] = (interactionCount[otherId] || 0) + 1;
+  });
+  const seenIds = new Set();
+  const loanPartners = [];
+  [...lentLoans, ...borrowedLoans].forEach(loan => {
+    const isLending = loan.lender_id === user.id;
+    const otherId = isLending ? loan.borrower_id : loan.lender_id;
+    if (seenIds.has(otherId)) return;
+    seenIds.add(otherId);
+    const prof = safeAllProfiles.find(p => p.user_id === otherId);
+    const firstName = (prof?.full_name || prof?.username || 'User').split(' ')[0];
+    const activeLoan = [...lentLoans, ...borrowedLoans].find(l =>
+      (l.borrower_id === otherId || l.lender_id === otherId)
+    );
+    loanPartners.push({ userId: otherId, firstName, fullName: prof?.full_name || prof?.username || 'User', avatar: prof?.avatar_url || prof?.profile_picture_url, hasLoan: true, loanId: activeLoan?.id, interactions: interactionCount[otherId] || 0 });
+  });
+  loanPartners.sort((a, b) => b.interactions - a.interactions);
+  let displayPeople = loanPartners.slice(0, 7);
+  if (displayPeople.length < 3) {
+    const friendPeople = acceptedFriendships
+      .map(f => f.user_id === user.id ? f.friend_id : f.user_id)
+      .filter(id => !seenIds.has(id))
+      .slice(0, 7 - displayPeople.length)
+      .map(fId => {
+        const prof = safeAllProfiles.find(p => p.user_id === fId);
+        const firstName = (prof?.full_name || prof?.username || 'Friend').split(' ')[0];
+        return { userId: fId, firstName, fullName: prof?.full_name || prof?.username || 'Friend', avatar: prof?.avatar_url || prof?.profile_picture_url, hasLoan: false, loanId: null, interactions: 0 };
+      });
+    displayPeople = [...displayPeople, ...friendPeople];
+  }
+  if (displayPeople.length === 0) return null;
+  // Positions for up to 7 bubbles (percentage-based, container is ~190px tall, full width)
+  const bubblePositions = [
+    { top: '50%', left: '50%', tx: '-50%', ty: '-50%', size: 54 },
+    { top: '12%', left: '18%', tx: '-50%', ty: '0', size: 44 },
+    { top: '12%', left: '80%', tx: '-50%', ty: '0', size: 44 },
+    { top: '68%', left: '22%', tx: '-50%', ty: '0', size: 42 },
+    { top: '68%', left: '78%', tx: '-50%', ty: '0', size: 42 },
+    { top: '40%', left: '7%', tx: '0', ty: '-50%', size: 38 },
+    { top: '40%', left: '93%', tx: '-100%', ty: '-50%', size: 38 },
+  ];
+  return (
+    <div style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+      {/* Blue gradient background */}
+      <div style={{ background: 'linear-gradient(135deg, #1a4f7a 0%, #03ACEA 100%)', height: 200, position: 'relative' }}>
+        {displayPeople.slice(0, 7).map((person, i) => {
+          const pos = bubblePositions[i];
+          const isSelected = selectedBubblePerson?.userId === person.userId;
+          const initials = person.firstName.charAt(0).toUpperCase();
+          const bubbleColors = ['#4DA6CE','#2E86B5','#5BB8D4','#1D7AAD','#6BC4E0','#38A0C8','#23618E'];
+          return (
+            <div key={person.userId} style={{ position: 'absolute', top: pos.top, left: pos.left, transform: `translate(${pos.tx}, ${pos.ty})`, zIndex: isSelected ? 20 : 1 }}>
+              {/* Avatar circle */}
+              <button type="button"
+                onClick={() => setSelectedBubblePerson(isSelected ? null : person)}
+                style={{ width: pos.size, height: pos.size, borderRadius: '50%', border: `3px solid ${isSelected ? '#ffffff' : 'rgba(255,255,255,0.55)'}`, background: person.avatar ? 'transparent' : bubbleColors[i % bubbleColors.length], overflow: 'hidden', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: isSelected ? '0 0 0 3px rgba(255,255,255,0.8)' : '0 2px 8px rgba(0,0,0,0.25)', transition: 'border 0.15s, box-shadow 0.15s', padding: 0 }}
+                aria-label={person.firstName}
+              >
+                {person.avatar
+                  ? <img src={person.avatar} alt={person.firstName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  : <span style={{ fontSize: pos.size * 0.38, fontWeight: 700, color: '#ffffff', fontFamily: "'DM Sans', sans-serif", lineHeight: 1 }}>{initials}</span>
                 }
-                if (upcomingEvents.length > 0) {
-                  const s = upcomingEvents[0];
-                  const dText = s.days === 0 ? 'today' : `in ${s.days} day${s.days === 1 ? '' : 's'}`;
-                  attentionItems.push({ type: 'due', text: `You have a payment due ${dText}` });
-                }
-                if (pendingOffers.length === 1) {
-                  const lenderProf = safeAllProfiles.find(p => p.user_id === pendingOffers[0].lender_id);
-                  attentionItems.push({ type: 'loan_offer', text: 'You have a new loan offer to review', loan: pendingOffers[0], lenderProf });
-                } else if (pendingOffers.length > 1) {
-                  attentionItems.push({ type: 'loan_offer', text: `You have ${pendingOffers.length} new loan offers to review` });
-                }
-                const AIcon = ({ type }) => {
-                  const red = '#E8726E', blue = '#03ACEA';
-                  if (type === 'overdue') return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={red} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:2}}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>;
-                  if (type === 'due') return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={blue} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:2}}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>;
-                  if (type === 'loan_offer') return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={blue} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:2}}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>;
-                  return null;
-                };
-                if (attentionItems.length === 0) return null;
-                return (
-                  <div className="home-card-attention" style={{ position: 'relative' }}>
-                    <div style={{ position: 'relative', zIndex: 1, background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.82)', boxShadow: '0 4px 20px rgba(0,0,0,0.08), inset 0 0 60px rgba(3,172,234,0.07)', padding: '14px 18px' }}>
-                      <SectionHeader title="Reminders" />
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                        {attentionItems.map((item, i) => {
-                          const arrowAction = (() => {
-                            if (item.type === 'overdue' || item.type === 'due') return () => navigate(createPageUrl('RecordPayment'));
-                            if (item.type === 'loan_offer' && item.loan) return () => setReviewOfferTarget({ loan: item.loan, lenderProf: item.lenderProf });
-                            return null;
-                          })();
-                          return (
-                            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '3px 0' }}>
-                              <AIcon type={item.type} />
-                              <span style={{ flex: 1, fontSize: 12, fontWeight: 500, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4 }}>{item.text}</span>
-                              {arrowAction && (
-                                <button type="button" onClick={arrowAction} aria-label="Open"
-                                  style={{ flexShrink: 0, background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', color: '#9B9A98', marginTop: 1 }}
-                                  onMouseEnter={e => e.currentTarget.style.color = '#03ACEA'}
-                                  onMouseLeave={e => e.currentTarget.style.color = '#9B9A98'}
-                                >
-                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
-                                </button>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
+              </button>
+              {/* Popover */}
+              {isSelected && (
+                <div style={{ position: 'absolute', bottom: pos.size + 8, left: '50%', transform: 'translateX(-50%)', background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(12px)', borderRadius: 10, padding: '10px 14px', minWidth: 160, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', zIndex: 30, whiteSpace: 'nowrap' }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", marginBottom: 8 }}>{person.fullName}</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <button type="button" onClick={() => navigate(createPageUrl('CreateOffer'))}
+                      style={{ width: '100%', padding: '6px 10px', borderRadius: 7, background: '#03ACEA', border: 'none', color: '#fff', fontSize: 11, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", cursor: 'pointer', textAlign: 'center' }}>
+                      Create a loan
+                    </button>
+                    {person.hasLoan && (
+                      <button type="button" onClick={() => navigate(createPageUrl('RecordPayment') + (person.loanId ? `?loanId=${person.loanId}` : ''))}
+                        style={{ width: '100%', padding: '6px 10px', borderRadius: 7, background: 'rgba(3,172,234,0.1)', border: '1.5px solid #03ACEA', color: '#03ACEA', fontSize: 11, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", cursor: 'pointer', textAlign: 'center' }}>
+                        Log a payment
+                      </button>
+                    )}
                   </div>
-                );
-              })()}
+                  {/* Little arrow */}
+                  <div style={{ position: 'absolute', bottom: -6, left: '50%', transform: 'translateX(-50%)', width: 12, height: 12, background: 'rgba(255,255,255,0.97)', borderRadius: 2, rotate: '45deg' }} />
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+})()}
 
 
             </div>
 
-            {/* Col 2: To Do This Week + Plan Your Month */}
+            {/* Col 2: Reminders + To Do This Week */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+
+              {/* ── Reminders ── */}
+              {(() => {
+  const attentionItems = [];
+  if (overdueYouOwe.length === 1) {
+    attentionItems.push({ type: 'overdue', text: 'You have an overdue payment' });
+  } else if (overdueYouOwe.length > 1) {
+    attentionItems.push({ type: 'overdue', text: `You have ${overdueYouOwe.length} overdue payments` });
+  }
+  if (upcomingEvents.length > 0) {
+    const s = upcomingEvents[0];
+    const dText = s.days === 0 ? 'today' : `in ${s.days} day${s.days === 1 ? '' : 's'}`;
+    attentionItems.push({ type: 'due', text: `You have a payment due ${dText}` });
+  }
+  if (pendingOffers.length === 1) {
+    const lenderProf = safeAllProfiles.find(p => p.user_id === pendingOffers[0].lender_id);
+    attentionItems.push({ type: 'loan_offer', text: 'You have a new loan offer to review', loan: pendingOffers[0], lenderProf });
+  } else if (pendingOffers.length > 1) {
+    attentionItems.push({ type: 'loan_offer', text: `You have ${pendingOffers.length} new loan offers to review` });
+  }
+  const AIcon = ({ type }) => {
+    const red = '#E8726E', blue = '#03ACEA';
+    if (type === 'overdue') return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={red} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:2}}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>;
+    if (type === 'due') return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={blue} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:2}}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>;
+    if (type === 'loan_offer') return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={blue} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:2}}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>;
+    return null;
+  };
+  if (attentionItems.length === 0) return null;
+  return (
+    <div className="home-card-attention" style={{ position: 'relative' }}>
+      <div style={{ position: 'relative', zIndex: 1, background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.82)', boxShadow: '0 4px 20px rgba(0,0,0,0.08), inset 0 0 60px rgba(3,172,234,0.07)', padding: '14px 18px' }}>
+        <SectionHeader title="Reminders" />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {attentionItems.map((item, i) => {
+            const arrowAction = (() => {
+              if (item.type === 'overdue' || item.type === 'due') return () => navigate(createPageUrl('RecordPayment'));
+              if (item.type === 'loan_offer' && item.loan) return () => setReviewOfferTarget({ loan: item.loan, lenderProf: item.lenderProf });
+              return null;
+            })();
+            return (
+              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '3px 0' }}>
+                <AIcon type={item.type} />
+                <span style={{ flex: 1, fontSize: 12, fontWeight: 500, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4 }}>{item.text}</span>
+                {arrowAction && (
+                  <button type="button" onClick={arrowAction} aria-label="Open"
+                    style={{ flexShrink: 0, background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', color: '#9B9A98', marginTop: 1 }}
+                    onMouseEnter={e => e.currentTarget.style.color = '#03ACEA'}
+                    onMouseLeave={e => e.currentTarget.style.color = '#9B9A98'}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+})()}
 
               {/* To Do This Week */}
               {(() => {
@@ -2086,151 +2188,6 @@ export default function Home() {
                 );
               })()}
 
-              {/* ── Plan Your Month ── */}
-              {(() => {
-                const monthStart = startOfMonth(today);
-                const monthEnd = endOfMonth(today);
-                const monthName = format(today, 'MMMM');
-                const cashLines = [];
-
-                // 1. Completed payments this month (actual transactions)
-                safePayments.forEach(p => {
-                  if (!p || p.status !== 'completed') return;
-                  const d = p.payment_date ? toLocalDate(p.payment_date) : new Date(p.created_at);
-                  if (d < monthStart || d > monthEnd) return;
-                  const loan = myLoans.find(l => l.id === p.loan_id);
-                  if (!loan) return;
-                  const isLender = loan.lender_id === user.id;
-                  const otherId = isLender ? loan.borrower_id : loan.lender_id;
-                  const prof = safeAllProfiles.find(pp => pp.user_id === otherId);
-                  const name = prof?.full_name?.split(' ')[0] || prof?.username || (isLender ? 'Borrower' : 'Lender');
-                  cashLines.push({ id: `paid-${p.id}`, label: isLender ? `From ${name}` : `To ${name}`, amount: isLender ? (p.amount || 0) : -(p.amount || 0), date: d, status: 'done' });
-                });
-
-                // 2. Scheduled this month (next_payment_date in month, not yet a completed payment above)
-                const paidLoanIds = new Set(cashLines.map(l => { const m = l.id.match(/^paid-/); return m ? null : null; }));
-                const completedThisMonth = new Set(safePayments.filter(p => {
-                  if (!p || p.status !== 'completed') return false;
-                  const d = p.payment_date ? toLocalDate(p.payment_date) : new Date(p.created_at);
-                  return d >= monthStart && d <= monthEnd;
-                }).map(p => p.loan_id));
-
-                lentLoans.forEach(loan => {
-                  if (!loan.next_payment_date) return;
-                  const d = toLocalDate(loan.next_payment_date);
-                  if (d < monthStart || d > monthEnd) return;
-                  if (completedThisMonth.has(loan.id)) return; // already recorded
-                  const p = safeAllProfiles.find(pp => pp.user_id === loan.borrower_id);
-                  const name = p?.full_name?.split(' ')[0] || p?.username || 'Borrower';
-                  cashLines.push({ id: `sched-in-${loan.id}`, label: `From ${name}`, amount: loan.payment_amount || 0, date: d, status: 'scheduled' });
-                });
-                borrowedLoans.forEach(loan => {
-                  if (!loan.next_payment_date) return;
-                  const d = toLocalDate(loan.next_payment_date);
-                  if (d < monthStart || d > monthEnd) return;
-                  if (completedThisMonth.has(loan.id)) return;
-                  const p = safeAllProfiles.find(pp => pp.user_id === loan.lender_id);
-                  const name = p?.full_name?.split(' ')[0] || p?.username || 'Lender';
-                  cashLines.push({ id: `sched-out-${loan.id}`, label: `To ${name}`, amount: -(loan.payment_amount || 0), date: d, status: 'scheduled' });
-                });
-
-                // 3. Overdue payments (next_payment_date before today, not completed)
-                lentLoans.forEach(loan => {
-                  if (!loan.next_payment_date) return;
-                  const d = toLocalDate(loan.next_payment_date);
-                  if (d >= monthStart) return; // covered above or future
-                  if (completedThisMonth.has(loan.id)) return;
-                  const p = safeAllProfiles.find(pp => pp.user_id === loan.borrower_id);
-                  const name = p?.full_name?.split(' ')[0] || p?.username || 'Borrower';
-                  cashLines.push({ id: `overdue-in-${loan.id}`, label: `From ${name}`, amount: loan.payment_amount || 0, date: d, status: 'overdue' });
-                });
-                borrowedLoans.forEach(loan => {
-                  if (!loan.next_payment_date) return;
-                  const d = toLocalDate(loan.next_payment_date);
-                  if (d >= monthStart) return;
-                  if (completedThisMonth.has(loan.id)) return;
-                  const p = safeAllProfiles.find(pp => pp.user_id === loan.lender_id);
-                  const name = p?.full_name?.split(' ')[0] || p?.username || 'Lender';
-                  cashLines.push({ id: `overdue-out-${loan.id}`, label: `To ${name}`, amount: -(loan.payment_amount || 0), date: d, status: 'overdue' });
-                });
-
-                cashLines.sort((a, b) => (a.date || new Date(0)) - (b.date || new Date(0)));
-                const allLines = [...cashLines, ...customExpenses.map(e => ({ ...e, date: e.date ? toLocalDate(e.date) : null, status: e.status || 'custom' }))];
-                const total = allLines.reduce((s, l) => s + l.amount, 0);
-                return (
-                  <div style={{ background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.82)', boxShadow: '0 4px 20px rgba(0,0,0,0.08), inset 0 0 60px rgba(3,172,234,0.07)', padding: '14px 18px' }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif", marginBottom: 10 }}>Plan Your Month</div>
-                    {allLines.length === 0 ? (
-                      <div style={{ fontSize: 12, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", textAlign: 'center', padding: '8px 0' }}>No cashflow scheduled for {monthName} 🌿</div>
-                    ) : (
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        {allLines.map(line => {
-                          const isPos = line.amount >= 0;
-                          const isDone = line.status === 'done';
-                          const isOverdue = line.status === 'overdue';
-                          const dotColor = isDone ? '#03ACEA' : isOverdue ? '#E8726E' : isPos ? '#03ACEA' : '#1D5B94';
-                          return (
-                            <div key={line.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0' }}>
-                              {/* Status circle */}
-                              <div style={{ flexShrink: 0, width: 20, height: 20, borderRadius: '50%', background: isDone ? '#03ACEA' : `${dotColor}18`, border: `1.5px solid ${dotColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                {isDone
-                                  ? <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                                  : isOverdue
-                                    ? <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={dotColor} strokeWidth="3" strokeLinecap="round"><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                                    : null
-                                }
-                              </div>
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <span style={{ fontSize: 12, fontWeight: 500, color: isDone ? '#9B9A98' : '#1A1918', fontFamily: "'DM Sans', sans-serif", textDecoration: isDone ? 'line-through' : 'none', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{line.label}</span>
-                                {line.date && <span style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>{format(line.date, 'MMM d')}</span>}
-                              </div>
-                              <span style={{ fontSize: 12, fontWeight: 600, color: isPos ? '#03ACEA' : '#1D5B94', fontFamily: "'DM Sans', sans-serif", flexShrink: 0 }}>
-                                {isPos ? '+' : ''}{formatMoney(line.amount)}
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                    {/* Total row */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10, paddingTop: 8, borderTop: '1.5px solid rgba(0,0,0,0.08)' }}>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>Net this month</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: total >= 0 ? '#03ACEA' : '#1D5B94', fontFamily: "'DM Sans', sans-serif" }}>
-                        {total >= 0 ? '+' : ''}{formatMoney(total)}
-                      </span>
-                    </div>
-                    {/* Add expense form */}
-                    {addingExpense && (
-                      <form onSubmit={e => { e.preventDefault(); addCustomExpense(newExpenseLabel, newExpenseAmount, newExpenseDate, newExpenseDir); setNewExpenseLabel(''); setNewExpenseAmount(''); setNewExpenseDate(''); setNewExpenseDir('out'); setAddingExpense(false); }} style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 10 }}>
-                        {/* In / Out toggle */}
-                        <div style={{ display: 'flex', gap: 6 }}>
-                          {['in','out'].map(d => (
-                            <button key={d} type="button" onClick={() => setNewExpenseDir(d)}
-                              style={{ flex: 1, padding: '5px 0', borderRadius: 6, border: `1.5px solid ${newExpenseDir === d ? '#03ACEA' : '#D9D8D6'}`, background: newExpenseDir === d ? '#EBF4FA' : 'transparent', color: newExpenseDir === d ? '#03ACEA' : '#9B9A98', fontSize: 11, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", cursor: 'pointer' }}>
-                              {d === 'in' ? '+ Money in' : '− Money out'}
-                            </button>
-                          ))}
-                        </div>
-                        {/* Label + Amount */}
-                        <div style={{ display: 'flex', gap: 6 }}>
-                          <input autoFocus value={newExpenseLabel} onChange={e => setNewExpenseLabel(e.target.value)} onKeyDown={e => { if (e.key === 'Escape') setAddingExpense(false); }} placeholder="Label…" style={{ flex: 1, fontSize: 12, fontFamily: "'DM Sans', sans-serif", border: 'none', borderBottom: '1.5px solid #03ACEA', outline: 'none', background: 'transparent', color: '#1A1918', padding: '2px 0' }} />
-                          <input value={newExpenseAmount} onChange={e => setNewExpenseAmount(e.target.value)} placeholder="$0" type="number" min="0" step="0.01" style={{ width: 56, fontSize: 12, fontFamily: "'DM Sans', sans-serif", border: 'none', borderBottom: '1.5px solid #03ACEA', outline: 'none', background: 'transparent', color: '#1A1918', padding: '2px 0', textAlign: 'right' }} />
-                        </div>
-                        {/* Optional date */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <input value={newExpenseDate} onChange={e => setNewExpenseDate(e.target.value)} type="date" style={{ flex: 1, fontSize: 11, fontFamily: "'DM Sans', sans-serif", border: 'none', borderBottom: '1px solid #D9D8D6', outline: 'none', background: 'transparent', color: newExpenseDate ? '#1A1918' : '#9B9A98', padding: '2px 0' }} />
-                          <button type="submit" style={{ background: '#03ACEA', border: 'none', cursor: 'pointer', borderRadius: 6, padding: '4px 10px', color: '#fff', fontSize: 11, fontWeight: 600, fontFamily: "'DM Sans', sans-serif" }}>Add</button>
-                        </div>
-                      </form>
-                    )}
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
-                      <button type="button" onClick={() => { setAddingExpense(v => !v); setNewExpenseLabel(''); setNewExpenseAmount(''); setNewExpenseDate(''); setNewExpenseDir('out'); }} style={{ width: 26, height: 26, borderRadius: '50%', background: addingExpense ? '#EBF4FA' : '#F4F3F1', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} aria-label="Add expense">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={addingExpense ? '#03ACEA' : '#787776'} strokeWidth="2.8" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                      </button>
-                    </div>
-                  </div>
-                );
-              })()}
 
             </div>{/* end col 2 */}
 
