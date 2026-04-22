@@ -241,6 +241,25 @@ export default function NotificationsPopup({ onClose, positionOverride, onOpenFr
     </button>
   );
 
+  // ── Arrow chevron button ──────────────────────────────────────
+  const ArrowBtn = ({ onClick, disabled }) => (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        background: 'none', border: 'none', padding: '2px 0 2px 4px',
+        cursor: disabled ? 'default' : 'pointer',
+        color: disabled ? '#C7C6C4' : 'rgba(0,0,0,0.35)',
+        display: 'flex', alignItems: 'center', flexShrink: 0,
+      }}
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="9 18 15 12 9 6" />
+      </svg>
+    </button>
+  );
+
   // ── Build allItems ───────────────────────────────────────────
   const allItems = [];
   friendRequestsReceived.forEach(request => {
@@ -296,9 +315,6 @@ export default function NotificationsPopup({ onClose, positionOverride, onOpenFr
           </button>
         </div>
 
-        {/* Divider */}
-        <div style={{ height: 1, background: 'rgba(0,0,0,0.05)', flexShrink: 0 }} />
-
         {/* Content */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '10px 16px 14px' }}>
           {isLoading ? (
@@ -318,16 +334,20 @@ export default function NotificationsPopup({ onClose, positionOverride, onOpenFr
                 return (
                   <div key={reminder.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '7px 0' }}>
                     <TypeIcon type={reminder.type} />
-                    <span style={{ flex: 1, fontSize: 12, fontWeight: 500, color: '#787776', lineHeight: 1.4 }}>
+                    <span style={{ flex: 1, fontSize: 12, fontWeight: 500, color: '#1A1918', lineHeight: 1.4 }}>
                       {reminder.title}
                     </span>
-                    <Link
-                      to={createPageUrl('RecordPayment')}
-                      onClick={onClose}
-                      style={{ fontSize: 12, fontWeight: 600, color: isOverdue ? '#E8726E' : '#03ACEA', textDecoration: 'none', flexShrink: 0 }}
-                    >
-                      Record
-                    </Link>
+                    {isOverdue ? (
+                      <Link
+                        to={createPageUrl('RecordPayment')}
+                        onClick={onClose}
+                        style={{ fontSize: 12, fontWeight: 600, color: '#E8726E', textDecoration: 'none', flexShrink: 0 }}
+                      >
+                        Record
+                      </Link>
+                    ) : (
+                      <ArrowBtn onClick={() => { onClose(); navigate(createPageUrl('Upcoming')); }} />
+                    )}
                   </div>
                 );
               })}
@@ -336,50 +356,30 @@ export default function NotificationsPopup({ onClose, positionOverride, onOpenFr
               {allItems.map(item => (
                 <div key={item.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '7px 0' }}>
                   <TypeIcon type={item.type} />
-                  <span style={{ flex: 1, fontSize: 12, fontWeight: 500, color: '#787776', lineHeight: 1.4 }}>
+                  <span style={{ flex: 1, fontSize: 12, fontWeight: 500, color: '#1A1918', lineHeight: 1.4 }}>
                     {item.type === 'friend' && `${item.name} sent you a friend request`}
-                    {item.type === 'offer_received' && `${item.name} sent you a loan offer${item.purpose ? ` for ${item.purpose}` : ''}`}
+                    {item.type === 'offer_received' && `${item.name} sent you a loan offer`}
                     {item.type === 'payment_confirm' && `${item.name} paid you $${item.amount?.toFixed(2)}${item.paymentMethod ? ` via ${item.paymentMethod}` : ''}`}
                     {item.type === 'term_change' && `${item.name} sent you a loan change request`}
                   </span>
-                  <div style={{ display: 'flex', gap: 8, flexShrink: 0, alignItems: 'center' }}>
+                  <div style={{ display: 'flex', flexShrink: 0, alignItems: 'center' }}>
                     {item.type === 'friend' && (
-                      <ActionBtn
-                        label="View"
-                        onClick={() => {
-                          onClose();
-                          onOpenFriends?.();
-                        }}
-                      />
+                      <ArrowBtn onClick={() => { onClose(); onOpenFriends?.(); }} />
                     )}
                     {item.type === 'offer_received' && (
-                      <ActionBtn
-                        label="View offer"
+                      <ArrowBtn
                         disabled={processingId === item.data.id}
-                        onClick={() => {
-                          setSelectedOffer(item.data);
-                          setShowSignatureModal(true);
-                        }}
+                        onClick={() => { setSelectedOffer(item.data); setShowSignatureModal(true); }}
                       />
                     )}
                     {item.type === 'payment_confirm' && (
-                      <>
-                        <ActionBtn
-                          label="Confirm"
-                          color="#16A34A"
-                          disabled={processingId === item.data.id}
-                          onClick={() => handleConfirmPayment(item.data)}
-                        />
-                        <ActionBtn
-                          label="Reject"
-                          color="#E8726E"
-                          disabled={processingId === item.data.id}
-                          onClick={() => setConfirmingDeny(item.data)}
-                        />
-                      </>
+                      <ArrowBtn
+                        disabled={processingId === item.data.id}
+                        onClick={() => { onClose(); navigate(createPageUrl('RecordPayment')); }}
+                      />
                     )}
                     {item.type === 'term_change' && (
-                      <ActionBtn label="View" onClick={() => { onClose(); navigate(createPageUrl('Home')); }} />
+                      <ArrowBtn onClick={() => { onClose(); navigate(createPageUrl('LendingBorrowing')); }} />
                     )}
                   </div>
                 </div>
