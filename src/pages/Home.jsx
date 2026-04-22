@@ -1976,69 +1976,49 @@ export default function Home() {
             {/* Col 2: April at a Glance + What needs your attention + Pending */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
-              {/* What needs your attention */}
+              {/* What needs your attention — max 3 consolidated items */}
               {(() => {
                 const attentionItems = [];
+                // 1. Overdue payments (yours)
                 if (overdueYouOwe.length === 1) {
                   attentionItems.push({ type: 'overdue', text: 'You have an overdue payment' });
                 } else if (overdueYouOwe.length > 1) {
                   attentionItems.push({ type: 'overdue', text: `You have ${overdueYouOwe.length} overdue payments` });
                 }
-                overdueOwedToYou.forEach(loan => {
-                  const prof = safeAllProfiles.find(p => p.user_id === loan.borrower_id);
-                  const name = prof?.full_name?.split(' ')[0] || 'Someone';
-                  attentionItems.push({ type: 'overdue_incoming', text: `${name}'s payment to you is overdue` });
-                });
+                // 2. Next upcoming payment due
                 if (upcomingEvents.length > 0) {
                   const s = upcomingEvents[0];
                   const dText = s.days === 0 ? 'today' : `in ${s.days} day${s.days === 1 ? '' : 's'}`;
                   attentionItems.push({ type: 'due', text: `You have a payment due ${dText}` });
                 }
-                // Pending loan offers (lender sent you an offer)
-                pendingOffers.forEach(loan => {
-                  const lenderProf = safeAllProfiles.find(p => p.user_id === loan.lender_id);
-                  const lName = lenderProf?.full_name?.split(' ')[0] || lenderProf?.username || 'Someone';
-                  attentionItems.push({ type: 'loan_offer', text: `${lName} sent a loan offer`, loan, lenderProf });
-                });
-                // Friend requests
-                friendRequestsInbox.forEach(req => {
-                  const prof = safeAllProfiles.find(p => p.user_id === req.user_id);
-                  const fName = prof?.full_name?.split(' ')[0] || prof?.username || 'Someone';
-                  attentionItems.push({ type: 'friend_request', text: `${fName} sent a friend request` });
-                });
-                // Payments waiting for your confirmation
-                paymentsToConfirm.forEach(payment => {
-                  const loan = myLoans.find(l => l.id === payment.loan_id);
-                  const recordedByProf = safeAllProfiles.find(p => p.user_id === payment.recorded_by);
-                  const rName = recordedByProf?.full_name?.split(' ')[0] || recordedByProf?.username || 'Someone';
-                  attentionItems.push({ type: 'payment_confirm', text: `Confirm ${rName}'s payment`, payment, loan, profile: recordedByProf });
-                });
-                const items = attentionItems.slice(0, 6);
+                // 3. Loan offers — consolidated
+                if (pendingOffers.length === 1) {
+                  const lenderProf = safeAllProfiles.find(p => p.user_id === pendingOffers[0].lender_id);
+                  attentionItems.push({ type: 'loan_offer', text: 'You have a new loan offer to review', loan: pendingOffers[0], lenderProf });
+                } else if (pendingOffers.length > 1) {
+                  attentionItems.push({ type: 'loan_offer', text: `You have ${pendingOffers.length} new loan offers to review` });
+                }
 
                 const AIcon = ({ type }) => {
-                  const red = '#E8726E', blue = '#03ACEA', green = '#16A34A', amber = '#D97706';
+                  const red = '#E8726E', blue = '#03ACEA';
                   if (type === 'overdue') return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={red} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:2}}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>;
-                  if (type === 'overdue_incoming') return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={amber} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:2}}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>;
                   if (type === 'due') return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={blue} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:2}}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>;
                   if (type === 'loan_offer') return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={blue} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:2}}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>;
-                  if (type === 'friend_request') return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={blue} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:2}}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
-                  if (type === 'payment_confirm') return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={green} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:2}}><polyline points="20 6 9 17 4 12"/></svg>;
-                  return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={blue} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:2}}><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>;
+                  return null;
                 };
 
                 return (
-                  <div className="home-card-attention" style={{ position: 'relative' }}>                    <div style={{ position: 'relative', zIndex: 1, background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.82)', boxShadow: '0 4px 20px rgba(0,0,0,0.08), inset 0 0 60px rgba(3,172,234,0.07)', padding: '14px 18px' }}>
+                  <div className="home-card-attention" style={{ position: 'relative' }}>
+                    <div style={{ position: 'relative', zIndex: 1, background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.82)', boxShadow: '0 4px 20px rgba(0,0,0,0.08), inset 0 0 60px rgba(3,172,234,0.07)', padding: '14px 18px' }}>
                       <SectionHeader title="What needs your attention" />
-                      {items.length === 0 ? (
+                      {attentionItems.length === 0 ? (
                         <p style={{ fontSize: 12, color: '#C5C3C0', margin: 0, lineHeight: 1.45 }}>All clear, your inbox is empty 🎉</p>
                       ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                          {items.map((item, i) => {
+                          {attentionItems.map((item, i) => {
                             const arrowAction = (() => {
                               if (item.type === 'overdue' || item.type === 'due') return () => navigate(createPageUrl('RecordPayment'));
-                              if (item.type === 'loan_offer') return () => setReviewOfferTarget({ loan: item.loan, lenderProf: item.lenderProf });
-                              if (item.type === 'friend_request') return () => window.dispatchEvent(new CustomEvent('open-friends-popup', { detail: { initialRequestsOpen: true } }));
-                              if (item.type === 'payment_confirm') return () => setConfirmPaymentTarget({ payment: item.payment, loan: item.loan, profile: item.profile });
+                              if (item.type === 'loan_offer' && item.loan) return () => setReviewOfferTarget({ loan: item.loan, lenderProf: item.lenderProf });
                               return null;
                             })();
                             return (
@@ -2046,21 +2026,12 @@ export default function Home() {
                                 <AIcon type={item.type} />
                                 <span style={{ flex: 1, fontSize: 12, fontWeight: 500, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4 }}>{item.text}</span>
                                 {arrowAction && (
-                                  <button
-                                    type="button"
-                                    onClick={arrowAction}
-                                    aria-label="Open"
-                                    style={{
-                                      flexShrink: 0, background: 'transparent', border: 'none', padding: 0,
-                                      cursor: 'pointer', display: 'inline-flex', alignItems: 'center',
-                                      color: '#9B9A98', marginTop: 1,
-                                    }}
+                                  <button type="button" onClick={arrowAction} aria-label="Open"
+                                    style={{ flexShrink: 0, background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', color: '#9B9A98', marginTop: 1 }}
                                     onMouseEnter={e => e.currentTarget.style.color = '#03ACEA'}
                                     onMouseLeave={e => e.currentTarget.style.color = '#9B9A98'}
                                   >
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                      <polyline points="9 18 15 12 9 6" />
-                                    </svg>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
                                   </button>
                                 )}
                               </div>
@@ -2072,45 +2043,6 @@ export default function Home() {
                   </div>
                 );
               })()}
-
-              {/* Monthly received / paid boxes */}
-              {(monthlyExpectedReceive > 0 || monthlyExpectedPay > 0) && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                  {/* You've received */}
-                  {monthlyExpectedReceive > 0 && (
-                    <div style={{ background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.82)', boxShadow: '0 4px 20px rgba(0,0,0,0.08), inset 0 0 60px rgba(3,172,234,0.07)', padding: '12px 14px' }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: '#03ACEA', fontFamily: "'DM Sans', sans-serif", marginBottom: 4 }}>
-                        {formatMoney(monthlyReceived)}
-                      </div>
-                      <div style={{ fontSize: 11, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4 }}>
-                        You've received this month
-                      </div>
-                      <div style={{ fontSize: 11, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", marginTop: 3 }}>
-                        of {formatMoney(monthlyExpectedReceive)} expected for {format(today, 'MMMM')}
-                      </div>
-                    </div>
-                  )}
-                  {/* You've paid */}
-                  {monthlyExpectedPay > 0 && (
-                    <div style={{ background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.82)', boxShadow: '0 4px 20px rgba(0,0,0,0.08), inset 0 0 60px rgba(3,172,234,0.07)', padding: '12px 14px' }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: '#1D5B94', fontFamily: "'DM Sans', sans-serif", marginBottom: 4 }}>
-                        {formatMoney(monthlyPaidOut)}
-                      </div>
-                      <div style={{ fontSize: 11, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4 }}>
-                        You've paid this month
-                      </div>
-                      <div style={{ fontSize: 11, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", marginTop: 3 }}>
-                        of {formatMoney(monthlyExpectedPay)} due in {format(today, 'MMMM')}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-            </div>{/* end col 2 */}
-
-            {/* Col 3: To Do This Week + combined Lending/Borrowing card */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
               {/* To Do This Week */}
               {(() => {
@@ -2156,7 +2088,8 @@ export default function Home() {
                 const allTasks = [...tasks, ...customTasks];
                 const sortedTasks = [...allTasks].sort((a, b) => Number(checkedTasks.has(a.id)) - Number(checkedTasks.has(b.id)));
                 return (
-                  <div className="home-card-tasks" style={{ position: 'relative' }}>                    <div style={{ position: 'relative', zIndex: 1, background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.82)', boxShadow: '0 4px 20px rgba(0,0,0,0.08), inset 0 0 60px rgba(3,172,234,0.07)', padding: '14px 18px' }}>
+                  <div className="home-card-tasks" style={{ position: 'relative' }}>
+                    <div style={{ position: 'relative', zIndex: 1, background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.82)', boxShadow: '0 4px 20px rgba(0,0,0,0.08), inset 0 0 60px rgba(3,172,234,0.07)', padding: '14px 18px' }}>
                       <SectionHeader title="To Do This Week" />
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, marginTop: 2, marginBottom: 10 }}>
                         {days.map((d, i) => {
@@ -2202,6 +2135,31 @@ export default function Home() {
                   </div>
                 );
               })()}
+
+            </div>{/* end col 2 */}
+
+            {/* Col 3: Monthly Summary + Your Loans */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+
+              {/* Monthly received / paid boxes — stacked full width */}
+              {(monthlyExpectedReceive > 0 || monthlyExpectedPay > 0) && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {monthlyExpectedReceive > 0 && (
+                    <div style={{ background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.82)', boxShadow: '0 4px 20px rgba(0,0,0,0.08), inset 0 0 60px rgba(3,172,234,0.07)', padding: '12px 14px' }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#03ACEA', fontFamily: "'DM Sans', sans-serif", marginBottom: 4 }}>{formatMoney(monthlyReceived)}</div>
+                      <div style={{ fontSize: 11, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4 }}>You've received this month</div>
+                      <div style={{ fontSize: 11, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", marginTop: 3 }}>of {formatMoney(monthlyExpectedReceive)} expected for {format(today, 'MMMM')}</div>
+                    </div>
+                  )}
+                  {monthlyExpectedPay > 0 && (
+                    <div style={{ background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.82)', boxShadow: '0 4px 20px rgba(0,0,0,0.08), inset 0 0 60px rgba(3,172,234,0.07)', padding: '12px 14px' }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#1D5B94', fontFamily: "'DM Sans', sans-serif", marginBottom: 4 }}>{formatMoney(monthlyPaidOut)}</div>
+                      <div style={{ fontSize: 11, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4 }}>You've paid this month</div>
+                      <div style={{ fontSize: 11, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", marginTop: 3 }}>of {formatMoney(monthlyExpectedPay)} due in {format(today, 'MMMM')}</div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Your Loans — lending + borrowing merged into one card */}
               {(() => {
