@@ -1929,6 +1929,141 @@ export default function Home() {
                 );
               })()}
 
+              {/* ── Plan Your Month ── */}
+              {(() => {
+                const monthStart = startOfMonth(today);
+                const monthEnd = endOfMonth(today);
+                const monthName = format(today, 'MMMM');
+                const cashLines = [];
+                safePayments.forEach(p => {
+                  if (!p || p.status !== 'completed') return;
+                  const d = p.payment_date ? toLocalDate(p.payment_date) : new Date(p.created_at);
+                  if (d < monthStart || d > monthEnd) return;
+                  const loan = myLoans.find(l => l.id === p.loan_id);
+                  if (!loan) return;
+                  const isLender = loan.lender_id === user.id;
+                  const otherId = isLender ? loan.borrower_id : loan.lender_id;
+                  const prof = safeAllProfiles.find(pp => pp.user_id === otherId);
+                  const name = prof?.full_name?.split(' ')[0] || prof?.username || (isLender ? 'Borrower' : 'Lender');
+                  cashLines.push({ id: `paid-${p.id}`, label: isLender ? `From ${name}` : `To ${name}`, amount: isLender ? (p.amount || 0) : -(p.amount || 0), date: d, status: 'done' });
+                });
+                const completedThisMonth = new Set(safePayments.filter(p => {
+                  if (!p || p.status !== 'completed') return false;
+                  const d = p.payment_date ? toLocalDate(p.payment_date) : new Date(p.created_at);
+                  return d >= monthStart && d <= monthEnd;
+                }).map(p => p.loan_id));
+                lentLoans.forEach(loan => {
+                  if (!loan.next_payment_date) return;
+                  const d = toLocalDate(loan.next_payment_date);
+                  if (d < monthStart || d > monthEnd) return;
+                  if (completedThisMonth.has(loan.id)) return;
+                  const p = safeAllProfiles.find(pp => pp.user_id === loan.borrower_id);
+                  const name = p?.full_name?.split(' ')[0] || p?.username || 'Borrower';
+                  cashLines.push({ id: `sched-in-${loan.id}`, label: `From ${name}`, amount: loan.payment_amount || 0, date: d, status: 'scheduled' });
+                });
+                borrowedLoans.forEach(loan => {
+                  if (!loan.next_payment_date) return;
+                  const d = toLocalDate(loan.next_payment_date);
+                  if (d < monthStart || d > monthEnd) return;
+                  if (completedThisMonth.has(loan.id)) return;
+                  const p = safeAllProfiles.find(pp => pp.user_id === loan.lender_id);
+                  const name = p?.full_name?.split(' ')[0] || p?.username || 'Lender';
+                  cashLines.push({ id: `sched-out-${loan.id}`, label: `To ${name}`, amount: -(loan.payment_amount || 0), date: d, status: 'scheduled' });
+                });
+                lentLoans.forEach(loan => {
+                  if (!loan.next_payment_date) return;
+                  const d = toLocalDate(loan.next_payment_date);
+                  if (d >= monthStart) return;
+                  if (completedThisMonth.has(loan.id)) return;
+                  const p = safeAllProfiles.find(pp => pp.user_id === loan.borrower_id);
+                  const name = p?.full_name?.split(' ')[0] || p?.username || 'Borrower';
+                  cashLines.push({ id: `overdue-in-${loan.id}`, label: `From ${name}`, amount: loan.payment_amount || 0, date: d, status: 'overdue' });
+                });
+                borrowedLoans.forEach(loan => {
+                  if (!loan.next_payment_date) return;
+                  const d = toLocalDate(loan.next_payment_date);
+                  if (d >= monthStart) return;
+                  if (completedThisMonth.has(loan.id)) return;
+                  const p = safeAllProfiles.find(pp => pp.user_id === loan.lender_id);
+                  const name = p?.full_name?.split(' ')[0] || p?.username || 'Lender';
+                  cashLines.push({ id: `overdue-out-${loan.id}`, label: `To ${name}`, amount: -(loan.payment_amount || 0), date: d, status: 'overdue' });
+                });
+                cashLines.sort((a, b) => (a.date || new Date(0)) - (b.date || new Date(0)));
+                const allLines = [...cashLines, ...customExpenses.map(e => ({ ...e, date: e.date ? toLocalDate(e.date) : null, status: e.status || 'custom' }))];
+                const total = allLines.reduce((s, l) => s + l.amount, 0);
+                return (
+                  <div style={{ background: '#F2F8FD', borderRadius: '6px 10px 10px 6px', borderLeft: '4px solid #03ACEA', boxShadow: '0 2px 14px rgba(3,172,234,0.10), 0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+                    {/* Header */}
+                    <div style={{ padding: '12px 16px 8px', borderBottom: '1px solid rgba(3,172,234,0.12)' }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Plan Your Month</div>
+                      <div style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", marginTop: 1 }}>{monthName} cashflow</div>
+                    </div>
+                    {/* Line items */}
+                    <div style={{ padding: '4px 0' }}>
+                      {allLines.length === 0 ? (
+                        <div style={{ fontSize: 12, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", textAlign: 'center', padding: '10px 16px' }}>No cashflow scheduled 🌿</div>
+                      ) : allLines.map((line, idx) => {
+                        const isPos = line.amount >= 0;
+                        const isDone = line.status === 'done';
+                        const isOverdue = line.status === 'overdue';
+                        const dotColor = isDone ? '#03ACEA' : isOverdue ? '#E8726E' : isPos ? '#03ACEA' : '#1D5B94';
+                        return (
+                          <div key={line.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 16px', background: idx % 2 === 1 ? 'rgba(3,172,234,0.04)' : 'transparent' }}>
+                            <div style={{ flexShrink: 0, width: 18, height: 18, borderRadius: '50%', background: isDone ? '#03ACEA' : `${dotColor}18`, border: `1.5px solid ${dotColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              {isDone
+                                ? <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                : isOverdue
+                                  ? <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke={dotColor} strokeWidth="3" strokeLinecap="round"><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                  : null
+                              }
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <span style={{ fontSize: 12, fontWeight: 500, color: isDone ? '#9B9A98' : '#1A1918', fontFamily: "'DM Sans', sans-serif", textDecoration: isDone ? 'line-through' : 'none', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{line.label}</span>
+                              {line.date && <span style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>{format(line.date, 'MMM d')}</span>}
+                            </div>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: isPos ? '#03ACEA' : '#1D5B94', fontFamily: "'DM Sans', sans-serif", flexShrink: 0 }}>
+                              {isPos ? '+' : ''}{formatMoney(line.amount)}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {/* Net total */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', borderTop: '1px solid rgba(3,172,234,0.14)', background: 'rgba(3,172,234,0.06)' }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>Net {monthName}</span>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: total >= 0 ? '#03ACEA' : '#1D5B94', fontFamily: "'DM Sans', sans-serif" }}>{total >= 0 ? '+' : ''}{formatMoney(total)}</span>
+                    </div>
+                    {/* Add expense form */}
+                    {addingExpense && (
+                      <form onSubmit={e => { e.preventDefault(); addCustomExpense(newExpenseLabel, newExpenseAmount, newExpenseDate, newExpenseDir); setNewExpenseLabel(''); setNewExpenseAmount(''); setNewExpenseDate(''); setNewExpenseDir('out'); setAddingExpense(false); }} style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '10px 16px', borderTop: '1px solid rgba(3,172,234,0.12)' }}>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          {['in','out'].map(d => (
+                            <button key={d} type="button" onClick={() => setNewExpenseDir(d)}
+                              style={{ flex: 1, padding: '5px 0', borderRadius: 6, border: `1.5px solid ${newExpenseDir === d ? '#03ACEA' : '#D9D8D6'}`, background: newExpenseDir === d ? '#EBF4FA' : 'transparent', color: newExpenseDir === d ? '#03ACEA' : '#9B9A98', fontSize: 11, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", cursor: 'pointer' }}>
+                              {d === 'in' ? '+ Money in' : '− Money out'}
+                            </button>
+                          ))}
+                        </div>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <input autoFocus value={newExpenseLabel} onChange={e => setNewExpenseLabel(e.target.value)} onKeyDown={e => { if (e.key === 'Escape') setAddingExpense(false); }} placeholder="Label…" style={{ flex: 1, fontSize: 12, fontFamily: "'DM Sans', sans-serif", border: 'none', borderBottom: '1.5px solid #03ACEA', outline: 'none', background: 'transparent', color: '#1A1918', padding: '2px 0' }} />
+                          <input value={newExpenseAmount} onChange={e => setNewExpenseAmount(e.target.value)} placeholder="$0" type="number" min="0" step="0.01" style={{ width: 56, fontSize: 12, fontFamily: "'DM Sans', sans-serif", border: 'none', borderBottom: '1.5px solid #03ACEA', outline: 'none', background: 'transparent', color: '#1A1918', padding: '2px 0', textAlign: 'right' }} />
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <input value={newExpenseDate} onChange={e => setNewExpenseDate(e.target.value)} type="date" style={{ flex: 1, fontSize: 11, fontFamily: "'DM Sans', sans-serif", border: 'none', borderBottom: '1px solid #D9D8D6', outline: 'none', background: 'transparent', color: newExpenseDate ? '#1A1918' : '#9B9A98', padding: '2px 0' }} />
+                          <button type="submit" style={{ background: '#03ACEA', border: 'none', cursor: 'pointer', borderRadius: 6, padding: '4px 10px', color: '#fff', fontSize: 11, fontWeight: 600, fontFamily: "'DM Sans', sans-serif" }}>Add</button>
+                        </div>
+                      </form>
+                    )}
+                    {/* Add button */}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '6px 16px 10px' }}>
+                      <button type="button" onClick={() => { setAddingExpense(v => !v); setNewExpenseLabel(''); setNewExpenseAmount(''); setNewExpenseDate(''); setNewExpenseDir('out'); }} style={{ width: 26, height: 26, borderRadius: '50%', background: addingExpense ? '#EBF4FA' : 'rgba(3,172,234,0.08)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} aria-label="Add expense">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={addingExpense ? '#03ACEA' : '#787776'} strokeWidth="2.8" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* ── People Bubble ── */}
               {(() => {
   // Count interactions (payments) per partner
