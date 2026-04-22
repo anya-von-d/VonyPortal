@@ -1965,11 +1965,10 @@ export default function Home() {
                     style={{
                       position: 'absolute',
                       top: '50%', transform: 'translateY(-50%)',
-                      [dir === 'left' ? 'left' : 'right']: -22,
-                      width: 24, height: 24, borderRadius: '50%',
-                      background: 'rgba(255,255,255,0.9)',
-                      border: '1px solid rgba(0,0,0,0.09)',
-                      boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+                      [dir === 'left' ? 'left' : 'right']: -13,
+                      width: 26, height: 26, borderRadius: '50%',
+                      background: '#F4F3F1',
+                      border: 'none',
                       cursor: 'pointer',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       zIndex: 2,
@@ -1979,7 +1978,7 @@ export default function Home() {
                     }}
                     aria-label={dir === 'left' ? 'Your Lending' : 'Your Borrowing'}
                   >
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1A1918" strokeWidth="2.5" strokeLinecap="round">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#787776" strokeWidth="2.5" strokeLinecap="round">
                       {dir === 'left'
                         ? <polyline points="15 18 9 12 15 6" />
                         : <polyline points="9 18 15 12 9 6" />}
@@ -1988,19 +1987,24 @@ export default function Home() {
                 );
                 return (
                   <div style={{ position: 'relative' }}>
+                    <style>{`
+                      @keyframes lbStatusA {
+                        0%, 38% { opacity: 1; }
+                        46%, 88% { opacity: 0; }
+                        96%, 100% { opacity: 1; }
+                      }
+                      @keyframes lbStatusB {
+                        0%, 38% { opacity: 0; }
+                        46%, 88% { opacity: 1; }
+                        96%, 100% { opacity: 0; }
+                      }
+                    `}</style>
                     {arrowBtn('left')}
                     {arrowBtn('right')}
                     <div className="home-card-lending-loans" style={{ position: 'relative' }}>
                       <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
                       <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '14px 18px' }}>
                         <SectionHeader title={title} linkTo={tabLink} linkLabel="View all →" />
-                        {/* Tab dots */}
-                        <div style={{ display: 'flex', gap: 4, marginBottom: 10 }}>
-                          {['lending', 'borrowing'].map(t => (
-                            <button key={t} type="button" onClick={() => setLbTab(t)}
-                              style={{ width: 6, height: 6, borderRadius: '50%', border: 'none', cursor: 'pointer', padding: 0, background: lbTab === t ? '#1A1918' : '#D9D8D6', transition: 'background 0.15s' }} />
-                          ))}
-                        </div>
                         {loans.length === 0 ? (
                           <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>{emptyMsg}</div>
                         ) : (
@@ -2017,6 +2021,7 @@ export default function Home() {
                               const statusLabel = isBehind ? `${formatMoney(behindAmt)} ${isLending ? 'behind' : 'overdue'}` : 'On track';
                               const statusColor = isBehind ? '#E8726E' : '#03ACEA';
                               const statusBg = isBehind ? 'rgba(232,114,110,0.08)' : 'rgba(3,172,234,0.10)';
+                              const pctRepaid = total > 0 ? Math.round(((loan.amount_paid || 0) / total) * 100) : 0;
                               const subLine = isLending
                                 ? `Borrowed ${formatMoney(total)} from you${loan.purpose ? ` for ${loan.purpose}` : ''}`
                                 : `Lent you ${formatMoney(total)}${loan.purpose ? ` for ${loan.purpose}` : ''}`;
@@ -2024,7 +2029,11 @@ export default function Home() {
                                 <div key={loan.id} style={{ padding: '9px 0' }}>
                                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
                                     <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
-                                    <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, color: statusColor, background: statusBg, borderRadius: 5, padding: '2px 6px', lineHeight: 1.2 }}>{statusLabel}</span>
+                                    {/* Cycling badge: status ↔ % repaid */}
+                                    <span style={{ flexShrink: 0, position: 'relative', display: 'inline-block', width: 72, height: 18 }}>
+                                      <span style={{ position: 'absolute', inset: 0, fontSize: 10, fontWeight: 700, color: statusColor, background: statusBg, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'lbStatusA 4s ease-in-out infinite', lineHeight: 1 }}>{statusLabel}</span>
+                                      <span style={{ position: 'absolute', inset: 0, fontSize: 10, fontWeight: 700, color: '#9B9A98', background: 'rgba(0,0,0,0.04)', borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'lbStatusB 4s ease-in-out infinite', lineHeight: 1 }}>{pctRepaid}% repaid</span>
+                                    </span>
                                   </div>
                                   <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{subLine}</div>
                                 </div>
