@@ -1992,50 +1992,79 @@ export default function Home() {
                 const allLines = [...cashLines, ...customExpenses.map(e => ({ ...e, date: e.date ? toLocalDate(e.date) : null, status: e.status || 'custom' }))];
                 const total = allLines.reduce((s, l) => s + l.amount, 0);
                 return (
-                  <div style={{ background: '#F2F8FD', borderRadius: '6px 10px 10px 6px', borderLeft: '4px solid #03ACEA', boxShadow: '0 2px 14px rgba(3,172,234,0.10), 0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
-                    {/* Header */}
-                    <div style={{ padding: '12px 16px 8px', borderBottom: '1px solid rgba(3,172,234,0.12)' }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Plan Your Month</div>
-                      <div style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", marginTop: 1 }}>{monthName} cashflow</div>
+                  <div style={{ background: '#ffffff', borderRadius: 10, boxShadow: '2px 5px 16px rgba(0,0,0,0.13), 0 1px 3px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
+
+                    {/* ── Toolbar strip ── */}
+                    <div style={{ background: '#03ACEA', padding: '9px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                        <span style={{ fontSize: 13 }}>📊</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: '#ffffff', fontFamily: "'DM Sans', sans-serif", letterSpacing: '-0.01em' }}>Plan Your Month</span>
+                      </div>
+                      <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.9)', fontFamily: "'DM Sans', sans-serif", background: 'rgba(255,255,255,0.2)', borderRadius: 4, padding: '2px 8px' }}>{monthName}</span>
                     </div>
-                    {/* Line items */}
-                    <div style={{ padding: '4px 0' }}>
-                      {allLines.length === 0 ? (
-                        <div style={{ fontSize: 12, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", textAlign: 'center', padding: '10px 16px' }}>No cashflow scheduled 🌿</div>
-                      ) : allLines.map((line, idx) => {
-                        const isPos = line.amount >= 0;
-                        const isDone = line.status === 'done';
-                        const isOverdue = line.status === 'overdue';
-                        const dotColor = isDone ? '#03ACEA' : isOverdue ? '#E8726E' : isPos ? '#03ACEA' : '#1D5B94';
-                        return (
-                          <div key={line.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 16px', background: idx % 2 === 1 ? 'rgba(3,172,234,0.04)' : 'transparent' }}>
-                            <div style={{ flexShrink: 0, width: 18, height: 18, borderRadius: '50%', background: isDone ? '#03ACEA' : `${dotColor}18`, border: `1.5px solid ${dotColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+
+                    {/* ── Column headers ── */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '28px 1fr 46px 66px', background: '#E4F4FC', borderBottom: '2px solid rgba(3,172,234,0.18)' }}>
+                      <div />
+                      <div style={{ padding: '5px 8px', fontSize: 9, fontWeight: 700, color: '#3A8DB5', fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.07em', textTransform: 'uppercase' }}>Description</div>
+                      <div style={{ padding: '5px 6px', fontSize: 9, fontWeight: 700, color: '#3A8DB5', fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.07em', textTransform: 'uppercase', borderLeft: '1px solid rgba(3,172,234,0.18)' }}>Date</div>
+                      <div style={{ padding: '5px 10px 5px 6px', fontSize: 9, fontWeight: 700, color: '#3A8DB5', fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.07em', textTransform: 'uppercase', textAlign: 'right', borderLeft: '1px solid rgba(3,172,234,0.18)' }}>Amount</div>
+                    </div>
+
+                    {/* ── Data rows ── */}
+                    {allLines.length === 0 ? (
+                      <div style={{ fontSize: 12, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", textAlign: 'center', padding: '14px 16px' }}>No cashflow scheduled 🌿</div>
+                    ) : allLines.map((line, idx) => {
+                      const isPos = line.amount >= 0;
+                      const isDone = line.status === 'done';
+                      const isOverdue = line.status === 'overdue';
+                      const dotColor = isDone ? '#03ACEA' : isOverdue ? '#E8726E' : isPos ? '#03ACEA' : '#1D5B94';
+                      return (
+                        <div key={line.id} style={{ display: 'grid', gridTemplateColumns: '28px 1fr 46px 66px', background: idx % 2 === 1 ? 'rgba(3,172,234,0.03)' : '#ffffff', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+                          {/* Status dot */}
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px 0' }}>
+                            <div style={{ width: 14, height: 14, borderRadius: '50%', background: isDone ? '#03ACEA' : `${dotColor}20`, border: `1.5px solid ${dotColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                               {isDone
-                                ? <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                ? <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                 : isOverdue
-                                  ? <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke={dotColor} strokeWidth="3" strokeLinecap="round"><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                  ? <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke={dotColor} strokeWidth="3" strokeLinecap="round"><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                                   : null
                               }
                             </div>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <span style={{ fontSize: 12, fontWeight: 500, color: isDone ? '#9B9A98' : '#1A1918', fontFamily: "'DM Sans', sans-serif", textDecoration: isDone ? 'line-through' : 'none', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{line.label}</span>
-                              {line.date && <span style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>{format(line.date, 'MMM d')}</span>}
-                            </div>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: isPos ? '#03ACEA' : '#1D5B94', fontFamily: "'DM Sans', sans-serif", flexShrink: 0 }}>
-                              {isPos ? '+' : ''}{formatMoney(line.amount)}
-                            </span>
                           </div>
-                        );
-                      })}
+                          {/* Label */}
+                          <div style={{ padding: '8px 6px 8px 8px', borderLeft: '1px solid rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', minWidth: 0 }}>
+                            <span style={{ fontSize: 11, fontWeight: 500, color: isDone ? '#B0AEA8' : '#1A1918', fontFamily: "'DM Sans', sans-serif", textDecoration: isDone ? 'line-through' : 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{line.label}</span>
+                          </div>
+                          {/* Date */}
+                          <div style={{ padding: '8px 5px', borderLeft: '1px solid rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center' }}>
+                            <span style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>{line.date ? format(line.date, 'MMM d') : '—'}</span>
+                          </div>
+                          {/* Amount */}
+                          <div style={{ padding: '8px 10px 8px 5px', borderLeft: '1px solid rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: isPos ? '#03ACEA' : '#1D5B94', fontFamily: "'DM Sans', sans-serif" }}>{isPos ? '+' : ''}{formatMoney(line.amount)}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    {/* ── Σ Total row ── */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '28px 1fr 46px 66px', background: '#E4F4FC', borderTop: '2px solid rgba(3,172,234,0.18)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span style={{ fontSize: 12, color: '#3A8DB5', fontWeight: 700 }}>Σ</span>
+                      </div>
+                      <div style={{ padding: '8px 6px 8px 8px', display: 'flex', alignItems: 'center' }}>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>Net {monthName}</span>
+                      </div>
+                      <div />
+                      <div style={{ padding: '8px 10px 8px 5px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                        <span style={{ fontSize: 12, fontWeight: 800, color: total >= 0 ? '#03ACEA' : '#1D5B94', fontFamily: "'DM Sans', sans-serif" }}>{total >= 0 ? '+' : ''}{formatMoney(total)}</span>
+                      </div>
                     </div>
-                    {/* Net total */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', borderTop: '1px solid rgba(3,172,234,0.14)', background: 'rgba(3,172,234,0.06)' }}>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>Net {monthName}</span>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: total >= 0 ? '#03ACEA' : '#1D5B94', fontFamily: "'DM Sans', sans-serif" }}>{total >= 0 ? '+' : ''}{formatMoney(total)}</span>
-                    </div>
-                    {/* Add expense form */}
+
+                    {/* ── Add expense form ── */}
                     {addingExpense && (
-                      <form onSubmit={e => { e.preventDefault(); addCustomExpense(newExpenseLabel, newExpenseAmount, newExpenseDate, newExpenseDir); setNewExpenseLabel(''); setNewExpenseAmount(''); setNewExpenseDate(''); setNewExpenseDir('out'); setAddingExpense(false); }} style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '10px 16px', borderTop: '1px solid rgba(3,172,234,0.12)' }}>
+                      <form onSubmit={e => { e.preventDefault(); addCustomExpense(newExpenseLabel, newExpenseAmount, newExpenseDate, newExpenseDir); setNewExpenseLabel(''); setNewExpenseAmount(''); setNewExpenseDate(''); setNewExpenseDir('out'); setAddingExpense(false); }} style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '10px 14px', borderTop: '1px solid rgba(3,172,234,0.12)', background: '#F8FCFE' }}>
                         <div style={{ display: 'flex', gap: 6 }}>
                           {['in','out'].map(d => (
                             <button key={d} type="button" onClick={() => setNewExpenseDir(d)}
@@ -2054,8 +2083,9 @@ export default function Home() {
                         </div>
                       </form>
                     )}
-                    {/* Add button */}
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '6px 16px 10px' }}>
+
+                    {/* ── Add button ── */}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '6px 10px 8px' }}>
                       <button type="button" onClick={() => { setAddingExpense(v => !v); setNewExpenseLabel(''); setNewExpenseAmount(''); setNewExpenseDate(''); setNewExpenseDir('out'); }} style={{ width: 26, height: 26, borderRadius: '50%', background: addingExpense ? '#EBF4FA' : 'rgba(3,172,234,0.08)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} aria-label="Add expense">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={addingExpense ? '#03ACEA' : '#787776'} strokeWidth="2.8" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                       </button>
