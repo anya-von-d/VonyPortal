@@ -543,7 +543,7 @@ function _noop() { // eslint-disable-line no-unused-vars
   };
 
   return (
-    <div ref={cardRef} style={{ position: 'relative', minWidth: 0 }} onClick={() => setHoveredPt(null)}>      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '14px 18px' }}>
+    <div ref={cardRef} style={{ position: 'relative', minWidth: 0 }} onClick={() => setHoveredPt(null)}>      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 0, padding: '14px 18px' }}>
 
         {/* ── Header row ── */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
@@ -1540,7 +1540,7 @@ export default function Home() {
           {/* New user onboarding — below greeting */}
           {!hasLoans && (
             <div style={{
-              marginBottom: 28, padding: '20px 22px', borderRadius: 10,
+              marginBottom: 28, padding: '20px 22px', borderRadius: 0,
               background: 'white',
               border: '1px solid rgba(0,0,0,0.07)',
               textAlign: 'center',
@@ -1557,7 +1557,7 @@ export default function Home() {
                   onClick={() => window.dispatchEvent(new CustomEvent('open-friends-popup'))}
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: 6,
-                    padding: '8px 14px', borderRadius: 10,
+                    padding: '8px 14px', borderRadius: 0,
                     background: '#03ACEA', color: 'white', textDecoration: 'none',
                     fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif",
                     border: 'none', cursor: 'pointer',
@@ -1569,7 +1569,7 @@ export default function Home() {
                   to={createPageUrl('CreateOffer')}
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: 6,
-                    padding: '8px 14px', borderRadius: 10,
+                    padding: '8px 14px', borderRadius: 0,
                     background: 'white', color: '#1A1918', textDecoration: 'none',
                     fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif",
                     border: '1px solid rgba(0,0,0,0.10)',
@@ -1583,7 +1583,7 @@ export default function Home() {
                   rel="noopener noreferrer"
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: 6,
-                    padding: '8px 14px', borderRadius: 10,
+                    padding: '8px 14px', borderRadius: 0,
                     background: 'white', color: '#787776', textDecoration: 'none',
                     fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', system-ui, sans-serif",
                     border: '1px solid rgba(0,0,0,0.10)',
@@ -1624,7 +1624,7 @@ export default function Home() {
                   {/* Card */}
                   <div style={{
                     position: 'relative', zIndex: 1, flex: 1,
-                    padding: '12px 14px', borderRadius: 10,
+                    padding: '12px 14px', borderRadius: 0,
                     background: '#ffffff',
                     border: '1px solid rgba(50,138,182,0.65)',
                     display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -1690,7 +1690,7 @@ export default function Home() {
                   {/* Card */}
                   <div style={{
                     position: 'relative', zIndex: 1, flex: 1,
-                    padding: '12px 14px', borderRadius: 10,
+                    padding: '12px 14px', borderRadius: 0,
                     background: '#ffffff',
                     border: '1px solid rgba(50,138,182,0.65)',
                     display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -1750,7 +1750,7 @@ export default function Home() {
                   {/* Card body — dark blue */}
                   <div style={{
                     position: 'relative', zIndex: 1, flex: 1,
-                    padding: '12px 14px', borderRadius: 10,
+                    padding: '12px 14px', borderRadius: 0,
                     background: '#14324D',
                     border: '1px solid rgba(99,102,241,0.4)',
                     display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -1792,7 +1792,7 @@ export default function Home() {
                 const hasOwing = borrowedLoans.length > 0 && borrowOwed > 0;
                 const hasOwed = lentLoans.length > 0 && lentOwed > 0;
                 if (!hasOwing && !hasOwed) return (
-                  <div style={{ position: 'relative' }}>                    <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '14px 18px' }}>
+                  <div style={{ position: 'relative' }}>                    <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 0, padding: '14px 18px' }}>
                       <p style={{ fontSize: 12, color: '#9B9A98', margin: 0, fontFamily: "'DM Sans', sans-serif", textAlign: 'center' }}>You have no active loans yet 🌱</p>
                     </div>
                   </div>
@@ -1800,7 +1800,7 @@ export default function Home() {
                 return (
                   <div style={{ display: 'flex', gap: 12 }}>
                     {/* Box 1 — You Owe */}
-                    <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>                      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '14px 14px' }}>
+                    <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>                      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 0, padding: '14px 14px' }}>
                         <div style={{ marginBottom: 10 }}>
                           <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
                             <circle cx="14" cy="14" r="13" stroke="#1D5B94" strokeWidth="1.5"/>
@@ -1816,7 +1816,7 @@ export default function Home() {
                       </div>
                     </div>
                     {/* Box 2 — You Are Owed */}
-                    <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>                      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '14px 14px' }}>
+                    <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>                      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 0, padding: '14px 14px' }}>
                         <div style={{ marginBottom: 10 }}>
                           <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
                             <circle cx="14" cy="14" r="13" stroke="#03ACEA" strokeWidth="1.5"/>
@@ -1862,7 +1862,7 @@ export default function Home() {
                 const nextLabel = firstDaysAway === 0 ? 'Today' : firstDaysAway === 1 ? 'Tomorrow' : `In ${firstDaysAway} days`;
 
                 return (
-                  <div className="home-card-upcoming-payments" style={{ position: 'relative' }}>                    <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '14px 18px' }}>
+                  <div className="home-card-upcoming-payments" style={{ position: 'relative' }}>                    <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 0, padding: '14px 18px' }}>
                       {/* Header row */}
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
                         <div style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Upcoming Payments</div>
@@ -1926,7 +1926,7 @@ export default function Home() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
               {/* April at a Glance */}
-              <div className="home-card-howmonth" style={{ position: 'relative' }}>              <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', padding: '14px 18px' }}>
+              <div className="home-card-howmonth" style={{ position: 'relative' }}>              <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 0, border: 'none', padding: '14px 18px' }}>
                 <div style={{ paddingBottom: 5, marginBottom: 4 }}>
                   <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>
                     {`${format(today, 'MMMM')} at a Glance`}
@@ -2013,7 +2013,7 @@ export default function Home() {
                 };
 
                 return (
-                  <div className="home-card-attention" style={{ position: 'relative' }}>                    <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '14px 18px' }}>
+                  <div className="home-card-attention" style={{ position: 'relative' }}>                    <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 0, padding: '14px 18px' }}>
                       <SectionHeader title="What needs your attention" />
                       {items.length === 0 ? (
                         <p style={{ fontSize: 12, color: '#C5C3C0', margin: 0, lineHeight: 1.45 }}>All clear, your inbox is empty 🎉</p>
@@ -2109,7 +2109,7 @@ export default function Home() {
                 const allTasks = [...tasks, ...customTasks];
                 const sortedTasks = [...allTasks].sort((a, b) => Number(checkedTasks.has(a.id)) - Number(checkedTasks.has(b.id)));
                 return (
-                  <div className="home-card-tasks" style={{ position: 'relative' }}>                    <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '14px 18px' }}>
+                  <div className="home-card-tasks" style={{ position: 'relative' }}>                    <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 0, padding: '14px 18px' }}>
                       <SectionHeader title="To Do This Week" />
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, marginTop: 2, marginBottom: 10 }}>
                         {days.map((d, i) => {
@@ -2176,7 +2176,7 @@ export default function Home() {
                         100% { opacity: 0; }
                       }
                     `}</style>
-                    <div className="home-card-lending-loans" style={{ position: 'relative' }}>                      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '14px 18px' }}>
+                    <div className="home-card-lending-loans" style={{ position: 'relative' }}>                      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 0, padding: '14px 18px' }}>
                         <SectionHeader title="Your Loans" linkTo={createPageUrl('LendingBorrowing') + '?tab=lending'} linkLabel="View all →" />
                         {allLoans.length === 0 ? (
                           <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>No active loans yet 🌱</div>
@@ -2308,7 +2308,7 @@ export default function Home() {
           </div>
 
           {/* Details */}
-          <div style={{ background: '#fafafa', borderRadius: 10, border: '1px solid rgba(0,0,0,0.07)', padding: '12px 14px', marginBottom: 18, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ background: '#fafafa', borderRadius: 0, border: '1px solid rgba(0,0,0,0.07)', padding: '12px 14px', marginBottom: 18, display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: 11, color: '#9B9A98', fontWeight: 500 }}>Amount</span>
               <span style={{ fontSize: 14, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.02em' }}>{formatMoney(confirmPaymentTarget.payment?.amount || 0)}</span>
