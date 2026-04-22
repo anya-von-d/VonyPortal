@@ -601,8 +601,8 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                   </div>
                 </div>
 
-                {/* Right (1fr): Repayment Progress top, You're Owed bottom-right */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {/* Right (1fr): Repayment Progress and You're Owed side-by-side */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, alignItems: 'stretch' }}>
 
                   {/* Repayment Progress */}
                   <div style={{ ...cardBase }}>
@@ -624,8 +624,8 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                     </div>
                   </div>
 
-                  {/* You're Owed — bottom */}
-                  <div style={{ ...cardBase, marginTop: 'auto' }}>
+                  {/* You're Owed — right */}
+                  <div style={{ ...cardBase }}>
                     <div style={{ marginBottom: 10 }}>
                       {isLending ? (
                         <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
@@ -861,7 +861,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
               { label: `${freqLabel} Payments`, value: `$${paymentAmountDisplay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: isLending ? `from ${otherPartyUsername}` : `to ${otherPartyUsername}` },
             ];
             return (
-              <div className="loan-progress-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+              <div className="loan-progress-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', rowGap: 22, columnGap: 16 }}>
                 {lpItems.map((item, idx) => (<div key={idx} style={{ textAlign: 'center' }}><p style={{ fontSize: 10, color: '#787776', fontWeight: 500, marginBottom: 2 }}>{item.label}</p><p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>{item.value}</p>{item.sub && <p style={{ fontSize: 9, color: '#787776', marginTop: 2 }}>{item.sub}</p>}</div>))}
               </div>
             );
