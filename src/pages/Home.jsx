@@ -2161,9 +2161,7 @@ export default function Home() {
                 const sortedTasks = [...allTasks].sort((a, b) => Number(checkedTasks.has(a.id)) - Number(checkedTasks.has(b.id)));
                 return (
                   <div className="home-card-tasks" style={{ position: 'relative' }}>
-                    <div style={{ position: 'relative', zIndex: 1, background: '#FEFDF5', borderRadius: 10, border: 'none', boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)', overflow: 'hidden' }}>
-                      {/* Red margin line */}
-                      <div style={{ position: 'absolute', left: 34, top: 0, bottom: 0, width: 1.5, background: 'rgba(210,50,50,0.2)', zIndex: 2, pointerEvents: 'none' }} />
+                    <div style={{ position: 'relative', zIndex: 1, background: '#FEFDF5', borderRadius: 4, border: 'none', boxShadow: '0 1px 0 2px #edeade, 0 3px 0 3px #f5f3ea, 2px 6px 18px rgba(0,0,0,0.13)', overflow: 'hidden' }}>
 
                       {/* Title + calendar — full width */}
                       <div style={{ padding: '14px 18px 10px', position: 'relative', zIndex: 1 }}>
