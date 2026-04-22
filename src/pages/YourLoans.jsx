@@ -592,9 +592,9 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
           );
         })()}
 
-        {/* 2-col masonry: left = Payment History + Docs, right = Payments */}
-        <div className="loan-details-masonry" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'start' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+        {/* 3-col: Payment History + Docs | Payments | Activity */}
+        <div className="loan-details-masonry" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20, alignItems: 'start' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
         <PageCard title="Payment History">
           <div>
           {chartData.length === 0 ? (
@@ -692,7 +692,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
         </div>
         </div>{/* end left column */}
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
         <PageCard title="Payments">
           <div>
           {(() => {
@@ -754,11 +754,10 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
           })()}
           </div>
         </PageCard>
-        </div>{/* end right column */}
-        </div>{/* end 2-col masonry */}
+        </div>{/* end payments column */}
 
-        {/* Activity | Loan Progress row */}
-        <div className="loan-details-activity-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'start', marginTop: 24 }}>
+        {/* Col 3: Activity */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
         <PageCard title="Activity">
           <div>
           {(() => {
@@ -825,6 +824,11 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
           })()}
           </div>
         </PageCard>
+        </div>{/* end activity column */}
+        </div>{/* end 3-col masonry */}
+
+        {/* Loan Progress — full-width row below */}
+        <div style={{ marginTop: 20 }}>
         <PageCard title="Loan Progress">
           <div>
           {(() => {
@@ -849,7 +853,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
           })()}
           </div>
         </PageCard>
-        </div>{/* end Activity | Loan Progress row */}
+        </div>
 
         {/* Cancelled notice */}
         {selectedLoan.status === 'cancelled' && (
