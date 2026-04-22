@@ -1829,33 +1829,57 @@ export default function Home() {
           <div className="home-two-col-row" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)', gap: 24 }}>
             {/* Col 1: Coming Up This Week */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-              {/* ── Overview ── */}
+              {/* ── Overview ── two equal-width mini-boxes */}
               {(() => {
                 const borrowOwed = Math.max(0, totalBorrowedAmount - totalPaidBack);
                 const lentOwed = Math.max(0, totalLentAmount - totalRepaid);
                 const hasOwing = borrowedLoans.length > 0 && borrowOwed > 0;
                 const hasOwed = lentLoans.length > 0 && lentOwed > 0;
-                return (
+                if (!hasOwing && !hasOwed) return (
                   <div style={{ position: 'relative' }}>
                     <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
                     <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '14px 18px' }}>
-                      <SectionHeader title="Overview" />
-                      {!hasOwing && !hasOwed ? (
-                        <p style={{ fontSize: 12, color: '#9B9A98', margin: 0, fontFamily: "'DM Sans', sans-serif", textAlign: 'center' }}>You have no active loans yet 🌱</p>
-                      ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 5, alignItems: 'center', textAlign: 'center' }}>
-                          {hasOwing && (
-                            <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>
-                              You owe <span style={{ color: '#1D5B94' }}>{formatMoney(borrowOwed)}</span> across {borrowedLoans.length} loan{borrowedLoans.length !== 1 ? 's' : ''}
-                            </div>
-                          )}
-                          {hasOwed && (
-                            <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>
-                              You are owed <span style={{ color: '#03ACEA' }}>{formatMoney(lentOwed)}</span> across {lentLoans.length} loan{lentLoans.length !== 1 ? 's' : ''}
-                            </div>
-                          )}
+                      <p style={{ fontSize: 12, color: '#9B9A98', margin: 0, fontFamily: "'DM Sans', sans-serif", textAlign: 'center' }}>You have no active loans yet 🌱</p>
+                    </div>
+                  </div>
+                );
+                return (
+                  <div style={{ display: 'flex', gap: 12 }}>
+                    {/* Box 1 — You Owe */}
+                    <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
+                      <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+                      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '14px 14px' }}>
+                        <div style={{ marginBottom: 10 }}>
+                          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                            <circle cx="14" cy="14" r="13" stroke="#1D5B94" strokeWidth="1.5"/>
+                            <path d="M14 19 L14 11 M10.5 14.5 L14 11 L17.5 14.5" stroke="#1D5B94" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
                         </div>
-                      )}
+                        <div style={{ fontSize: 13, fontWeight: 400, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>
+                          You owe <span style={{ color: '#1D5B94', fontWeight: 500 }}>{formatMoney(borrowOwed)}</span>
+                        </div>
+                        <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 3, fontFamily: "'DM Sans', sans-serif" }}>
+                          across {borrowedLoans.length} loan{borrowedLoans.length !== 1 ? 's' : ''}
+                        </div>
+                      </div>
+                    </div>
+                    {/* Box 2 — You Are Owed */}
+                    <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
+                      <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+                      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '14px 14px' }}>
+                        <div style={{ marginBottom: 10 }}>
+                          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                            <circle cx="14" cy="14" r="13" stroke="#03ACEA" strokeWidth="1.5"/>
+                            <path d="M14 10 L14 18 M10.5 13.5 L14 18 L17.5 13.5" stroke="#03ACEA" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </div>
+                        <div style={{ fontSize: 13, fontWeight: 400, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>
+                          You are owed <span style={{ color: '#03ACEA', fontWeight: 500 }}>{formatMoney(lentOwed)}</span>
+                        </div>
+                        <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 3, fontFamily: "'DM Sans', sans-serif" }}>
+                          across {lentLoans.length} loan{lentLoans.length !== 1 ? 's' : ''}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 );
@@ -2010,7 +2034,7 @@ export default function Home() {
                       {items.length === 0 ? (
                         <p style={{ fontSize: 12, color: '#C5C3C0', margin: 0, lineHeight: 1.45 }}>All clear, your inbox is empty 🎉</p>
                       ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
                           {items.map((item, i) => {
                             const arrowAction = (() => {
                               if (item.type === 'overdue' || item.type === 'due') return () => navigate(createPageUrl('RecordPayment'));
@@ -2262,40 +2286,12 @@ export default function Home() {
                 );
               })()}
 
-              {/* Combined Your Lending / Your Borrowing with left-right arrows */}
+              {/* Your Loans — lending + borrowing merged into one card */}
               {(() => {
-                const isLending = lbTab === 'lending';
-                const loans = isLending ? lentLoans : borrowedLoans;
-                const title = isLending ? 'Your Lending' : 'Your Borrowing';
-                const tabLink = createPageUrl('LendingBorrowing') + (isLending ? '?tab=lending' : '?tab=borrowing');
-                const emptyMsg = isLending ? "You haven't lent anything yet 🌱" : "You haven't borrowed anything yet 🤝";
-                const arrowBtn = (dir) => (
-                  <button
-                    type="button"
-                    onClick={() => setLbTab(dir === 'left' ? 'lending' : 'borrowing')}
-                    style={{
-                      position: 'absolute',
-                      top: '50%', transform: 'translateY(-50%)',
-                      [dir === 'left' ? 'left' : 'right']: -13,
-                      width: 26, height: 26, borderRadius: '50%',
-                      background: '#F4F3F1',
-                      border: 'none',
-                      cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      zIndex: 2,
-                      opacity: (dir === 'left' && isLending) || (dir === 'right' && !isLending) ? 0.3 : 1,
-                      pointerEvents: (dir === 'left' && isLending) || (dir === 'right' && !isLending) ? 'none' : 'auto',
-                      transition: 'opacity 0.15s',
-                    }}
-                    aria-label={dir === 'left' ? 'Your Lending' : 'Your Borrowing'}
-                  >
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#787776" strokeWidth="2.5" strokeLinecap="round">
-                      {dir === 'left'
-                        ? <polyline points="15 18 9 12 15 6" />
-                        : <polyline points="9 18 15 12 9 6" />}
-                    </svg>
-                  </button>
-                );
+                const allLoans = [
+                  ...lentLoans.map(l => ({ ...l, _isLending: true })),
+                  ...borrowedLoans.map(l => ({ ...l, _isLending: false })),
+                ];
                 return (
                   <div style={{ position: 'relative' }}>
                     <style>{`
@@ -2310,17 +2306,17 @@ export default function Home() {
                         100% { opacity: 0; }
                       }
                     `}</style>
-                    {arrowBtn('left')}
-                    {arrowBtn('right')}
                     <div className="home-card-lending-loans" style={{ position: 'relative' }}>
                       <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
                       <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '14px 18px' }}>
-                        <SectionHeader title={title} linkTo={tabLink} linkLabel="View all →" />
-                        {loans.length === 0 ? (
-                          <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>{emptyMsg}</div>
+                        <SectionHeader title="Your Loans" linkTo={createPageUrl('LendingBorrowing')} linkLabel="View all →" />
+                        {allLoans.length === 0 ? (
+                          <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>No active loans yet 🌱</div>
                         ) : (
                           <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            {loans.slice(0, 5).map(loan => {
+                            {allLoans.slice(0, 6).map(loan => {
+                              const isLending = loan._isLending;
+                              const circleColor = isLending ? '#03ACEA' : '#1D5B94';
                               const otherId = isLending ? loan.borrower_id : loan.lender_id;
                               const otherProfile = safeAllProfiles.find(p => p.user_id === otherId);
                               const name = otherProfile?.full_name?.split(' ')[0] || otherProfile?.username || 'User';
@@ -2337,16 +2333,24 @@ export default function Home() {
                                 ? `Borrowed ${formatMoney(total)} from you${loan.purpose ? ` for ${loan.purpose}` : ''}`
                                 : `Lent you ${formatMoney(total)}${loan.purpose ? ` for ${loan.purpose}` : ''}`;
                               return (
-                                <div key={loan.id} style={{ padding: '9px 0' }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-                                    <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
-                                    {/* Cycling badge: status ↔ % repaid */}
-                                    <span style={{ flexShrink: 0, position: 'relative', display: 'inline-block', width: 96, height: 18 }}>
-                                      <span style={{ position: 'absolute', inset: 0, fontSize: 10, fontWeight: 700, color: statusColor, background: statusBg, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'lbStatusA 8s ease-in-out infinite', lineHeight: 1, whiteSpace: 'nowrap' }}>{statusLabel}</span>
-                                      <span style={{ position: 'absolute', inset: 0, fontSize: 10, fontWeight: 700, color: '#9B9A98', background: 'rgba(0,0,0,0.04)', borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'lbStatusB 8s ease-in-out infinite', lineHeight: 1, whiteSpace: 'nowrap' }}>{pctRepaid}% repaid</span>
-                                    </span>
+                                <div key={loan.id} style={{ padding: '9px 0', display: 'flex', alignItems: 'flex-start', gap: 9 }}>
+                                  {/* Direction circle */}
+                                  <div style={{ flexShrink: 0, marginTop: 3 }}>
+                                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                                      <circle cx="5" cy="5" r="4.25" stroke={circleColor} strokeWidth="1.5"/>
+                                    </svg>
                                   </div>
-                                  <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{subLine}</div>
+                                  <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                                      <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
+                                      {/* Cycling badge: status ↔ % repaid */}
+                                      <span style={{ flexShrink: 0, position: 'relative', display: 'inline-block', width: 96, height: 18 }}>
+                                        <span style={{ position: 'absolute', inset: 0, fontSize: 10, fontWeight: 700, color: statusColor, background: statusBg, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'lbStatusA 8s ease-in-out infinite', lineHeight: 1, whiteSpace: 'nowrap' }}>{statusLabel}</span>
+                                        <span style={{ position: 'absolute', inset: 0, fontSize: 10, fontWeight: 700, color: '#9B9A98', background: 'rgba(0,0,0,0.04)', borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'lbStatusB 8s ease-in-out infinite', lineHeight: 1, whiteSpace: 'nowrap' }}>{pctRepaid}% repaid</span>
+                                      </span>
+                                    </div>
+                                    <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{subLine}</div>
+                                  </div>
                                 </div>
                               );
                             })}
