@@ -201,13 +201,33 @@ export default function Upcoming() {
     });
   });
 
-  // ── PaymentRow component ──
-  // Matches the Home "Upcoming" card styling: countdown badge on the left,
-  // primary line (e.g. "$1.02 due to Natalie"), purpose as secondary line.
+  // Add completed payments as green dots on the calendar
+  safePayments.forEach(payment => {
+    if (payment.status !== 'completed') return;
+    const pDate = new Date(payment.payment_date || payment.created_at);
+    const key = format(pDate, 'yyyy-MM-dd');
+    if (!calendarEvents[key]) calendarEvents[key] = [];
+    const loan = myLoans.find(l => l.id === payment.loan_id);
+    if (!loan) return;
+    const isLender = loan.lender_id === user.id;
+    const otherUserId = isLender ? loan.borrower_id : loan.lender_id;
+    const otherProfile = getProfile(otherUserId);
+    const firstName = (otherProfile?.full_name || otherProfile?.username || 'User').split(' ')[0];
+    calendarEvents[key].push({
+      amount: payment.amount || 0, isLender,
+      initial: (otherProfile?.full_name || 'U').charAt(0).toUpperCase(),
+      firstName, purpose: loan.purpose || '', isCompleted: true,
+    });
+  });
+
+  // ── PaymentRow component (Coming Later) ──
+  // Badge color: incoming = light blue, outgoing = dark blue
   const PaymentRow = ({ event }) => {
     const isOverdueItem = event.days < 0;
-    const daysLabel = isOverdueItem ? format(event.date, 'MMM d') : format(event.date, 'MMM d');
+    const daysLabel = format(event.date, 'MMM d');
     const amountStr = formatMoney(event.amount);
+    const badgeColor = event.isLender ? '#03ACEA' : '#1D5B94';
+    const badgeBg = event.isLender ? 'rgba(3,172,234,0.09)' : 'rgba(29,91,148,0.09)';
     let primaryLine;
     if (isOverdueItem) {
       primaryLine = event.isLender
@@ -223,9 +243,10 @@ export default function Upcoming() {
         <div style={{
           flexShrink: 0,
           fontSize: 10, fontWeight: 700, lineHeight: 1.2,
-          color: isOverdueItem ? '#E8726E' : event.days <= 3 ? '#F59E0B' : '#9B9A98',
-          background: isOverdueItem ? 'rgba(232,114,110,0.08)' : event.days <= 3 ? 'rgba(245,158,11,0.08)' : 'rgba(0,0,0,0.04)',
+          color: badgeColor,
+          background: badgeBg,
           borderRadius: 5, padding: '2px 5px',
+          fontFamily: "'DM Sans', sans-serif",
         }}>
           {daysLabel}
         </div>
@@ -292,24 +313,15 @@ export default function Upcoming() {
             <div className="upcoming-col-1" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {/* Overdue */}
               {overdue.length > 0 && (
-                <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
-                  <div style={{
-                    position: 'absolute', top: '50%', left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: 'calc(100% + 10px)', height: 'calc(100% + 10px)',
-                    background: 'linear-gradient(135deg, rgb(232,114,110) 0%, rgb(239,68,68) 30%, rgb(251,146,60) 60%, rgb(232,114,110) 100%)',
-                    filter: 'blur(5px) saturate(1.2)', opacity: 0.35,
-                    borderRadius: 18, zIndex: 0, pointerEvents: 'none',
-                  }} />
-                  <div style={{
-                    position: 'relative', zIndex: 1, flex: 1,
-                    background: 'linear-gradient(to right, rgba(232,114,110,0) 0%, #E8726E 67%, #E8726E 100%)',
-                    padding: 1, borderRadius: 11, display: 'flex', flexDirection: 'column',
-                  }}>
-                  <div style={{ flex: 1, padding: '14px 18px', borderRadius: 10, background: '#ffffff', display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 8 }}>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: '#E8726E', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Overdue</span>
-                      <span style={{ fontSize: 11, color: '#9B9A98' }}>{overdue.length} · {formatMoney(overdue.reduce((s, e) => s + e.amount, 0))}</span>
+                <div style={{ position: 'relative' }}>
+                  <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+                  <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, padding: '14px 18px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Overdue</span>
+                      <span style={{ fontSize: 11, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>{overdue.length} · {formatMoney(overdue.reduce((s, e) => s + e.amount, 0))}</span>
+                    </div>
+                    <div style={{ fontSize: 11, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", marginBottom: 10 }}>
+                      {overdue.length} payment{overdue.length !== 1 ? 's' : ''} past due
                     </div>
                     {overdue.map(event => {
                       const daysAgo = Math.abs(event.days);
@@ -317,20 +329,26 @@ export default function Upcoming() {
                         ? <>{event.firstName}'s <span style={{ fontWeight: 700 }}>{formatMoney(event.amount)}</span> payment is {daysAgo} day{daysAgo !== 1 ? 's' : ''} overdue</>
                         : <>Your payment of <span style={{ fontWeight: 700 }}>{formatMoney(event.amount)}</span> to {event.firstName} is {daysAgo} day{daysAgo !== 1 ? 's' : ''} overdue</>;
                       return (
-                        <div key={event.loanId + '-ov'} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '7px 0', borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
-                          <div style={{ fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", flex: 1, minWidth: 0 }}>
-                            {primaryText}
+                        <div key={event.loanId + '-ov'} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '7px 0' }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 12, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>
+                              {primaryText}
+                            </div>
+                            {event.purpose && (
+                              <div style={{ fontSize: 11, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {event.purpose}
+                              </div>
+                            )}
                           </div>
                           <Link
                             to={createPageUrl('RecordPayment')}
                             style={{ fontSize: 11, fontWeight: 600, color: '#E8726E', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0, fontFamily: "'DM Sans', sans-serif" }}
                           >
-                            Record Payment →
+                            Record →
                           </Link>
                         </div>
                       );
                     })}
-                  </div>
                   </div>
                 </div>
               )}
@@ -367,10 +385,10 @@ export default function Upcoming() {
                           const dateLabel = format(day, 'MMM d');
                           if (dayEvents.length === 0) {
                             return (
-                              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '7px 0', borderBottom: i < 6 ? '1px solid rgba(0,0,0,0.04)' : 'none' }}>
+                              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '7px 0' }}>
                                 <div style={{ width: 52, flexShrink: 0, fontFamily: "'DM Sans', sans-serif" }}>
                                   <div style={{ fontSize: 10, fontWeight: 500, color: isToday ? '#03ACEA' : '#9B9A98', letterSpacing: '-0.01em' }}>{dayName}</div>
-                                  <div style={{ fontSize: 12, fontWeight: 500, color: isToday ? '#1A1918' : '#C4C2C0' }}>{dateLabel}</div>
+                                  <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918' }}>{dateLabel}</div>
                                 </div>
                                 <div style={{ width: 3, alignSelf: 'stretch', borderRadius: 2, background: 'rgba(0,0,0,0.06)', flexShrink: 0 }} />
                                 <span style={{ fontSize: 11, color: '#D4D2D0', fontFamily: "'DM Sans', sans-serif" }}>—</span>
@@ -383,7 +401,7 @@ export default function Upcoming() {
                               ? `Expect ${formatMoney(event.amount)} from ${event.firstName}`
                               : `${formatMoney(event.amount)} due to ${event.firstName}`;
                             return (
-                              <div key={`${i}-${ei}`} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '7px 0', borderBottom: i < 6 && ei === dayEvents.length - 1 ? '1px solid rgba(0,0,0,0.04)' : 'none' }}>
+                              <div key={`${i}-${ei}`} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '7px 0' }}>
                                 {/* Date column — only show for first event of the day */}
                                 <div style={{ width: 52, flexShrink: 0, fontFamily: "'DM Sans', sans-serif", opacity: ei === 0 ? 1 : 0 }}>
                                   <div style={{ fontSize: 10, fontWeight: 500, color: isToday ? '#03ACEA' : '#9B9A98', letterSpacing: '-0.01em' }}>{dayName}</div>
@@ -468,8 +486,9 @@ export default function Upcoming() {
                   const isSelected = isSameDay(day, selectedDay);
                   const key = format(day, 'yyyy-MM-dd');
                   const dayEvents = calendarEvents[key] || [];
-                  const hasIncoming = dayEvents.some(e => e.isLender);
-                  const hasOutgoing = dayEvents.some(e => !e.isLender);
+                  const hasIncoming = dayEvents.some(e => !e.isCompleted && e.isLender);
+                  const hasOutgoing = dayEvents.some(e => !e.isCompleted && !e.isLender);
+                  const hasCompleted = dayEvents.some(e => e.isCompleted);
                   return (
                     <button
                       key={i}
@@ -494,10 +513,11 @@ export default function Upcoming() {
                         {format(day, 'd')}
                       </span>
                       {/* Dots for payments */}
-                      {(hasIncoming || hasOutgoing) && (
+                      {(hasIncoming || hasOutgoing || hasCompleted) && (
                         <div style={{ display: 'flex', gap: 2, alignItems: 'center' }}>
                           {hasOutgoing && <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#1D5B94', flexShrink: 0 }} />}
                           {hasIncoming && <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#03ACEA', flexShrink: 0 }} />}
+                          {hasCompleted && <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />}
                         </div>
                       )}
                     </button>
@@ -508,7 +528,7 @@ export default function Upcoming() {
               {/* Selected day details */}
               <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid rgba(0,0,0,0.06)' }}>
                 {/* Color key */}
-                <div style={{ display: 'flex', gap: 12, marginBottom: 10, justifyContent: 'center' }}>
+                <div style={{ display: 'flex', gap: 10, marginBottom: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                     <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#03ACEA', flexShrink: 0, display: 'inline-block' }} />
                     <span style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>Incoming</span>
@@ -520,6 +540,10 @@ export default function Upcoming() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                     <span style={{ width: 6, height: 6, borderRadius: 2, background: '#E8726E', flexShrink: 0, display: 'inline-block' }} />
                     <span style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>Overdue</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', flexShrink: 0, display: 'inline-block' }} />
+                    <span style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>Complete</span>
                   </div>
                 </div>
                 {/* Date label */}
@@ -538,21 +562,27 @@ export default function Upcoming() {
                   if (dayEvents.length === 0) {
                     return <div style={{ fontSize: 12, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>Nothing due</div>;
                   }
-                  return dayEvents.map((ev, idx) => (
-                    <div key={idx} style={{ marginBottom: idx < dayEvents.length - 1 ? 8 : 0 }}>
-                      <div style={{ fontSize: 12, color: '#1A1918', fontWeight: 500, fontFamily: "'DM Sans', sans-serif" }}>
-                        {ev.isLender
-                          ? <>{formatMoney(ev.amount)} expected from {ev.firstName}</>
-                          : <>Send {ev.firstName} {formatMoney(ev.amount)}</>
-                        }
-                      </div>
-                      {ev.purpose && (
-                        <div style={{ fontSize: 11, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", marginTop: 1 }}>
-                          {ev.purpose}
+                  return dayEvents.map((ev, idx) => {
+                    const barColor = ev.isCompleted ? '#22c55e' : ev.isLender ? '#03ACEA' : '#1D5B94';
+                    return (
+                      <div key={idx} style={{ display: 'flex', alignItems: 'stretch', gap: 10, marginBottom: idx < dayEvents.length - 1 ? 8 : 0 }}>
+                        <div style={{ width: 3, borderRadius: 2, background: barColor, flexShrink: 0, minHeight: 18 }} />
+                        <div>
+                          <div style={{ fontSize: 12, color: '#1A1918', fontWeight: 500, fontFamily: "'DM Sans', sans-serif" }}>
+                            {ev.isCompleted
+                              ? (ev.isLender ? <>{formatMoney(ev.amount)} received from {ev.firstName}</> : <>Sent {ev.firstName} {formatMoney(ev.amount)}</>)
+                              : (ev.isLender ? <>{formatMoney(ev.amount)} expected from {ev.firstName}</> : <>Send {ev.firstName} {formatMoney(ev.amount)}</>)
+                            }
+                          </div>
+                          {ev.purpose && (
+                            <div style={{ fontSize: 11, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", marginTop: 1 }}>
+                              {ev.purpose}
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  ));
+                      </div>
+                    );
+                  });
                 })()}
               </div>
 
