@@ -2388,14 +2388,55 @@ export default function Home() {
                 </div>
               )}
 
-              {/* Your Loans — lending + borrowing merged into one card */}
+              {/* Your Loans — two paper cards, lending on top anti-clockwise, borrowing clockwise */}
               {(() => {
-                const allLoans = [
-                  ...lentLoans.map(l => ({ ...l, _isLending: true })),
-                  ...borrowedLoans.map(l => ({ ...l, _isLending: false })),
-                ];
+                const renderLoanRow = (loan, isLending) => {
+                  const circleColor = isLending ? '#03ACEA' : '#1D5B94';
+                  const otherId = isLending ? loan.borrower_id : loan.lender_id;
+                  const otherProfile = safeAllProfiles.find(p => p.user_id === otherId);
+                  const name = otherProfile?.full_name?.split(' ')[0] || otherProfile?.username || 'User';
+                  const total = loan.total_amount || loan.amount || 0;
+                  const nextDue = loan.next_payment_date ? new Date(loan.next_payment_date) : null;
+                  const hasPending = safePayments.some(p => p && p.loan_id === loan.id && p.status === 'pending_confirmation');
+                  const isBehind = nextDue && nextDue < today && !hasPending;
+                  const behindAmt = isBehind ? (loan.payment_amount || 0) : 0;
+                  const statusLabel = isBehind ? `${formatMoney(behindAmt)} ${isLending ? 'behind' : 'overdue'}` : 'On track';
+                  const statusColor = isBehind ? '#E8726E' : '#03ACEA';
+                  const statusBg = isBehind ? 'rgba(232,114,110,0.08)' : 'rgba(3,172,234,0.10)';
+                  const pctRepaid = total > 0 ? Math.round(((loan.amount_paid || 0) / total) * 100) : 0;
+                  const subLine = isLending
+                    ? `Borrowed ${formatMoney(total)} from you${loan.purpose ? ` for ${loan.purpose}` : ''}`
+                    : `Lent you ${formatMoney(total)}${loan.purpose ? ` for ${loan.purpose}` : ''}`;
+                  const pct = Math.min(1, Math.max(0, pctRepaid / 100));
+                  const sz = 26, r = 10, cx = 13, cy = 13;
+                  const circ = 2 * Math.PI * r;
+                  const dash = pct * circ;
+                  return (
+                    <div key={loan.id} style={{ padding: '9px 0', display: 'flex', alignItems: 'center', gap: 9 }}>
+                      <svg width={sz} height={sz} viewBox={`0 0 ${sz} ${sz}`} style={{ flexShrink: 0 }}>
+                        <circle cx={cx} cy={cy} r={r} fill="none" stroke={`${circleColor}22`} strokeWidth="3"/>
+                        {pct > 0 && (
+                          <circle cx={cx} cy={cy} r={r} fill="none" stroke={circleColor} strokeWidth="3"
+                            strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"
+                            transform={`rotate(-90 ${cx} ${cy})`}
+                          />
+                        )}
+                      </svg>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                          <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
+                          <span style={{ flexShrink: 0, position: 'relative', display: 'inline-block', width: 96, height: 18 }}>
+                            <span style={{ position: 'absolute', inset: 0, fontSize: 10, fontWeight: 700, color: statusColor, background: statusBg, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'lbStatusA 8s ease-in-out infinite', lineHeight: 1, whiteSpace: 'nowrap' }}>{statusLabel}</span>
+                            <span style={{ position: 'absolute', inset: 0, fontSize: 10, fontWeight: 700, color: '#9B9A98', background: 'rgba(0,0,0,0.04)', borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'lbStatusB 8s ease-in-out infinite', lineHeight: 1, whiteSpace: 'nowrap' }}>{pctRepaid}% repaid</span>
+                          </span>
+                        </div>
+                        <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{subLine}</div>
+                      </div>
+                    </div>
+                  );
+                };
                 return (
-                  <div style={{ position: 'relative' }}>
+                  <div style={{ position: 'relative', overflow: 'visible', padding: '0 6px' }}>
                     <style>{`
                       @keyframes lbStatusA {
                         0%, 44% { opacity: 1; }
@@ -2408,69 +2449,26 @@ export default function Home() {
                         100% { opacity: 0; }
                       }
                     `}</style>
-                    <div className="home-card-lending-loans" style={{ position: 'relative' }}>                      <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)', padding: '14px 18px' }}>
-                        <SectionHeader title="Your Loans" linkTo={createPageUrl('LendingBorrowing') + '?tab=lending'} linkLabel="View all →" />
-                        {allLoans.length === 0 ? (
-                          <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>No active loans yet 🌱</div>
-                        ) : (
-                          <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            {allLoans.map(loan => {
-                              const isLending = loan._isLending;
-                              const circleColor = isLending ? '#03ACEA' : '#1D5B94';
-                              const otherId = isLending ? loan.borrower_id : loan.lender_id;
-                              const otherProfile = safeAllProfiles.find(p => p.user_id === otherId);
-                              const name = otherProfile?.full_name?.split(' ')[0] || otherProfile?.username || 'User';
-                              const total = loan.total_amount || loan.amount || 0;
-                              const nextDue = loan.next_payment_date ? new Date(loan.next_payment_date) : null;
-                              const hasPending = safePayments.some(p => p && p.loan_id === loan.id && p.status === 'pending_confirmation');
-                              const isBehind = nextDue && nextDue < today && !hasPending;
-                              const behindAmt = isBehind ? (loan.payment_amount || 0) : 0;
-                              const statusLabel = isBehind ? `${formatMoney(behindAmt)} ${isLending ? 'behind' : 'overdue'}` : 'On track';
-                              const statusColor = isBehind ? '#E8726E' : '#03ACEA';
-                              const statusBg = isBehind ? 'rgba(232,114,110,0.08)' : 'rgba(3,172,234,0.10)';
-                              const pctRepaid = total > 0 ? Math.round(((loan.amount_paid || 0) / total) * 100) : 0;
-                              const subLine = isLending
-                                ? `Borrowed ${formatMoney(total)} from you${loan.purpose ? ` for ${loan.purpose}` : ''}`
-                                : `Lent you ${formatMoney(total)}${loan.purpose ? ` for ${loan.purpose}` : ''}`;
-                              return (
-                                <div key={loan.id} style={{ padding: '9px 0', display: 'flex', alignItems: 'center', gap: 9 }}>
-                                  {/* Pie chart repayment progress */}
-                                  {(() => {
-                                    const pct = Math.min(1, Math.max(0, pctRepaid / 100));
-                                    const sz = 26, r = 10, cx = 13, cy = 13;
-                                    const circ = 2 * Math.PI * r;
-                                    const dash = pct * circ;
-                                    return (
-                                      <svg width={sz} height={sz} viewBox={`0 0 ${sz} ${sz}`} style={{ flexShrink: 0 }}>
-                                        {/* Track */}
-                                        <circle cx={cx} cy={cy} r={r} fill="none" stroke={`${circleColor}22`} strokeWidth="3"/>
-                                        {/* Progress arc */}
-                                        {pct > 0 && (
-                                          <circle cx={cx} cy={cy} r={r} fill="none" stroke={circleColor} strokeWidth="3"
-                                            strokeDasharray={`${dash} ${circ}`}
-                                            strokeLinecap="round"
-                                            transform={`rotate(-90 ${cx} ${cy})`}
-                                          />
-                                        )}
-                                      </svg>
-                                    );
-                                  })()}
-                                  <div style={{ flex: 1, minWidth: 0 }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-                                      <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
-                                      {/* Cycling badge: status ↔ % repaid */}
-                                      <span style={{ flexShrink: 0, position: 'relative', display: 'inline-block', width: 96, height: 18 }}>
-                                        <span style={{ position: 'absolute', inset: 0, fontSize: 10, fontWeight: 700, color: statusColor, background: statusBg, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'lbStatusA 8s ease-in-out infinite', lineHeight: 1, whiteSpace: 'nowrap' }}>{statusLabel}</span>
-                                        <span style={{ position: 'absolute', inset: 0, fontSize: 10, fontWeight: 700, color: '#9B9A98', background: 'rgba(0,0,0,0.04)', borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'lbStatusB 8s ease-in-out infinite', lineHeight: 1, whiteSpace: 'nowrap' }}>{pctRepaid}% repaid</span>
-                                      </span>
-                                    </div>
-                                    <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{subLine}</div>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
+
+                    {/* Your Lending — anti-clockwise, sits on top */}
+                    <div style={{ position: 'relative', zIndex: 2, transform: 'rotate(-2deg)', transformOrigin: 'center center', marginBottom: -22 }}>
+                      <div style={{ background: '#ffffff', borderRadius: 10, boxShadow: '2px 6px 20px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.09)', padding: '14px 18px 36px' }}>
+                        <SectionHeader title="Your Lending" linkTo={createPageUrl('LendingBorrowing') + '?tab=lending'} linkLabel="View all →" />
+                        {lentLoans.length === 0
+                          ? <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>No active lending 🌱</div>
+                          : <div style={{ display: 'flex', flexDirection: 'column' }}>{lentLoans.map(l => renderLoanRow(l, true))}</div>
+                        }
+                      </div>
+                    </div>
+
+                    {/* Your Borrowing — clockwise, sits behind/below */}
+                    <div style={{ position: 'relative', zIndex: 1, transform: 'rotate(1.5deg)', transformOrigin: 'center center' }}>
+                      <div style={{ background: '#ffffff', borderRadius: 10, boxShadow: '2px 6px 20px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.09)', padding: '36px 18px 14px' }}>
+                        <SectionHeader title="Your Borrowing" linkTo={createPageUrl('LendingBorrowing') + '?tab=borrowing'} linkLabel="View all →" />
+                        {borrowedLoans.length === 0
+                          ? <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>No active borrowing 🌱</div>
+                          : <div style={{ display: 'flex', flexDirection: 'column' }}>{borrowedLoans.map(l => renderLoanRow(l, false))}</div>
+                        }
                       </div>
                     </div>
                   </div>
