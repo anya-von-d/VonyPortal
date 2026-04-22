@@ -625,17 +625,6 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                         : <>You owe <span style={{ color: '#1D5B94' }}>{formatMoney(remaining)}</span></>
                       }
                     </div>
-                    <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 3, fontFamily: "'DM Sans', sans-serif" }}>
-                      {formatMoney(totalPaidAmt)} of {formatMoney(totalWithInterest)} {isLending ? 'repaid' : 'paid back'}
-                    </div>
-                    {selectedLoan.next_payment_date && (() => {
-                      const d = daysUntilDate(selectedLoan.next_payment_date);
-                      const isLate = d < 0;
-                      const label = isLate ? `${Math.abs(d)}d overdue` : d === 0 ? 'today' : `${d}d`;
-                      return (
-                        <div style={{ marginTop: 6, fontSize: 10, fontWeight: 600, color: isLate ? '#E8726E' : ringColor, background: isLate ? 'rgba(232,114,110,0.08)' : `${ringColor}12`, borderRadius: 4, padding: '2px 6px', display: 'inline-block', fontFamily: "'DM Sans', sans-serif" }}>{label}</div>
-                      );
-                    })()}
                   </div>
 
                   {/* Repayment Progress */}
@@ -664,8 +653,8 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
           );
         })()}
 
-        {/* 3-col: Payment History + Docs | Payments | Activity */}
-        <div className="loan-details-masonry" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20, alignItems: 'start' }}>
+        {/* 2-col: [Payment History + Activity] | [Payments + Loan Progress] */}
+        <div className="loan-details-masonry" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
         <PageCard title="Payment History">
           <div>
@@ -718,6 +707,73 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
               </div>
             </div>
           )}
+          </div>
+        </PageCard>
+
+        <PageCard title="Activity">
+          <div>
+          {(() => {
+            const ag = loanAgreements.find(a => a.loan_id === selectedLoan.id);
+            const loanPmts = allPayments.filter(p => p.loan_id === selectedLoan.id);
+            const lenderProfile = publicProfiles.find(p => p.user_id === selectedLoan.lender_id);
+            const borrowerProfile = publicProfiles.find(p => p.user_id === selectedLoan.borrower_id);
+            const lenderName = lenderProfile?.full_name || 'lender';
+            const borrowerName = borrowerProfile?.full_name || 'borrower';
+            const activities = [];
+            if (selectedLoan.created_at) activities.push({ timestamp: new Date(selectedLoan.created_at), type: 'created', description: `Loan created between ${borrowerName} and ${lenderName}` });
+            if (ag?.borrower_signed_date) activities.push({ timestamp: new Date(ag.borrower_signed_date), type: 'signature', description: `${borrowerName} signed the loan agreement` });
+            if (ag?.lender_signed_date) activities.push({ timestamp: new Date(ag.lender_signed_date), type: 'signature', description: `${lenderName} signed the loan agreement` });
+            loanPmts.forEach(payment => {
+              const isConfirmed = payment.status === 'completed' || payment.status === 'confirmed';
+              const isRecordedByUser = payment.recorded_by === user?.id;
+              const pmtAmount = `$${(payment.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+              let desc;
+              if (isLending) {
+                if (isRecordedByUser) desc = `You ${isConfirmed ? 'confirmed' : 'recorded'} a ${pmtAmount} payment from ${borrowerName}`;
+                else desc = `${borrowerName} ${isConfirmed ? 'made' : 'recorded'} a ${pmtAmount} payment`;
+              } else {
+                if (isRecordedByUser) desc = `You ${isConfirmed ? 'made' : 'recorded'} a ${pmtAmount} payment to ${lenderName}`;
+                else desc = `${lenderName} recorded a ${pmtAmount} payment from ${borrowerName}`;
+              }
+              activities.push({ timestamp: new Date(payment.payment_date || payment.created_at), type: 'payment', description: desc, isAwaitingConfirmation: !isConfirmed });
+            });
+            if (ag?.cancelled_date) activities.push({ timestamp: new Date(ag.cancelled_date), type: 'cancellation', description: 'Loan was cancelled' });
+            if (selectedLoan.status === 'completed') activities.push({ timestamp: new Date(), type: 'completion', description: 'Loan repaid in full' });
+            activities.sort((a, b) => a.timestamp - b.timestamp);
+            const activityIconConfig = {
+              created:      { bg: 'rgba(3,172,234,0.12)',   stroke: '#03ACEA',  path: 'M12 4v16m8-8H4',                                                                                                                                         sz: 14, sw: 2 },
+              signature:    { bg: 'rgba(124,58,237,0.12)',  stroke: '#7C3AED',  path: 'M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z',                                                     sz: 14, sw: 2 },
+              payment:      { bg: 'rgba(22,163,74,0.12)',   stroke: '#16A34A',  path: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1',          sz: 17, sw: 2.5 },
+              cancellation: { bg: 'rgba(232,114,110,0.12)', stroke: '#E8726E',  path: 'M6 18L18 6M6 6l12 12',                                                                                                                                    sz: 14, sw: 2 },
+              completion:   { bg: 'rgba(22,163,74,0.12)',   stroke: '#16A34A',  path: 'M5 13l4 4L19 7',                                                                                                                                          sz: 14, sw: 2 },
+            };
+            const getIcon = (type) => {
+              const cfg = activityIconConfig[type] || activityIconConfig.created;
+              return <svg width={cfg.sz} height={cfg.sz} fill="none" viewBox="0 0 24 24" stroke={cfg.stroke} strokeWidth={cfg.sw}><path strokeLinecap="round" strokeLinejoin="round" d={cfg.path} /></svg>;
+            };
+            const getDotStyle = (type) => {
+              const cfg = activityIconConfig[type] || activityIconConfig.created;
+              return { width: 24, height: 24, borderRadius: 6, background: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, position: 'relative', zIndex: 10, marginTop: 2, boxShadow: '0 0 0 3px white' };
+            };
+            if (activities.length === 0) return <p style={{ fontSize: 11, color: '#C7C6C4', textAlign: 'center' }}>No activity recorded yet ✨</p>;
+            return (
+              <div className="space-y-0 max-h-[200px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                {activities.map((activity, idx) => (
+                  <div key={idx} className="flex items-start gap-2.5 relative">
+                    {idx < activities.length - 1 && <div className="absolute left-[12px] top-[23px] w-[1px]" style={{ height: 'calc(100% - 6px)', background: 'rgba(84,166,207,0.2)' }} />}
+                    <div style={getDotStyle(activity.type)}>{getIcon(activity.type)}</div>
+                    <div className="flex-1 min-w-0 pb-3">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', lineHeight: 1.4 }}>{activity.description}</p>
+                        {activity.isAwaitingConfirmation && <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-semibold bg-[#F59E0B]/20 text-[#F59E0B] border border-[#F59E0B]/30 whitespace-nowrap">Awaiting Confirmation</span>}
+                      </div>
+                      <p style={{ fontSize: 11, color: '#5C5B5A', marginTop: 2 }}>{format(activity.timestamp, 'MMM d, yyyy · h:mm a')}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
           </div>
         </PageCard>
 
@@ -785,81 +841,6 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
           })()}
           </div>
         </PageCard>
-        </div>{/* end payments column */}
-
-        {/* Col 3: Activity */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-        <PageCard title="Activity">
-          <div>
-          {(() => {
-            const ag = loanAgreements.find(a => a.loan_id === selectedLoan.id);
-            const loanPmts = allPayments.filter(p => p.loan_id === selectedLoan.id);
-            const lenderProfile = publicProfiles.find(p => p.user_id === selectedLoan.lender_id);
-            const borrowerProfile = publicProfiles.find(p => p.user_id === selectedLoan.borrower_id);
-            const lenderName = lenderProfile?.full_name || 'lender';
-            const borrowerName = borrowerProfile?.full_name || 'borrower';
-            const activities = [];
-            if (selectedLoan.created_at) activities.push({ timestamp: new Date(selectedLoan.created_at), type: 'created', description: `Loan created between ${borrowerName} and ${lenderName}` });
-            if (ag?.borrower_signed_date) activities.push({ timestamp: new Date(ag.borrower_signed_date), type: 'signature', description: `${borrowerName} signed the loan agreement` });
-            if (ag?.lender_signed_date) activities.push({ timestamp: new Date(ag.lender_signed_date), type: 'signature', description: `${lenderName} signed the loan agreement` });
-            loanPmts.forEach(payment => {
-              const isConfirmed = payment.status === 'completed' || payment.status === 'confirmed';
-              const isRecordedByUser = payment.recorded_by === user?.id;
-              const pmtAmount = `$${(payment.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-              let desc;
-              if (isLending) {
-                if (isRecordedByUser) desc = `You ${isConfirmed ? 'confirmed' : 'recorded'} a ${pmtAmount} payment from ${borrowerName}`;
-                else desc = `${borrowerName} ${isConfirmed ? 'made' : 'recorded'} a ${pmtAmount} payment`;
-              } else {
-                if (isRecordedByUser) desc = `You ${isConfirmed ? 'made' : 'recorded'} a ${pmtAmount} payment to ${lenderName}`;
-                else desc = `${lenderName} recorded a ${pmtAmount} payment from ${borrowerName}`;
-              }
-              activities.push({ timestamp: new Date(payment.payment_date || payment.created_at), type: 'payment', description: desc, isAwaitingConfirmation: !isConfirmed });
-            });
-            if (ag?.cancelled_date) activities.push({ timestamp: new Date(ag.cancelled_date), type: 'cancellation', description: 'Loan was cancelled' });
-            if (selectedLoan.status === 'completed') activities.push({ timestamp: new Date(), type: 'completion', description: 'Loan repaid in full' });
-            activities.sort((a, b) => a.timestamp - b.timestamp);
-            const activityIconConfig = {
-              created:      { bg: 'rgba(3,172,234,0.12)',   stroke: '#03ACEA',  path: 'M12 4v16m8-8H4',                                                                                                                                         sz: 14, sw: 2 },
-              signature:    { bg: 'rgba(124,58,237,0.12)',  stroke: '#7C3AED',  path: 'M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z',                                                     sz: 14, sw: 2 },
-              payment:      { bg: 'rgba(22,163,74,0.12)',   stroke: '#16A34A',  path: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1',          sz: 17, sw: 2.5 },
-              cancellation: { bg: 'rgba(232,114,110,0.12)', stroke: '#E8726E',  path: 'M6 18L18 6M6 6l12 12',                                                                                                                                    sz: 14, sw: 2 },
-              completion:   { bg: 'rgba(22,163,74,0.12)',   stroke: '#16A34A',  path: 'M5 13l4 4L19 7',                                                                                                                                          sz: 14, sw: 2 },
-            };
-            const getIcon = (type) => {
-              const cfg = activityIconConfig[type] || activityIconConfig.created;
-              return <svg width={cfg.sz} height={cfg.sz} fill="none" viewBox="0 0 24 24" stroke={cfg.stroke} strokeWidth={cfg.sw}><path strokeLinecap="round" strokeLinejoin="round" d={cfg.path} /></svg>;
-            };
-            const getDotStyle = (type) => {
-              const cfg = activityIconConfig[type] || activityIconConfig.created;
-              return { width: 24, height: 24, borderRadius: 6, background: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, position: 'relative', zIndex: 10, marginTop: 2, boxShadow: '0 0 0 3px white' };
-            };
-            if (activities.length === 0) return <p style={{ fontSize: 11, color: '#C7C6C4', textAlign: 'center' }}>No activity recorded yet ✨</p>;
-            return (
-              <div className="space-y-0 max-h-[200px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-                {activities.map((activity, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 relative">
-                    {idx < activities.length - 1 && <div className="absolute left-[12px] top-[23px] w-[1px]" style={{ height: 'calc(100% - 6px)', background: 'rgba(84,166,207,0.2)' }} />}
-                    <div style={getDotStyle(activity.type)}>{getIcon(activity.type)}</div>
-                    <div className="flex-1 min-w-0 pb-3">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1918', lineHeight: 1.4 }}>{activity.description}</p>
-                        {activity.isAwaitingConfirmation && <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-semibold bg-[#F59E0B]/20 text-[#F59E0B] border border-[#F59E0B]/30 whitespace-nowrap">Awaiting Confirmation</span>}
-                      </div>
-                      <p style={{ fontSize: 11, color: '#5C5B5A', marginTop: 2 }}>{format(activity.timestamp, 'MMM d, yyyy · h:mm a')}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            );
-          })()}
-          </div>
-        </PageCard>
-        </div>{/* end activity column */}
-        </div>{/* end 3-col masonry */}
-
-        {/* Loan Progress — full-width row below */}
-        <div style={{ marginTop: 20 }}>
         <PageCard title="Loan Progress">
           <div>
           {(() => {
@@ -877,14 +858,16 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
               { label: `${freqLabel} Payments`, value: `$${paymentAmountDisplay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: isLending ? `from ${otherPartyUsername}` : `to ${otherPartyUsername}` },
             ];
             return (
-              <div className="loan-progress-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+              <div className="loan-progress-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
                 {lpItems.map((item, idx) => (<div key={idx} style={{ textAlign: 'center' }}><p style={{ fontSize: 10, color: '#787776', fontWeight: 500, marginBottom: 2 }}>{item.label}</p><p style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', margin: 0 }}>{item.value}</p>{item.sub && <p style={{ fontSize: 9, color: '#787776', marginTop: 2 }}>{item.sub}</p>}</div>))}
               </div>
             );
           })()}
           </div>
         </PageCard>
-        </div>
+        </div>{/* end right column */}
+
+        </div>{/* end 2-col masonry */}
 
         {/* Cancelled notice */}
         {selectedLoan.status === 'cancelled' && (
@@ -1198,13 +1181,6 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
           </div>{/* end col 3 */}
 
         </div>{/* end top grid */}
-
-        {/* Balance History */}
-        {user?.id && (
-          <div style={{ marginTop: 28 }}>
-            <LoanTimeline myLoans={allLoans} safePayments={allPayments} safeAllProfiles={publicProfiles} userId={user.id} />
-          </div>
-        )}
 
         {/* Loan carousel */}
         {loanCards.length > 0 && (
