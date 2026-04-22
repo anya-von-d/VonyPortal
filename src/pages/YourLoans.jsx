@@ -83,7 +83,6 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
 
   useEffect(() => {
     setSelectedScrollLoan(null);
-    setSelectedWalletLoan(null);
   }, [activeTab]);
 
   // Keep manageLoanSelected in sync with selectedScrollLoan for doc popups
