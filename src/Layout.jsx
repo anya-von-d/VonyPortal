@@ -6,6 +6,10 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { Keyboard } from '@capacitor/keyboard';
 import { motion, AnimatePresence } from "framer-motion";
 
+// Static grain SVG data URIs — computed once at module load
+const GRAIN_FINE = `url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>')}")`;
+const GRAIN_FIBRE = `url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600"><filter id="f"><feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 0.96  0 0 0 0 0.94  0 0 0 0 0.90  0 0 0 0.35 0"/></filter><rect width="100%" height="100%" filter="url(#f)"/></svg>')}")`;
+
 // Check if running as native app
 const isNativeApp = () => {
   try {
@@ -99,6 +103,11 @@ export default function Layout({ children }) {
 
   return (
     <div className="min-h-screen flex flex-col w-full safe-area-inset-top safe-area-inset-bottom" style={{ background: 'transparent' }}>
+
+      {/* Fine grain overlay — sits above all content, pointer-events off */}
+      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 15, backgroundImage: GRAIN_FINE, backgroundSize: '180px 180px', mixBlendMode: 'multiply', opacity: 0.18 }} />
+      {/* Coarse fibre overlay — adds pulp/texture depth */}
+      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 15, backgroundImage: GRAIN_FIBRE, backgroundSize: '600px 600px', mixBlendMode: 'multiply', opacity: 0.35 }} />
 
       {/* Main content container */}
       <main className="flex-1">
