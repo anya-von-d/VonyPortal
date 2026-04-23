@@ -595,46 +595,63 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                   </div>
                 </div>
 
-                {/* Right (1fr): Repayment Progress and You're Owed side-by-side */}
-                <div className="loan-repayment-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, alignItems: 'stretch' }}>
+                {/* Right (1fr): overlapping post-it notes */}
+                <div className="loan-repayment-col" style={{ overflow: 'visible' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', overflow: 'visible', paddingBottom: 14 }}>
 
-                  {/* Repayment Progress — warm ivory with folded corner */}
-                  <div style={{ background: '#FEFCF4', borderRadius: 3, border: 'none', boxShadow: '2px 5px 14px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.07)', padding: '14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                    <div style={{ position: 'relative', width: 80, height: 80, marginBottom: 8 }}>
-                      <svg width="80" height="80" viewBox="0 0 128 128" style={{ transform: 'rotate(-90deg)' }}>
-                        <circle cx="64" cy="64" r="45" fill="none" stroke={`${ringColor}26`} strokeWidth="10" />
-                        <circle cx="64" cy="64" r="45" fill="none" stroke={ringColor} strokeWidth="10" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={ringOffset} />
-                      </svg>
-                      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ fontSize: 14, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.03em', fontFamily: "'DM Sans', sans-serif", lineHeight: 1 }}>{paidPct}%</span>
-                        <span style={{ fontSize: 8, fontWeight: 500, color: '#787776', fontFamily: "'DM Sans', sans-serif", lineHeight: 1, marginTop: 2 }}>repaid</span>
+                    {/* Post-it 1 — Repayment Progress (behind, rotated left) */}
+                    <div style={{
+                      flex: 1, minWidth: 0, position: 'relative',
+                      background: 'linear-gradient(170deg, #FFFDE0 0%, #FFF59D 100%)',
+                      borderRadius: '2px 2px 3px 3px',
+                      boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)',
+                      padding: '18px 10px 12px',
+                      transform: 'rotate(-3.5deg)',
+                      marginRight: '-18px',
+                      zIndex: 1,
+                      display: 'flex', flexDirection: 'column', alignItems: 'center',
+                    }}>
+                      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'rgba(0,0,0,0.08)', borderRadius: '2px 2px 0 0' }} />
+                      <div style={{ position: 'relative', width: 72, height: 72, marginBottom: 7 }}>
+                        <svg width="72" height="72" viewBox="0 0 128 128" style={{ transform: 'rotate(-90deg)' }}>
+                          <circle cx="64" cy="64" r="45" fill="none" stroke={`${ringColor}26`} strokeWidth="10" />
+                          <circle cx="64" cy="64" r="45" fill="none" stroke={ringColor} strokeWidth="10" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={ringOffset} />
+                        </svg>
+                        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.03em', fontFamily: "'DM Sans', sans-serif", lineHeight: 1 }}>{paidPct}%</span>
+                          <span style={{ fontSize: 8, fontWeight: 500, color: '#787776', fontFamily: "'DM Sans', sans-serif", lineHeight: 1, marginTop: 2 }}>repaid</span>
+                        </div>
+                      </div>
+                      <div style={{ fontSize: 10, color: '#5C4200', fontFamily: "'DM Sans', sans-serif", textAlign: 'center', lineHeight: 1.4 }}>
+                        {formatMoney(totalPaidAmt)} of {formatMoney(totalWithInterest)}<br/>{isLending ? 'repaid to you' : 'paid back'}
                       </div>
                     </div>
-                    <div style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", textAlign: 'center', lineHeight: 1.4 }}>
-                      {formatMoney(totalPaidAmt)} of {formatMoney(totalWithInterest)} {isLending ? 'repaid to you' : 'paid back'}
-                    </div>
-                    {/* Corner fold */}
-                    <div style={{ position: 'absolute', bottom: 0, right: 0, width: 18, height: 18, background: '#DDD9CF', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 2 }} />
-                  </div>
 
-                  {/* You're Owed — amber-tinted stacked paper */}
-                  <div style={{
-                    background: '#FFFEF6', borderRadius: 2,
-                    boxShadow: '0 1px 0 2px #ede8d5, 0 3px 0 3px #f3edd8, 2px 6px 16px rgba(0,0,0,0.11)',
-                    padding: '12px 10px 10px', fontFamily: "'DM Sans', sans-serif",
-                    display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'visible',
-                  }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: '#1A1918', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 5 }}>
-                      {isLending ? "You're owed" : "You owe"}
+                    {/* Post-it 2 — You're Owed (front, rotated right) */}
+                    <div style={{
+                      flex: 1, minWidth: 0, position: 'relative',
+                      background: 'linear-gradient(170deg, #FFE566 0%, #FFD638 100%)',
+                      borderRadius: '2px 2px 3px 3px',
+                      boxShadow: '3px 6px 18px rgba(0,0,0,0.20), 0 1px 3px rgba(0,0,0,0.12)',
+                      padding: '18px 10px 12px',
+                      transform: 'rotate(2.5deg) translateY(8px)',
+                      zIndex: 2,
+                      display: 'flex', flexDirection: 'column',
+                    }}>
+                      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'rgba(0,0,0,0.08)', borderRadius: '2px 2px 0 0' }} />
+                      {/* Corner curl */}
+                      <div style={{ position: 'absolute', bottom: 0, right: 0, width: 16, height: 16, background: '#D4C060', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 2 }} />
+                      <div style={{ fontSize: 10, fontWeight: 700, color: '#5C4200', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 6 }}>
+                        {isLending ? "You're owed" : "You owe"}
+                      </div>
+                      <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: ringColor, marginBottom: 'auto', paddingBottom: 10 }}>
+                        {formatMoney(remaining)}
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <span style={{ fontSize: 10, color: '#8B7000' }}>{isLending ? `${otherPartyUsername.split(' ')[0]}'s loan` : 'this loan'}</span>
+                      </div>
                     </div>
-                    <div style={{ borderTop: '1.5px dashed rgba(0,0,0,0.15)', marginBottom: 8 }} />
-                    <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: ringColor, marginBottom: 'auto', paddingBottom: 10 }}>
-                      {formatMoney(remaining)}
-                    </div>
-                    <div style={{ borderTop: '1.5px dashed rgba(0,0,0,0.10)', marginBottom: 6 }} />
-                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                      <span style={{ fontSize: 10, color: '#9B9A98' }}>{isLending ? `${otherPartyUsername.split(' ')[0]}'s loan` : 'this loan'}</span>
-                    </div>
+
                   </div>
                 </div>
 
@@ -1005,24 +1022,24 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                   fontFamily: "'DM Sans', sans-serif",
                   textAlign: 'center',
                 }}>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: accent, marginBottom: 10, lineHeight: 1.5 }}>{insightText}</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: accent, marginBottom: 10, lineHeight: 1.5 }}>{insightText}</div>
                   {isLending && monthlyExpectedReceive > 0 && (
-                    <div style={{ fontSize: 11, color: '#1A1918', marginBottom: 5 }}>
+                    <div style={{ fontSize: 12, color: '#1A1918', marginBottom: 5 }}>
                       You're expecting <span style={{ fontWeight: 700, color: accent }}>{formatMoney(monthlyExpectedReceive)}</span> this month
                     </div>
                   )}
                   {!isLending && monthlyExpectedPay > 0 && (
-                    <div style={{ fontSize: 11, color: '#1A1918', marginBottom: 5 }}>
+                    <div style={{ fontSize: 12, color: '#1A1918', marginBottom: 5 }}>
                       You're expecting to pay <span style={{ fontWeight: 700, color: accent }}>{formatMoney(monthlyExpectedPay)}</span> this month
                     </div>
                   )}
                   {isLending && monthlyReceived > 0 && (
-                    <div style={{ fontSize: 11, color: '#1A1918' }}>
+                    <div style={{ fontSize: 12, color: '#1A1918' }}>
                       You've received <span style={{ fontWeight: 700, color: accent }}>{formatMoney(monthlyReceived)}</span> so far
                     </div>
                   )}
                   {!isLending && monthlyPaidOut > 0 && (
-                    <div style={{ fontSize: 11, color: '#1A1918' }}>
+                    <div style={{ fontSize: 12, color: '#1A1918' }}>
                       You've paid <span style={{ fontWeight: 700, color: accent }}>{formatMoney(monthlyPaidOut)}</span> so far
                     </div>
                   )}

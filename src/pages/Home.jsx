@@ -2150,9 +2150,9 @@ export default function Home() {
                 let si = 0;
                 while (reminders.length < 3) { reminders.push(suggestions[si++ % suggestions.length]); }
                 const noteConfigs = [
-                  { bg: 'linear-gradient(170deg, #FFE566 0%, #FFD638 100%)', rotate: '-3.5deg', ty: '7px', zIndex: 1, textColor: '#5C4200' },
-                  { bg: 'linear-gradient(170deg, #FFFDE0 0%, #FFF59D 100%)', rotate: '1.8deg',  ty: '0px',  zIndex: 2, textColor: '#5C4200' },
-                  { bg: 'linear-gradient(170deg, #FFE082 0%, #FFCA28 100%)', rotate: '-1deg',   ty: '5px',  zIndex: 3, textColor: '#5C4200' },
+                  { bg: 'linear-gradient(170deg, #BFDFFF 0%, #93C5FF 100%)', rotate: '-3.5deg', ty: '7px', zIndex: 1, textColor: '#0A3550' },
+                  { bg: 'linear-gradient(170deg, #D8EDFF 0%, #B3D8FF 100%)', rotate: '1.8deg',  ty: '0px',  zIndex: 2, textColor: '#0A3550' },
+                  { bg: 'linear-gradient(170deg, #A8D4FF 0%, #7BB8FF 100%)', rotate: '-1deg',   ty: '5px',  zIndex: 3, textColor: '#0A3550' },
                 ];
                 return (
                   <div className="home-card-attention" style={{ display: 'flex', paddingBottom: 10, overflow: 'visible' }}>
@@ -2323,20 +2323,20 @@ export default function Home() {
               {(monthlyExpectedReceive > 0 || monthlyExpectedPay > 0) && (
                 <div className="home-card-monthly-summary" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {monthlyExpectedReceive > 0 && (
-                    <div style={{ position: 'relative', background: 'linear-gradient(170deg, #FFF9DE 0%, #FFF3B0 100%)', borderRadius: '2px 2px 3px 3px', boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)', padding: '12px 14px 13px 12px', overflow: 'visible' }}>
+                    <div style={{ position: 'relative', background: 'linear-gradient(170deg, #D8EDFF 0%, #B3D8FF 100%)', borderRadius: '2px 2px 3px 3px', boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)', padding: '12px 14px 13px 12px', overflow: 'visible' }}>
                       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'rgba(0,0,0,0.08)', borderRadius: '2px 2px 0 0' }} />
-                      <div style={{ fontSize: 12, fontWeight: 600, color: '#5C4200', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.3, marginTop: 5 }}>You've received <span style={{ color: '#03ACEA' }}>{formatMoney(monthlyReceived)}</span></div>
-                      <div style={{ fontSize: 11, color: '#8C6D00', fontFamily: "'DM Sans', sans-serif", marginTop: 2 }}>of {formatMoney(monthlyExpectedReceive)} expected in {format(today, 'MMMM')}</div>
-                      <div style={{ position: 'absolute', bottom: 0, right: 0, width: 16, height: 16, background: '#D4C060', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 2 }} />
+                      <div style={{ fontSize: 12, fontWeight: 600, color: '#0A3550', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.3, marginTop: 5 }}>You've received <span style={{ color: '#03ACEA' }}>{formatMoney(monthlyReceived)}</span></div>
+                      <div style={{ fontSize: 11, color: '#1D5B94', fontFamily: "'DM Sans', sans-serif", marginTop: 2 }}>of {formatMoney(monthlyExpectedReceive)} expected in {format(today, 'MMMM')}</div>
+                      <div style={{ position: 'absolute', bottom: 0, right: 0, width: 16, height: 16, background: '#5AAED4', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 2 }} />
                       <div style={{ position: 'absolute', bottom: 0, right: 0, width: 20, height: 20, background: 'radial-gradient(ellipse at 100% 100%, rgba(0,0,0,0.20) 0%, transparent 65%)', zIndex: 1 }} />
                     </div>
                   )}
                   {monthlyExpectedPay > 0 && (
-                    <div style={{ position: 'relative', background: 'linear-gradient(170deg, #FFFDE0 0%, #FFF59D 100%)', borderRadius: '2px 2px 3px 3px', boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)', padding: '12px 14px 13px 12px', overflow: 'visible' }}>
+                    <div style={{ position: 'relative', background: 'linear-gradient(170deg, #C5E3FF 0%, #99C9FF 100%)', borderRadius: '2px 2px 3px 3px', boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)', padding: '12px 14px 13px 12px', overflow: 'visible' }}>
                       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'rgba(0,0,0,0.08)', borderRadius: '2px 2px 0 0' }} />
-                      <div style={{ fontSize: 12, fontWeight: 600, color: '#5C4200', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.3, marginTop: 5 }}>You've paid <span style={{ color: '#8C6D00' }}>{formatMoney(monthlyPaidOut)}</span></div>
-                      <div style={{ fontSize: 11, color: '#8C6D00', fontFamily: "'DM Sans', sans-serif", marginTop: 2 }}>of {formatMoney(monthlyExpectedPay)} due in {format(today, 'MMMM')}</div>
-                      <div style={{ position: 'absolute', bottom: 0, right: 0, width: 16, height: 16, background: '#D4C060', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 2 }} />
+                      <div style={{ fontSize: 12, fontWeight: 600, color: '#0A3550', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.3, marginTop: 5 }}>You've paid <span style={{ color: '#1D5B94' }}>{formatMoney(monthlyPaidOut)}</span></div>
+                      <div style={{ fontSize: 11, color: '#1D5B94', fontFamily: "'DM Sans', sans-serif", marginTop: 2 }}>of {formatMoney(monthlyExpectedPay)} due in {format(today, 'MMMM')}</div>
+                      <div style={{ position: 'absolute', bottom: 0, right: 0, width: 16, height: 16, background: '#3D8FBF', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 2 }} />
                       <div style={{ position: 'absolute', bottom: 0, right: 0, width: 20, height: 20, background: 'radial-gradient(ellipse at 100% 100%, rgba(0,0,0,0.20) 0%, transparent 65%)', zIndex: 1 }} />
                     </div>
                   )}
