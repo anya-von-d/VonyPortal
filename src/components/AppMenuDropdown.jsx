@@ -5,6 +5,8 @@ import { useAuth } from '@/lib/AuthContext';
 
 /* ── Icons ── */
 const PendingIcon = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>;
+const ProfileIcon = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
+const FriendsIcon = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
 const LearnIcon = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
 const InviteIcon = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>;
 const ContactIcon = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>;
@@ -50,7 +52,7 @@ function Item({ label, icon, onClick, to, danger }) {
  *   onInviteFriend   — open FriendsPopup on Invite tab
  *   onOpenSettings   — open SettingsModal
  */
-export default function AppMenuDropdown({ style, onClose, onInviteFriend, onOpenSettings, onOpenPendingRequests }) {
+export default function AppMenuDropdown({ style, onClose, onInviteFriend, onOpenSettings, onOpenPendingRequests, onOpenFriends, showProfileAndFriends }) {
   const { logout } = useAuth();
 
   const close = () => { if (onClose) onClose(); };
@@ -65,6 +67,12 @@ export default function AppMenuDropdown({ style, onClose, onInviteFriend, onOpen
       fontFamily: "'DM Sans', sans-serif",
       ...style,
     }}>
+      {showProfileAndFriends && (
+        <>
+          <Item label="Profile"          to={createPageUrl('Profile')} onClick={close} icon={<ProfileIcon />} />
+          <Item label="Friends"          onClick={() => { close(); onOpenFriends && onOpenFriends(); }} icon={<FriendsIcon />} />
+        </>
+      )}
       <Item label="Pending Requests" onClick={() => { close(); onOpenPendingRequests && onOpenPendingRequests(); }} icon={<PendingIcon />} />
       <Item label="Learn"           to={createPageUrl('LoanHelp')} onClick={close} icon={<LearnIcon />} />
       <Item label="Invite a Friend" onClick={() => { close(); onInviteFriend && onInviteFriend(); }} icon={<InviteIcon />} />

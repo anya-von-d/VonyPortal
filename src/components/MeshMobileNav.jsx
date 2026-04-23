@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import UserAvatar from "@/components/ui/UserAvatar";
 import SettingsModal from "@/components/SettingsModal";
 import FriendsPopup from "@/components/FriendsPopup";
 import NotificationsPopup from "@/components/NotificationsPopup";
@@ -139,35 +138,6 @@ export default function MeshMobileNav({ user, activePage }) {
             )}
           </button>
 
-          {/* Profile — standalone glass bubble */}
-          <Link to={createPageUrl("Profile")} style={{
-            ...glassBubble,
-            background: isActivePage('Profile') ? 'rgba(0,0,0,0.08)' : glassBubble.background,
-          }}>
-            <UserAvatar
-              name={user?.full_name || user?.username}
-              src={user?.avatar_url || user?.profile_picture_url}
-              size={26}
-              radius={13}
-            />
-          </Link>
-
-          {/* Friends — standalone glass bubble */}
-          <button
-            onClick={() => { setFriendsOpen(v => !v); setNotifOpen(false); setMenuOpen(false); }}
-            style={{
-              ...glassBubble, cursor: 'pointer',
-              background: friendsOpen ? 'rgba(0,0,0,0.08)' : glassBubble.background,
-            }}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={friendsOpen ? '#1A1918' : 'rgba(0,0,0,0.6)'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-          </button>
-
           {/* Hamburger / App menu — bare, no bubble */}
           <div ref={menuRef} style={{ position: 'relative' }}>
             <button
@@ -193,21 +163,26 @@ export default function MeshMobileNav({ user, activePage }) {
                 onClose={() => setMenuOpen(false)}
                 onInviteFriend={() => { setFriendsInitialTab('Invite'); setFriendsOpen(true); }}
                 onOpenSettings={() => setSettingsOpen(true)}
+                onOpenFriends={() => setFriendsOpen(true)}
+                showProfileAndFriends
               />
             )}
           </div>
         </div>
       </div>
 
-      {/* ── Floating bottom pill nav ── */}
+      {/* ── Floating bottom pill nav — glass like notification bubble ── */}
       <div style={{
         position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)',
         zIndex: 200,
-        background: '#1A1918',
+        background: 'rgba(255,255,255,0.82)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        border: '1px solid rgba(0,0,0,0.10)',
         borderRadius: 40,
         padding: '6px 8px',
         display: 'flex', alignItems: 'center', gap: 2,
-        boxShadow: '0 4px 24px rgba(0,0,0,0.28), 0 1px 6px rgba(0,0,0,0.18)',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.13)',
         fontFamily: "'DM Sans', sans-serif",
         whiteSpace: 'nowrap',
       }}>
@@ -243,8 +218,8 @@ export default function MeshMobileNav({ user, activePage }) {
           style={{
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             padding: '8px 16px', borderRadius: 30, cursor: 'pointer', textDecoration: 'none',
-            background: isLendingActive ? 'rgba(255,255,255,0.15)' : 'transparent',
-            color: isLendingActive ? '#ffffff' : 'rgba(255,255,255,0.5)',
+            background: isLendingActive ? 'rgba(0,0,0,0.08)' : 'transparent',
+            color: isLendingActive ? '#1A1918' : 'rgba(0,0,0,0.6)',
             fontSize: 13, fontWeight: isLendingActive ? 700 : 500,
             letterSpacing: '-0.01em',
             transition: 'background 0.15s, color 0.15s',
@@ -295,8 +270,8 @@ function BottomNavItem({ to, active, icon }) {
       style={{
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
         width: 40, height: 40, borderRadius: 30, textDecoration: 'none',
-        background: active ? 'rgba(255,255,255,0.15)' : 'transparent',
-        color: active ? '#ffffff' : 'rgba(255,255,255,0.5)',
+        background: active ? 'rgba(0,0,0,0.08)' : 'transparent',
+        color: active ? '#1A1918' : 'rgba(0,0,0,0.6)',
         transition: 'background 0.15s, color 0.15s',
       }}
     >
