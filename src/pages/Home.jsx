@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { format, startOfMonth, endOfMonth, addMonths, addDays, isBefore, isAfter, isSameDay, differenceInDays } from "date-fns";
 import { formatMoney } from "@/components/utils/formatMoney";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toLocalDate, getLocalToday, daysUntil as daysUntilDate } from "@/components/utils/dateUtils";
 import { countNotifications } from "@/components/utils/notificationCount";
 import LoanTimeline from "@/components/LoanTimeline";
@@ -773,6 +774,8 @@ export default function Home() {
   const [lbTab, setLbTab] = useState('lending'); // 'lending' | 'borrowing'
   const [selectedBubblePerson, setSelectedBubblePerson] = useState(null);
   const [hoveredPostit, setHoveredPostit] = useState(null);
+  const [rankingFilterLending, setRankingFilterLending] = useState('status');
+  const [rankingFilterBorrowing, setRankingFilterBorrowing] = useState('status');
   const [editingPlan, setEditingPlan] = useState(false);
   const loansWasOut = useRef(true);
   const activeWasOut = useRef(true);
@@ -2231,10 +2234,29 @@ export default function Home() {
                 </div>
               )}
 
-              {/* Your Loans — two paper cards, lending on top anti-clockwise, borrowing clockwise */}
+              {/* Your Loans — two paper cards with sort dropdown */}
               {(() => {
-                const renderLoanRow = (loan, isLending) => {
-                  const circleColor = isLending ? '#03ACEA' : '#1D5B94';
+                const sortLoans = (loansArr, filter) => [...loansArr].sort((a, b) => {
+                  if (filter === 'status') { const aOv = a.next_payment_date && new Date(a.next_payment_date) < new Date(); const bOv = b.next_payment_date && new Date(b.next_payment_date) < new Date(); if (aOv && !bOv) return -1; if (!aOv && bOv) return 1; return 0; }
+                  if (filter === 'highest_interest') return (b.interest_rate || 0) - (a.interest_rate || 0);
+                  if (filter === 'lowest_interest') return (a.interest_rate || 0) - (b.interest_rate || 0);
+                  if (filter === 'highest_payment') return (b.payment_amount || 0) - (a.payment_amount || 0);
+                  if (filter === 'lowest_payment') return (a.payment_amount || 0) - (b.payment_amount || 0);
+                  if (filter === 'soonest_deadline') { const dA = a.next_payment_date ? new Date(a.next_payment_date) : new Date('2099-01-01'); const dB = b.next_payment_date ? new Date(b.next_payment_date) : new Date('2099-01-01'); return dA - dB; }
+                  if (filter === 'largest_amount') return (b.total_amount || b.amount || 0) - (a.total_amount || a.amount || 0);
+                  if (filter === 'smallest_amount') return (a.total_amount || a.amount || 0) - (b.total_amount || b.amount || 0);
+                  if (filter === 'most_repaid') { const pA = (a.total_amount||a.amount||0)>0?(a.amount_paid||0)/(a.total_amount||a.amount||1):0; const pB = (b.total_amount||b.amount||0)>0?(b.amount_paid||0)/(b.total_amount||b.amount||1):0; return pB-pA; }
+                  if (filter === 'least_repaid') { const pA = (a.total_amount||a.amount||0)>0?(a.amount_paid||0)/(a.total_amount||a.amount||1):0; const pB = (b.total_amount||b.amount||0)>0?(b.amount_paid||0)/(b.total_amount||b.amount||1):0; return pA-pB; }
+                  if (filter === 'most_recent') return new Date(b.created_at) - new Date(a.created_at);
+                  return 0;
+                });
+
+                const renderLoanRow = (loan, isLending, idx, filter) => {
+                  const accentCol = isLending ? '#03ACEA' : '#1D5B94';
+                  const accentColBg = isLending ? 'rgba(3,172,234,0.10)' : 'rgba(29,91,148,0.10)';
+                  const lendGrad = ['#7FD9FF','#3DC4F5','#03ACEA','#0291C0','#027AA3'];
+                  const borrGrad = ['#7AAED4','#4D8DBF','#2B6EA8','#1D5B94','#154578'];
+                  const ringColor = (isLending ? lendGrad : borrGrad)[idx] || accentCol;
                   const otherId = isLending ? loan.borrower_id : loan.lender_id;
                   const otherProfile = safeAllProfiles.find(p => p.user_id === otherId);
                   const name = otherProfile?.full_name?.split(' ')[0] || otherProfile?.username || 'User';
@@ -2243,73 +2265,101 @@ export default function Home() {
                   const hasPending = safePayments.some(p => p && p.loan_id === loan.id && p.status === 'pending_confirmation');
                   const isBehind = nextDue && nextDue < today && !hasPending;
                   const behindAmt = isBehind ? (loan.payment_amount || 0) : 0;
-                  const statusLabel = isBehind ? `${formatMoney(behindAmt)} ${isLending ? 'behind' : 'overdue'}` : 'On track';
-                  const statusColor = isBehind ? '#E8726E' : '#03ACEA';
-                  const statusBg = isBehind ? 'rgba(232,114,110,0.08)' : 'rgba(3,172,234,0.10)';
                   const pctRepaid = total > 0 ? Math.round(((loan.amount_paid || 0) / total) * 100) : 0;
                   const subLine = isLending
                     ? `Borrowed ${formatMoney(total)} from you${loan.purpose ? ` for ${loan.purpose}` : ''}`
                     : `Lent you ${formatMoney(total)}${loan.purpose ? ` for ${loan.purpose}` : ''}`;
                   const pct = Math.min(1, Math.max(0, pctRepaid / 100));
-                  const sz = 24, r = 9, cx = 12, cy = 12;
+                  const sz = 34, r = 13, cx = 17, cy = 17;
                   const circ = 2 * Math.PI * r;
                   const dash = pct * circ;
+                  let badgeLabel = '', badgeColor = accentCol, badgeBg = accentColBg;
+                  if (filter === 'status') { badgeLabel = isBehind ? `${formatMoney(behindAmt)} ${isLending ? 'behind' : 'overdue'}` : 'On track'; badgeColor = isBehind ? '#E8726E' : accentCol; badgeBg = isBehind ? 'rgba(232,114,110,0.08)' : accentColBg; }
+                  else if (filter === 'highest_interest' || filter === 'lowest_interest') { badgeLabel = `${loan.interest_rate || 0}% interest`; }
+                  else if (filter === 'highest_payment' || filter === 'lowest_payment') { badgeLabel = `${formatMoney(loan.payment_amount || 0)}/period`; }
+                  else if (filter === 'soonest_deadline') { const d = loan.next_payment_date ? daysUntilDate(loan.next_payment_date) : null; badgeLabel = d === null ? '—' : d < 0 ? `${Math.abs(d)}d late` : d === 0 ? 'today' : `${d}d`; if (d !== null && d < 0) { badgeColor = '#E8726E'; badgeBg = 'rgba(232,114,110,0.08)'; } }
+                  else if (filter === 'largest_amount' || filter === 'smallest_amount') { badgeLabel = `${formatMoney(total)} total`; }
+                  else if (filter === 'most_repaid' || filter === 'least_repaid') { badgeLabel = `${pctRepaid}% repaid`; }
+                  else if (filter === 'most_recent') { badgeLabel = loan.created_at ? format(new Date(loan.created_at), 'MMM d') : '—'; }
                   return (
                     <div key={loan.id} style={{ padding: '9px 0', display: 'flex', alignItems: 'center', gap: 9 }}>
                       <div style={{ position: 'relative', width: sz, height: sz, flexShrink: 0 }}>
                         <svg width={sz} height={sz} viewBox={`0 0 ${sz} ${sz}`}>
-                          <circle cx={cx} cy={cy} r={r} fill="none" stroke={`${circleColor}22`} strokeWidth="3"/>
+                          <circle cx={cx} cy={cy} r={r} fill="none" stroke={`${ringColor}22`} strokeWidth="3"/>
                           {pct > 0 && (
-                            <circle cx={cx} cy={cy} r={r} fill="none" stroke={circleColor} strokeWidth="3"
+                            <circle cx={cx} cy={cy} r={r} fill="none" stroke={ringColor} strokeWidth="3"
                               strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"
                               transform={`rotate(-90 ${cx} ${cy})`}
                             />
                           )}
                         </svg>
+                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: ringColor, lineHeight: 1, fontFamily: "'DM Sans', sans-serif" }}>{idx + 1}</span>
+                        </div>
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
                           <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
-                          <span style={{ flexShrink: 0, position: 'relative', display: 'inline-block', width: 96, height: 18 }}>
-                            <span style={{ position: 'absolute', inset: 0, fontSize: 10, fontWeight: 700, color: statusColor, background: statusBg, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'lbStatusA 8s ease-in-out infinite', lineHeight: 1, whiteSpace: 'nowrap' }}>{statusLabel}</span>
-                            <span style={{ position: 'absolute', inset: 0, fontSize: 10, fontWeight: 700, color: '#9B9A98', background: 'rgba(0,0,0,0.04)', borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'lbStatusB 8s ease-in-out infinite', lineHeight: 1, whiteSpace: 'nowrap' }}>{pctRepaid}% repaid</span>
-                          </span>
+                          <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, color: badgeColor, background: badgeBg, borderRadius: 5, padding: '2px 6px', lineHeight: 1.2, whiteSpace: 'nowrap' }}>{badgeLabel}</span>
                         </div>
                         <div style={{ fontSize: 11, color: '#9B9A98', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{subLine}</div>
                       </div>
                     </div>
                   );
                 };
+
+                const sortedBorrowing = sortLoans(borrowedLoans, rankingFilterBorrowing);
+                const sortedLending = sortLoans(lentLoans, rankingFilterLending);
+
+                const SortDropdown = ({ value, onChange, accentCol, accentColBg }) => (
+                  <Select value={value} onValueChange={onChange}>
+                    <SelectTrigger className="w-auto h-7 px-2 border-0 text-xs font-medium rounded-lg" style={{ background: accentColBg, color: accentCol }}><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="status">Status</SelectItem>
+                      <SelectItem value="highest_interest">Highest Interest Rate</SelectItem>
+                      <SelectItem value="lowest_interest">Lowest Interest Rate</SelectItem>
+                      <SelectItem value="highest_payment">Highest Payment</SelectItem>
+                      <SelectItem value="lowest_payment">Lowest Payment</SelectItem>
+                      <SelectItem value="soonest_deadline">Soonest Deadline</SelectItem>
+                      <SelectItem value="largest_amount">Largest Amount</SelectItem>
+                      <SelectItem value="smallest_amount">Smallest Amount</SelectItem>
+                      <SelectItem value="most_repaid">Most Repaid</SelectItem>
+                      <SelectItem value="least_repaid">Least Repaid</SelectItem>
+                      <SelectItem value="most_recent">Most Recently Created</SelectItem>
+                    </SelectContent>
+                  </Select>
+                );
+
                 return (
                   <div className="home-card-loans-pair" style={{ display: 'flex', flexDirection: 'column' }}>
-                    <style>{`
-                      @keyframes lbStatusA {
-                        0%, 44% { opacity: 1; }
-                        52%, 94% { opacity: 0; }
-                        100% { opacity: 1; }
-                      }
-                      @keyframes lbStatusB {
-                        0%, 44% { opacity: 0; }
-                        52%, 94% { opacity: 1; }
-                        100% { opacity: 0; }
-                      }
-                    `}</style>
 
                     {/* Your Borrowing */}
                     <div style={{ background: '#FFFEFD', borderRadius: 4, boxShadow: '0 1px 0 2px #f0efea, 0 3px 0 3px #f5f4f0, 2px 6px 18px rgba(0,0,0,0.13)', padding: '14px 18px', marginBottom: 20 }}>
-                      <SectionHeader title="Your Borrowing" linkTo={createPageUrl('LendingBorrowing') + '?tab=borrowing'} linkLabel="View all →" />
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Your Borrowing</span>
+                          <Link to={createPageUrl('LendingBorrowing') + '?tab=borrowing'} style={{ fontSize: 11, fontWeight: 500, color: '#03ACEA', textDecoration: 'none' }}>View all →</Link>
+                        </div>
+                        <SortDropdown value={rankingFilterBorrowing} onChange={setRankingFilterBorrowing} accentCol="#1D5B94" accentColBg="rgba(29,91,148,0.10)" />
+                      </div>
                       {borrowedLoans.length === 0
                         ? <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>No active borrowing 🌱</div>
-                        : <div style={{ display: 'flex', flexDirection: 'column' }}>{borrowedLoans.map(l => renderLoanRow(l, false))}</div>
+                        : <div style={{ display: 'flex', flexDirection: 'column' }}>{sortedBorrowing.map((l, idx) => renderLoanRow(l, false, idx, rankingFilterBorrowing))}</div>
                       }
                     </div>
 
                     {/* Your Lending */}
                     <div style={{ background: '#FFFEFD', borderRadius: 4, boxShadow: '0 1px 0 2px #f0efea, 0 3px 0 3px #f5f4f0, 2px 6px 18px rgba(0,0,0,0.13)', padding: '14px 18px' }}>
-                      <SectionHeader title="Your Lending" linkTo={createPageUrl('LendingBorrowing') + '?tab=lending'} linkLabel="View all →" />
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Your Lending</span>
+                          <Link to={createPageUrl('LendingBorrowing') + '?tab=lending'} style={{ fontSize: 11, fontWeight: 500, color: '#03ACEA', textDecoration: 'none' }}>View all →</Link>
+                        </div>
+                        <SortDropdown value={rankingFilterLending} onChange={setRankingFilterLending} accentCol="#03ACEA" accentColBg="rgba(3,172,234,0.10)" />
+                      </div>
                       {lentLoans.length === 0
                         ? <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>No active lending 🌱</div>
-                        : <div style={{ display: 'flex', flexDirection: 'column' }}>{lentLoans.map(l => renderLoanRow(l, true))}</div>
+                        : <div style={{ display: 'flex', flexDirection: 'column' }}>{sortedLending.map((l, idx) => renderLoanRow(l, true, idx, rankingFilterLending))}</div>
                       }
                     </div>
                   </div>
