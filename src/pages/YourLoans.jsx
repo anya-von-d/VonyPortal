@@ -535,8 +535,8 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                 {/* Left (2fr): Loan Terms full-width, then doc buttons below */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
 
-                  {/* Loan Terms */}
-                  <div style={{ ...cardBase }}>
+                  {/* Loan Terms — crisp white notecard */}
+                  <div style={{ background: '#FFFFFF', borderRadius: 2, border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 10px rgba(0,0,0,0.08)', padding: '14px 12px' }}>
                     <div style={{ fontSize: 11, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif", marginBottom: 10 }}>Loan Terms</div>
                     <div className="loan-terms-inner" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
                       {[
@@ -598,8 +598,8 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                 {/* Right (1fr): Repayment Progress and You're Owed side-by-side */}
                 <div className="loan-repayment-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, alignItems: 'stretch' }}>
 
-                  {/* Repayment Progress — no title, bigger chart */}
-                  <div style={{ ...cardBase, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                  {/* Repayment Progress — warm ivory with folded corner */}
+                  <div style={{ background: '#FEFCF4', borderRadius: 3, border: 'none', boxShadow: '2px 5px 14px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.07)', padding: '14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                     <div style={{ position: 'relative', width: 80, height: 80, marginBottom: 8 }}>
                       <svg width="80" height="80" viewBox="0 0 128 128" style={{ transform: 'rotate(-90deg)' }}>
                         <circle cx="64" cy="64" r="45" fill="none" stroke={`${ringColor}26`} strokeWidth="10" />
@@ -613,12 +613,14 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                     <div style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", textAlign: 'center', lineHeight: 1.4 }}>
                       {formatMoney(totalPaidAmt)} of {formatMoney(totalWithInterest)} {isLending ? 'repaid to you' : 'paid back'}
                     </div>
+                    {/* Corner fold */}
+                    <div style={{ position: 'absolute', bottom: 0, right: 0, width: 18, height: 18, background: '#DDD9CF', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 2 }} />
                   </div>
 
-                  {/* You're Owed — paper style */}
+                  {/* You're Owed — amber-tinted stacked paper */}
                   <div style={{
-                    background: '#FEFCF8', borderRadius: 3,
-                    boxShadow: '0 1px 0 2px #f0efea, 0 3px 0 3px #f5f4f0, 2px 6px 18px rgba(0,0,0,0.13)',
+                    background: '#FFFEF6', borderRadius: 2,
+                    boxShadow: '0 1px 0 2px #ede8d5, 0 3px 0 3px #f3edd8, 2px 6px 16px rgba(0,0,0,0.11)',
                     padding: '12px 10px 10px', fontFamily: "'DM Sans', sans-serif",
                     display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'visible',
                   }}>
@@ -698,7 +700,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
           </div>
         </PageCard>
 
-        <PageCard title="Activity">
+        <PageCard title="Activity" style={{ background: '#FEFEFE', borderRadius: 2, border: 'none', boxShadow: '5px 4px 18px rgba(0,0,0,0.09), -1px 0 0 rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.06)' }}>
           <div>
           {(() => {
             const ag = loanAgreements.find(a => a.loan_id === selectedLoan.id);
@@ -768,7 +770,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
         </div>{/* end left column */}
 
         <div>
-        <PageCard title="Payments">
+        <PageCard title="Payments" style={{ background: '#FDFBF3', borderRadius: 3, border: 'none', boxShadow: '0 1px 0 2px #ede8d5, 0 3px 0 3px #f3edd8, 2px 6px 18px rgba(0,0,0,0.11)' }}>
           <div>
           {(() => {
             const paymentAmt = selectedLoan.payment_amount || 0;
@@ -831,8 +833,9 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
         </PageCard>
         </div>{/* end payments column */}
 
-        <div>
-        <PageCard title="Loan Progress">
+        <div style={{ position: 'relative', marginBottom: 24 }}>
+          <div style={{ position: 'absolute', bottom: -5, right: -4, left: 5, top: 5, background: 'rgba(0,0,0,0.07)', borderRadius: 3, transform: 'rotate(1.5deg)' }} />
+        <PageCard title="Loan Progress" wrapperStyle={{ marginBottom: 0 }} style={{ background: '#FEFCF8', borderRadius: 3, border: 'none', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', position: 'relative', zIndex: 1 }}>
           <div>
           {(() => {
             const repaymentPeriod = selectedLoan.repayment_period || 0;
