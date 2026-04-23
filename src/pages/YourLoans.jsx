@@ -511,7 +511,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
           const paidPct = Math.round(totalWithInterest > 0 ? Math.min(100, (totalPaidAmt / totalWithInterest) * 100) : 0);
           const remaining = Math.max(0, totalWithInterest - totalPaidAmt);
           const ringColor = isLending ? '#03ACEA' : '#1D5B94';
-          const cardBase = { background: '#FEFCF8', borderRadius: 3, border: 'none', boxShadow: '0 1px 0 2px #f0efea, 0 3px 0 3px #f5f4f0, 2px 6px 18px rgba(0,0,0,0.13)', padding: '14px 12px' };
+          const cardBase = { background: '#FEFCF8', borderRadius: 3, border: 'none', boxShadow: '0 8px 14px rgba(0,0,0,0.14), 0 1px 2px rgba(0,0,0,0.12)', padding: '14px 12px' };
           const C = 2 * Math.PI * 45; const ringOffset = C - (paidPct / 100) * C;
           const interestRate = selectedLoan.interest_rate || 0;
           const repaymentPeriod = selectedLoan.repayment_period || 0;
@@ -620,7 +620,8 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                   {/* You're Owed — amber-tinted stacked paper */}
                   <div style={{
                     background: '#FFFEF6', borderRadius: 2,
-                    boxShadow: '0 1px 0 2px #ede8d5, 0 3px 0 3px #f3edd8, 2px 6px 16px rgba(0,0,0,0.11)',
+                    boxShadow: '10px 12px 26px rgba(0,0,0,0.13), -2px -1px 6px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06)',
+                    transform: 'rotate(0.3deg)',
                     padding: '12px 10px 10px', fontFamily: "'DM Sans', sans-serif",
                     display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'visible',
                   }}>
@@ -646,7 +647,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
         {/* 3-col: [Payment History + Activity] | [Payments] | [Loan Progress] */}
         <div className="loan-details-masonry" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20, alignItems: 'start' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-        <PageCard title="Payment History" wrapperStyle={{ marginBottom: 0 }}>
+        <PageCard title="Payment History" shadow="lifted" wrapperStyle={{ marginBottom: 0 }}>
           <div>
           {chartData.length === 0 ? (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: chartHeight }}><p style={{ fontSize: 12, color: '#C7C6C4' }}>No payment schedule</p></div>
@@ -770,7 +771,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
         </div>{/* end left column */}
 
         <div>
-        <PageCard title="Payments" style={{ background: '#FDFBF3', borderRadius: 3, border: 'none', boxShadow: '0 1px 0 2px #ede8d5, 0 3px 0 3px #f3edd8, 2px 6px 18px rgba(0,0,0,0.11)' }}>
+        <PageCard title="Payments" shadow="tiltR" style={{ background: '#FDFBF3', borderRadius: 3, border: 'none', boxShadow: '10px 8px 22px rgba(0,0,0,0.12), 2px 2px 6px rgba(0,0,0,0.07)', transform: 'rotate(0.4deg)' }}>
           <div>
           {(() => {
             const paymentAmt = selectedLoan.payment_amount || 0;
@@ -835,7 +836,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
 
         <div style={{ position: 'relative', marginBottom: 24 }}>
           <div style={{ position: 'absolute', bottom: -5, right: -4, left: 5, top: 5, background: 'rgba(0,0,0,0.07)', borderRadius: 3, transform: 'rotate(1.5deg)' }} />
-        <PageCard title="Loan Progress" wrapperStyle={{ marginBottom: 0 }} style={{ background: '#FEFCF8', borderRadius: 3, border: 'none', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', position: 'relative', zIndex: 1 }}>
+        <PageCard title="Loan Progress" wrapperStyle={{ marginBottom: 0 }} style={{ background: '#FEFCF8', borderRadius: 3, border: 'none', boxShadow: '0 20px 40px rgba(0,0,0,0.12), 0 3px 8px rgba(0,0,0,0.05)', position: 'relative', zIndex: 1 }}>
           <div>
           {(() => {
             const repaymentPeriod = selectedLoan.repayment_period || 0;
@@ -948,11 +949,9 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                 </div>
               </div>
 
-              {/* Box 2 — Repayment Progress — paper with lifted corner */}
+              {/* Box 2 — Repayment Progress — single sheet, lifted right */}
               <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
-              {/* Lifted corner shadow layer */}
-              <div style={{ position: 'absolute', bottom: -5, right: -4, left: 5, top: 5, background: 'rgba(0,0,0,0.07)', borderRadius: 4, transform: 'rotate(1.8deg)' }} />
-              <div style={{ position: 'relative', zIndex: 1, background: '#FEFCF8', borderRadius: 4, border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', padding: '14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ position: 'relative', zIndex: 1, background: '#FEFCF8', borderRadius: 4, border: 'none', boxShadow: '10px 8px 22px rgba(0,0,0,0.12), 2px 2px 6px rgba(0,0,0,0.07)', transform: 'rotate(0.5deg)', padding: '14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 {(() => {
                   const c2 = isLending ? '#03ACEA' : '#1D5B94';
                   const p2 = isLending ? percentRepaid : percentPaid;
@@ -999,7 +998,8 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                 <div style={{
                   background: '#FEFCF8',
                   borderRadius: 4,
-                  boxShadow: '0 1px 0 2px #f0efea, 0 3px 0 3px #f5f4f0, 2px 6px 18px rgba(0,0,0,0.13)',
+                  boxShadow: '-10px 8px 22px rgba(0,0,0,0.12), -2px 2px 6px rgba(0,0,0,0.07)',
+                  transform: 'rotate(-0.4deg)',
                   padding: '14px 16px',
                   fontFamily: "'DM Sans', sans-serif",
                   textAlign: 'center',
@@ -1049,7 +1049,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
             const firstDays = combined.length > 0 ? combined[0].days : null;
             const nextLabel = firstDays === null ? '' : firstDays < 0 ? 'overdue' : firstDays === 0 ? 'today' : firstDays === 1 ? 'tomorrow' : `in ${firstDays} days`;
             return (
-              <div style={{ background: '#FEFDF9', borderRadius: 4, border: 'none', boxShadow: '0 1px 0 2px #f0efea, 0 3px 0 3px #f5f4f0, 2px 6px 18px rgba(0,0,0,0.13)', padding: '14px 18px' }}>
+              <div style={{ background: '#FEFDF9', borderRadius: 4, border: 'none', boxShadow: '0 14px 34px rgba(0,0,0,0.18), 0 3px 8px rgba(0,0,0,0.10)', padding: '14px 18px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Upcoming</div>
                   <Link to={createPageUrl('Upcoming')} style={{ fontSize: 11, fontWeight: 500, color: accent, textDecoration: 'none', fontFamily: "'DM Sans', sans-serif" }}>Full schedule →</Link>
@@ -1125,7 +1125,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
               });
               return (
                 <div>
-                <PageCard tone={tone} title={titleStr} style={{ marginBottom: 0, background: '#FEFCF8', borderRadius: 4, boxShadow: '0 1px 0 2px #f0efea, 0 3px 0 3px #f5f4f0, 2px 6px 18px rgba(0,0,0,0.13)' }} headerRight={
+                <PageCard tone={tone} title={titleStr} shadow="peeled" style={{ marginBottom: 0, background: '#FEFCF8', borderRadius: 4, boxShadow: '14px 10px 24px rgba(0,0,0,0.14), -6px -4px 14px rgba(0,0,0,0.06)', transform: 'rotate(-0.3deg)' }} headerRight={
                   <Select value={rankingFilter} onValueChange={setRankingFilter}>
                     <SelectTrigger className="w-auto h-7 px-2 border-0 text-xs font-medium rounded-lg" style={{ background: accentColBg, color: accentCol }}><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -1300,7 +1300,20 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
 
   const LENDER_GREEN = '#03ACEA';
 
-  const PageCard = ({ title, headerRight, children, style, highlight, tone, wrapperStyle }) => {
+  // Single-paper shadow variants — no layered aura. Each card is one sheet.
+  const paperVariants = {
+    soft:   { boxShadow: '0 2px 6px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.04)', transform: 'none' },
+    lifted: { boxShadow: '10px 12px 26px rgba(0,0,0,0.13), -2px -1px 6px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06)', transform: 'rotate(0.25deg)' },
+    strong: { boxShadow: '0 14px 34px rgba(0,0,0,0.18), 0 3px 8px rgba(0,0,0,0.10)', transform: 'none' },
+    tiltL:  { boxShadow: '-10px 8px 22px rgba(0,0,0,0.12), -2px 2px 6px rgba(0,0,0,0.07)', transform: 'rotate(-0.4deg)' },
+    tiltR:  { boxShadow: '10px 8px 22px rgba(0,0,0,0.12), 2px 2px 6px rgba(0,0,0,0.07)', transform: 'rotate(0.4deg)' },
+    floaty: { boxShadow: '0 20px 40px rgba(0,0,0,0.12), 0 3px 8px rgba(0,0,0,0.05)', transform: 'translateY(-1px)' },
+    peeled: { boxShadow: '14px 10px 24px rgba(0,0,0,0.14), -6px -4px 14px rgba(0,0,0,0.06)', transform: 'rotate(-0.3deg)' },
+    crisp:  { boxShadow: '0 8px 14px rgba(0,0,0,0.14), 0 1px 2px rgba(0,0,0,0.12)', transform: 'none' },
+  };
+
+  const PageCard = ({ title, headerRight, children, style, highlight, tone, wrapperStyle, shadow }) => {
+    const v = paperVariants[shadow] || paperVariants.soft;
     return (
     <div style={{ position: 'relative', marginBottom: 24, ...wrapperStyle }}>
     <div style={{
@@ -1308,7 +1321,8 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
       background: '#FEFCF8',
       borderRadius: 3,
       border: 'none',
-      boxShadow: '0 1px 0 2px #f0efea, 0 3px 0 3px #f5f4f0, 2px 6px 18px rgba(0,0,0,0.13)',
+      boxShadow: v.boxShadow,
+      transform: v.transform,
       padding: '14px 18px',
       ...style
     }}>
