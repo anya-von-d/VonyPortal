@@ -1173,7 +1173,9 @@ export default function LoanAgreements() {
 
           {activeTab === 'documents' ? (
           <>
-          <PageCard style={{ padding: '14px 18px' }}>
+          <div style={{ position: 'relative', marginBottom: 24 }}>
+          <div style={{ position: 'absolute', inset: -5, background: '#CFDCE7', borderRadius: 16, filter: 'blur(6px)', opacity: 0.75, zIndex: 0, pointerEvents: 'none' }} />
+          <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 14, border: 'none', boxShadow: '0 6px 28px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.10)', padding: '18px 22px' }}>
 
           {/* Filters */}
           <div style={{ marginBottom: 16 }}>
@@ -1385,7 +1387,8 @@ export default function LoanAgreements() {
               )}
             </div>
           </div>
-          </PageCard>
+          </div>
+          </div>
 
           {/* Desktop table responsive styles */}
           <style>{`
