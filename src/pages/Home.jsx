@@ -2311,9 +2311,9 @@ export default function Home() {
                 const sortedBorrowing = sortLoans(borrowedLoans, rankingFilterBorrowing);
                 const sortedLending = sortLoans(lentLoans, rankingFilterLending);
 
-                const SortDropdown = ({ value, onChange, accentCol, accentColBg }) => (
+                const SortDropdown = ({ value, onChange }) => (
                   <Select value={value} onValueChange={onChange}>
-                    <SelectTrigger className="w-auto h-7 px-2 border-0 text-xs font-medium rounded-lg" style={{ background: accentColBg, color: accentCol }}><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="w-auto border-0 p-0 shadow-none focus:ring-0" style={{ background: 'transparent', color: '#03ACEA', fontSize: 11, fontWeight: 500, fontFamily: "'DM Sans', sans-serif", height: 'auto', gap: 3 }}><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="status">Status</SelectItem>
                       <SelectItem value="highest_interest">Highest Interest Rate</SelectItem>
@@ -2335,12 +2335,9 @@ export default function Home() {
 
                     {/* Your Borrowing */}
                     <div style={{ background: '#FFFEFD', borderRadius: 4, boxShadow: '0 1px 0 2px #f0efea, 0 3px 0 3px #f5f4f0, 2px 6px 18px rgba(0,0,0,0.13)', padding: '14px 18px', marginBottom: 20 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Your Borrowing</span>
-                          <Link to={createPageUrl('LendingBorrowing') + '?tab=borrowing'} style={{ fontSize: 11, fontWeight: 500, color: '#03ACEA', textDecoration: 'none' }}>View all →</Link>
-                        </div>
-                        <SortDropdown value={rankingFilterBorrowing} onChange={setRankingFilterBorrowing} accentCol="#1D5B94" accentColBg="rgba(29,91,148,0.10)" />
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Your Borrowing</span>
+                        <SortDropdown value={rankingFilterBorrowing} onChange={setRankingFilterBorrowing} />
                       </div>
                       {borrowedLoans.length === 0
                         ? <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>No active borrowing 🌱</div>
@@ -2350,12 +2347,9 @@ export default function Home() {
 
                     {/* Your Lending */}
                     <div style={{ background: '#FFFEFD', borderRadius: 4, boxShadow: '0 1px 0 2px #f0efea, 0 3px 0 3px #f5f4f0, 2px 6px 18px rgba(0,0,0,0.13)', padding: '14px 18px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Your Lending</span>
-                          <Link to={createPageUrl('LendingBorrowing') + '?tab=lending'} style={{ fontSize: 11, fontWeight: 500, color: '#03ACEA', textDecoration: 'none' }}>View all →</Link>
-                        </div>
-                        <SortDropdown value={rankingFilterLending} onChange={setRankingFilterLending} accentCol="#03ACEA" accentColBg="rgba(3,172,234,0.10)" />
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Your Lending</span>
+                        <SortDropdown value={rankingFilterLending} onChange={setRankingFilterLending} />
                       </div>
                       {lentLoans.length === 0
                         ? <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>No active lending 🌱</div>
