@@ -101,8 +101,24 @@ export default function Layout({ children }) {
   const isHomePage = location.pathname === '/' || location.pathname === '/home';
   const isDashboardStyle = isHomePage || location.pathname === '/Upcoming' || location.pathname === '/upcoming' || location.pathname === '/Borrowing' || location.pathname === '/borrowing' || location.pathname === '/RecentActivity' || location.pathname === '/recentactivity' || location.pathname === '/Lending' || location.pathname === '/lending' || location.pathname === '/CreateOffer' || location.pathname === '/createoffer' || location.pathname === '/LoanAgreements' || location.pathname === '/loanagreements' || location.pathname === '/RecordPayment' || location.pathname === '/recordpayment' || location.pathname === '/YourLoans' || location.pathname === '/yourloans' || location.pathname === '/Profile' || location.pathname === '/profile' || location.pathname === '/ComingSoon' || location.pathname === '/comingsoon' || location.pathname === '/LoanHelp' || location.pathname === '/loanhelp';
 
+  const todayLabel = new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+
   return (
     <div className="min-h-screen flex flex-col w-full safe-area-inset-top safe-area-inset-bottom" style={{ background: 'transparent' }}>
+
+      {/* Thin blue top bar with centered date */}
+      <div style={{
+        position: 'fixed', top: 0, left: 0, right: 0,
+        height: 22, background: '#03ACEA',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        zIndex: 50, pointerEvents: 'none',
+        fontFamily: "'DM Sans', sans-serif",
+        fontSize: 11, fontWeight: 600, color: '#ffffff',
+        letterSpacing: '0.02em',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+      }}>
+        {todayLabel}
+      </div>
 
       {/* Fine grain overlay — sits above all content, pointer-events off */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 15, backgroundImage: GRAIN_FINE, backgroundSize: '180px 180px', mixBlendMode: 'multiply', opacity: 0.10 }} />
