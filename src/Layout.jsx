@@ -105,9 +105,9 @@ export default function Layout({ children }) {
     <div className="min-h-screen flex flex-col w-full safe-area-inset-top safe-area-inset-bottom" style={{ background: 'transparent' }}>
 
       {/* Fine grain overlay — sits above all content, pointer-events off */}
-      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 15, backgroundImage: GRAIN_FINE, backgroundSize: '180px 180px', mixBlendMode: 'multiply', opacity: 0.18 }} />
+      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 15, backgroundImage: GRAIN_FINE, backgroundSize: '180px 180px', mixBlendMode: 'multiply', opacity: 0.10 }} />
       {/* Coarse fibre overlay — adds pulp/texture depth */}
-      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 15, backgroundImage: GRAIN_FIBRE, backgroundSize: '600px 600px', mixBlendMode: 'multiply', opacity: 0.35 }} />
+      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 15, backgroundImage: GRAIN_FIBRE, backgroundSize: '600px 600px', mixBlendMode: 'multiply', opacity: 0.20 }} />
 
       {/* Main content container */}
       <main className="flex-1">
