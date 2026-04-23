@@ -556,12 +556,12 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                   {/* Blue doc buttons — horizontal row, centered, fit to text */}
                   <div className="loan-doc-btns" style={{ display: 'flex', flexDirection: 'row', gap: 6, justifyContent: 'center' }}>
                     <div style={{ position: 'relative' }}>
-                      <div style={{ background: '#03ACEA', borderRadius: 10, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 10px' }}>
+                      <div style={{ background: '#FEFEFE', borderRadius: 0, boxShadow: '5px 4px 18px rgba(0,0,0,0.09), -1px 0 0 rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.06)', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 10px' }}>
                         <button onClick={() => { const ag = loanAgreements.find(a => a.loan_id === selectedLoan.id); if (ag) openDocPopup('promissory', ag); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-                          <p style={{ fontSize: 12, fontWeight: 600, color: 'white', margin: 0, whiteSpace: 'nowrap' }}>Promissory Note</p>
+                          <p style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', margin: 0, whiteSpace: 'nowrap' }}>Promissory Note</p>
                         </button>
                         <button onClick={(e) => { e.stopPropagation(); setInfoTooltip(infoTooltip === 'promissory' ? null : 'promissory'); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', flexShrink: 0 }}>
-                          <span style={{ width: 16, height: 16, borderRadius: '50%', background: 'rgba(255,255,255,0.3)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ fontSize: 9, fontWeight: 800, color: 'white', lineHeight: 1 }}>i</span></span>
+                          <span style={{ width: 16, height: 16, borderRadius: '50%', background: '#03ACEA', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ fontSize: 9, fontWeight: 800, color: 'white', lineHeight: 1 }}>i</span></span>
                         </button>
                       </div>
                       {infoTooltip === 'promissory' && (
@@ -571,12 +571,12 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                       )}
                     </div>
                     <div style={{ position: 'relative' }}>
-                      <div style={{ background: '#03ACEA', borderRadius: 10, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 10px' }}>
+                      <div style={{ background: '#FEFEFE', borderRadius: 0, boxShadow: '5px 4px 18px rgba(0,0,0,0.09), -1px 0 0 rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.06)', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 10px' }}>
                         <button onClick={() => { const ag = loanAgreements.find(a => a.loan_id === selectedLoan.id); if (ag) openDocPopup('amortization', ag); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-                          <p style={{ fontSize: 12, fontWeight: 600, color: 'white', margin: 0, whiteSpace: 'nowrap' }}>Amortization Schedule</p>
+                          <p style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', margin: 0, whiteSpace: 'nowrap' }}>Amortization Schedule</p>
                         </button>
                         <button onClick={(e) => { e.stopPropagation(); setInfoTooltip(infoTooltip === 'amortization' ? null : 'amortization'); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', flexShrink: 0 }}>
-                          <span style={{ width: 16, height: 16, borderRadius: '50%', background: 'rgba(255,255,255,0.3)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ fontSize: 9, fontWeight: 800, color: 'white', lineHeight: 1 }}>i</span></span>
+                          <span style={{ width: 16, height: 16, borderRadius: '50%', background: '#03ACEA', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ fontSize: 9, fontWeight: 800, color: 'white', lineHeight: 1 }}>i</span></span>
                         </button>
                       </div>
                       {infoTooltip === 'amortization' && (
@@ -586,9 +586,9 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                       )}
                     </div>
                     <div className="loan-doc-summary-wrap">
-                      <div style={{ background: '#03ACEA', borderRadius: 10, display: 'inline-flex', alignItems: 'center', padding: '7px 10px' }}>
+                      <div style={{ background: '#FEFEFE', borderRadius: 0, boxShadow: '5px 4px 18px rgba(0,0,0,0.09), -1px 0 0 rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.06)', display: 'inline-flex', alignItems: 'center', padding: '7px 10px' }}>
                         <button onClick={() => { const ag = loanAgreements.find(a => a.loan_id === selectedLoan.id); if (ag) openDocPopup('summary', ag); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-                          <p style={{ fontSize: 12, fontWeight: 600, color: 'white', margin: 0, whiteSpace: 'nowrap' }}>Loan Summary</p>
+                          <p style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', margin: 0, whiteSpace: 'nowrap' }}>Loan Summary</p>
                         </button>
                       </div>
                     </div>
