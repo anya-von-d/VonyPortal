@@ -2078,9 +2078,9 @@ export default function Home() {
                 let si = 0;
                 while (reminders.length < 3) { reminders.push(suggestions[si++ % suggestions.length]); }
                 const noteConfigs = [
-                  { bg: '#5BC8F5', rotate: '-3.5deg', ty: '7px', zIndex: 1, textColor: '#003A52' },
-                  { bg: '#88D8F8', rotate: '1.8deg',  ty: '0px',  zIndex: 2, textColor: '#003A52' },
-                  { bg: '#29B5E8', rotate: '-1deg',   ty: '5px',  zIndex: 3, textColor: '#001F30' },
+                  { img: '/images/postits/1.png', rotate: '-3.5deg', ty: '7px', zIndex: 1, textColor: '#002A40' },
+                  { img: '/images/postits/2.png', rotate: '1.8deg',  ty: '0px',  zIndex: 2, textColor: '#003A52' },
+                  { img: '/images/postits/3.png', rotate: '-1deg',   ty: '5px',  zIndex: 3, textColor: '#001F30' },
                 ];
                 return (
                   <div className="home-card-attention" style={{ display: 'flex', paddingBottom: 10, overflow: 'visible' }}>
@@ -2096,36 +2096,46 @@ export default function Home() {
                           style={{
                             flex: 1,
                             minHeight: 120,
-                            background: nc.bg,
-                            borderRadius: '3px 3px 4px 4px',
-                            padding: '14px 10px 12px',
                             marginRight: i < 2 ? -11 : 0,
                             transform: hoveredPostit === i
                               ? `rotate(${nc.rotate}) translateY(calc(${nc.ty} - 10px))`
                               : `rotate(${nc.rotate}) translateY(${nc.ty})`,
                             zIndex: hoveredPostit === i ? 10 : nc.zIndex,
                             position: 'relative',
-                            boxShadow: hoveredPostit === i
-                              ? '4px 12px 28px rgba(0,0,0,0.22), 0 2px 6px rgba(0,0,0,0.14)'
-                              : '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)',
+                            // drop-shadow follows the PNG's alpha so shadow hugs the paper edge
+                            filter: hoveredPostit === i
+                              ? 'drop-shadow(4px 10px 14px rgba(0,0,0,0.26)) drop-shadow(0 2px 5px rgba(0,0,0,0.16))'
+                              : 'drop-shadow(2px 5px 9px rgba(0,0,0,0.22)) drop-shadow(0 1px 2px rgba(0,0,0,0.12))',
                             cursor: rem.action ? 'pointer' : 'default',
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: 6,
-                            transition: 'transform 0.18s ease, box-shadow 0.18s ease',
+                            transition: 'transform 0.18s ease, filter 0.18s ease',
                           }}
                         >
-                          {/* Top sticky strip */}
-                          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'rgba(0,0,0,0.08)', borderRadius: '2px 2px 0 0' }} />
+                          {/* Post-it paper image */}
+                          <img
+                            src={nc.img}
+                            alt=""
+                            draggable={false}
+                            style={{
+                              position: 'absolute', inset: 0,
+                              width: '100%', height: '100%',
+                              objectFit: 'fill',
+                              pointerEvents: 'none', userSelect: 'none',
+                              zIndex: 0,
+                            }}
+                          />
+                          {/* Text on top of the paper */}
                           <p style={{
-                            margin: 0,
-                            marginTop: 8,
+                            position: 'relative', zIndex: 1,
+                            margin: 0, padding: '18px 14px 14px',
                             fontSize: 11,
                             fontWeight: isSuggestion ? 400 : 600,
                             color: nc.textColor,
                             fontFamily: "'DM Sans', sans-serif",
                             lineHeight: 1.45,
-                            opacity: isSuggestion ? 0.7 : 1,
+                            opacity: isSuggestion ? 0.85 : 1,
+                            textShadow: '0 1px 0 rgba(255,255,255,0.25)',
                           }}>
                             {rem.text}
                           </p>
