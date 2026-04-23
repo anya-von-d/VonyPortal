@@ -925,27 +925,31 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
             {/* Two side-by-side overview boxes */}
             <div style={{ display: 'flex', gap: 12 }}>
 
-              {/* Box 1 — You're Owed / You Owe — post-it note */}
+              {/* Box 1 — You're Owed / You Owe — post-it (png1) */}
               <div style={{
                 flex: 1, minWidth: 0, minHeight: 120, position: 'relative',
-                background: 'linear-gradient(170deg, #FFE566 0%, #FFD638 100%)',
-                borderRadius: '3px 3px 4px 4px',
-                boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)',
-                padding: '14px 10px 12px',
                 fontFamily: "'DM Sans', sans-serif",
                 transform: 'rotate(-1.5deg)',
-                display: 'flex', flexDirection: 'column', gap: 6,
+                filter: 'drop-shadow(2px 5px 9px rgba(0,0,0,0.22)) drop-shadow(0 1px 2px rgba(0,0,0,0.12))',
               }}>
-                {/* Top strip */}
-                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'rgba(0,0,0,0.08)', borderRadius: '2px 2px 0 0' }} />
-                <div style={{ fontSize: 11, fontWeight: 600, color: '#5C4200', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.45, marginTop: 4 }}>
-                  {isLending ? "You're owed" : "You owe"}
-                </div>
-                <div style={{ fontSize: 11, fontWeight: 600, color: '#5C4200', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.45, marginBottom: 'auto' }}>
-                  {isLending ? formatMoney(lentOwed) : formatMoney(borrowOwed)}
-                </div>
-                <div style={{ fontSize: 11, fontWeight: 600, color: '#5C4200', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.45, textAlign: 'right' }}>
-                  across {activeLoans.length} loan{activeLoans.length !== 1 ? 's' : ''}
+                <img src="/images/postits/1.png" alt="" style={{
+                  position: 'absolute', inset: 0, width: '100%', height: '100%',
+                  objectFit: 'fill', zIndex: 0, pointerEvents: 'none',
+                }} />
+                <div style={{
+                  position: 'relative', zIndex: 1,
+                  padding: '14px 12px 12px',
+                  display: 'flex', flexDirection: 'column', gap: 6, height: '100%',
+                }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#002A40', lineHeight: 1.45 }}>
+                    {isLending ? "You're owed" : "You owe"}
+                  </div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#002A40', lineHeight: 1.45, marginBottom: 'auto' }}>
+                    {isLending ? formatMoney(lentOwed) : formatMoney(borrowOwed)}
+                  </div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#002A40', lineHeight: 1.45, textAlign: 'right' }}>
+                    across {activeLoans.length} loan{activeLoans.length !== 1 ? 's' : ''}
+                  </div>
                 </div>
               </div>
 
@@ -1270,14 +1274,23 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                 <div style={{ display: 'flex', justifyContent: 'center', margin: '8px 0 20px', padding: '0 16px' }}>
                   <div style={{
                     position: 'relative',
-                    background: 'linear-gradient(170deg, #FFE566 0%, #FFD638 100%)',
-                    borderRadius: 3,
-                    padding: '14px 18px 12px',
-                    boxShadow: '2px 5px 16px rgba(0,0,0,0.14), 0 1px 3px rgba(0,0,0,0.08)',
+                    minWidth: 280,
                     maxWidth: '100%',
+                    transform: 'rotate(-1deg)',
+                    filter: 'drop-shadow(2px 5px 9px rgba(0,0,0,0.22)) drop-shadow(0 1px 2px rgba(0,0,0,0.12))',
                   }}>
-                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'rgba(0,0,0,0.08)', borderRadius: '2px 2px 0 0' }} />
-                    <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: '#5C4200', fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <img src="/images/postits/2.png" alt="" style={{
+                      position: 'absolute', inset: 0, width: '100%', height: '100%',
+                      objectFit: 'fill', zIndex: 0, pointerEvents: 'none',
+                    }} />
+                    <p style={{
+                      position: 'relative', zIndex: 1,
+                      margin: 0, padding: '16px 22px 14px',
+                      fontSize: 12, fontWeight: 600, color: '#003A52',
+                      fontFamily: "'DM Sans', sans-serif",
+                      whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                      textAlign: 'center',
+                    }}>
                       {desc}
                     </p>
                   </div>
