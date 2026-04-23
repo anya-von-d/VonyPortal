@@ -1040,7 +1040,6 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                   fontFamily: "'DM Sans', sans-serif",
                   textAlign: 'center',
                 }}>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: '#9B9A98', letterSpacing: '0.10em', textTransform: 'uppercase', marginBottom: 8 }}>Insight</div>
                   <div style={{ fontSize: 11, fontWeight: 600, color: accent, marginBottom: 10, lineHeight: 1.5 }}>{insightText}</div>
                   {isLending && monthlyExpectedReceive > 0 && (
                     <div style={{ fontSize: 11, color: '#1A1918', marginBottom: 5 }}>
@@ -1242,12 +1241,14 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                 const scale = isSelected ? 1.07 : Math.max(0.80, 1 - Math.abs(diff) * 0.05);
                 const ty = isSelected || selectedIdx === -1 ? 0 : Math.abs(diff) * 5;
                 const zIdx = isSelected ? 10 : Math.max(1, 6 - Math.abs(diff));
+                const avatarUrl = profile?.avatar_url || profile?.profile_picture_url;
+                const initials = name.charAt(0).toUpperCase();
                 return (
                   <div
                     key={loan.id}
                     onClick={() => setSelectedScrollLoan(isSelected ? null : loan)}
                     style={{
-                      width: 115, flexShrink: 0, position: 'relative', zIndex: zIdx,
+                      width: 100, flexShrink: 0, position: 'relative', zIndex: zIdx,
                       cursor: 'pointer',
                       transform: `rotate(${rotate}deg) scale(${scale}) translateY(${ty}px)`,
                       transformOrigin: 'bottom center',
@@ -1255,27 +1256,29 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                       userSelect: 'none',
                     }}
                   >
-                    {/* Spiral binding holes */}
-                    <div style={{ display: 'flex', gap: 7, justifyContent: 'center', paddingLeft: 4, paddingRight: 4, marginBottom: -1 }}>
-                      {[0,1,2,3,4,5].map(ri => (
-                        <div key={ri} style={{ width: 9, height: 11, borderRadius: '4px 4px 0 0', border: '1.5px solid rgba(0,0,0,0.22)', borderBottom: 'none', background: '#DDDBD5', flexShrink: 0 }} />
-                      ))}
-                    </div>
-                    {/* Paper body */}
+                    {/* Sharp paper card */}
                     <div style={{
-                      background: '#FEFCF4',
-                      borderRadius: '0 0 3px 3px',
-                      border: isSelected ? `1.5px solid ${accent}` : '1px solid rgba(0,0,0,0.09)',
-                      borderTop: '2px solid rgba(0,0,0,0.18)',
-                      boxShadow: isSelected ? `0 6px 20px ${accent}28, 2px 4px 10px rgba(0,0,0,0.10)` : '1px 3px 8px rgba(0,0,0,0.10)',
-                      padding: '10px 10px 12px',
+                      background: '#FEFCF8',
+                      borderRadius: 3,
+                      border: isSelected ? `1.5px solid ${accent}` : '1px solid rgba(0,0,0,0.10)',
+                      boxShadow: isSelected
+                        ? `0 6px 20px ${accent}30, 2px 4px 12px rgba(0,0,0,0.12)`
+                        : '2px 4px 12px rgba(0,0,0,0.13), 1px 1px 0 rgba(0,0,0,0.05)',
+                      padding: '10px 8px 12px',
                       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
-                      backgroundImage: 'repeating-linear-gradient(to bottom, transparent, transparent 20px, rgba(3,172,234,0.08) 20px, rgba(3,172,234,0.08) 21px)',
                     }}>
+                      {/* Profile photo */}
+                      {avatarUrl ? (
+                        <img src={avatarUrl} alt={name} style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                      ) : (
+                        <div style={{ width: 34, height: 34, borderRadius: '50%', background: `${accent}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <span style={{ fontSize: 14, fontWeight: 700, color: accent, fontFamily: "'DM Sans', sans-serif" }}>{initials}</span>
+                        </div>
+                      )}
                       <div style={{ fontSize: 11, fontWeight: 600, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", textAlign: 'center', lineHeight: 1.25 }}>{name}</div>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: accent, fontFamily: "'DM Sans', sans-serif" }}>{formatMoney(remaining)}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: accent, fontFamily: "'DM Sans', sans-serif" }}>{formatMoney(remaining)}</div>
                       {loan.purpose && (
-                        <div style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", textAlign: 'center', lineHeight: 1.35, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                        <div style={{ fontSize: 9, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", textAlign: 'center', lineHeight: 1.35, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                           {loan.purpose}
                         </div>
                       )}
@@ -1284,6 +1287,34 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                 );
               })}
             </div>
+
+            {/* Selected loan sticky note description */}
+            {selectedScrollLoan && (() => {
+              const selCard = loanCards.find(c => c.loan.id === selectedScrollLoan.id);
+              const fullName = selCard?.profile?.full_name || selCard?.name || 'User';
+              const amt = formatMoney(selectedScrollLoan.amount || 0);
+              const purpose = selectedScrollLoan.purpose;
+              const desc = isLending
+                ? `${fullName} borrowed ${amt}${purpose ? ` for ${purpose}` : ''}`
+                : `You borrowed ${amt} from ${fullName}${purpose ? ` for ${purpose}` : ''}`;
+              return (
+                <div style={{ display: 'flex', justifyContent: 'center', margin: '8px 0 20px', padding: '0 16px' }}>
+                  <div style={{
+                    position: 'relative',
+                    background: 'linear-gradient(170deg, #D8EDFF 0%, #B3D8FF 100%)',
+                    borderRadius: 3,
+                    padding: '18px 18px 12px',
+                    boxShadow: '2px 5px 16px rgba(0,0,0,0.14), 0 1px 3px rgba(0,0,0,0.08)',
+                    maxWidth: '100%',
+                  }}>
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 14, background: 'linear-gradient(to bottom, rgba(0,40,90,0.28) 0%, rgba(0,30,70,0.14) 100%)', borderRadius: '2px 2px 0 0', boxShadow: 'inset 0 -1px 0 rgba(0,0,0,0.08)' }} />
+                    <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: '#0A3550', fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {desc}
+                    </p>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Detail panel */}
             {selectedScrollLoan && (
