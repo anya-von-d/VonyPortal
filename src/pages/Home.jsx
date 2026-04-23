@@ -758,6 +758,7 @@ export default function Home() {
   };
   const [lbTab, setLbTab] = useState('lending'); // 'lending' | 'borrowing'
   const [selectedBubblePerson, setSelectedBubblePerson] = useState(null);
+  const [hoveredPostit, setHoveredPostit] = useState(null);
   const loansWasOut = useRef(true);
   const activeWasOut = useRef(true);
   const [bigScreen, setBigScreen] = useState(window.innerWidth > 900);
@@ -2207,6 +2208,8 @@ export default function Home() {
                         <div
                           key={i}
                           onClick={rem.action}
+                          onMouseEnter={() => setHoveredPostit(i)}
+                          onMouseLeave={() => setHoveredPostit(null)}
                           style={{
                             flex: 1,
                             minHeight: 110,
@@ -2214,21 +2217,26 @@ export default function Home() {
                             borderRadius: '2px 2px 3px 3px',
                             padding: '14px 10px 12px',
                             marginRight: i < 2 ? -11 : 0,
-                            transform: `rotate(${nc.rotate}) translateY(${nc.ty})`,
-                            zIndex: nc.zIndex,
+                            transform: hoveredPostit === i
+                              ? `rotate(${nc.rotate}) translateY(calc(${nc.ty} - 10px))`
+                              : `rotate(${nc.rotate}) translateY(${nc.ty})`,
+                            zIndex: hoveredPostit === i ? 10 : nc.zIndex,
                             position: 'relative',
-                            boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)',
+                            boxShadow: hoveredPostit === i
+                              ? '4px 12px 28px rgba(0,0,0,0.22), 0 2px 6px rgba(0,0,0,0.14)'
+                              : '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)',
                             cursor: rem.action ? 'pointer' : 'default',
                             display: 'flex',
                             flexDirection: 'column',
                             gap: 6,
+                            transition: 'transform 0.18s ease, box-shadow 0.18s ease',
                           }}
                         >
                           {/* Top sticky strip — darker yellow band */}
                           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'rgba(0,0,0,0.08)', borderRadius: '2px 2px 0 0' }} />
-                          <div style={{ fontSize: 18, lineHeight: 1, marginTop: 4 }}>{rem.emoji}</div>
                           <p style={{
                             margin: 0,
+                            marginTop: 8,
                             fontSize: 11,
                             fontWeight: isSuggestion ? 400 : 600,
                             color: nc.textColor,
@@ -2402,20 +2410,32 @@ export default function Home() {
                     ? `Borrowed ${formatMoney(total)} from you${loan.purpose ? ` for ${loan.purpose}` : ''}`
                     : `Lent you ${formatMoney(total)}${loan.purpose ? ` for ${loan.purpose}` : ''}`;
                   const pct = Math.min(1, Math.max(0, pctRepaid / 100));
-                  const sz = 26, r = 10, cx = 13, cy = 13;
+                  const sz = 36, r = 14, cx = 18, cy = 18;
                   const circ = 2 * Math.PI * r;
                   const dash = pct * circ;
+                  const avatarUrl = otherProfile?.avatar_url || otherProfile?.profile_picture_url;
+                  const avatarSize = 20;
                   return (
                     <div key={loan.id} style={{ padding: '9px 0', display: 'flex', alignItems: 'center', gap: 9 }}>
-                      <svg width={sz} height={sz} viewBox={`0 0 ${sz} ${sz}`} style={{ flexShrink: 0 }}>
-                        <circle cx={cx} cy={cy} r={r} fill="none" stroke={`${circleColor}22`} strokeWidth="3"/>
-                        {pct > 0 && (
-                          <circle cx={cx} cy={cy} r={r} fill="none" stroke={circleColor} strokeWidth="3"
-                            strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"
-                            transform={`rotate(-90 ${cx} ${cy})`}
-                          />
+                      <div style={{ position: 'relative', width: sz, height: sz, flexShrink: 0 }}>
+                        <svg width={sz} height={sz} viewBox={`0 0 ${sz} ${sz}`}>
+                          <circle cx={cx} cy={cy} r={r} fill="none" stroke={`${circleColor}22`} strokeWidth="3"/>
+                          {pct > 0 && (
+                            <circle cx={cx} cy={cy} r={r} fill="none" stroke={circleColor} strokeWidth="3"
+                              strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"
+                              transform={`rotate(-90 ${cx} ${cy})`}
+                            />
+                          )}
+                        </svg>
+                        {avatarUrl ? (
+                          <img src={avatarUrl} alt={name}
+                            style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: avatarSize, height: avatarSize, borderRadius: '50%', objectFit: 'cover' }} />
+                        ) : (
+                          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: avatarSize, height: avatarSize, borderRadius: '50%', background: `${circleColor}22`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <span style={{ fontSize: 8, fontWeight: 700, color: circleColor, fontFamily: "'DM Sans', sans-serif" }}>{name.charAt(0)}</span>
+                          </div>
                         )}
-                      </svg>
+                      </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
                           <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
@@ -2430,7 +2450,7 @@ export default function Home() {
                   );
                 };
                 return (
-                  <div className="home-card-loans-pair" style={{ position: 'relative', overflow: 'visible', padding: '0 6px' }}>
+                  <div className="home-card-loans-pair" style={{ display: 'flex', flexDirection: 'column' }}>
                     <style>{`
                       @keyframes lbStatusA {
                         0%, 44% { opacity: 1; }
@@ -2444,26 +2464,22 @@ export default function Home() {
                       }
                     `}</style>
 
-                    {/* Your Borrowing — clockwise, sits on top */}
-                    <div style={{ position: 'relative', zIndex: 2, transform: 'rotate(1.5deg)', transformOrigin: 'center center', marginBottom: -22 }}>
-                      <div style={{ background: '#FFFEFA', borderRadius: 4, boxShadow: '0 1px 0 2px #f0efea, 0 3px 0 3px #f5f4f0, 2px 6px 18px rgba(0,0,0,0.13)', padding: '14px 18px 36px' }}>
-                        <SectionHeader title="Your Borrowing" linkTo={createPageUrl('LendingBorrowing') + '?tab=borrowing'} linkLabel="View all →" />
-                        {borrowedLoans.length === 0
-                          ? <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>No active borrowing 🌱</div>
-                          : <div style={{ display: 'flex', flexDirection: 'column' }}>{borrowedLoans.map(l => renderLoanRow(l, false))}</div>
-                        }
-                      </div>
+                    {/* Your Borrowing */}
+                    <div style={{ background: '#FFFDFC', borderRadius: 4, boxShadow: '0 1px 0 2px #f0efea, 0 3px 0 3px #f5f4f0, 2px 6px 18px rgba(0,0,0,0.13)', padding: '14px 18px', marginBottom: 20 }}>
+                      <SectionHeader title="Your Borrowing" linkTo={createPageUrl('LendingBorrowing') + '?tab=borrowing'} linkLabel="View all →" />
+                      {borrowedLoans.length === 0
+                        ? <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>No active borrowing 🌱</div>
+                        : <div style={{ display: 'flex', flexDirection: 'column' }}>{borrowedLoans.map(l => renderLoanRow(l, false))}</div>
+                      }
                     </div>
 
-                    {/* Your Lending — anti-clockwise, sits behind */}
-                    <div style={{ position: 'relative', zIndex: 1, transform: 'rotate(-2deg)', transformOrigin: 'center center' }}>
-                      <div style={{ background: '#FFFEFA', borderRadius: 4, boxShadow: '0 1px 0 2px #f0efea, 0 3px 0 3px #f5f4f0, 2px 6px 18px rgba(0,0,0,0.13)', padding: '36px 18px 14px' }}>
-                        <SectionHeader title="Your Lending" linkTo={createPageUrl('LendingBorrowing') + '?tab=lending'} linkLabel="View all →" />
-                        {lentLoans.length === 0
-                          ? <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>No active lending 🌱</div>
-                          : <div style={{ display: 'flex', flexDirection: 'column' }}>{lentLoans.map(l => renderLoanRow(l, true))}</div>
-                        }
-                      </div>
+                    {/* Your Lending */}
+                    <div style={{ background: '#FFFDFC', borderRadius: 4, boxShadow: '0 1px 0 2px #f0efea, 0 3px 0 3px #f5f4f0, 2px 6px 18px rgba(0,0,0,0.13)', padding: '14px 18px' }}>
+                      <SectionHeader title="Your Lending" linkTo={createPageUrl('LendingBorrowing') + '?tab=lending'} linkLabel="View all →" />
+                      {lentLoans.length === 0
+                        ? <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>No active lending 🌱</div>
+                        : <div style={{ display: 'flex', flexDirection: 'column' }}>{lentLoans.map(l => renderLoanRow(l, true))}</div>
+                      }
                     </div>
                   </div>
                 );
