@@ -2446,7 +2446,7 @@ export default function Home() {
 
                     {/* Your Borrowing — clockwise, sits on top */}
                     <div style={{ position: 'relative', zIndex: 2, transform: 'rotate(1.5deg)', transformOrigin: 'center center', marginBottom: -22 }}>
-                      <div style={{ background: '#FEFDF7', borderRadius: 4, boxShadow: '0 1px 0 2px #edeade, 0 3px 0 3px #f5f3ea, 2px 6px 18px rgba(0,0,0,0.13)', padding: '14px 18px 36px' }}>
+                      <div style={{ background: '#F5F0E8', borderRadius: 4, boxShadow: '0 1px 0 2px #e8e0d0, 0 3px 0 3px #ede7d8, 2px 6px 18px rgba(0,0,0,0.13)', padding: '14px 18px 36px' }}>
                         <SectionHeader title="Your Borrowing" linkTo={createPageUrl('LendingBorrowing') + '?tab=borrowing'} linkLabel="View all →" />
                         {borrowedLoans.length === 0
                           ? <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>No active borrowing 🌱</div>
@@ -2457,7 +2457,7 @@ export default function Home() {
 
                     {/* Your Lending — anti-clockwise, sits behind */}
                     <div style={{ position: 'relative', zIndex: 1, transform: 'rotate(-2deg)', transformOrigin: 'center center' }}>
-                      <div style={{ background: '#FEFDF7', borderRadius: 4, boxShadow: '0 1px 0 2px #edeade, 0 3px 0 3px #f5f3ea, 2px 6px 18px rgba(0,0,0,0.13)', padding: '36px 18px 14px' }}>
+                      <div style={{ background: '#F5F0E8', borderRadius: 4, boxShadow: '0 1px 0 2px #e8e0d0, 0 3px 0 3px #ede7d8, 2px 6px 18px rgba(0,0,0,0.13)', padding: '36px 18px 14px' }}>
                         <SectionHeader title="Your Lending" linkTo={createPageUrl('LendingBorrowing') + '?tab=lending'} linkLabel="View all →" />
                         {lentLoans.length === 0
                           ? <div style={{ padding: '8px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>No active lending 🌱</div>
