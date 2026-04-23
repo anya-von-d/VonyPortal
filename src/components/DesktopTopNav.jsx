@@ -110,7 +110,7 @@ export default function DesktopTopNav() {
     <>
       {/* desktop-top-nav class is hidden on mobile via index.css */}
       <div className="desktop-top-nav" style={{
-        position: 'fixed', top: 18, left: 0, right: 0, zIndex: 300,
+        position: 'fixed', top: 34, left: 0, right: 0, zIndex: 300,
         display: 'flex', alignItems: 'center',
         padding: '0 56px', gap: 12,
         background: 'none',
