@@ -111,7 +111,7 @@ export default function MeshMobileNav({ user, activePage }) {
         {/* Right side */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, pointerEvents: 'auto' }}>
 
-          {/* Notifications — standalone glassmorphism bubble */}
+          {/* Notifications — standalone glass bubble */}
           <button
             onClick={() => { setNotifOpen(v => !v); setFriendsOpen(false); setMenuOpen(false); }}
             style={{
@@ -139,69 +139,62 @@ export default function MeshMobileNav({ user, activePage }) {
             )}
           </button>
 
-          {/* Combined bubble: Friends + Records + Profile + Menu */}
-          <div style={{
-            display: 'inline-flex', alignItems: 'center',
-            background: 'rgba(255,255,255,0.82)',
-            backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-            border: '1px solid rgba(0,0,0,0.10)',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.13)',
-            borderRadius: 999, padding: 4, gap: 2,
+          {/* Profile — standalone glass bubble */}
+          <Link to={createPageUrl("Profile")} style={{
+            ...glassBubble,
+            background: isActivePage('Profile') ? 'rgba(0,0,0,0.08)' : glassBubble.background,
           }}>
-            {/* Friends — opens dropdown */}
+            <UserAvatar
+              name={user?.full_name || user?.username}
+              src={user?.avatar_url || user?.profile_picture_url}
+              size={26}
+              radius={13}
+            />
+          </Link>
+
+          {/* Friends — standalone glass bubble */}
+          <button
+            onClick={() => { setFriendsOpen(v => !v); setNotifOpen(false); setMenuOpen(false); }}
+            style={{
+              ...glassBubble, cursor: 'pointer',
+              background: friendsOpen ? 'rgba(0,0,0,0.08)' : glassBubble.background,
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={friendsOpen ? '#1A1918' : 'rgba(0,0,0,0.6)'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </button>
+
+          {/* Hamburger / App menu — bare, no bubble */}
+          <div ref={menuRef} style={{ position: 'relative' }}>
             <button
-              onClick={() => { setFriendsOpen(v => !v); setNotifOpen(false); setMenuOpen(false); }}
-              style={innerBtn(friendsOpen)}
+              onClick={() => { setMenuOpen(v => !v); setNotifOpen(false); setFriendsOpen(false); }}
+              style={{
+                ...innerBtnBase,
+                width: 36, height: 36,
+                color: menuOpen ? '#1A1918' : 'rgba(0,0,0,0.6)',
+                background: 'none',
+                cursor: 'pointer',
+              }}
+              aria-label="Menu"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              <svg width="17" height="13" viewBox="0 0 17 13" fill="none">
+                <line x1="0" y1="1"   x2="17" y2="1"   stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" opacity="0.9"/>
+                <line x1="0" y1="6.5" x2="17" y2="6.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" opacity="0.9"/>
+                <line x1="0" y1="12"  x2="17" y2="12"  stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" opacity="0.9"/>
               </svg>
             </button>
-
-            {/* Records */}
-            <Link
-              to={createPageUrl("LoanAgreements")}
-              style={{
-                ...innerBtn(isActivePage('LoanAgreements')), width: 'auto', padding: '0 10px',
-                fontSize: 13, fontWeight: isActivePage('LoanAgreements') ? 600 : 500, letterSpacing: '-0.01em',
-              }}
-            >Records</Link>
-
-            {/* Profile */}
-            <Link to={createPageUrl("Profile")} style={innerBtn(isActivePage('Profile'))}>
-              <UserAvatar
-                name={user?.full_name || user?.username}
-                src={user?.avatar_url || user?.profile_picture_url}
-                size={26}
-                radius={13}
+            {menuOpen && (
+              <AppMenuDropdown
+                style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, zIndex: 400 }}
+                onClose={() => setMenuOpen(false)}
+                onInviteFriend={() => { setFriendsInitialTab('Invite'); setFriendsOpen(true); }}
+                onOpenSettings={() => setSettingsOpen(true)}
               />
-            </Link>
-
-            {/* Hamburger / App menu */}
-            <div ref={menuRef} style={{ position: 'relative' }}>
-              <button
-                onClick={() => { setMenuOpen(v => !v); setNotifOpen(false); setFriendsOpen(false); }}
-                style={innerBtn(menuOpen)}
-                aria-label="Menu"
-              >
-                <svg width="17" height="13" viewBox="0 0 17 13" fill="none">
-                  <line x1="0" y1="1"   x2="17" y2="1"   stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" opacity="0.9"/>
-                  <line x1="0" y1="6.5" x2="17" y2="6.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" opacity="0.9"/>
-                  <line x1="0" y1="12"  x2="17" y2="12"  stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" opacity="0.9"/>
-                </svg>
-              </button>
-              {menuOpen && (
-                <AppMenuDropdown
-                  style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, zIndex: 400 }}
-                  onClose={() => setMenuOpen(false)}
-                  onInviteFriend={() => { setFriendsInitialTab('Invite'); setFriendsOpen(true); }}
-                  onOpenSettings={() => setSettingsOpen(true)}
-                />
-              )}
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -259,6 +252,21 @@ export default function MeshMobileNav({ user, activePage }) {
         >
           Lending &amp; Borrowing
         </Link>
+
+        {/* Records */}
+        <BottomNavItem
+          to={createPageUrl('LoanAgreements')}
+          active={isActivePage('LoanAgreements')}
+          icon={
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+          }
+        />
       </div>
 
       <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
