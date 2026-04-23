@@ -780,6 +780,12 @@ export default function Home() {
   const [rankingFilterLending, setRankingFilterLending] = useState('status');
   const [rankingFilterBorrowing, setRankingFilterBorrowing] = useState('status');
   const [editingPlan, setEditingPlan] = useState(false);
+  // Plan Your Month — clicking a scheduled/overdue loan tick opens an inline
+  // amount prompt so the user can record the actual amount they received/sent.
+  // Shape: { lineId, loan, scheduled, direction: 'in'|'out' }
+  const [planTickTarget, setPlanTickTarget] = useState(null);
+  const [planTickAmount, setPlanTickAmount] = useState('');
+  const [planTickWorking, setPlanTickWorking] = useState(false);
   const loansWasOut = useRef(true);
   const activeWasOut = useRef(true);
   const [bigScreen, setBigScreen] = useState(window.innerWidth > 900);
@@ -900,6 +906,42 @@ export default function Home() {
       console.error('Error confirming payment:', e);
     }
     setConfirmWorking(false);
+  };
+
+  // Confirm a tick from Plan Your Month on a scheduled/overdue loan line.
+  // Creates a completed Payment with the user-entered actual amount (supports
+  // over/underpayment — the displayed paid-line will show what was received/sent).
+  const handlePlanTickConfirm = async () => {
+    if (!planTickTarget || planTickWorking) return;
+    const amount = parseFloat(planTickAmount);
+    if (!amount || amount <= 0 || Number.isNaN(amount)) return;
+    setPlanTickWorking(true);
+    try {
+      const { loan } = planTickTarget;
+      await Payment.create({
+        loan_id: loan.id,
+        amount,
+        status: 'completed',
+        payment_date: format(new Date(), 'yyyy-MM-dd'),
+      });
+      const newPaid = (loan.amount_paid || 0) + amount;
+      const total = loan.total_amount || loan.amount || 0;
+      const remaining = total - newPaid;
+      const loanUpdate = { amount_paid: newPaid };
+      if (remaining <= 0) {
+        loanUpdate.status = 'completed';
+        loanUpdate.next_payment_date = null;
+      } else {
+        loanUpdate.next_payment_date = format(addMonths(new Date(), 1), 'yyyy-MM-dd');
+      }
+      await Loan.update(loan.id, loanUpdate);
+      setPlanTickTarget(null);
+      setPlanTickAmount('');
+      await loadData();
+    } catch (e) {
+      console.error('Error confirming plan tick payment:', e);
+    }
+    setPlanTickWorking(false);
   };
 
   const handleRejectPayment = async () => {
@@ -1984,6 +2026,13 @@ export default function Home() {
                           const subLabel = isOverdue
                             ? (line.overdueDate ? `Overdue since ${format(line.overdueDate, 'MMM d')}` : 'Overdue')
                             : line.date ? `${line.dateLabel} ${format(line.date, 'MMM d')}` : null;
+                          // Loan-payment lines are tickable too (scheduled or overdue).
+                          // Clicking opens an inline input to confirm the actual amount.
+                          const loanLineMatch = line.id.match(/^(sched-in|sched-out|overdue-in|overdue-out)-(.+)$/);
+                          const isLoanLine = !!loanLineMatch;
+                          const loanForLine = isLoanLine ? myLoans.find(l => l.id === loanLineMatch[2]) : null;
+                          const isTickableLoan = !!loanForLine && !isDemoMode;
+                          const isTickPromptOpen = planTickTarget?.lineId === line.id;
                           return (
                             <React.Fragment key={line.id}>
                               {isFirstCustom && (
@@ -1992,10 +2041,20 @@ export default function Home() {
                                 </div>
                               )}
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 0' }}>
-                              {/* Tick circle — clickable for custom items */}
+                              {/* Tick circle — clickable for custom items AND scheduled/overdue loan payments */}
                               <div
-                                onClick={isCustom ? () => toggleCustomExpenseDone(line.id) : undefined}
-                                style={{ flexShrink: 0, width: 13, height: 13, borderRadius: '50%', background: isDone ? '#03ACEA' : `${dotColor}18`, border: `1.5px solid ${dotColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: isCustom ? 'pointer' : 'default', alignSelf: 'center' }}>
+                                onClick={
+                                  isCustom
+                                    ? () => toggleCustomExpenseDone(line.id)
+                                    : isTickableLoan
+                                    ? () => {
+                                        const scheduled = Math.abs(line.amount);
+                                        setPlanTickTarget({ lineId: line.id, loan: loanForLine, scheduled, direction: line.amount >= 0 ? 'in' : 'out' });
+                                        setPlanTickAmount(String(scheduled));
+                                      }
+                                    : undefined
+                                }
+                                style={{ flexShrink: 0, width: 13, height: 13, borderRadius: '50%', background: isDone ? '#03ACEA' : `${dotColor}18`, border: `1.5px solid ${dotColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: (isCustom || isTickableLoan) ? 'pointer' : 'default', alignSelf: 'center' }}>
                                 {isDone
                                   ? <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                   : null
@@ -2018,6 +2077,44 @@ export default function Home() {
                                 </button>
                               )}
                             </div>
+                            {/* Inline amount input — appears when user clicks a scheduled loan tick */}
+                            {isTickPromptOpen && (
+                              <form
+                                onSubmit={(e) => { e.preventDefault(); handlePlanTickConfirm(); }}
+                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 0 8px 21px' }}
+                              >
+                                <span style={{ fontSize: 10, color: '#787776', fontFamily: "'DM Sans', sans-serif" }}>
+                                  Amount {planTickTarget.direction === 'in' ? 'received' : 'sent'}
+                                </span>
+                                <div style={{ display: 'flex', alignItems: 'center', borderBottom: '1.5px solid #03ACEA', paddingBottom: 1 }}>
+                                  <span style={{ fontSize: 11, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>$</span>
+                                  <input
+                                    autoFocus
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value={planTickAmount}
+                                    onChange={(e) => setPlanTickAmount(e.target.value)}
+                                    onKeyDown={(e) => { if (e.key === 'Escape') { setPlanTickTarget(null); setPlanTickAmount(''); } }}
+                                    style={{ width: 64, fontSize: 11, fontFamily: "'DM Sans', sans-serif", border: 'none', outline: 'none', background: 'transparent', color: '#1A1918', padding: '2px 0', textAlign: 'right' }}
+                                  />
+                                </div>
+                                <button
+                                  type="submit"
+                                  disabled={planTickWorking}
+                                  style={{ background: '#03ACEA', border: 'none', cursor: planTickWorking ? 'default' : 'pointer', borderRadius: 6, padding: '3px 10px', color: '#fff', fontSize: 10, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", opacity: planTickWorking ? 0.6 : 1 }}
+                                >
+                                  {planTickWorking ? '…' : 'Confirm'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => { setPlanTickTarget(null); setPlanTickAmount(''); }}
+                                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#9B9A98', fontSize: 10, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", padding: '3px 4px' }}
+                                >
+                                  Cancel
+                                </button>
+                              </form>
+                            )}
                             </React.Fragment>
                           );
                         })}
