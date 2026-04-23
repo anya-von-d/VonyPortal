@@ -927,24 +927,23 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
               {/* Box 1 — You're Owed / You Owe — post-it note */}
               <div style={{
                 flex: 1, minWidth: 0, position: 'relative',
-                background: 'linear-gradient(170deg, #FFF9DE 0%, #FFF3B0 100%)',
-                borderRadius: 3,
-                boxShadow: '0 4px 10px rgba(0,0,0,0.13), 0 1px 3px rgba(0,0,0,0.08)',
-                padding: '18px 12px 12px',
+                background: 'linear-gradient(170deg, #FFE566 0%, #FFD638 100%)',
+                borderRadius: '2px 2px 3px 3px',
+                boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)',
+                padding: '14px 10px 10px',
                 fontFamily: "'DM Sans', sans-serif",
+                transform: 'rotate(-1.5deg)',
                 display: 'flex', flexDirection: 'column',
               }}>
                 {/* Top strip */}
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'rgba(0,0,0,0.08)', borderRadius: '2px 2px 0 0' }} />
-                {/* Corner curl */}
-                <div style={{ position: 'absolute', bottom: 0, right: 0, width: 16, height: 16, background: '#D4C060', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 2 }} />
-                <div style={{ fontSize: 10, fontWeight: 700, color: '#5C4200', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 8 }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: '#5C4200', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.45, marginTop: 4 }}>
                   {isLending ? "You're owed" : "You owe"}
                 </div>
-                <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: isLending ? '#03ACEA' : '#1D5B94', marginBottom: 'auto', paddingBottom: 8 }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: '#5C4200', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.45, marginBottom: 'auto' }}>
                   {isLending ? formatMoney(lentOwed) : formatMoney(borrowOwed)}
                 </div>
-                <div style={{ fontSize: 10, color: '#8B7000', textAlign: 'right' }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: '#5C4200', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.45, textAlign: 'right' }}>
                   across {activeLoans.length} loan{activeLoans.length !== 1 ? 's' : ''}
                 </div>
               </div>

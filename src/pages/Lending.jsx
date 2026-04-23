@@ -1881,6 +1881,32 @@ export default function Lending({ initialTab }) {
                   </div>
                 </PageCard>
 
+                {/* Log a Payment — sticky note */}
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
+                  <div
+                    onClick={() => { setSelectedLoan(null); setShowPaymentModal(true); }}
+                    style={{
+                      position: 'relative',
+                      background: 'linear-gradient(170deg, #FFE566 0%, #FFD638 100%)',
+                      borderRadius: '2px 2px 3px 3px',
+                      padding: '14px 14px 12px',
+                      boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)',
+                      transform: 'rotate(-1deg)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      transition: 'transform 0.18s ease, box-shadow 0.18s ease',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = 'rotate(-1deg) translateY(-4px)'; e.currentTarget.style.boxShadow = '4px 10px 24px rgba(0,0,0,0.20), 0 2px 6px rgba(0,0,0,0.12)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = 'rotate(-1deg)'; e.currentTarget.style.boxShadow = '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)'; }}
+                  >
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'rgba(0,0,0,0.08)', borderRadius: '2px 2px 0 0' }} />
+                    <span style={{ fontSize: 11, fontWeight: 600, color: '#5C4200', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.45, marginTop: 2 }}>Log a Payment</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5C4200" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                  </div>
+                </div>
+
                 {/* Upcoming Payments */}
                 <div style={{ marginBottom: 8 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, marginBottom: 2 }}>
