@@ -2095,8 +2095,8 @@ export default function Home() {
                           onMouseLeave={() => setHoveredPostit(null)}
                           style={{
                             flex: 1,
-                            minHeight: 120,
-                            marginRight: i < 2 ? -11 : 0,
+                            minHeight: 150,
+                            marginRight: i < 2 ? -22 : 0,
                             transform: hoveredPostit === i
                               ? `rotate(${nc.rotate}) translateY(calc(${nc.ty} - 10px))`
                               : `rotate(${nc.rotate}) translateY(${nc.ty})`,
@@ -2108,11 +2108,12 @@ export default function Home() {
                               : 'drop-shadow(2px 5px 9px rgba(0,0,0,0.22)) drop-shadow(0 1px 2px rgba(0,0,0,0.12))',
                             cursor: rem.action ? 'pointer' : 'default',
                             display: 'flex',
-                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
                             transition: 'transform 0.18s ease, filter 0.18s ease',
                           }}
                         >
-                          {/* Post-it paper image */}
+                          {/* Post-it paper image — fills the container, inherits parent rotation */}
                           <img
                             src={nc.img}
                             alt=""
@@ -2125,16 +2126,17 @@ export default function Home() {
                               zIndex: 0,
                             }}
                           />
-                          {/* Text on top of the paper */}
+                          {/* Centered text — already inherits the post-it's rotation via the parent */}
                           <p style={{
                             position: 'relative', zIndex: 1,
-                            margin: 0, padding: '18px 14px 14px',
-                            fontSize: 11,
-                            fontWeight: isSuggestion ? 400 : 600,
+                            margin: 0, padding: '0 16px',
+                            textAlign: 'center',
+                            fontSize: 12,
+                            fontWeight: isSuggestion ? 500 : 700,
                             color: nc.textColor,
                             fontFamily: "'DM Sans', sans-serif",
                             lineHeight: 1.45,
-                            opacity: isSuggestion ? 0.85 : 1,
+                            opacity: isSuggestion ? 0.9 : 1,
                             textShadow: '0 1px 0 rgba(255,255,255,0.25)',
                           }}>
                             {rem.text}
