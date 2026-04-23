@@ -321,10 +321,22 @@ export const getDemoLoanAgreements = (uid) => [
 ];
 
 // Plan Your Month extras injected into the Home page list in demo mode.
-export const getDemoPlanItems = () => [
-  { id: 'demo-plan-rent',   label: 'Have to send rent payment to landlord', amount: -1450, date: dateOnly(6),  status: 'custom' },
-  { id: 'demo-plan-income', label: 'Income',                                amount:  2800, date: dateOnly(10), status: 'custom' },
-];
+// Dates are clamped to the current calendar month so they always appear
+// in the current month's Plan Your Month view.
+export const getDemoPlanItems = () => {
+  const now = new Date();
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const daysLeft = Math.max(0, Math.floor((lastDay - todayMidnight) / DAY));
+  // rent: 5 days out, capped so it stays within the month
+  const rentOffset = Math.min(5, Math.max(0, daysLeft - 1));
+  // income: 8 days out, capped to the last day of the month
+  const incomeOffset = Math.min(8, daysLeft);
+  return [
+    { id: 'demo-plan-rent',   label: 'Have to send rent payment to landlord', amount: -1450, date: dateOnly(rentOffset),   status: 'custom' },
+    { id: 'demo-plan-income', label: 'Income',                                amount:  2800, date: dateOnly(incomeOffset), status: 'custom' },
+  ];
+};
 
 // Convenience selector used by entity wrappers
 export const getDemoDataset = (uid) => ({

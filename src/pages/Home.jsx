@@ -1924,7 +1924,8 @@ export default function Home() {
                   if (completedThisMonth.has(loan.id)) return;
                   const p = safeAllProfiles.find(pp => pp.user_id === loan.borrower_id);
                   const name = p?.full_name?.split(' ')[0] || p?.username || 'Borrower';
-                  cashLines.push({ id: `overdue-in-${loan.id}`, label: `From ${name}`, amount: loan.payment_amount || 0, date: d, status: 'overdue', dateLabel: 'expect by' });
+                  // date set to today so the display stays within the current month; overdueDate stores the original for the sub-label
+                  cashLines.push({ id: `overdue-in-${loan.id}`, label: `From ${name}`, amount: loan.payment_amount || 0, date: today, overdueDate: d, status: 'overdue', dateLabel: 'expect by' });
                 });
                 borrowedLoans.forEach(loan => {
                   if (!loan.next_payment_date) return;
@@ -1933,7 +1934,7 @@ export default function Home() {
                   if (completedThisMonth.has(loan.id)) return;
                   const p = safeAllProfiles.find(pp => pp.user_id === loan.lender_id);
                   const name = p?.full_name?.split(' ')[0] || p?.username || 'Lender';
-                  cashLines.push({ id: `overdue-out-${loan.id}`, label: `To ${name}`, amount: -(loan.payment_amount || 0), date: d, status: 'overdue', dateLabel: 'due' });
+                  cashLines.push({ id: `overdue-out-${loan.id}`, label: `To ${name}`, amount: -(loan.payment_amount || 0), date: today, overdueDate: d, status: 'overdue', dateLabel: 'due' });
                 });
                 cashLines.sort((a, b) => (a.date || new Date(0)) - (b.date || new Date(0)));
                 // In demo mode, strip out Elena's completed loan-7 payment (it's already paid off)
@@ -1953,9 +1954,11 @@ export default function Home() {
                 const total = allLines.reduce((s, l) => s + l.amount, 0);
                 const soFarTotal = allLines.filter(l => l.status === 'done').reduce((s, l) => s + l.amount, 0);
                 const fmtSigned = (amt) => amt === 0 ? '$0.00' : amt > 0 ? `+${formatMoney(amt)}` : `-${formatMoney(Math.abs(amt))}`;
-                // Index of the first user-added custom expense — the section header appears here
-                // In demo mode there are no user custom items, so this will be -1 (no header shown)
-                const firstCustomIdx = isDemoMode ? -1 : allLines.findIndex(line => customExpenses.some(e => e.id === line.id));
+                // Index where the "Additional Income and Expenses" header appears.
+                // In demo mode, demo plan items are treated as custom items — header before the first one.
+                const firstCustomIdx = isDemoMode
+                  ? (rawCustomExpenses.length > 0 ? effectiveCashLines.length : -1)
+                  : allLines.findIndex(line => customExpenses.some(e => e.id === line.id));
                 return (
                   <div className="home-card-plan-month" style={{ background: '#FEFEFE', borderRadius: 4, boxShadow: '0 4px 12px rgba(0,0,0,0.10)', padding: '14px 18px' }}>
                     {/* Header row with title + Edit button */}
@@ -1978,18 +1981,15 @@ export default function Home() {
                           const isCustom = customExpenses.some(e => e.id === line.id);
                           const isFirstCustom = firstCustomIdx !== -1 && idx === firstCustomIdx;
                           const dotColor = isDone ? '#03ACEA' : isOverdue ? '#E8726E' : isPos ? '#03ACEA' : '#1D5B94';
-                          const subLabel = isOverdue && line.date
-                            ? `Overdue since ${format(line.date, 'MMM d')}`
+                          const subLabel = isOverdue
+                            ? (line.overdueDate ? `Overdue since ${format(line.overdueDate, 'MMM d')}` : 'Overdue')
                             : line.date ? `${line.dateLabel} ${format(line.date, 'MMM d')}` : null;
                           return (
                             <React.Fragment key={line.id}>
                               {isFirstCustom && (
-                                <>
-                                  <div style={{ borderTop: '1px solid rgba(0,0,0,0.08)', margin: '6px 0 4px' }} />
-                                  <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif", paddingBottom: 4 }}>
-                                    Additional Income and Expenses
-                                  </div>
-                                </>
+                                <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif", paddingBottom: 4, paddingTop: 6 }}>
+                                  Additional Income and Expenses
+                                </div>
                               )}
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 0' }}>
                               {/* Tick circle — clickable for custom items */}
@@ -2180,14 +2180,14 @@ export default function Home() {
                   .map(l => {
                     const p = safeAllProfiles.find(pp => pp.user_id === l.borrower_id);
                     const name = p?.full_name?.split(' ')[0] || p?.username || 'User';
-                    return { id: l.id, direction: 'in', name, avatar: p?.avatar_url || p?.profile_picture_url, amount: l.payment_amount || 0, date: new Date(l.next_payment_date) };
+                    return { id: l.id, direction: 'in', name, avatar: p?.avatar_url || p?.profile_picture_url, amount: l.payment_amount || 0, date: new Date(l.next_payment_date), reason: l.reason || null };
                   });
                 const outgoing = borrowedLoans
                   .filter(l => l.next_payment_date && new Date(l.next_payment_date) >= new Date(now.getFullYear(), now.getMonth(), now.getDate()))
                   .map(l => {
                     const p = safeAllProfiles.find(pp => pp.user_id === l.lender_id);
                     const name = p?.full_name?.split(' ')[0] || p?.username || 'User';
-                    return { id: l.id, direction: 'out', name, avatar: p?.avatar_url || p?.profile_picture_url, amount: l.payment_amount || 0, date: new Date(l.next_payment_date) };
+                    return { id: l.id, direction: 'out', name, avatar: p?.avatar_url || p?.profile_picture_url, amount: l.payment_amount || 0, date: new Date(l.next_payment_date), reason: l.reason || null };
                   });
                 const upcoming = [...incoming, ...outgoing]
                   .sort((a, b) => a.date - b.date)
@@ -2231,8 +2231,11 @@ export default function Home() {
                               <div style={{ fontSize: 12, fontWeight: 500, color: '#1A1918' }}>{dateNum}</div>
                             </div>
                             <div style={{ width: 3, alignSelf: 'stretch', borderRadius: 2, background: barColor, flexShrink: 0 }} />
-                            <div style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 500, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {label}
+                            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                              <span style={{ fontSize: 12, fontWeight: 500, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
+                              {item.reason && (
+                                <span style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.reason}</span>
+                              )}
                             </div>
                           </div>
                         );
