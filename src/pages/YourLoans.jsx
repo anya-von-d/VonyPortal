@@ -511,7 +511,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
           const paidPct = Math.round(totalWithInterest > 0 ? Math.min(100, (totalPaidAmt / totalWithInterest) * 100) : 0);
           const remaining = Math.max(0, totalWithInterest - totalPaidAmt);
           const ringColor = isLending ? '#03ACEA' : '#1D5B94';
-          const cardBase = { background: '#ffffff', borderRadius: 10, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.13)', padding: '14px 12px' };
+          const cardBase = { background: '#FEFCF8', borderRadius: 3, border: 'none', boxShadow: '0 1px 0 2px #f0efea, 0 3px 0 3px #f5f4f0, 2px 6px 18px rgba(0,0,0,0.13)', padding: '14px 12px' };
           const C = 2 * Math.PI * 45; const ringOffset = C - (paidPct / 100) * C;
           const interestRate = selectedLoan.interest_rate || 0;
           const repaymentPeriod = selectedLoan.repayment_period || 0;
@@ -651,14 +651,13 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                     </div>
                   </div>
 
-                  {/* You're Owed — receipt style, no icon */}
+                  {/* You're Owed — paper style */}
                   <div style={{
-                    background: '#FEFEFE', borderRadius: 3,
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.06)',
+                    background: '#FEFCF8', borderRadius: 3,
+                    boxShadow: '0 1px 0 2px #f0efea, 0 3px 0 3px #f5f4f0, 2px 6px 18px rgba(0,0,0,0.13)',
                     padding: '12px 10px 10px', fontFamily: "'DM Sans', sans-serif",
                     display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'visible',
                   }}>
-                    <div style={{ position: 'absolute', top: -6, left: 0, right: 0, height: 6, backgroundImage: 'radial-gradient(circle at 6px -1px, #FEFEFE 6px, transparent 6px)', backgroundSize: '12px 6px', backgroundRepeat: 'repeat-x' }} />
                     <div style={{ fontSize: 10, fontWeight: 700, color: '#1A1918', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 5 }}>
                       {isLending ? "You're owed" : "You owe"}
                     </div>
@@ -670,7 +669,6 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                       <span style={{ fontSize: 10, color: '#9B9A98' }}>{isLending ? `${otherPartyUsername.split(' ')[0]}'s loan` : 'this loan'}</span>
                     </div>
-                    <div style={{ position: 'absolute', bottom: -6, left: 0, right: 0, height: 6, backgroundImage: 'radial-gradient(circle at 6px 7px, #FEFEFE 6px, transparent 6px)', backgroundSize: '12px 6px', backgroundRepeat: 'repeat-x' }} />
                   </div>
                 </div>
 
@@ -1336,10 +1334,10 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
     <div style={{ position: 'relative', marginBottom: 24, ...wrapperStyle }}>
     <div style={{
       position: 'relative', zIndex: 1,
-      background: '#ffffff',
-      borderRadius: 10,
+      background: '#FEFCF8',
+      borderRadius: 3,
       border: 'none',
-      boxShadow: '0 4px 20px rgba(0,0,0,0.13)',
+      boxShadow: '0 1px 0 2px #f0efea, 0 3px 0 3px #f5f4f0, 2px 6px 18px rgba(0,0,0,0.13)',
       padding: '14px 18px',
       ...style
     }}>
