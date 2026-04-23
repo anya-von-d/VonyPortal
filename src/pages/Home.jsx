@@ -1949,6 +1949,8 @@ export default function Home() {
                 const total = allLines.reduce((s, l) => s + l.amount, 0);
                 const soFarTotal = allLines.filter(l => l.status === 'done').reduce((s, l) => s + l.amount, 0);
                 const fmtSigned = (amt) => amt === 0 ? '$0.00' : amt > 0 ? `+${formatMoney(amt)}` : `-${formatMoney(Math.abs(amt))}`;
+                // Index of the first user-added custom expense — the section header appears here
+                const firstCustomIdx = allLines.findIndex(line => customExpenses.some(e => e.id === line.id));
                 return (
                   <div className="home-card-plan-month" style={{ background: '#FEFEFE', borderRadius: 4, boxShadow: '0 4px 12px rgba(0,0,0,0.10)', padding: '14px 18px' }}>
                     {/* Header row with title + Edit button */}
@@ -1969,12 +1971,22 @@ export default function Home() {
                           const isDone = line.status === 'done';
                           const isOverdue = line.status === 'overdue';
                           const isCustom = customExpenses.some(e => e.id === line.id);
+                          const isFirstCustom = firstCustomIdx !== -1 && idx === firstCustomIdx;
                           const dotColor = isDone ? '#03ACEA' : isOverdue ? '#E8726E' : isPos ? '#03ACEA' : '#1D5B94';
                           const subLabel = isOverdue && line.date
                             ? `Overdue since ${format(line.date, 'MMM d')}`
                             : line.date ? `${line.dateLabel} ${format(line.date, 'MMM d')}` : null;
                           return (
-                            <div key={line.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 0' }}>
+                            <React.Fragment key={line.id}>
+                              {isFirstCustom && (
+                                <>
+                                  <div style={{ borderTop: '1px solid rgba(0,0,0,0.08)', margin: '6px 0 4px' }} />
+                                  <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif", paddingBottom: 4 }}>
+                                    Additional Income and Expenses
+                                  </div>
+                                </>
+                              )}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 0' }}>
                               {/* Tick circle — clickable for custom items */}
                               <div
                                 onClick={isCustom ? () => toggleCustomExpenseDone(line.id) : undefined}
@@ -2001,6 +2013,7 @@ export default function Home() {
                                 </button>
                               )}
                             </div>
+                            </React.Fragment>
                           );
                         })}
                       </div>
