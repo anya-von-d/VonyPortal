@@ -2,6 +2,8 @@ import React, { createContext, useState, useContext, useEffect, useRef } from 'r
 import { supabase } from '@/lib/supabaseClient';
 import { App as CapApp } from '@capacitor/app';
 import { Browser } from '@capacitor/browser';
+import { isDemoModeActive } from '@/lib/DemoModeContext';
+import { DEMO_USER } from '@/lib/demoData';
 
 const AuthContext = createContext();
 
@@ -35,8 +37,16 @@ export const AuthProvider = ({ children }) => {
         .single();
 
       if (!error && profile) {
-        setUserProfile(profile);
-        return profile;
+        const finalProfile = isDemoModeActive()
+          ? { ...profile,
+              full_name: DEMO_USER.full_name,
+              username: DEMO_USER.username,
+              email: DEMO_USER.email,
+              profile_picture_url: DEMO_USER.profile_picture_url,
+              avatar_url: DEMO_USER.profile_picture_url }
+          : profile;
+        setUserProfile(finalProfile);
+        return finalProfile;
       }
     } catch (e) {
       console.log('Profile fetch error:', e);

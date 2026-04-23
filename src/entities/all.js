@@ -1,6 +1,18 @@
 import { supabase } from '@/lib/supabaseClient';
 import { isDemoModeActive } from '@/lib/DemoModeContext';
-import { getDemoDataset } from '@/lib/demoData';
+import { getDemoDataset, DEMO_USER } from '@/lib/demoData';
+
+// Dispatched when a demo-mode user attempts a write. A global modal listens for
+// this event and prompts them to exit demo mode. Writes always throw so
+// calling code short-circuits and doesn't fake-success.
+const emitDemoBlocked = () => {
+  try {
+    window.dispatchEvent(new CustomEvent('vony-demo-blocked'));
+  } catch {}
+  const err = new Error('DEMO_MODE_WRITE_BLOCKED');
+  err.code = 'DEMO_MODE_WRITE_BLOCKED';
+  return err;
+};
 
 // ── Demo-mode helpers ────────────────────────────────────────────────────────
 // When demo mode is on, reads (list/filter) for certain tables return sample
@@ -117,8 +129,8 @@ const createTableApi = (tableName) => ({
     return data ?? [];
   },
   async create(payload) {
-    if (isDemoModeActive() && DEMO_TABLES.has(tableName)) {
-      return { id: `demo-${tableName}-${Date.now()}`, ...payload };
+    if (isDemoModeActive()) {
+      throw emitDemoBlocked();
     }
     const { data, error } = await supabase
       .from(tableName)
@@ -129,8 +141,8 @@ const createTableApi = (tableName) => ({
     return data;
   },
   async update(id, payload) {
-    if (isDemoModeActive() && DEMO_TABLES.has(tableName)) {
-      return { id, ...payload };
+    if (isDemoModeActive()) {
+      throw emitDemoBlocked();
     }
     const { data, error } = await supabase
       .from(tableName)
@@ -142,8 +154,8 @@ const createTableApi = (tableName) => ({
     return data;
   },
   async delete(id) {
-    if (isDemoModeActive() && DEMO_TABLES.has(tableName)) {
-      return true;
+    if (isDemoModeActive()) {
+      throw emitDemoBlocked();
     }
     const { error } = await supabase.from(tableName).delete().eq('id', id);
     if (error) throw error;
@@ -219,14 +231,31 @@ const updateCurrentUserProfile = async (payload) => {
   return data;
 };
 
+const applyDemoIdentity = (profile) => {
+  if (!profile) return profile;
+  return {
+    ...profile,
+    full_name: DEMO_USER.full_name,
+    username: DEMO_USER.username,
+    email: DEMO_USER.email,
+    profile_picture_url: DEMO_USER.profile_picture_url,
+    avatar_url: DEMO_USER.profile_picture_url,
+  };
+};
+
 export const User = {
   async me() {
-    return getCurrentUserProfile();
+    const profile = await getCurrentUserProfile();
+    if (isDemoModeActive()) return applyDemoIdentity(profile);
+    return profile;
   },
   async list(order = null, limit = null) {
     return createTableApi('profiles').list(order, limit);
   },
   async updateMyUserData(payload) {
+    if (isDemoModeActive()) {
+      throw emitDemoBlocked();
+    }
     return updateCurrentUserProfile(payload);
   },
   async loginWithGoogle() {

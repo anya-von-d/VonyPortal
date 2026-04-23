@@ -12,6 +12,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { DemoModeProvider } from '@/lib/DemoModeContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import OnboardingModal from '@/components/OnboardingModal';
+import DemoBlockedModal from '@/components/DemoBlockedModal';
 import { User } from '@/entities/all';
 
 const { Pages, Layout, mainPage } = pagesConfig;
@@ -116,6 +117,7 @@ function App() {
             <AuthenticatedApp />
           </Router>
           <Toaster />
+          <DemoBlockedModal />
           <VisualEditAgent />
         </QueryClientProvider>
       </DemoModeProvider>

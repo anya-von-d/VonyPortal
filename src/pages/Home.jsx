@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Loan, Payment, PublicProfile, Friendship, LoanAgreement } from "@/entities/all";
 import { useAuth } from "@/lib/AuthContext";
+import { useDemoMode } from "@/lib/DemoModeContext";
+import { getDemoPlanItems } from "@/lib/demoData";
 
 
 import { motion, AnimatePresence } from "framer-motion";
@@ -743,6 +745,7 @@ export default function Home() {
   const [addingTask, setAddingTask] = useState(false);
   const [newTaskText, setNewTaskText] = useState('');
   // Plan Your Month — custom expenses
+  const { isDemoMode } = useDemoMode();
   const [customExpenses, setCustomExpenses] = useState(() => {
     try { const raw = localStorage.getItem('vony.plan-expenses'); return raw ? JSON.parse(raw) : []; } catch { return []; }
   });
@@ -1933,7 +1936,10 @@ export default function Home() {
                   cashLines.push({ id: `overdue-out-${loan.id}`, label: `To ${name}`, amount: -(loan.payment_amount || 0), date: d, status: 'overdue', dateLabel: 'due' });
                 });
                 cashLines.sort((a, b) => (a.date || new Date(0)) - (b.date || new Date(0)));
-                const customLines = customExpenses.map(e => ({
+                const rawCustomExpenses = isDemoMode
+                  ? [...getDemoPlanItems(), ...customExpenses]
+                  : customExpenses;
+                const customLines = rawCustomExpenses.map(e => ({
                   ...e,
                   date: e.date ? toLocalDate(e.date) : null,
                   status: e.done ? 'done' : (e.status || 'custom'),

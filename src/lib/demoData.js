@@ -2,11 +2,20 @@
  * Demo mode sample data.
  *
  * All dates are calculated RELATIVE to "now" so the demo always looks healthy
- * no matter when investors open the app. A mix of lending & borrowing, a
- * variety of reasons, and some completed history to show Vony's breadth.
+ * whenever the app is opened. A mix of lending & borrowing with varied terms,
+ * every active loan has at least one completed payment, and the math between
+ * Home and Lending/Borrowing pages is internally consistent.
  *
- * The current authenticated user becomes "you" (uid passed in). Other people
- * are fake peers with stable synthetic IDs.
+ * Consistency contract (so Home.jsx and LendingBorrowing.jsx agree):
+ *   - loan.amount            = principal (what was borrowed)
+ *   - loan.total_amount      = amount + simple interest over the term
+ *   - loan.payment_amount    = per-period payment amount (used everywhere)
+ *   - loan.repayment_period  = number of periods (used for "Term", "Payments Made N/X")
+ *   - loan.repayment_unit    = 'months' | 'weeks' | 'years' (display unit)
+ *   - loan.payment_frequency = 'monthly' | 'weekly' | 'biweekly' (used by analyzer)
+ *   - loan.interest_rate     = annual %, used by analyzer
+ *   - loan.amount_paid       = sum of completed payment amounts on this loan
+ *   - Each active loan has >=1 completed payment; totals match individual payments.
  */
 
 const DAY = 86400000;
@@ -24,9 +33,17 @@ const PEERS = {
   elena:   'demo-peer-elena-0007',
 };
 
+// Demo user identity override — shown everywhere the real user name would be.
+export const DEMO_USER = {
+  full_name: 'Alex Morgan',
+  username: 'alexmorgan',
+  email: 'demo@vony-lending.com',
+  profile_picture_url: 'https://ui-avatars.com/api/?name=Alex+Morgan&background=54A6CF&color=fff&size=128',
+};
+
 export const getDemoPublicProfiles = (uid) => [
-  { id: 'demo-pp-you', user_id: uid, username: 'you', full_name: 'You',
-    profile_picture_url: `https://ui-avatars.com/api/?name=You&background=54A6CF&color=fff&size=128` },
+  { id: 'demo-pp-you', user_id: uid, username: DEMO_USER.username, full_name: DEMO_USER.full_name,
+    profile_picture_url: DEMO_USER.profile_picture_url },
   { id: 'demo-pp-maya',   user_id: PEERS.maya,   username: 'mayac',    full_name: 'Maya Chen',
     profile_picture_url: 'https://ui-avatars.com/api/?name=Maya+Chen&background=E8A87C&color=fff&size=128' },
   { id: 'demo-pp-jordan', user_id: PEERS.jordan, username: 'jordanp',  full_name: 'Jordan Park',
@@ -53,174 +70,169 @@ export const getDemoFriendships = (uid) => [
   { id: 'demo-fr-7', user_id: PEERS.elena, friend_id: uid,  status: 'pending',  created_at: iso(-2) },
 ];
 
+/**
+ * Each loan definition below specifies its own payment schedule to keep the
+ * math internally consistent. `completed` counts the payments that show up as
+ * `status: 'completed'` in getDemoPayments (with matching dates/amounts).
+ *
+ * amount_paid === completed × payment_amount (when no pending_confirmation).
+ * total_amount === payment_amount × repayment_period (0% interest) unless
+ * interest_rate > 0, in which case total_amount is pre-computed to match.
+ */
 export const getDemoLoans = (uid) => [
   // ── LENDING (you are the lender) ──
+  // 1. Maya — 6-month, $100/mo, 4 completed + 1 pending_confirmation waiting on you
   {
     id: 'demo-loan-1',
-    lender_id: uid,
-    borrower_id: PEERS.maya,
-    amount: 600,
-    total_amount: 600,
-    amount_paid: 400,
-    payment_amount: 100,
-    next_payment_date: dateOnly(8),
-    status: 'active',
+    lender_id: uid, borrower_id: PEERS.maya,
+    amount: 600, total_amount: 600, amount_paid: 400,
+    payment_amount: 100, repayment_period: 6, repayment_unit: 'months', payment_frequency: 'monthly',
+    interest_rate: 0,
+    next_payment_date: dateOnly(8), status: 'active',
     reason: 'Flight home for the holidays',
-    created_at: iso(-150),
-    start_date: dateOnly(-150),
+    created_at: iso(-150), start_date: dateOnly(-150),
   },
+  // 2. Jordan — 8-month, $150/mo, 2 completed
   {
     id: 'demo-loan-2',
-    lender_id: uid,
-    borrower_id: PEERS.jordan,
-    amount: 1200,
-    total_amount: 1200,
-    amount_paid: 300,
-    payment_amount: 150,
-    next_payment_date: dateOnly(14),
-    status: 'active',
+    lender_id: uid, borrower_id: PEERS.jordan,
+    amount: 1200, total_amount: 1200, amount_paid: 300,
+    payment_amount: 150, repayment_period: 8, repayment_unit: 'months', payment_frequency: 'monthly',
+    interest_rate: 0,
+    next_payment_date: dateOnly(14), status: 'active',
     reason: 'First-month rent while between jobs',
-    created_at: iso(-90),
-    start_date: dateOnly(-90),
+    created_at: iso(-90), start_date: dateOnly(-90),
   },
+  // 3. Sofia — 1-period, $250, 1 completed (done)
   {
     id: 'demo-loan-3',
-    lender_id: uid,
-    borrower_id: PEERS.sofia,
-    amount: 250,
-    total_amount: 250,
-    amount_paid: 250,
-    payment_amount: 250,
-    next_payment_date: null,
-    status: 'completed',
+    lender_id: uid, borrower_id: PEERS.sofia,
+    amount: 250, total_amount: 250, amount_paid: 250,
+    payment_amount: 250, repayment_period: 1, repayment_unit: 'months', payment_frequency: 'monthly',
+    interest_rate: 0,
+    next_payment_date: null, status: 'completed',
     reason: 'Concert tickets split',
-    created_at: iso(-60),
-    start_date: dateOnly(-60),
+    created_at: iso(-60), start_date: dateOnly(-60),
   },
+  // 4. Priya — 3-month, $150/mo, 1 completed (fixes "0/0 full payments")
   {
     id: 'demo-loan-4',
-    lender_id: uid,
-    borrower_id: PEERS.priya,
-    amount: 450,
-    total_amount: 450,
-    amount_paid: 0,
-    payment_amount: 150,
-    next_payment_date: dateOnly(21),
-    status: 'active',
+    lender_id: uid, borrower_id: PEERS.priya,
+    amount: 450, total_amount: 450, amount_paid: 150,
+    payment_amount: 150, repayment_period: 3, repayment_unit: 'months', payment_frequency: 'monthly',
+    interest_rate: 0,
+    next_payment_date: dateOnly(21), status: 'active',
     reason: 'Textbooks for the semester',
-    created_at: iso(-10),
-    start_date: dateOnly(-10),
+    created_at: iso(-35), start_date: dateOnly(-35),
   },
 
   // ── BORROWING (you are the borrower) ──
+  // 5. Alex — 8-month, $100/mo, 5 completed
   {
     id: 'demo-loan-5',
-    lender_id: PEERS.alex,
-    borrower_id: uid,
-    amount: 800,
-    total_amount: 800,
-    amount_paid: 500,
-    payment_amount: 100,
-    next_payment_date: dateOnly(5),
-    status: 'active',
+    lender_id: PEERS.alex, borrower_id: uid,
+    amount: 800, total_amount: 800, amount_paid: 500,
+    payment_amount: 100, repayment_period: 8, repayment_unit: 'months', payment_frequency: 'monthly',
+    interest_rate: 0,
+    next_payment_date: dateOnly(5), status: 'active',
     reason: 'Laptop repair after coffee spill',
-    created_at: iso(-100),
-    start_date: dateOnly(-100),
+    created_at: iso(-150), start_date: dateOnly(-150),
   },
+  // 6. Marcus — 8-month, $250/mo, 2 completed + 1 pending_confirmation
   {
     id: 'demo-loan-6',
-    lender_id: PEERS.marcus,
-    borrower_id: uid,
-    amount: 2000,
-    total_amount: 2000,
-    amount_paid: 500,
-    payment_amount: 250,
-    next_payment_date: dateOnly(18),
-    status: 'active',
+    lender_id: PEERS.marcus, borrower_id: uid,
+    amount: 2000, total_amount: 2000, amount_paid: 500,
+    payment_amount: 250, repayment_period: 8, repayment_unit: 'months', payment_frequency: 'monthly',
+    interest_rate: 0,
+    next_payment_date: dateOnly(18), status: 'active',
     reason: 'Security deposit on new apartment',
-    created_at: iso(-75),
-    start_date: dateOnly(-75),
+    created_at: iso(-75), start_date: dateOnly(-75),
   },
+  // 7. Elena — 1-period, $180, 1 completed (done)
   {
     id: 'demo-loan-7',
-    lender_id: PEERS.elena,
-    borrower_id: uid,
-    amount: 180,
-    total_amount: 180,
-    amount_paid: 180,
-    payment_amount: 180,
-    next_payment_date: null,
-    status: 'completed',
+    lender_id: PEERS.elena, borrower_id: uid,
+    amount: 180, total_amount: 180, amount_paid: 180,
+    payment_amount: 180, repayment_period: 1, repayment_unit: 'months', payment_frequency: 'monthly',
+    interest_rate: 0,
+    next_payment_date: null, status: 'completed',
     reason: 'Birthday dinner I hosted',
-    created_at: iso(-40),
-    start_date: dateOnly(-40),
+    created_at: iso(-40), start_date: dateOnly(-40),
   },
 
-  // ── PENDING OFFER (someone offering to lend YOU) — shows the approval flow ──
+  // ── PENDING OFFER (someone offering to lend YOU) ──
   {
     id: 'demo-loan-8',
-    lender_id: PEERS.jordan,
-    borrower_id: uid,
-    amount: 350,
-    total_amount: 350,
-    amount_paid: 0,
-    payment_amount: 175,
-    next_payment_date: dateOnly(30),
-    status: 'pending',
+    lender_id: PEERS.jordan, borrower_id: uid,
+    amount: 350, total_amount: 350, amount_paid: 0,
+    payment_amount: 175, repayment_period: 2, repayment_unit: 'months', payment_frequency: 'monthly',
+    interest_rate: 0,
+    next_payment_date: dateOnly(30), status: 'pending',
     reason: 'Studio time for your EP',
-    created_at: iso(-1),
-    start_date: dateOnly(0),
+    created_at: iso(-1), start_date: dateOnly(0),
   },
 ];
 
 export const getDemoPayments = (uid) => [
-  // Completed history — shows a healthy track record
-  { id: 'demo-pay-1', loan_id: 'demo-loan-1', amount: 100, status: 'completed',
+  // Loan 1 (Maya → you): 4 completed × $100 + 1 pending_confirmation
+  { id: 'demo-pay-1a', loan_id: 'demo-loan-1', amount: 100, status: 'completed',
     payment_date: dateOnly(-120), recorded_by: PEERS.maya, created_at: iso(-120) },
-  { id: 'demo-pay-2', loan_id: 'demo-loan-1', amount: 100, status: 'completed',
+  { id: 'demo-pay-1b', loan_id: 'demo-loan-1', amount: 100, status: 'completed',
     payment_date: dateOnly(-90),  recorded_by: PEERS.maya, created_at: iso(-90) },
-  { id: 'demo-pay-3', loan_id: 'demo-loan-1', amount: 100, status: 'completed',
+  { id: 'demo-pay-1c', loan_id: 'demo-loan-1', amount: 100, status: 'completed',
     payment_date: dateOnly(-60),  recorded_by: PEERS.maya, created_at: iso(-60) },
-  { id: 'demo-pay-4', loan_id: 'demo-loan-1', amount: 100, status: 'completed',
+  { id: 'demo-pay-1d', loan_id: 'demo-loan-1', amount: 100, status: 'completed',
     payment_date: dateOnly(-30),  recorded_by: PEERS.maya, created_at: iso(-30) },
-
-  { id: 'demo-pay-5', loan_id: 'demo-loan-2', amount: 150, status: 'completed',
-    payment_date: dateOnly(-60),  recorded_by: PEERS.jordan, created_at: iso(-60) },
-  { id: 'demo-pay-6', loan_id: 'demo-loan-2', amount: 150, status: 'completed',
-    payment_date: dateOnly(-30),  recorded_by: PEERS.jordan, created_at: iso(-30) },
-
-  { id: 'demo-pay-7', loan_id: 'demo-loan-3', amount: 250, status: 'completed',
-    payment_date: dateOnly(-35),  recorded_by: PEERS.sofia, created_at: iso(-35) },
-
-  { id: 'demo-pay-8',  loan_id: 'demo-loan-5', amount: 100, status: 'completed',
-    payment_date: dateOnly(-85),  recorded_by: uid, created_at: iso(-85) },
-  { id: 'demo-pay-9',  loan_id: 'demo-loan-5', amount: 100, status: 'completed',
-    payment_date: dateOnly(-55),  recorded_by: uid, created_at: iso(-55) },
-  { id: 'demo-pay-10', loan_id: 'demo-loan-5', amount: 100, status: 'completed',
-    payment_date: dateOnly(-25),  recorded_by: uid, created_at: iso(-25) },
-  { id: 'demo-pay-11', loan_id: 'demo-loan-5', amount: 100, status: 'completed',
-    payment_date: dateOnly(-5),   recorded_by: uid, created_at: iso(-5) },
-  { id: 'demo-pay-12', loan_id: 'demo-loan-5', amount: 100, status: 'completed',
-    payment_date: dateOnly(-40),  recorded_by: uid, created_at: iso(-40) },
-
-  { id: 'demo-pay-13', loan_id: 'demo-loan-6', amount: 250, status: 'completed',
-    payment_date: dateOnly(-45),  recorded_by: uid, created_at: iso(-45) },
-  { id: 'demo-pay-14', loan_id: 'demo-loan-6', amount: 250, status: 'completed',
-    payment_date: dateOnly(-15),  recorded_by: uid, created_at: iso(-15) },
-
-  { id: 'demo-pay-15', loan_id: 'demo-loan-7', amount: 180, status: 'completed',
-    payment_date: dateOnly(-20),  recorded_by: uid, created_at: iso(-20) },
-
-  // PENDING confirmation — a peer recorded a payment, waiting for you to confirm
-  { id: 'demo-pay-16', loan_id: 'demo-loan-1', amount: 100, status: 'pending_confirmation',
+  { id: 'demo-pay-1e', loan_id: 'demo-loan-1', amount: 100, status: 'pending_confirmation',
     payment_date: dateOnly(-1),   recorded_by: PEERS.maya, created_at: iso(-1) },
 
-  // PENDING confirmation — you recorded a payment on a loan you borrowed, peer hasn't confirmed
-  { id: 'demo-pay-17', loan_id: 'demo-loan-6', amount: 250, status: 'pending_confirmation',
+  // Loan 2 (Jordan → you): 2 completed × $150
+  { id: 'demo-pay-2a', loan_id: 'demo-loan-2', amount: 150, status: 'completed',
+    payment_date: dateOnly(-60),  recorded_by: PEERS.jordan, created_at: iso(-60) },
+  { id: 'demo-pay-2b', loan_id: 'demo-loan-2', amount: 150, status: 'completed',
+    payment_date: dateOnly(-30),  recorded_by: PEERS.jordan, created_at: iso(-30) },
+
+  // Loan 3 (Sofia → you): 1 completed × $250 (done)
+  { id: 'demo-pay-3a', loan_id: 'demo-loan-3', amount: 250, status: 'completed',
+    payment_date: dateOnly(-35),  recorded_by: PEERS.sofia, created_at: iso(-35) },
+
+  // Loan 4 (Priya → you): 1 completed × $150
+  { id: 'demo-pay-4a', loan_id: 'demo-loan-4', amount: 150, status: 'completed',
+    payment_date: dateOnly(-5),   recorded_by: PEERS.priya, created_at: iso(-5) },
+
+  // Loan 5 (you → Alex): 5 completed × $100
+  { id: 'demo-pay-5a', loan_id: 'demo-loan-5', amount: 100, status: 'completed',
+    payment_date: dateOnly(-125), recorded_by: uid, created_at: iso(-125) },
+  { id: 'demo-pay-5b', loan_id: 'demo-loan-5', amount: 100, status: 'completed',
+    payment_date: dateOnly(-95),  recorded_by: uid, created_at: iso(-95) },
+  { id: 'demo-pay-5c', loan_id: 'demo-loan-5', amount: 100, status: 'completed',
+    payment_date: dateOnly(-65),  recorded_by: uid, created_at: iso(-65) },
+  { id: 'demo-pay-5d', loan_id: 'demo-loan-5', amount: 100, status: 'completed',
+    payment_date: dateOnly(-35),  recorded_by: uid, created_at: iso(-35) },
+  { id: 'demo-pay-5e', loan_id: 'demo-loan-5', amount: 100, status: 'completed',
+    payment_date: dateOnly(-5),   recorded_by: uid, created_at: iso(-5) },
+
+  // Loan 6 (you → Marcus): 2 completed × $250 + 1 pending_confirmation
+  { id: 'demo-pay-6a', loan_id: 'demo-loan-6', amount: 250, status: 'completed',
+    payment_date: dateOnly(-45),  recorded_by: uid, created_at: iso(-45) },
+  { id: 'demo-pay-6b', loan_id: 'demo-loan-6', amount: 250, status: 'completed',
+    payment_date: dateOnly(-15),  recorded_by: uid, created_at: iso(-15) },
+  { id: 'demo-pay-6c', loan_id: 'demo-loan-6', amount: 250, status: 'pending_confirmation',
     payment_date: dateOnly(-2),   recorded_by: uid, created_at: iso(-2) },
+
+  // Loan 7 (you → Elena): 1 completed × $180 (done)
+  { id: 'demo-pay-7a', loan_id: 'demo-loan-7', amount: 180, status: 'completed',
+    payment_date: dateOnly(-20),  recorded_by: uid, created_at: iso(-20) },
 ];
 
 export const getDemoLoanAgreements = () => [];
+
+// Plan Your Month extras injected into the Home page list in demo mode.
+export const getDemoPlanItems = () => [
+  { id: 'demo-plan-rent',   label: 'Have to send rent payment to landlord', amount: -1450, date: dateOnly(6),  status: 'custom' },
+  { id: 'demo-plan-income', label: 'Income',                                amount:  2800, date: dateOnly(10), status: 'custom' },
+];
 
 // Convenience selector used by entity wrappers
 export const getDemoDataset = (uid) => ({
