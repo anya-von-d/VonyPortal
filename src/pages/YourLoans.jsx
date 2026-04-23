@@ -1206,41 +1206,39 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                     key={loan.id}
                     onClick={() => setSelectedScrollLoan(isSelected ? null : loan)}
                     style={{
-                      width: 115,
-                      flexShrink: 0,
-                      background: '#ffffff',
-                      borderRadius: 12,
-                      border: isSelected ? `2px solid ${accent}` : '1.5px solid rgba(0,0,0,0.08)',
-                      boxShadow: isSelected
-                        ? `0 6px 24px ${accent}30, 0 2px 8px rgba(0,0,0,0.08)`
-                        : '0 2px 8px rgba(0,0,0,0.06)',
-                      padding: '14px 10px 12px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: 7,
+                      width: 115, flexShrink: 0, position: 'relative', zIndex: zIdx,
                       cursor: 'pointer',
                       transform: `rotate(${rotate}deg) scale(${scale}) translateY(${ty}px)`,
                       transformOrigin: 'bottom center',
-                      transition: 'transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s, border-color 0.2s',
-                      position: 'relative',
-                      zIndex: zIdx,
+                      transition: 'transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
                       userSelect: 'none',
                     }}
                   >
-                    <UserAvatar
-                      name={profile?.full_name || profile?.username || name}
-                      src={profile?.avatar_url || profile?.profile_picture_url}
-                      size={38}
-                      radius={19}
-                    />
-                    <div style={{ fontSize: 11, fontWeight: 600, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", textAlign: 'center', lineHeight: 1.25 }}>{name}</div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: accent, fontFamily: "'DM Sans', sans-serif" }}>{formatMoney(remaining)}</div>
-                    {loan.purpose && (
-                      <div style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", textAlign: 'center', lineHeight: 1.35, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-                        {loan.purpose}
-                      </div>
-                    )}
+                    {/* Spiral binding holes */}
+                    <div style={{ display: 'flex', gap: 7, justifyContent: 'center', paddingLeft: 4, paddingRight: 4, marginBottom: -1 }}>
+                      {[0,1,2,3,4,5].map(ri => (
+                        <div key={ri} style={{ width: 9, height: 11, borderRadius: '4px 4px 0 0', border: '1.5px solid rgba(0,0,0,0.22)', borderBottom: 'none', background: '#DDDBD5', flexShrink: 0 }} />
+                      ))}
+                    </div>
+                    {/* Paper body */}
+                    <div style={{
+                      background: '#FEFCF4',
+                      borderRadius: '0 0 3px 3px',
+                      border: isSelected ? `1.5px solid ${accent}` : '1px solid rgba(0,0,0,0.09)',
+                      borderTop: '2px solid rgba(0,0,0,0.18)',
+                      boxShadow: isSelected ? `0 6px 20px ${accent}28, 2px 4px 10px rgba(0,0,0,0.10)` : '1px 3px 8px rgba(0,0,0,0.10)',
+                      padding: '10px 10px 12px',
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
+                      backgroundImage: 'repeating-linear-gradient(to bottom, transparent, transparent 20px, rgba(3,172,234,0.08) 20px, rgba(3,172,234,0.08) 21px)',
+                    }}>
+                      <div style={{ fontSize: 11, fontWeight: 600, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", textAlign: 'center', lineHeight: 1.25 }}>{name}</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: accent, fontFamily: "'DM Sans', sans-serif" }}>{formatMoney(remaining)}</div>
+                      {loan.purpose && (
+                        <div style={{ fontSize: 10, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", textAlign: 'center', lineHeight: 1.35, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                          {loan.purpose}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               })}
