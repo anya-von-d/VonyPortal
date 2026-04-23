@@ -1936,8 +1936,12 @@ export default function Home() {
                   cashLines.push({ id: `overdue-out-${loan.id}`, label: `To ${name}`, amount: -(loan.payment_amount || 0), date: d, status: 'overdue', dateLabel: 'due' });
                 });
                 cashLines.sort((a, b) => (a.date || new Date(0)) - (b.date || new Date(0)));
+                // In demo mode, strip out Elena's completed loan-7 payment (it's already paid off)
+                const effectiveCashLines = isDemoMode
+                  ? cashLines.filter(line => !line.id.includes('demo-loan-7') && !line.id.includes('demo-pay-7'))
+                  : cashLines;
                 const rawCustomExpenses = isDemoMode
-                  ? [...getDemoPlanItems(), ...customExpenses]
+                  ? getDemoPlanItems()
                   : customExpenses;
                 const customLines = rawCustomExpenses.map(e => ({
                   ...e,
@@ -1945,12 +1949,13 @@ export default function Home() {
                   status: e.done ? 'done' : (e.status || 'custom'),
                   dateLabel: e.amount >= 0 ? 'expect by' : 'due',
                 }));
-                const allLines = [...cashLines, ...customLines];
+                const allLines = [...effectiveCashLines, ...customLines];
                 const total = allLines.reduce((s, l) => s + l.amount, 0);
                 const soFarTotal = allLines.filter(l => l.status === 'done').reduce((s, l) => s + l.amount, 0);
                 const fmtSigned = (amt) => amt === 0 ? '$0.00' : amt > 0 ? `+${formatMoney(amt)}` : `-${formatMoney(Math.abs(amt))}`;
                 // Index of the first user-added custom expense — the section header appears here
-                const firstCustomIdx = allLines.findIndex(line => customExpenses.some(e => e.id === line.id));
+                // In demo mode there are no user custom items, so this will be -1 (no header shown)
+                const firstCustomIdx = isDemoMode ? -1 : allLines.findIndex(line => customExpenses.some(e => e.id === line.id));
                 return (
                   <div className="home-card-plan-month" style={{ background: '#FEFEFE', borderRadius: 4, boxShadow: '0 4px 12px rgba(0,0,0,0.10)', padding: '14px 18px' }}>
                     {/* Header row with title + Edit button */}

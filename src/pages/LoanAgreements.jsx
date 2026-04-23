@@ -1173,11 +1173,7 @@ export default function LoanAgreements() {
 
           {activeTab === 'documents' ? (
           <>
-          <div style={{ position: 'relative', marginBottom: 24 }}>
-          <div style={{ position: 'absolute', inset: -5, background: '#CFDCE7', borderRadius: 16, filter: 'blur(6px)', opacity: 0.75, zIndex: 0, pointerEvents: 'none' }} />
-          <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 14, border: 'none', boxShadow: '0 6px 28px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.10)', padding: '18px 22px' }}>
-
-          {/* Filters */}
+          {/* Filters — outside the card */}
           <div style={{ marginBottom: 16 }}>
             <div style={{ marginBottom: 8 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 12px', background: 'transparent', borderRadius: 18, border: '1px solid rgba(0,0,0,0.06)', height: 36 }}>
@@ -1200,7 +1196,8 @@ export default function LoanAgreements() {
             </div>
           </div>
 
-          {/* ── Agreements List ──────────────────────────────────── */}
+          {/* ── Agreements List — home-style card ──────────────────── */}
+          <div style={{ background: '#FEFEFE', borderRadius: 4, boxShadow: '0 4px 12px rgba(0,0,0,0.10)', padding: '14px 18px', marginBottom: 24 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, padding: '10px 16px' }}>
               <span style={{ fontSize: 11, fontWeight: 500, color: '#787776', marginRight: 4 }}>Page {laSafePage + 1} of {laTotalPages}</span>
@@ -1388,7 +1385,6 @@ export default function LoanAgreements() {
             </div>
           </div>
           </div>
-          </div>
 
           {/* Desktop table responsive styles */}
           <style>{`
@@ -1404,12 +1400,7 @@ export default function LoanAgreements() {
             }
           `}</style>
           </>) : (
-            <div style={{ position: 'relative', marginBottom: 24 }}>
-              <div style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
-              <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.13)', padding: '14px 18px' }}>
-                <RecentActivity embeddedMode />
-              </div>
-            </div>
+            <RecentActivity embeddedMode />
           )}
 
         </div>

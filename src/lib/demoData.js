@@ -52,8 +52,8 @@ export const getDemoPublicProfiles = (uid) => [
     profile_picture_url: 'https://ui-avatars.com/api/?name=Sofia+Rivera&background=C38D9E&color=fff&size=128' },
   { id: 'demo-pp-alex',   user_id: PEERS.alex,   username: 'alexk',    full_name: 'Alex Kim',
     profile_picture_url: 'https://ui-avatars.com/api/?name=Alex+Kim&background=41B3A3&color=fff&size=128' },
-  { id: 'demo-pp-priya',  user_id: PEERS.priya,  username: 'priyan',   full_name: 'Priya Nair',
-    profile_picture_url: 'https://ui-avatars.com/api/?name=Priya+Nair&background=F4B942&color=fff&size=128' },
+  { id: 'demo-pp-priya',  user_id: PEERS.priya,  username: 'priyash',  full_name: 'Priya Sharma',
+    profile_picture_url: 'https://ui-avatars.com/api/?name=Priya+Sharma&background=F4B942&color=fff&size=128' },
   { id: 'demo-pp-marcus', user_id: PEERS.marcus, username: 'marcusw',  full_name: 'Marcus Wright',
     profile_picture_url: 'https://ui-avatars.com/api/?name=Marcus+Wright&background=6C8EBF&color=fff&size=128' },
   { id: 'demo-pp-elena',  user_id: PEERS.elena,  username: 'elenat',   full_name: 'Elena Torres',
@@ -226,7 +226,99 @@ export const getDemoPayments = (uid) => [
     payment_date: dateOnly(-20),  recorded_by: uid, created_at: iso(-20) },
 ];
 
-export const getDemoLoanAgreements = () => [];
+export const getDemoLoanAgreements = (uid) => [
+  // Loan 1 — Alex Morgan lends $600 to Maya Chen, 6 × $100/mo
+  {
+    id: 'demo-agr-1', loan_id: 'demo-loan-1',
+    lender_id: uid, borrower_id: PEERS.maya,
+    amount: 600, total_amount: 600, payment_amount: 100,
+    payment_frequency: 'monthly', repayment_period: 6, repayment_unit: 'months',
+    interest_rate: 0,
+    purpose: 'Flight home for the holidays',
+    lender_name: DEMO_USER.full_name, borrower_name: 'Maya Chen',
+    created_at: iso(-150),
+    lender_signed_date: iso(-148), borrower_signed_date: iso(-148),
+    first_payment_date: dateOnly(-120), due_date: dateOnly(30),
+  },
+  // Loan 2 — Alex Morgan lends $1200 to Jordan Park, 8 × $150/mo
+  {
+    id: 'demo-agr-2', loan_id: 'demo-loan-2',
+    lender_id: uid, borrower_id: PEERS.jordan,
+    amount: 1200, total_amount: 1200, payment_amount: 150,
+    payment_frequency: 'monthly', repayment_period: 8, repayment_unit: 'months',
+    interest_rate: 0,
+    purpose: 'First-month rent while between jobs',
+    lender_name: DEMO_USER.full_name, borrower_name: 'Jordan Park',
+    created_at: iso(-90),
+    lender_signed_date: iso(-88), borrower_signed_date: iso(-88),
+    first_payment_date: dateOnly(-60), due_date: dateOnly(150),
+  },
+  // Loan 3 — Alex Morgan lends $250 to Sofia Rivera, 1 × $250/mo (completed)
+  {
+    id: 'demo-agr-3', loan_id: 'demo-loan-3',
+    lender_id: uid, borrower_id: PEERS.sofia,
+    amount: 250, total_amount: 250, payment_amount: 250,
+    payment_frequency: 'monthly', repayment_period: 1, repayment_unit: 'months',
+    interest_rate: 0,
+    purpose: 'Concert tickets split',
+    lender_name: DEMO_USER.full_name, borrower_name: 'Sofia Rivera',
+    created_at: iso(-60),
+    lender_signed_date: iso(-58), borrower_signed_date: iso(-58),
+    first_payment_date: dateOnly(-35), due_date: dateOnly(-35),
+  },
+  // Loan 4 — Alex Morgan lends $450 to Priya Sharma, 3 × $150/mo
+  {
+    id: 'demo-agr-4', loan_id: 'demo-loan-4',
+    lender_id: uid, borrower_id: PEERS.priya,
+    amount: 450, total_amount: 450, payment_amount: 150,
+    payment_frequency: 'monthly', repayment_period: 3, repayment_unit: 'months',
+    interest_rate: 0,
+    purpose: 'Textbooks for the semester',
+    lender_name: DEMO_USER.full_name, borrower_name: 'Priya Sharma',
+    created_at: iso(-35),
+    lender_signed_date: iso(-33), borrower_signed_date: iso(-33),
+    first_payment_date: dateOnly(-5), due_date: dateOnly(55),
+  },
+  // Loan 5 — Alex Kim lends $800 to Alex Morgan, 8 × $100/mo
+  {
+    id: 'demo-agr-5', loan_id: 'demo-loan-5',
+    lender_id: PEERS.alex, borrower_id: uid,
+    amount: 800, total_amount: 800, payment_amount: 100,
+    payment_frequency: 'monthly', repayment_period: 8, repayment_unit: 'months',
+    interest_rate: 0,
+    purpose: 'Laptop repair after coffee spill',
+    lender_name: 'Alex Kim', borrower_name: DEMO_USER.full_name,
+    created_at: iso(-150),
+    lender_signed_date: iso(-148), borrower_signed_date: iso(-148),
+    first_payment_date: dateOnly(-125), due_date: dateOnly(85),
+  },
+  // Loan 6 — Marcus Wright lends $2000 to Alex Morgan, 8 × $250/mo
+  {
+    id: 'demo-agr-6', loan_id: 'demo-loan-6',
+    lender_id: PEERS.marcus, borrower_id: uid,
+    amount: 2000, total_amount: 2000, payment_amount: 250,
+    payment_frequency: 'monthly', repayment_period: 8, repayment_unit: 'months',
+    interest_rate: 0,
+    purpose: 'Security deposit on new apartment',
+    lender_name: 'Marcus Wright', borrower_name: DEMO_USER.full_name,
+    created_at: iso(-75),
+    lender_signed_date: iso(-73), borrower_signed_date: iso(-73),
+    first_payment_date: dateOnly(-45), due_date: dateOnly(165),
+  },
+  // Loan 7 — Elena Torres lends $180 to Alex Morgan, 1 × $180/mo (completed)
+  {
+    id: 'demo-agr-7', loan_id: 'demo-loan-7',
+    lender_id: PEERS.elena, borrower_id: uid,
+    amount: 180, total_amount: 180, payment_amount: 180,
+    payment_frequency: 'monthly', repayment_period: 1, repayment_unit: 'months',
+    interest_rate: 0,
+    purpose: 'Birthday dinner I hosted',
+    lender_name: 'Elena Torres', borrower_name: DEMO_USER.full_name,
+    created_at: iso(-40),
+    lender_signed_date: iso(-38), borrower_signed_date: iso(-38),
+    first_payment_date: dateOnly(-20), due_date: dateOnly(-20),
+  },
+];
 
 // Plan Your Month extras injected into the Home page list in demo mode.
 export const getDemoPlanItems = () => [
@@ -240,5 +332,5 @@ export const getDemoDataset = (uid) => ({
   friendships:     getDemoFriendships(uid),
   loans:           getDemoLoans(uid),
   payments:        getDemoPayments(uid),
-  loan_agreements: getDemoLoanAgreements(),
+  loan_agreements: getDemoLoanAgreements(uid),
 });
