@@ -2040,7 +2040,7 @@ export default function Home() {
                             ? `Overdue since ${format(line.date, 'MMM d')}`
                             : line.date ? `${line.dateLabel} ${format(line.date, 'MMM d')}` : null;
                           return (
-                            <div key={line.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 0', borderBottom: idx < allLines.length - 1 ? '1px solid #ECEAE5' : 'none' }}>
+                            <div key={line.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 0' }}>
                               {/* Tick circle — clickable for custom items */}
                               <div
                                 onClick={isCustom ? () => toggleCustomExpenseDone(line.id) : undefined}
@@ -2074,7 +2074,7 @@ export default function Home() {
 
                     {/* Footer: So far + Net */}
                     <div style={{ marginTop: 10 }}>
-                      <div style={{ borderTop: '1.5px dashed rgba(0,0,0,0.13)', marginBottom: 4 }} />
+                      <div style={{ borderTop: '1px solid rgba(0,0,0,0.13)', marginBottom: 4 }} />
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 0' }}>
                         <span style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>So Far This Month</span>
                         <span style={{ fontSize: 13, fontWeight: 700, color: soFarTotal >= 0 ? '#03ACEA' : '#1D5B94', fontFamily: "'DM Sans', sans-serif" }}>{fmtSigned(soFarTotal)}</span>
@@ -2114,106 +2114,6 @@ export default function Home() {
                 );
               })()}
 
-              {/* ── People Bubble ── */}
-              {(() => {
-  // Count interactions (payments) per partner
-  const interactionCount = {};
-  safePayments.forEach(p => {
-    if (!p) return;
-    const loan = myLoans.find(l => l.id === p.loan_id);
-    if (!loan) return;
-    const isLndr = loan.lender_id === user.id;
-    const otherId = isLndr ? loan.borrower_id : loan.lender_id;
-    interactionCount[otherId] = (interactionCount[otherId] || 0) + 1;
-  });
-  const seenIds = new Set();
-  const loanPartners = [];
-  [...lentLoans, ...borrowedLoans].forEach(loan => {
-    const isLending = loan.lender_id === user.id;
-    const otherId = isLending ? loan.borrower_id : loan.lender_id;
-    if (seenIds.has(otherId)) return;
-    seenIds.add(otherId);
-    const prof = safeAllProfiles.find(p => p.user_id === otherId);
-    const firstName = (prof?.full_name || prof?.username || 'User').split(' ')[0];
-    const activeLoan = [...lentLoans, ...borrowedLoans].find(l =>
-      (l.borrower_id === otherId || l.lender_id === otherId)
-    );
-    loanPartners.push({ userId: otherId, firstName, fullName: prof?.full_name || prof?.username || 'User', avatar: prof?.avatar_url || prof?.profile_picture_url, hasLoan: true, loanId: activeLoan?.id, interactions: interactionCount[otherId] || 0 });
-  });
-  loanPartners.sort((a, b) => b.interactions - a.interactions);
-  let displayPeople = loanPartners.slice(0, 7);
-  if (displayPeople.length < 3) {
-    const friendPeople = acceptedFriendships
-      .map(f => f.user_id === user.id ? f.friend_id : f.user_id)
-      .filter(id => !seenIds.has(id))
-      .slice(0, 7 - displayPeople.length)
-      .map(fId => {
-        const prof = safeAllProfiles.find(p => p.user_id === fId);
-        const firstName = (prof?.full_name || prof?.username || 'Friend').split(' ')[0];
-        return { userId: fId, firstName, fullName: prof?.full_name || prof?.username || 'Friend', avatar: prof?.avatar_url || prof?.profile_picture_url, hasLoan: false, loanId: null, interactions: 0 };
-      });
-    displayPeople = [...displayPeople, ...friendPeople];
-  }
-  if (displayPeople.length === 0) return null;
-  // Positions for up to 7 bubbles (percentage-based, container is ~190px tall, full width)
-  const bubblePositions = [
-    { top: '50%', left: '50%', tx: '-50%', ty: '-50%', size: 54 },
-    { top: '12%', left: '18%', tx: '-50%', ty: '0', size: 44 },
-    { top: '12%', left: '80%', tx: '-50%', ty: '0', size: 44 },
-    { top: '68%', left: '22%', tx: '-50%', ty: '0', size: 42 },
-    { top: '68%', left: '78%', tx: '-50%', ty: '0', size: 42 },
-    { top: '40%', left: '7%', tx: '0', ty: '-50%', size: 38 },
-    { top: '40%', left: '93%', tx: '-100%', ty: '-50%', size: 38 },
-  ];
-  return (
-    <div className="home-card-people-bubble" style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
-      {/* Blue gradient background */}
-      <div style={{ background: 'linear-gradient(135deg, #1a4f7a 0%, #03ACEA 100%)', height: 200, position: 'relative' }}>
-        {displayPeople.slice(0, 7).map((person, i) => {
-          const pos = bubblePositions[i];
-          const isSelected = selectedBubblePerson?.userId === person.userId;
-          const initials = person.firstName.charAt(0).toUpperCase();
-          const bubbleColors = ['#4DA6CE','#2E86B5','#5BB8D4','#1D7AAD','#6BC4E0','#38A0C8','#23618E'];
-          return (
-            <div key={person.userId} style={{ position: 'absolute', top: pos.top, left: pos.left, transform: `translate(${pos.tx}, ${pos.ty})`, zIndex: isSelected ? 20 : 1 }}>
-              {/* Avatar circle */}
-              <button type="button"
-                onClick={() => setSelectedBubblePerson(isSelected ? null : person)}
-                style={{ width: pos.size, height: pos.size, borderRadius: '50%', border: `3px solid ${isSelected ? '#ffffff' : 'rgba(255,255,255,0.55)'}`, background: person.avatar ? 'transparent' : bubbleColors[i % bubbleColors.length], overflow: 'hidden', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: isSelected ? '0 0 0 3px rgba(255,255,255,0.8)' : '0 2px 8px rgba(0,0,0,0.25)', transition: 'border 0.15s, box-shadow 0.15s', padding: 0 }}
-                aria-label={person.firstName}
-              >
-                {person.avatar
-                  ? <img src={person.avatar} alt={person.firstName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  : <span style={{ fontSize: pos.size * 0.38, fontWeight: 700, color: '#ffffff', fontFamily: "'DM Sans', sans-serif", lineHeight: 1 }}>{initials}</span>
-                }
-              </button>
-              {/* Popover */}
-              {isSelected && (
-                <div style={{ position: 'absolute', bottom: pos.size + 8, left: '50%', transform: 'translateX(-50%)', background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(12px)', borderRadius: 10, padding: '10px 14px', minWidth: 160, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', zIndex: 30, whiteSpace: 'nowrap' }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", marginBottom: 8 }}>{person.fullName}</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    <button type="button" onClick={() => navigate(createPageUrl('CreateOffer'))}
-                      style={{ width: '100%', padding: '6px 10px', borderRadius: 7, background: '#03ACEA', border: 'none', color: '#fff', fontSize: 11, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", cursor: 'pointer', textAlign: 'center' }}>
-                      Create a loan
-                    </button>
-                    {person.hasLoan && (
-                      <button type="button" onClick={() => navigate(createPageUrl('RecordPayment') + (person.loanId ? `?loanId=${person.loanId}` : ''))}
-                        style={{ width: '100%', padding: '6px 10px', borderRadius: 7, background: 'rgba(3,172,234,0.1)', border: '1.5px solid #03ACEA', color: '#03ACEA', fontSize: 11, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", cursor: 'pointer', textAlign: 'center' }}>
-                        Log a payment
-                      </button>
-                    )}
-                  </div>
-                  {/* Little arrow */}
-                  <div style={{ position: 'absolute', bottom: -6, left: '50%', transform: 'translateX(-50%)', width: 12, height: 12, background: 'rgba(255,255,255,0.97)', borderRadius: 2, rotate: '45deg' }} />
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-})()}
 
 
             </div>
@@ -2250,9 +2150,9 @@ export default function Home() {
                 let si = 0;
                 while (reminders.length < 3) { reminders.push(suggestions[si++ % suggestions.length]); }
                 const noteConfigs = [
-                  { bg: 'linear-gradient(170deg, #FFE566 0%, #FFD638 100%)', rotate: '-3.5deg', ty: '7px', zIndex: 1, textColor: '#5C4200' },
-                  { bg: 'linear-gradient(170deg, #FFFDE0 0%, #FFF59D 100%)', rotate: '1.8deg',  ty: '0px',  zIndex: 2, textColor: '#5C4200' },
-                  { bg: 'linear-gradient(170deg, #FFE082 0%, #FFCA28 100%)', rotate: '-1deg',   ty: '5px',  zIndex: 3, textColor: '#5C4200' },
+                  { bg: 'linear-gradient(170deg, #BFDFFF 0%, #93C5FF 100%)', rotate: '-3.5deg', ty: '7px', zIndex: 1, textColor: '#0A3550' },
+                  { bg: 'linear-gradient(170deg, #D8EDFF 0%, #B3D8FF 100%)', rotate: '1.8deg',  ty: '0px',  zIndex: 2, textColor: '#0A3550' },
+                  { bg: 'linear-gradient(170deg, #A8D4FF 0%, #7BB8FF 100%)', rotate: '-1deg',   ty: '5px',  zIndex: 3, textColor: '#0A3550' },
                 ];
                 return (
                   <div className="home-card-attention" style={{ display: 'flex', paddingBottom: 10, overflow: 'visible' }}>
@@ -2371,19 +2271,18 @@ export default function Home() {
                         </div>
                       </div>
 
-                      {/* Ruled separator under calendar */}
-                      <div style={{ height: 1, background: 'rgba(173,210,230,0.30)' }} />
+                      {/* Ruled separator under calendar — removed */}
 
                       {/* Task rows — bullet aligned under Mon column */}
                       <div style={{ padding: '0 18px', position: 'relative', zIndex: 1 }}>
                         {sortedTasks.length === 0 ? (
-                          <div style={{ padding: '10px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center', borderBottom: '1px solid rgba(173,210,230,0.22)' }}>Nothing on the list right now 🌿</div>
+                          <div style={{ padding: '10px 0', fontSize: 12, color: '#9B9A98', textAlign: 'center' }}>Nothing on the list right now 🌿</div>
                         ) : (
                           sortedTasks.map(task => {
                             const checked = checkedTasks.has(task.id);
                             return (
                               <button key={task.id} type="button" onClick={() => { if (!checked && task.onCheck) { task.onCheck(); return; } toggleTask(task.id); }}
-                                style={{ display: 'flex', alignItems: 'center', gap: 0, padding: '5px 0', background: 'transparent', border: 'none', borderBottom: '1px solid rgba(173,210,230,0.22)', cursor: 'pointer', textAlign: 'left', fontFamily: "'DM Sans', sans-serif", width: '100%' }}>
+                                style={{ display: 'flex', alignItems: 'center', gap: 0, padding: '5px 0', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', fontFamily: "'DM Sans', sans-serif", width: '100%' }}>
                                 {/* Bullet centered in first-day-column width */}
                                 <div style={{ width: 'calc(100% / 7)', flexShrink: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                                   <span style={{ width: 13, height: 13, borderRadius: '50%', border: checked ? '1.5px solid #03ACEA' : '1.5px solid #C4C2BE', background: checked ? '#03ACEA' : 'transparent', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s', flexShrink: 0 }}>
@@ -2396,7 +2295,7 @@ export default function Home() {
                           })
                         )}
                         {addingTask && (
-                          <form onSubmit={e => { e.preventDefault(); addCustomTask(newTaskText); setNewTaskText(''); setAddingTask(false); }} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 0', borderBottom: '1px solid rgba(173,210,230,0.22)' }}>
+                          <form onSubmit={e => { e.preventDefault(); addCustomTask(newTaskText); setNewTaskText(''); setAddingTask(false); }} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 0' }}>
                             <input autoFocus value={newTaskText} onChange={e => setNewTaskText(e.target.value)} onKeyDown={e => { if (e.key === 'Escape') { setAddingTask(false); setNewTaskText(''); } }} placeholder="Add a to-do…" style={{ flex: 1, fontSize: 12, fontFamily: "'DM Sans', sans-serif", border: 'none', borderBottom: '1.5px solid #03ACEA', outline: 'none', background: 'transparent', color: '#1A1918', padding: '2px 0' }} />
                             <button type="submit" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#03ACEA" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
                           </form>
@@ -2424,20 +2323,20 @@ export default function Home() {
               {(monthlyExpectedReceive > 0 || monthlyExpectedPay > 0) && (
                 <div className="home-card-monthly-summary" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {monthlyExpectedReceive > 0 && (
-                    <div style={{ position: 'relative', background: 'linear-gradient(170deg, #FFF9DE 0%, #FFF3B0 100%)', borderRadius: '2px 2px 3px 3px', boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)', padding: '12px 14px 13px 12px', overflow: 'visible' }}>
+                    <div style={{ position: 'relative', background: 'linear-gradient(170deg, #D8EDFF 0%, #B3D8FF 100%)', borderRadius: '2px 2px 3px 3px', boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)', padding: '12px 14px 13px 12px', overflow: 'visible' }}>
                       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'rgba(0,0,0,0.08)', borderRadius: '2px 2px 0 0' }} />
-                      <div style={{ fontSize: 12, fontWeight: 600, color: '#5C4200', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.3, marginTop: 5 }}>You've received <span style={{ color: '#03ACEA' }}>{formatMoney(monthlyReceived)}</span></div>
-                      <div style={{ fontSize: 11, color: '#8C6D00', fontFamily: "'DM Sans', sans-serif", marginTop: 2 }}>of {formatMoney(monthlyExpectedReceive)} expected in {format(today, 'MMMM')}</div>
-                      <div style={{ position: 'absolute', bottom: 0, right: 0, width: 16, height: 16, background: '#D4C060', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 2 }} />
+                      <div style={{ fontSize: 12, fontWeight: 600, color: '#0A3550', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.3, marginTop: 5 }}>You've received <span style={{ color: '#03ACEA' }}>{formatMoney(monthlyReceived)}</span></div>
+                      <div style={{ fontSize: 11, color: '#1D5B94', fontFamily: "'DM Sans', sans-serif", marginTop: 2 }}>of {formatMoney(monthlyExpectedReceive)} expected in {format(today, 'MMMM')}</div>
+                      <div style={{ position: 'absolute', bottom: 0, right: 0, width: 16, height: 16, background: '#5AAED4', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 2 }} />
                       <div style={{ position: 'absolute', bottom: 0, right: 0, width: 20, height: 20, background: 'radial-gradient(ellipse at 100% 100%, rgba(0,0,0,0.20) 0%, transparent 65%)', zIndex: 1 }} />
                     </div>
                   )}
                   {monthlyExpectedPay > 0 && (
-                    <div style={{ position: 'relative', background: 'linear-gradient(170deg, #FFFDE0 0%, #FFF59D 100%)', borderRadius: '2px 2px 3px 3px', boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)', padding: '12px 14px 13px 12px', overflow: 'visible' }}>
+                    <div style={{ position: 'relative', background: 'linear-gradient(170deg, #C5E3FF 0%, #99C9FF 100%)', borderRadius: '2px 2px 3px 3px', boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)', padding: '12px 14px 13px 12px', overflow: 'visible' }}>
                       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'rgba(0,0,0,0.08)', borderRadius: '2px 2px 0 0' }} />
-                      <div style={{ fontSize: 12, fontWeight: 600, color: '#5C4200', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.3, marginTop: 5 }}>You've paid <span style={{ color: '#1D5B94' }}>{formatMoney(monthlyPaidOut)}</span></div>
-                      <div style={{ fontSize: 11, color: '#8C6D00', fontFamily: "'DM Sans', sans-serif", marginTop: 2 }}>of {formatMoney(monthlyExpectedPay)} due in {format(today, 'MMMM')}</div>
-                      <div style={{ position: 'absolute', bottom: 0, right: 0, width: 16, height: 16, background: '#D4C060', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 2 }} />
+                      <div style={{ fontSize: 12, fontWeight: 600, color: '#0A3550', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.3, marginTop: 5 }}>You've paid <span style={{ color: '#1D5B94' }}>{formatMoney(monthlyPaidOut)}</span></div>
+                      <div style={{ fontSize: 11, color: '#1D5B94', fontFamily: "'DM Sans', sans-serif", marginTop: 2 }}>of {formatMoney(monthlyExpectedPay)} due in {format(today, 'MMMM')}</div>
+                      <div style={{ position: 'absolute', bottom: 0, right: 0, width: 16, height: 16, background: '#3D8FBF', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 2 }} />
                       <div style={{ position: 'absolute', bottom: 0, right: 0, width: 20, height: 20, background: 'radial-gradient(ellipse at 100% 100%, rgba(0,0,0,0.20) 0%, transparent 65%)', zIndex: 1 }} />
                     </div>
                   )}
