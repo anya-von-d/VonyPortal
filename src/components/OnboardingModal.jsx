@@ -5,42 +5,48 @@ import { CheckCircle, Loader2, ChevronDown } from "lucide-react";
 
 // Grain overlays — match Layout.jsx portal texture
 const GRAIN_FINE = `url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>')}")`;
-const GRAIN_FIBRE = `url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600"><filter id="f"><feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 0.96  0 0 0 0 0.94  0 0 0 0 0.90  0 0 0 0.35 0"/></filter><rect width="100%" height="100%" filter="url(#f)"/></svg>')}")`;
+const GRAIN_FIBRE = `url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600"><filter id="f"><feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 0.96  0 0 0 0 0.94  0 0 0 0 0.90  0 0 0 0 0.35 0"/></filter><rect width="100%" height="100%" filter="url(#f)"/></svg>')}")`;
 
 const CARD_WIDTH = 420;
+// Portal background — matches html/body in index.css
+const PORTAL_BG = '#FDFBF9';
+// Vony brand bright blue
+const BRAND_BLUE = '#03ACEA';
 
 // ── Profile icon palette ───────────────────────────────────────────────────
+// Grown-up set: nature, cosmos, weather, minimalist objects. No animal-emoji
+// kid-stickers. Colors draw from the portal palette.
 const ICON_OPTIONS = [
-  { id: 'bear',      emoji: '🐻', bg: '#E8A87C' },
-  { id: 'fox',       emoji: '🦊', bg: '#F4A261' },
-  { id: 'lion',      emoji: '🦁', bg: '#E9C46A' },
-  { id: 'tiger',     emoji: '🐯', bg: '#F4965C' },
-  { id: 'wolf',      emoji: '🐺', bg: '#8FA8C8' },
-  { id: 'cat',       emoji: '🐱', bg: '#C38D9E' },
-  { id: 'dog',       emoji: '🐶', bg: '#D4A373' },
-  { id: 'koala',     emoji: '🐨', bg: '#A5B4C3' },
-  { id: 'panda',     emoji: '🐼', bg: '#9EC5AB' },
-  { id: 'rabbit',    emoji: '🐰', bg: '#B084CC' },
-  { id: 'frog',      emoji: '🐸', bg: '#85B79D' },
-  { id: 'owl',       emoji: '🦉', bg: '#6C8EBF' },
-  { id: 'penguin',   emoji: '🐧', bg: '#7EC1EC' },
-  { id: 'flamingo',  emoji: '🦩', bg: '#F4A8B7' },
-  { id: 'eagle',     emoji: '🦅', bg: '#C9A84C' },
-  { id: 'unicorn',   emoji: '🦄', bg: '#D4AEDD' },
-  { id: 'dolphin',   emoji: '🐬', bg: '#54A6CF' },
-  { id: 'butterfly', emoji: '🦋', bg: '#B9A0D4' },
-  { id: 'moon',      emoji: '🌙', bg: '#6C8EBF' },
-  { id: 'star',      emoji: '⭐', bg: '#F4B942' },
-  { id: 'wave',      emoji: '🌊', bg: '#3A9BDC' },
-  { id: 'fire',      emoji: '🔥', bg: '#E8726E' },
-  { id: 'plant',     emoji: '🌿', bg: '#5CB87A' },
-  { id: 'rose',      emoji: '🌹', bg: '#D97C8A' },
-  { id: 'gem',       emoji: '💎', bg: '#5BA4CF' },
-  { id: 'rocket',    emoji: '🚀', bg: '#4A5568' },
-  { id: 'music',     emoji: '🎵', bg: '#9B7FCA' },
-  { id: 'art',       emoji: '🎨', bg: '#E67E22' },
-  { id: 'target',    emoji: '🎯', bg: '#E85555' },
-  { id: 'coffee',    emoji: '☕', bg: '#9B7651' },
+  { id: 'moon',       emoji: '🌙', bg: '#1D5B94' },
+  { id: 'sun',        emoji: '☀️', bg: '#E9A83A' },
+  { id: 'star',       emoji: '✦',  bg: '#0B2F5C' },
+  { id: 'wave',       emoji: '🌊', bg: '#3A9BDC' },
+  { id: 'mountain',   emoji: '⛰',  bg: '#6C8A9C' },
+  { id: 'leaf',       emoji: '🌿', bg: '#5A8A6B' },
+  { id: 'olive',      emoji: '🫒', bg: '#7A8B54' },
+  { id: 'tulip',      emoji: '🌷', bg: '#D97C8A' },
+  { id: 'tree',       emoji: '🌳', bg: '#4A7A56' },
+  { id: 'clover',     emoji: '☘',  bg: '#4E8A5A' },
+  { id: 'flame',      emoji: '🔥', bg: '#C9562B' },
+  { id: 'cloud',      emoji: '☁',  bg: '#8FA8C8' },
+  { id: 'rain',       emoji: '🌧', bg: '#5C7AA0' },
+  { id: 'snow',       emoji: '❄',  bg: '#7EB4D4' },
+  { id: 'book',       emoji: '📖', bg: '#8C6A4A' },
+  { id: 'coffee',     emoji: '☕', bg: '#6A4A36' },
+  { id: 'teacup',     emoji: '🍵', bg: '#8AA66A' },
+  { id: 'music',      emoji: '♪',  bg: '#7A5CA8' },
+  { id: 'palette',    emoji: '🎨', bg: '#C86A4C' },
+  { id: 'lens',       emoji: '📷', bg: '#3E3E3E' },
+  { id: 'globe',      emoji: '🌍', bg: '#2F6B8F' },
+  { id: 'anchor',     emoji: '⚓', bg: '#264A6B' },
+  { id: 'compass',    emoji: '🧭', bg: '#B8823E' },
+  { id: 'key',        emoji: '🔑', bg: '#A67C2E' },
+  { id: 'quill',      emoji: '✒',  bg: '#2A2A2A' },
+  { id: 'candle',     emoji: '🕯', bg: '#9B7A4E' },
+  { id: 'lantern',    emoji: '🏮', bg: '#B6443A' },
+  { id: 'diamond',    emoji: '◆',  bg: '#5BA4CF' },
+  { id: 'circle',     emoji: '●',  bg: '#1A1918' },
+  { id: 'crescent',   emoji: '☾',  bg: '#3A4A6B' },
 ];
 
 // ── Country list ─────────────────────────────────────────────────────────────
@@ -124,11 +130,144 @@ const TERMS = [
 ];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-const generateIconUrl = (icon) => {
+export const generateIconUrl = (icon) => {
   if (!icon) return null;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"><circle cx="64" cy="64" r="64" fill="${icon.bg}"/><text x="64" y="75" dominant-baseline="middle" text-anchor="middle" font-size="60" font-family="Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,sans-serif">${icon.emoji}</text></svg>`;
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 };
+
+// ── Shared styles (module-level so inputs aren't remounted per render) ────────
+const labelStyle = {
+  display: 'block',
+  fontSize: 13, fontWeight: 600, color: '#1A1918',
+  marginBottom: 6, fontFamily: "'DM Sans', sans-serif",
+};
+const inputStyle = {
+  width: '100%', padding: '10px 13px',
+  fontSize: 14, fontFamily: "'DM Sans', sans-serif", color: '#1A1918',
+  background: '#ffffff', border: '1px solid #D4D2CF', borderRadius: 8,
+  outline: 'none', transition: 'border-color 0.15s', boxSizing: 'border-box',
+};
+const disabledInputStyle = {
+  ...inputStyle, background: '#F0EFEC', color: '#9B9A98',
+  cursor: 'not-allowed', border: '1px solid #E0DEDB',
+};
+const selectStyle = {
+  ...inputStyle,
+  appearance: 'none', WebkitAppearance: 'none',
+  paddingRight: 36, cursor: 'pointer',
+};
+
+// ── Module-level sub-components (keeping these outside the main function is
+//    what prevents inputs from being remounted on every keystroke) ────────────
+const SelectField = ({ value, onChange, children, placeholder }) => (
+  <div style={{ position: 'relative' }}>
+    <select
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      style={selectStyle}
+      onFocus={e => e.target.style.borderColor = '#1A1918'}
+      onBlur={e => e.target.style.borderColor = '#D4D2CF'}
+    >
+      {placeholder && <option value="">{placeholder}</option>}
+      {children}
+    </select>
+    <ChevronDown size={14} style={{
+      position: 'absolute', right: 12, top: '50%',
+      transform: 'translateY(-50%)', pointerEvents: 'none', color: '#787776',
+    }} />
+  </div>
+);
+
+/* Hugging-width post-it in Vony bright blue. Tight padding around the text. */
+const PostIt = () => (
+  <div style={{
+    display: 'inline-block',
+    background: BRAND_BLUE,
+    padding: '10px 22px',
+    transform: 'rotate(-1.2deg)',
+    boxShadow: '3px 5px 10px rgba(0,0,0,0.18)',
+    position: 'relative',
+  }}>
+    {/* subtle highlight strip along the top, standard post-it look */}
+    <div style={{
+      position: 'absolute', top: 0, left: 0, right: 0, height: 3,
+      background: 'rgba(255,255,255,0.35)', pointerEvents: 'none',
+    }} />
+    <h1 style={{
+      fontFamily: "'Cormorant Garamond', Georgia, serif",
+      fontSize: 26, fontWeight: 600, color: '#FFFFFF',
+      margin: 0, letterSpacing: '-0.01em', lineHeight: 1.05,
+      whiteSpace: 'nowrap',
+    }}>Welcome to Vony</h1>
+  </div>
+);
+
+/* Dark Continue button */
+const ContinueBtn = ({ form, children = 'Continue' }) => (
+  <button
+    type="submit"
+    form={form}
+    style={{
+      width: '100%', maxWidth: CARD_WIDTH,
+      padding: '14px 0', borderRadius: 10, border: 'none',
+      fontSize: 14, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+      background: '#1A1918',
+      color: 'white', cursor: 'pointer',
+      transition: 'background 0.15s',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+      boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
+    }}
+  >
+    {children}
+  </button>
+);
+
+/* Create Account button — black to match Continue */
+const CreateAccountBtn = ({ form, loading }) => (
+  <button
+    type="submit"
+    form={form}
+    style={{
+      width: '100%', maxWidth: CARD_WIDTH,
+      padding: '14px 0', borderRadius: 10, border: 'none',
+      fontSize: 14, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+      background: '#1A1918',
+      color: 'white', cursor: 'pointer',
+      transition: 'background 0.15s',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+      boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
+    }}
+  >
+    {loading ? (
+      <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} /> Creating account...</>
+    ) : 'Create Account'}
+  </button>
+);
+
+const Card = ({ children }) => (
+  <div style={{
+    width: '100%', maxWidth: CARD_WIDTH,
+    background: '#FEFEFE', borderRadius: 4,
+    boxShadow: '5px 4px 18px rgba(0,0,0,0.14), -1px 0 0 rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.06), 0 12px 40px rgba(0,0,0,0.12)',
+  }}>
+    {children}
+  </div>
+);
+
+/* Card header — now in DM Sans to match the rest of the card type */
+const CardHeader = ({ title, subtitle }) => (
+  <div style={{ padding: '28px 28px 8px', textAlign: 'center' }}>
+    <h2 style={{
+      fontFamily: "'DM Sans', sans-serif",
+      fontSize: 20, fontWeight: 700, color: '#1A1918',
+      margin: 0, letterSpacing: '-0.02em', lineHeight: 1.2,
+    }}>{title}</h2>
+    <p style={{ fontSize: 13, color: '#787776', margin: '6px 0 0', fontFamily: "'DM Sans', sans-serif" }}>
+      {subtitle}
+    </p>
+  </div>
+);
 
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function OnboardingModal({ user, onComplete }) {
@@ -138,7 +277,7 @@ export default function OnboardingModal({ user, onComplete }) {
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [usernameError, setUsernameError] = useState(null);
 
-  // Step 3 terms state — which are checked, and whether to show validation errors
+  // Step 3 terms state
   const [termsChecked, setTermsChecked] = useState(TERMS.map(() => false));
   const [termsErrorShown, setTermsErrorShown] = useState(false);
 
@@ -205,7 +344,7 @@ export default function OnboardingModal({ user, onComplete }) {
   const handleStep2Continue = async (e) => {
     e.preventDefault();
     if (!formData.username.trim()) { alert("Please choose a username"); return; }
-    // Final username check if not yet verified
+    // Wait out any in-flight check and validate once more
     if (isCheckingUsername) return;
     if (usernameError) return;
     if (formData.username.length < 3) { setUsernameError("Username must be at least 3 characters"); return; }
@@ -217,7 +356,6 @@ export default function OnboardingModal({ user, onComplete }) {
 
   const handleStep3Submit = async (e) => {
     e.preventDefault();
-    // Validate all terms checked
     const allChecked = termsChecked.every(Boolean);
     if (!allChecked) {
       setTermsErrorShown(true);
@@ -225,21 +363,27 @@ export default function OnboardingModal({ user, onComplete }) {
     }
     setIsSubmitting(true);
     try {
-      await User.updateMyUserData({
-        full_name: formData.full_name.trim(),
-        username: formData.username.trim().toLowerCase(),
-        phone: formData.phone.trim(),
-      });
-      await supabase.auth.updateUser({
-        data: {
-          location: formData.location,
-          currency: formData.currency,
-        }
-      });
       const avatarUrl = formData.selectedIcon
         ? generateIconUrl(formData.selectedIcon)
         : (user?.user_metadata?.avatar_url ||
           `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.full_name.trim())}&background=54A6CF&color=fff&size=128`);
+
+      await User.updateMyUserData({
+        full_name: formData.full_name.trim(),
+        username: formData.username.trim().toLowerCase(),
+        phone: formData.phone.trim(),
+        profile_picture_url: avatarUrl,
+      });
+      // Persist picker + prefs onto the auth user_metadata so the top-right
+      // avatar and all other surfaces pick it up immediately.
+      await supabase.auth.updateUser({
+        data: {
+          location: formData.location,
+          currency: formData.currency,
+          profile_picture_url: avatarUrl,
+          avatar_url: avatarUrl,
+        }
+      });
       const publicProfileData = {
         user_id: user.id,
         username: formData.username.trim().toLowerCase(),
@@ -266,161 +410,17 @@ export default function OnboardingModal({ user, onComplete }) {
       next[idx] = !next[idx];
       return next;
     });
-    // Clear error highlight once user starts checking
     if (termsErrorShown) setTermsErrorShown(false);
   };
 
-  /* ── Shared styles ─────────────────────────────────────────────────────────── */
-  const labelStyle = {
-    display: 'block',
-    fontSize: 13, fontWeight: 600, color: '#1A1918',
-    marginBottom: 6, fontFamily: "'DM Sans', sans-serif",
-  };
-  const inputStyle = {
-    width: '100%', padding: '10px 13px',
-    fontSize: 14, fontFamily: "'DM Sans', sans-serif", color: '#1A1918',
-    background: '#ffffff', border: '1px solid #D4D2CF', borderRadius: 8,
-    outline: 'none', transition: 'border-color 0.15s', boxSizing: 'border-box',
-  };
-  const disabledInputStyle = {
-    ...inputStyle, background: '#F0EFEC', color: '#9B9A98',
-    cursor: 'not-allowed', border: '1px solid #E0DEDB',
-  };
-  const selectStyle = {
-    ...inputStyle,
-    appearance: 'none', WebkitAppearance: 'none',
-    paddingRight: 36, cursor: 'pointer',
-  };
-
-  /* ── Sub-components ─────────────────────────────────────────────────────────── */
-  const SelectField = ({ value, onChange, children, placeholder }) => (
-    <div style={{ position: 'relative' }}>
-      <select
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        style={selectStyle}
-        onFocus={e => e.target.style.borderColor = '#1A1918'}
-        onBlur={e => e.target.style.borderColor = '#D4D2CF'}
-      >
-        {placeholder && <option value="">{placeholder}</option>}
-        {children}
-      </select>
-      <ChevronDown size={14} style={{
-        position: 'absolute', right: 12, top: '50%',
-        transform: 'translateY(-50%)', pointerEvents: 'none', color: '#787776',
-      }} />
-    </div>
-  );
-
-  /* Post-it — same on all 3 steps */
-  const PostIt = () => (
-    <div style={{
-      position: 'relative', width: '100%', maxWidth: CARD_WIDTH,
-      filter: 'drop-shadow(3px 5px 10px rgba(0,0,0,0.18))',
-      transform: 'rotate(-1deg)',
-    }}>
-      <svg viewBox="0 0 420 96" preserveAspectRatio="none"
-        style={{ display: 'block', width: '100%', height: 96 }}>
-        <defs>
-          <linearGradient id="postitGrad2" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="#7EC1EC" />
-            <stop offset="100%" stopColor="#54A6CF" />
-          </linearGradient>
-        </defs>
-        <rect x="0" y="0" width="420" height="96" fill="url(#postitGrad2)" />
-        <rect x="0" y="0" width="420" height="4" fill="rgba(255,255,255,0.35)" />
-      </svg>
-      <div style={{
-        position: 'absolute', inset: 0,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        pointerEvents: 'none',
-      }}>
-        <h1 style={{
-          fontFamily: "'Cormorant Garamond', Georgia, serif",
-          fontSize: 28, fontWeight: 600, color: '#1A1918',
-          margin: 0, letterSpacing: '-0.01em', lineHeight: 1.15, textAlign: 'center',
-        }}>Welcome to Vony</h1>
-      </div>
-    </div>
-  );
-
-  /* Dark Continue button (steps 1 & 2) */
-  const ContinueBtn = ({ form, disabled }) => (
-    <button
-      type="submit"
-      form={form}
-      disabled={disabled}
-      style={{
-        width: '100%', maxWidth: CARD_WIDTH,
-        padding: '14px 0', borderRadius: 10, border: 'none',
-        fontSize: 14, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
-        background: disabled ? '#C8C6C2' : '#1A1918',
-        color: 'white', cursor: disabled ? 'not-allowed' : 'pointer',
-        transition: 'background 0.15s',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-        boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
-      }}
-    >
-      Continue
-    </button>
-  );
-
-  /* Blue Create Account button (step 3) */
-  const CreateAccountBtn = ({ form, disabled, loading }) => (
-    <button
-      type="submit"
-      form={form}
-      disabled={disabled}
-      style={{
-        width: '100%', maxWidth: CARD_WIDTH,
-        padding: '14px 0', borderRadius: 10, border: 'none',
-        fontSize: 14, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
-        background: disabled ? '#A8CBDF' : '#54A6CF',
-        color: 'white', cursor: disabled ? 'not-allowed' : 'pointer',
-        transition: 'background 0.15s',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-        boxShadow: '0 4px 18px rgba(84,166,207,0.35)',
-      }}
-    >
-      {loading ? (
-        <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} /> Creating account...</>
-      ) : 'Create Account'}
-    </button>
-  );
-
-  /* Shared card wrapper */
-  const Card = ({ children }) => (
-    <div style={{
-      width: '100%', maxWidth: CARD_WIDTH,
-      background: '#FEFEFE', borderRadius: 4,
-      boxShadow: '5px 4px 18px rgba(0,0,0,0.14), -1px 0 0 rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.06), 0 12px 40px rgba(0,0,0,0.12)',
-    }}>
-      {children}
-    </div>
-  );
-
-  /* Card header */
-  const CardHeader = ({ title, subtitle }) => (
-    <div style={{ padding: '28px 28px 8px', textAlign: 'center' }}>
-      <h2 style={{
-        fontFamily: "'Cormorant Garamond', Georgia, serif",
-        fontSize: 28, fontWeight: 600, color: '#1A1918',
-        margin: 0, letterSpacing: '-0.01em', lineHeight: 1.15,
-      }}>{title}</h2>
-      <p style={{ fontSize: 13, color: '#787776', margin: '6px 0 0', fontFamily: "'DM Sans', sans-serif" }}>
-        {subtitle}
-      </p>
-    </div>
-  );
-
-  /* ── Render ─────────────────────────────────────────────────────────────────── */
+  // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 9999,
       overflowY: 'auto', fontFamily: "'DM Sans', sans-serif",
     }}>
       {/* Portal-matching background */}
-      <div style={{ position: 'fixed', inset: 0, background: '#F5F4F0', zIndex: 0 }} />
+      <div style={{ position: 'fixed', inset: 0, background: PORTAL_BG, zIndex: 0 }} />
       <div style={{
         position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 1,
         backgroundImage: GRAIN_FINE, backgroundSize: '180px 180px',
@@ -478,7 +478,7 @@ export default function OnboardingModal({ user, onComplete }) {
                 </div>
               </form>
             </Card>
-            <ContinueBtn form="step1-form" disabled={false} />
+            <ContinueBtn form="step1-form" />
           </>
         )}
 
@@ -504,7 +504,7 @@ export default function OnboardingModal({ user, onComplete }) {
                       width: 72, height: 72, borderRadius: '50%', flexShrink: 0,
                       background: formData.selectedIcon ? formData.selectedIcon.bg : '#D4D2CF',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 38, lineHeight: 1,
+                      fontSize: 34, lineHeight: 1, color: '#fff',
                       border: '2px solid rgba(0,0,0,0.08)',
                       transition: 'background 0.2s',
                     }}>
@@ -529,7 +529,7 @@ export default function OnboardingModal({ user, onComplete }) {
                                 background: icon.bg,
                                 border: isSelected ? '2.5px solid #1A1918' : '2.5px solid transparent',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: 22, lineHeight: 1, cursor: 'pointer',
+                                fontSize: 20, lineHeight: 1, color: '#fff', cursor: 'pointer',
                                 transition: 'border-color 0.12s, transform 0.12s',
                                 transform: isSelected ? 'scale(1.12)' : 'scale(1)',
                                 boxSizing: 'border-box',
@@ -578,7 +578,7 @@ export default function OnboardingModal({ user, onComplete }) {
                 </div>
               </form>
             </Card>
-            <ContinueBtn form="step2-form" disabled={isCheckingUsername || !!usernameError} />
+            <ContinueBtn form="step2-form" />
           </>
         )}
 
@@ -598,9 +598,8 @@ export default function OnboardingModal({ user, onComplete }) {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingBottom: 24 }}>
                   {TERMS.map((term, idx) => {
                     const checked = termsChecked[idx];
-                    // Show red only on unchecked items after a failed submit attempt
                     const showError = termsErrorShown && !checked;
-                    const circleColor = showError ? '#E8726E' : '#54A6CF';
+                    const circleColor = showError ? '#E8726E' : BRAND_BLUE;
 
                     return (
                       <div
@@ -613,12 +612,11 @@ export default function OnboardingModal({ user, onComplete }) {
                           borderRadius: 8,
                           background: showError
                             ? 'rgba(232,114,110,0.06)'
-                            : checked ? 'rgba(84,166,207,0.06)' : 'rgba(0,0,0,0.02)',
-                          border: `1px solid ${showError ? 'rgba(232,114,110,0.3)' : checked ? 'rgba(84,166,207,0.25)' : 'rgba(0,0,0,0.07)'}`,
+                            : checked ? 'rgba(3,172,234,0.06)' : 'rgba(0,0,0,0.02)',
+                          border: `1px solid ${showError ? 'rgba(232,114,110,0.3)' : checked ? 'rgba(3,172,234,0.25)' : 'rgba(0,0,0,0.07)'}`,
                           transition: 'background 0.15s, border-color 0.15s',
                         }}
                       >
-                        {/* Circle checkbox */}
                         <div style={{
                           flexShrink: 0,
                           width: 18, height: 18,
@@ -637,7 +635,6 @@ export default function OnboardingModal({ user, onComplete }) {
                           )}
                         </div>
 
-                        {/* Term text */}
                         <span style={{
                           fontSize: 13, lineHeight: 1.55,
                           fontFamily: "'DM Sans', sans-serif",
@@ -651,7 +648,6 @@ export default function OnboardingModal({ user, onComplete }) {
                   })}
                 </div>
 
-                {/* Terms of Service link — bottom of card, centered */}
                 <div style={{
                   borderTop: '1px solid rgba(0,0,0,0.07)',
                   padding: '14px 0',
@@ -679,11 +675,7 @@ export default function OnboardingModal({ user, onComplete }) {
               </form>
             </Card>
 
-            <CreateAccountBtn
-              form="step3-form"
-              disabled={isSubmitting}
-              loading={isSubmitting}
-            />
+            <CreateAccountBtn form="step3-form" loading={isSubmitting} />
           </>
         )}
 
