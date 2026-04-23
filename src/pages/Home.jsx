@@ -2150,9 +2150,24 @@ export default function Home() {
                 let si = 0;
                 while (reminders.length < 3) { reminders.push(suggestions[si++ % suggestions.length]); }
                 const noteConfigs = [
-                  { bg: 'linear-gradient(170deg, #BFDFFF 0%, #93C5FF 100%)', rotate: '-3.5deg', ty: '7px', zIndex: 1, textColor: '#0A3550' },
-                  { bg: 'linear-gradient(170deg, #D8EDFF 0%, #B3D8FF 100%)', rotate: '1.8deg',  ty: '0px',  zIndex: 2, textColor: '#0A3550' },
-                  { bg: 'linear-gradient(170deg, #A8D4FF 0%, #7BB8FF 100%)', rotate: '-1deg',   ty: '5px',  zIndex: 3, textColor: '#0A3550' },
+                  {
+                    bg: 'linear-gradient(168deg, #CDE6FF 0%, #A6CDF5 55%, #8FBEEC 100%)',
+                    topBand: 'linear-gradient(180deg, rgba(30,75,120,0.22) 0%, rgba(30,75,120,0.10) 45%, rgba(30,75,120,0) 100%)',
+                    curlBg: 'linear-gradient(135deg, #7AAEDB 0%, #5B95C6 100%)',
+                    rotate: '-3.5deg', ty: '7px', zIndex: 1, textColor: '#0A3550',
+                  },
+                  {
+                    bg: 'linear-gradient(168deg, #E4F1FF 0%, #C3DCF5 55%, #AECCEC 100%)',
+                    topBand: 'linear-gradient(180deg, rgba(25,70,115,0.20) 0%, rgba(25,70,115,0.08) 45%, rgba(25,70,115,0) 100%)',
+                    curlBg: 'linear-gradient(135deg, #9EC1E0 0%, #7FA6CC 100%)',
+                    rotate: '1.8deg',  ty: '0px',  zIndex: 2, textColor: '#0A3550',
+                  },
+                  {
+                    bg: 'linear-gradient(168deg, #BADBFB 0%, #8EB9E8 55%, #6FA3D6 100%)',
+                    topBand: 'linear-gradient(180deg, rgba(15,55,100,0.26) 0%, rgba(15,55,100,0.12) 45%, rgba(15,55,100,0) 100%)',
+                    curlBg: 'linear-gradient(135deg, #5F94C6 0%, #4477AE 100%)',
+                    rotate: '-1deg',   ty: '5px',  zIndex: 3, textColor: '#0A3550',
+                  },
                 ];
                 return (
                   <div className="home-card-attention" style={{ display: 'flex', paddingBottom: 10, overflow: 'visible' }}>
@@ -2177,9 +2192,10 @@ export default function Home() {
                               : `rotate(${nc.rotate}) translateY(${nc.ty})`,
                             zIndex: hoveredPostit === i ? 10 : nc.zIndex,
                             position: 'relative',
+                            overflow: 'hidden',
                             boxShadow: hoveredPostit === i
-                              ? '4px 12px 28px rgba(0,0,0,0.22), 0 2px 6px rgba(0,0,0,0.14)'
-                              : '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)',
+                              ? '0 1px 1px rgba(0,0,0,0.14), 3px 6px 10px rgba(0,0,0,0.16), 6px 14px 22px rgba(0,0,0,0.16), 10px 26px 40px rgba(0,0,0,0.12), inset 0 -1px 2px rgba(0,0,0,0.05), inset 0 1px 1px rgba(255,255,255,0.35)'
+                              : '0 1px 1px rgba(0,0,0,0.12), 2px 4px 7px rgba(0,0,0,0.14), 4px 10px 18px rgba(0,0,0,0.14), 8px 20px 32px rgba(0,0,0,0.09), inset 0 -1px 2px rgba(0,0,0,0.04), inset 0 1px 1px rgba(255,255,255,0.35)',
                             cursor: rem.action ? 'pointer' : 'default',
                             display: 'flex',
                             flexDirection: 'column',
@@ -2187,9 +2203,16 @@ export default function Home() {
                             transition: 'transform 0.18s ease, box-shadow 0.18s ease',
                           }}
                         >
-                          {/* Top sticky strip */}
-                          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'rgba(0,0,0,0.08)', borderRadius: '2px 2px 0 0' }} />
+                          {/* Adhesive top band — darker gradient fading down */}
+                          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 32, background: nc.topBand, pointerEvents: 'none' }} />
+                          {/* Diagonal lighting sheen */}
+                          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.08) 35%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.06) 100%)', pointerEvents: 'none' }} />
+                          {/* Subtle inner vignette at bottom edge for weight */}
+                          <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 14, background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.09) 100%)', pointerEvents: 'none' }} />
+                          {/* Corner curl / fold at bottom-right */}
+                          <div style={{ position: 'absolute', bottom: 0, right: 0, width: 14, height: 14, background: nc.curlBg, clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', boxShadow: '-1px -1px 2px rgba(0,0,0,0.18)', pointerEvents: 'none' }} />
                           <p style={{
+                            position: 'relative',
                             margin: 0,
                             marginTop: 8,
                             fontSize: 11,
