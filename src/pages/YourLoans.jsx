@@ -519,42 +519,6 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
           const paymentFrequency = selectedLoan.payment_frequency || 'monthly';
           return (
             <>
-              {/* Notebook page — paper pulled from a spiral-bound notebook, to the left of upcoming */}
-              <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 20 }}>
-                <div style={{ width: 230, flexShrink: 0 }}>
-                  {/* Spiral binding holes */}
-                  <div style={{ display: 'flex', gap: 5, paddingLeft: 8, paddingRight: 8, marginBottom: -1 }}>
-                    {[0,1,2,3,4,5,6,7,8].map(ri => (
-                      <div key={ri} style={{ width: 9, height: 13, borderRadius: '4px 4px 0 0', border: '1.5px solid rgba(0,0,0,0.24)', borderBottom: 'none', background: '#CCCAC3', flexShrink: 0 }} />
-                    ))}
-                  </div>
-                  {/* Paper body with notebook lines */}
-                  <div style={{
-                    background: '#FEFCF4',
-                    borderRadius: '0 4px 4px 4px',
-                    border: '1px solid rgba(0,0,0,0.10)',
-                    borderTop: '3px solid rgba(0,0,0,0.22)',
-                    boxShadow: '4px 8px 24px rgba(0,0,0,0.15), 1px 2px 6px rgba(0,0,0,0.08), -1px 0 0 rgba(0,0,0,0.04)',
-                    padding: '14px 16px 36px',
-                    backgroundImage: 'repeating-linear-gradient(to bottom, transparent, transparent 20px, rgba(3,172,234,0.09) 20px, rgba(3,172,234,0.09) 21px)',
-                    minHeight: 170,
-                    transform: 'rotate(-1deg)',
-                    transformOrigin: 'top center',
-                  }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4 }}>{otherPartyUsername}</div>
-                    <div style={{ fontSize: 12, color: '#787776', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4, marginTop: 3 }}>
-                      {isLending ? 'borrowed ' : 'lent you '}
-                      <span style={{ color: ringColor, fontWeight: 700 }}>{formatMoney(selectedLoan.amount || 0)}</span>
-                    </div>
-                    {selectedLoan.purpose && (
-                      <div style={{ fontSize: 11, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4, marginTop: 12 }}>
-                        for {selectedLoan.purpose}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
               <style>{`
                 @media (max-width: 768px) {
                   .loan-detail-grid { display: flex !important; flex-direction: column !important; gap: 12px !important; }
@@ -963,12 +927,12 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                 background: 'linear-gradient(170deg, #FFF9DE 0%, #FFF3B0 100%)',
                 borderRadius: 3,
                 boxShadow: '0 4px 10px rgba(0,0,0,0.13), 0 1px 3px rgba(0,0,0,0.08)',
-                padding: '22px 12px 12px',
+                padding: '18px 12px 12px',
                 fontFamily: "'DM Sans', sans-serif",
                 display: 'flex', flexDirection: 'column',
               }}>
                 {/* Top strip */}
-                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 14, background: 'linear-gradient(to bottom, rgba(100,70,0,0.26) 0%, rgba(80,55,0,0.12) 100%)', borderRadius: '2px 2px 0 0', boxShadow: 'inset 0 -1px 0 rgba(0,0,0,0.08)' }} />
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'rgba(0,0,0,0.08)', borderRadius: '2px 2px 0 0' }} />
                 {/* Corner curl */}
                 <div style={{ position: 'absolute', bottom: 0, right: 0, width: 16, height: 16, background: '#D4C060', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 2 }} />
                 <div style={{ fontSize: 10, fontWeight: 700, color: '#5C4200', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 8 }}>
@@ -1299,14 +1263,14 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                 <div style={{ display: 'flex', justifyContent: 'center', margin: '8px 0 20px', padding: '0 16px' }}>
                   <div style={{
                     position: 'relative',
-                    background: 'linear-gradient(170deg, #D8EDFF 0%, #B3D8FF 100%)',
+                    background: 'linear-gradient(170deg, #FFE566 0%, #FFD638 100%)',
                     borderRadius: 3,
-                    padding: '18px 18px 12px',
+                    padding: '14px 18px 12px',
                     boxShadow: '2px 5px 16px rgba(0,0,0,0.14), 0 1px 3px rgba(0,0,0,0.08)',
                     maxWidth: '100%',
                   }}>
-                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 14, background: 'linear-gradient(to bottom, rgba(0,40,90,0.28) 0%, rgba(0,30,70,0.14) 100%)', borderRadius: '2px 2px 0 0', boxShadow: 'inset 0 -1px 0 rgba(0,0,0,0.08)' }} />
-                    <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: '#0A3550', fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'rgba(0,0,0,0.08)', borderRadius: '2px 2px 0 0' }} />
+                    <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: '#5C4200', fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {desc}
                     </p>
                   </div>
