@@ -1834,7 +1834,7 @@ export default function Home() {
                 return (
                   <div className="home-card-bor-overview" style={{ display: 'flex', gap: 12 }}>
                     {/* Box 1 — You Owe */}
-                    <div style={{ position: 'relative', flex: 1, minWidth: 0 }}><div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 4, border: 'none', boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)', padding: '14px 14px' }}>
+                    <div style={{ position: 'relative', flex: 1, minWidth: 0 }}><div style={{ position: 'relative', zIndex: 1, background: '#FEFDF5', borderRadius: 4, border: 'none', boxShadow: '0 1px 0 2px #edeade, 0 3px 0 3px #f5f3ea, 2px 6px 18px rgba(0,0,0,0.13)', padding: '14px 14px' }}>
                         <div style={{ marginBottom: 10 }}>
                           <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
                             <circle cx="14" cy="14" r="13" stroke="#1D5B94" strokeWidth="1.5"/>
@@ -1850,7 +1850,7 @@ export default function Home() {
                       </div>
                     </div>
                     {/* Box 2 — You Are Owed */}
-                    <div style={{ position: 'relative', flex: 1, minWidth: 0 }}><div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 4, border: 'none', boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)', padding: '14px 14px' }}>
+                    <div style={{ position: 'relative', flex: 1, minWidth: 0 }}><div style={{ position: 'relative', zIndex: 1, background: '#FEFDF5', borderRadius: 4, border: 'none', boxShadow: '0 1px 0 2px #edeade, 0 3px 0 3px #f5f3ea, 2px 6px 18px rgba(0,0,0,0.13)', padding: '14px 14px' }}>
                         <div style={{ marginBottom: 10 }}>
                           <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
                             <circle cx="14" cy="14" r="13" stroke="#03ACEA" strokeWidth="1.5"/>
