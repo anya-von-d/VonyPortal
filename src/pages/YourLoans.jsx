@@ -926,14 +926,14 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
 
               {/* Box 1 — You're Owed / You Owe — post-it note */}
               <div style={{
-                flex: 1, minWidth: 0, position: 'relative',
+                flex: 1, minWidth: 0, minHeight: 120, position: 'relative',
                 background: 'linear-gradient(170deg, #FFE566 0%, #FFD638 100%)',
-                borderRadius: '2px 2px 3px 3px',
+                borderRadius: '3px 3px 4px 4px',
                 boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)',
-                padding: '14px 10px 10px',
+                padding: '14px 10px 12px',
                 fontFamily: "'DM Sans', sans-serif",
                 transform: 'rotate(-1.5deg)',
-                display: 'flex', flexDirection: 'column',
+                display: 'flex', flexDirection: 'column', gap: 6,
               }}>
                 {/* Top strip */}
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'rgba(0,0,0,0.08)', borderRadius: '2px 2px 0 0' }} />

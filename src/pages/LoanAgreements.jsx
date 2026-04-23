@@ -1197,7 +1197,9 @@ export default function LoanAgreements() {
           </div>
 
           {/* ── Agreements List ──────────────────────────────────── */}
-          <div style={{ background: '#ffffff', borderRadius: 10, border: 'none' }}>
+          <div style={{ position: 'relative', marginBottom: 24 }}>
+          <div className="home-aura-glow" style={{ position: 'absolute', inset: -3, background: '#CFDCE7', borderRadius: 12, filter: 'blur(4px)', opacity: 0.5, zIndex: 0, pointerEvents: 'none' }} />
+          <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 10, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.13)', padding: '14px 18px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, padding: '10px 16px' }}>
               <span style={{ fontSize: 11, fontWeight: 500, color: '#787776', marginRight: 4 }}>Page {laSafePage + 1} of {laTotalPages}</span>
               <button onClick={() => setLaPage(Math.max(0, laSafePage - 1))} disabled={laSafePage === 0} style={{ width: 22, height: 22, borderRadius: 6, border: '1px solid rgba(0,0,0,0.09)', background: 'white', cursor: laSafePage === 0 ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: laSafePage === 0 ? 0.3 : 1, flexShrink: 0 }}>
@@ -1382,6 +1384,7 @@ export default function LoanAgreements() {
                 </>
               )}
             </div>
+          </div>
           </div>
 
           {/* Desktop table responsive styles */}
