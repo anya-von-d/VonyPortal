@@ -2239,7 +2239,7 @@ export default function Home() {
               {/* Your Loans — two paper cards with sort dropdown */}
               {(() => {
                 const sortLoans = (loansArr, filter) => [...loansArr].sort((a, b) => {
-                  if (filter === 'status') { const aOv = a.next_payment_date && new Date(a.next_payment_date) < new Date(); const bOv = b.next_payment_date && new Date(b.next_payment_date) < new Date(); if (aOv && !bOv) return -1; if (!aOv && bOv) return 1; return 0; }
+                  if (filter === 'status') { const now = new Date(); const aOv = a.next_payment_date && new Date(a.next_payment_date) < now; const bOv = b.next_payment_date && new Date(b.next_payment_date) < now; if (aOv && !bOv) return -1; if (!aOv && bOv) return 1; const dA = a.next_payment_date ? new Date(a.next_payment_date) : new Date('2099-01-01'); const dB = b.next_payment_date ? new Date(b.next_payment_date) : new Date('2099-01-01'); return dA - dB; }
                   if (filter === 'highest_interest') return (b.interest_rate || 0) - (a.interest_rate || 0);
                   if (filter === 'lowest_interest') return (a.interest_rate || 0) - (b.interest_rate || 0);
                   if (filter === 'highest_payment') return (b.payment_amount || 0) - (a.payment_amount || 0);

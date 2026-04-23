@@ -1103,9 +1103,14 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
               const accentColBg = isLending ? 'rgba(3,172,234,0.10)' : 'rgba(29,91,148,0.10)';
               const sortedLoans = [...activeLoans].sort((a, b) => {
                 if (rankingFilter === 'status') {
-                  const aOv = a.next_payment_date && new Date(a.next_payment_date) < new Date();
-                  const bOv = b.next_payment_date && new Date(b.next_payment_date) < new Date();
-                  if (aOv && !bOv) return -1; if (!aOv && bOv) return 1; return 0;
+                  const now = new Date();
+                  const aOv = a.next_payment_date && new Date(a.next_payment_date) < now;
+                  const bOv = b.next_payment_date && new Date(b.next_payment_date) < now;
+                  if (aOv && !bOv) return -1;
+                  if (!aOv && bOv) return 1;
+                  const dA = a.next_payment_date ? new Date(a.next_payment_date) : new Date('2099-01-01');
+                  const dB = b.next_payment_date ? new Date(b.next_payment_date) : new Date('2099-01-01');
+                  return dA - dB;
                 }
                 if (rankingFilter === 'highest_interest') return (b.interest_rate || 0) - (a.interest_rate || 0);
                 if (rankingFilter === 'lowest_interest') return (a.interest_rate || 0) - (b.interest_rate || 0);
