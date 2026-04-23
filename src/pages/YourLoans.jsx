@@ -555,8 +555,18 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                 </div>
               </div>
 
+              <style>{`
+                @media (max-width: 768px) {
+                  .loan-detail-grid { display: flex !important; flex-direction: column !important; gap: 12px !important; }
+                  .loan-repayment-col { order: -1 !important; }
+                  .loan-terms-inner { grid-template-columns: repeat(2, 1fr) !important; }
+                  .loan-doc-btns { flex-wrap: wrap !important; }
+                  .loan-doc-summary-wrap { width: 100% !important; display: flex !important; justify-content: center !important; }
+                }
+              `}</style>
+
               {/* [2fr: Loan Terms + Docs] [1fr: You're Owed + Repayment Progress] */}
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 14, marginBottom: 20, alignItems: 'stretch' }}>
+              <div className="loan-detail-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 14, marginBottom: 20, alignItems: 'stretch' }}>
 
                 {/* Left (2fr): Loan Terms full-width, then doc buttons below */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -564,7 +574,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                   {/* Loan Terms */}
                   <div style={{ ...cardBase }}>
                     <div style={{ fontSize: 11, fontWeight: 600, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif", marginBottom: 10 }}>Loan Terms</div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                    <div className="loan-terms-inner" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
                       {[
                         { label: 'Loan Amount', value: formatMoney(selectedLoan.amount || 0) },
                         { label: 'Interest Rate', value: `${interestRate}%` },
@@ -580,7 +590,7 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                   </div>
 
                   {/* Blue doc buttons — horizontal row, centered, fit to text */}
-                  <div style={{ display: 'flex', flexDirection: 'row', gap: 6, justifyContent: 'center' }}>
+                  <div className="loan-doc-btns" style={{ display: 'flex', flexDirection: 'row', gap: 6, justifyContent: 'center' }}>
                     <div style={{ position: 'relative' }}>
                       <div style={{ background: '#03ACEA', borderRadius: 10, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 10px' }}>
                         <button onClick={() => { const ag = loanAgreements.find(a => a.loan_id === selectedLoan.id); if (ag) openDocPopup('promissory', ag); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
@@ -611,16 +621,18 @@ export default function YourLoans({ defaultTab, embeddedMode }) {
                         </div>
                       )}
                     </div>
-                    <div style={{ background: '#03ACEA', borderRadius: 10, display: 'inline-flex', alignItems: 'center', padding: '7px 10px' }}>
-                      <button onClick={() => { const ag = loanAgreements.find(a => a.loan_id === selectedLoan.id); if (ag) openDocPopup('summary', ag); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-                        <p style={{ fontSize: 12, fontWeight: 600, color: 'white', margin: 0, whiteSpace: 'nowrap' }}>Loan Summary</p>
-                      </button>
+                    <div className="loan-doc-summary-wrap">
+                      <div style={{ background: '#03ACEA', borderRadius: 10, display: 'inline-flex', alignItems: 'center', padding: '7px 10px' }}>
+                        <button onClick={() => { const ag = loanAgreements.find(a => a.loan_id === selectedLoan.id); if (ag) openDocPopup('summary', ag); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                          <p style={{ fontSize: 12, fontWeight: 600, color: 'white', margin: 0, whiteSpace: 'nowrap' }}>Loan Summary</p>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Right (1fr): Repayment Progress and You're Owed side-by-side */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, alignItems: 'stretch' }}>
+                <div className="loan-repayment-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, alignItems: 'stretch' }}>
 
                   {/* Repayment Progress — no title, bigger chart */}
                   <div style={{ ...cardBase, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
