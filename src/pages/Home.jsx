@@ -1896,7 +1896,7 @@ export default function Home() {
                 const nextLabel = firstDaysAway === 0 ? 'Today' : firstDaysAway === 1 ? 'Tomorrow' : `In ${firstDaysAway} days`;
 
                 return (
-                  <div className="home-card-upcoming-payments" style={{ position: 'relative' }}>                    <div style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 4, border: 'none', boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)', padding: '14px 18px' }}>
+                  <div className="home-card-upcoming-payments" style={{ background: '#FFFEFD', borderRadius: 4, border: 'none', boxShadow: '0 1px 0 2px #f0efea, 0 3px 0 3px #f5f4f0, 2px 6px 18px rgba(0,0,0,0.13)', padding: '14px 18px' }}>
                       {/* Header row */}
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
                         <div style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', letterSpacing: '-0.01em', fontFamily: "'DM Sans', sans-serif" }}>Upcoming Payments</div>
@@ -1939,7 +1939,6 @@ export default function Home() {
                           );
                         })}
                       </div>
-                    </div>
                   </div>
 
                 );
@@ -2017,7 +2016,9 @@ export default function Home() {
                 const soFarTotal = allLines.filter(l => l.status === 'done').reduce((s, l) => s + l.amount, 0);
                 const fmtSigned = (amt) => amt === 0 ? '$0.00' : amt > 0 ? `+${formatMoney(amt)}` : `-${formatMoney(Math.abs(amt))}`;
                 return (
-                  <div className="home-card-plan-month" style={{ background: '#ffffff', borderRadius: 4, boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)', padding: '14px 18px' }}>
+                  <div style={{ position: 'relative' }}>
+                    <div style={{ position: 'absolute', bottom: -7, left: 6, right: -6, height: 18, background: '#F5F3EC', borderRadius: 4, zIndex: 0, boxShadow: '0 2px 6px rgba(0,0,0,0.08)' }} />
+                    <div className="home-card-plan-month" style={{ position: 'relative', zIndex: 1, background: '#ffffff', borderRadius: 4, boxShadow: '2px 5px 16px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)', padding: '14px 18px' }}>
                     {/* Header row with title + Edit button */}
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 2 }}>
                       <SectionHeader title="Plan Your Month" />
@@ -2039,7 +2040,7 @@ export default function Home() {
                           const isCustom = customExpenses.some(e => e.id === line.id);
                           const dotColor = isDone ? '#03ACEA' : isOverdue ? '#E8726E' : isPos ? '#03ACEA' : '#1D5B94';
                           return (
-                            <div key={line.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+                            <div key={line.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0' }}>
                               {/* Tick circle — clickable for custom items */}
                               <div
                                 onClick={isCustom ? () => toggleCustomExpenseDone(line.id) : undefined}
@@ -2059,7 +2060,7 @@ export default function Home() {
                                 )}
                               </div>
                               {/* Amount — centered between two lines */}
-                              <span style={{ fontSize: 12, fontWeight: 600, color: isPos ? '#03ACEA' : '#E8726E', fontFamily: "'DM Sans', sans-serif", flexShrink: 0, alignSelf: 'center' }}>{fmtSigned(line.amount)}</span>
+                              <span style={{ fontSize: 12, fontWeight: 500, color: isPos ? '#03ACEA' : '#1D5B94', fontFamily: "'DM Sans', sans-serif", flexShrink: 0, alignSelf: 'center' }}>{fmtSigned(line.amount)}</span>
                               {/* Delete button — edit mode, custom only */}
                               {editingPlan && isCustom && (
                                 <button type="button" onClick={() => deleteCustomExpense(line.id)}
@@ -2073,15 +2074,16 @@ export default function Home() {
                       </div>
                     )}
 
-                    {/* Footer: So far + Net — styled like the image */}
-                    <div style={{ marginTop: 10, borderTop: '1.5px solid rgba(0,0,0,0.08)' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
-                        <span style={{ fontSize: 11, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", fontStyle: 'italic' }}>So far this month</span>
-                        <span style={{ fontSize: 11, fontWeight: 600, color: soFarTotal >= 0 ? '#03ACEA' : '#E8726E', fontFamily: "'DM Sans', sans-serif" }}>{fmtSigned(soFarTotal)}</span>
+                    {/* Footer: So far + Net */}
+                    <div style={{ marginTop: 10 }}>
+                      <div style={{ borderTop: '1.5px dashed rgba(0,0,0,0.13)', marginBottom: 4 }} />
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 0' }}>
+                        <span style={{ fontSize: 11, fontWeight: 500, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif" }}>So far this month</span>
+                        <span style={{ fontSize: 11, fontWeight: 500, color: soFarTotal >= 0 ? '#03ACEA' : '#1D5B94', fontFamily: "'DM Sans', sans-serif" }}>{fmtSigned(soFarTotal)}</span>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 0 2px' }}>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", fontStyle: 'italic' }}>Net {monthName}</span>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: total >= 0 ? '#03ACEA' : '#E8726E', fontFamily: "'DM Sans', sans-serif" }}>{fmtSigned(total)}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 0 2px' }}>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: '#1A1918', fontFamily: "'DM Sans', sans-serif" }}>Net {monthName}</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: total >= 0 ? '#03ACEA' : '#1D5B94', fontFamily: "'DM Sans', sans-serif" }}>{fmtSigned(total)}</span>
                       </div>
                     </div>
 
@@ -2109,6 +2111,7 @@ export default function Home() {
                       <button type="button" onClick={() => { setAddingExpense(v => !v); setNewExpenseLabel(''); setNewExpenseAmount(''); setNewExpenseDate(''); setNewExpenseDir('out'); }} style={{ width: 26, height: 26, borderRadius: '50%', background: addingExpense ? '#EBF4FA' : '#F4F3F1', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} aria-label="Add expense">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={addingExpense ? '#03ACEA' : '#787776'} strokeWidth="2.8" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                       </button>
+                    </div>
                     </div>
                   </div>
                 );
@@ -2421,27 +2424,17 @@ export default function Home() {
               {(monthlyExpectedReceive > 0 || monthlyExpectedPay > 0) && (
                 <div className="home-card-monthly-summary" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {monthlyExpectedReceive > 0 && (
-                    <div style={{ position: 'relative', background: '#FEFEF9', borderRadius: '2px 2px 2px 2px', border: 'none',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.07), 2px 4px 10px rgba(0,0,0,0.09), 8px 12px 22px rgba(0,0,0,0.10)',
-                      padding: '12px 14px 14px 14px', overflow: 'hidden' }}>
+                    <div style={{ position: 'relative', background: '#FEFEF5', borderRadius: '3px 12px 3px 3px', border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 1px 4px rgba(0,0,0,0.08), 3px 5px 14px rgba(0,0,0,0.09)', padding: '9px 14px 9px 12px', overflow: 'visible' }}>
+                      <div style={{ position: 'absolute', top: -1, right: -1, width: 28, height: 10, background: '#F2F0E8', borderRadius: '0 3px 0 0', border: '1px solid rgba(0,0,0,0.08)', borderBottom: 'none' }} />
                       <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.3 }}>You've received <span style={{ color: '#03ACEA' }}>{formatMoney(monthlyReceived)}</span></div>
                       <div style={{ fontSize: 11, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", marginTop: 2 }}>of {formatMoney(monthlyExpectedReceive)} expected in {format(today, 'MMMM')}</div>
-                      {/* Corner curl — bottom right */}
-                      <div style={{ position: 'absolute', bottom: 0, right: 0, width: 20, height: 20,
-                        background: 'linear-gradient(225deg, #EEEEE6 50%, transparent 50%)',
-                        boxShadow: '-2px -2px 4px rgba(0,0,0,0.08)' }} />
                     </div>
                   )}
                   {monthlyExpectedPay > 0 && (
-                    <div style={{ position: 'relative', background: '#FEFEF9', borderRadius: '2px 2px 2px 2px', border: 'none',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.07), 2px 4px 10px rgba(0,0,0,0.09), 8px 12px 22px rgba(0,0,0,0.10)',
-                      padding: '12px 14px 14px 14px', overflow: 'hidden' }}>
+                    <div style={{ position: 'relative', background: '#FEFEF5', borderRadius: '3px 12px 3px 3px', border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 1px 4px rgba(0,0,0,0.08), 3px 5px 14px rgba(0,0,0,0.09)', padding: '9px 14px 9px 12px', overflow: 'visible' }}>
+                      <div style={{ position: 'absolute', top: -1, right: -1, width: 28, height: 10, background: '#F2F0E8', borderRadius: '0 3px 0 0', border: '1px solid rgba(0,0,0,0.08)', borderBottom: 'none' }} />
                       <div style={{ fontSize: 12, fontWeight: 600, color: '#1A1918', fontFamily: "'DM Sans', sans-serif", lineHeight: 1.3 }}>You've paid <span style={{ color: '#1D5B94' }}>{formatMoney(monthlyPaidOut)}</span></div>
                       <div style={{ fontSize: 11, color: '#9B9A98', fontFamily: "'DM Sans', sans-serif", marginTop: 2 }}>of {formatMoney(monthlyExpectedPay)} due in {format(today, 'MMMM')}</div>
-                      {/* Corner curl — bottom right */}
-                      <div style={{ position: 'absolute', bottom: 0, right: 0, width: 20, height: 20,
-                        background: 'linear-gradient(225deg, #EEEEE6 50%, transparent 50%)',
-                        boxShadow: '-2px -2px 4px rgba(0,0,0,0.08)' }} />
                     </div>
                   )}
                 </div>
